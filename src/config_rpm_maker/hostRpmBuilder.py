@@ -74,9 +74,14 @@ class HostRpmBuilder(object):
         self._save_segment_variables()
         self._save_network_variables()
 
-        self._generate_patch_info()
+        patch_info = self._generate_patch_info()
 
         self._copy_files_for_config_viewer()
+        self._save_overlaying_to_configviewer(overall_exported)
+
+        # write patch info into variable and config viewer
+        self._write_file(os.path.join(self.variables_dir, 'VARIABLES'), patch_info)
+        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.variables'), patch_info)
 
         self._filter_tokens_in_rpm_sources()
 
@@ -137,10 +142,12 @@ class HostRpmBuilder(object):
         shutil.copytree(self.host_config_dir, self.config_viewer_host_dir, symlinks=True)
         shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
 
+        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
+
     def _generate_patch_info(self):
         variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
         variables = [var_name.rjust(40) + ' : ' + self._get_content(os.path.join(self.variables_dir, var_name)) for var_name in variables]
-        self._write_file(os.path.join(self.variables_dir, 'VARIABLES'), "\n".join(variables))
+        return "\n".join(variables) + "\n"
 
     def _save_network_variables(self):
         ip, fqdn, aliases = HostResolver().resolve(self.hostname)
@@ -193,7 +200,14 @@ class HostRpmBuilder(object):
         content = "\n".join([overlaying[path].rjust(25) + ' : ' + path for path in sorted(overlaying.keys())])
         self._write_file(os.path.join(self.variables_dir, 'OVERLAYING'), content)
 
+    def _save_overlaying_to_configviewer(self, exported_dict):
+        overlaying = {}
+        for segment in OVERLAY_ORDER:
+            for path_tuple in exported_dict[segment]:
+                overlaying[path_tuple[1]] = path_tuple[0]
 
+        content = "\n".join([overlaying[path] + ':' + path for path in sorted(overlaying.keys())])
+        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.overlaying'), content + "\n")
 
     def _render_log(self, log):
         return """
