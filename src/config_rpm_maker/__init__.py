@@ -1,0 +1,65 @@
+import os
+import tempfile
+from config_rpm_maker import config
+from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
+from config_rpm_maker.segment import OVERLAY_ORDER
+
+class ConfigRpmMaker(object):
+
+    def __init__(self, revision, svn_service):
+        self.revision = revision
+        self.svn_service = svn_service
+
+    def build(self):
+        print "Starting with revision %s" % self.revision
+        change_set = self.svn_service.get_change_set(self.revision)
+        available_hosts = self.svn_service.get_hosts(self.revision)
+
+        affected_hosts = self._get_affected_hosts(change_set, available_hosts)
+        if not affected_hosts:
+            print "We have nothing to do. No host affected from change: "
+            print change_set
+            return
+
+        for host in affected_hosts:
+            self._build_host(host)
+
+        self._upload_rpms()
+
+    def _build_host(self, host):
+        temp_dir = config.get('temp_dir')
+        if temp_dir and not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+
+        work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + host, dir=temp_dir)
+        HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service=self.svn_service).build()
+
+
+
+
+
+    def _upload_rpms(self):
+        pass
+
+
+    def _get_affected_hosts(self, change_set, available_host):
+        result = set()
+        for segment in OVERLAY_ORDER:
+            for change_path in change_set:
+                result |= set(self._find_matching_hosts(segment, change_path, available_host))
+
+        return result
+
+    def _find_matching_hosts(self, segment, svn_path, available_hosts):
+        result = []
+        for host in available_hosts:
+            for path in segment.get_svn_paths(host):
+                if svn_path.startswith(path):
+                    result.append(host)
+                    break
+
+        return result
+
+
+
+
