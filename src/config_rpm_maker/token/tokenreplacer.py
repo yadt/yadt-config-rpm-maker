@@ -88,7 +88,7 @@ class TokenReplacer (object):
                           replacer_function.__name__)
         self.replacer_function = replacer_function
 
-        self._replace_tokens_in_token_values()
+        self.token_values = self._replace_tokens_in_token_values(self.token_values)
         
 
     def filter (self, content):
@@ -117,9 +117,9 @@ class TokenReplacer (object):
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
 
-    def _replace_tokens_in_token_values(self):
-        valid_tokens = dict((key, value) for (key, value) in self.token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
-        invalid_tokens = dict((key, value) for (key, value) in self.token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
+    def _replace_tokens_in_token_values(self, token_values):
+        valid_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
+        invalid_tokens = dict((key, value) for (key, value) in token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
 
         while invalid_tokens:
             still_invalid_tokens = {}
@@ -143,4 +143,4 @@ class TokenReplacer (object):
 
             invalid_tokens = still_invalid_tokens
 
-        self.token_values = valid_tokens
+        return valid_tokens
