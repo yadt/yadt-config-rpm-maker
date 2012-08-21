@@ -1,9 +1,13 @@
 import os
 import subprocess
 import tempfile
+import logging
 from config_rpm_maker import config
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
+
+logging.basicConfig(format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s")
+logging.getLogger().setLevel(logging.DEBUG)
 
 class ConfigRpmMaker(object):
 
@@ -12,14 +16,13 @@ class ConfigRpmMaker(object):
         self.svn_service = svn_service
 
     def build(self):
-        print "Starting with revision %s" % self.revision
+        logging.info("Starting with revision %s", self.revision)
         change_set = self.svn_service.get_change_set(self.revision)
         available_hosts = self.svn_service.get_hosts(self.revision)
 
         affected_hosts = self._get_affected_hosts(change_set, available_hosts)
         if not affected_hosts:
-            print "We have nothing to do. No host affected from change: "
-            print change_set
+            logging.info("We have nothing to do. No host affected from change set: %s", str(change_set))
             return
 
         rpms = []

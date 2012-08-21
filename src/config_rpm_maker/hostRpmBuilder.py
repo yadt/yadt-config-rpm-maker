@@ -121,7 +121,6 @@ class HostRpmBuilder(object):
         return output_file
 
     def _filter_tokens_in_rpm_sources(self):
-        cli.init_logging()
         TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir)
 
 
