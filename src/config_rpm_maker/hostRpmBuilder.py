@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import subprocess
@@ -28,7 +29,7 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
-        print "Building config rpm for host %s" % (self.hostname)
+        logging.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
             raise Exception("ERROR: '%s' exists already whereas I should be creating it now." % self.host_config_dir)
@@ -46,6 +47,10 @@ class HostRpmBuilder(object):
             overall_requires += requires
             overall_provides += provides
 
+        logging.debug("Overall_exported: %s", str(overall_exported))
+        logging.debug("Overall_requires: %s", str(overall_requires))
+        logging.debug("Overall_provides: %s", str(overall_provides))
+        logging.debug("Overall_svn_paths: %s", str(overall_svn_paths))
 
         if not os.path.exists(self.variables_dir):
             os.mkdir(self.variables_dir)
@@ -90,6 +95,7 @@ class HostRpmBuilder(object):
                 if filename.startswith(self.config_rpm_prefix + '-' + self.hostname) and filename.endswith('.rpm'):
                    result.append(os.path.join(root, filename))
 
+        logging.debug("Found rpms: %s", str(result))
         return result
 
     def _build_rpm(self):
@@ -103,7 +109,7 @@ class HostRpmBuilder(object):
         my_env = os.environ.copy()
         my_env['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
-        print "Executing '%s' ..." % rpmbuild_cmd
+        logging.debug("Executing '%s' ...", rpmbuild_cmd)
         p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env)
         p.communicate()
         if p.returncode:
@@ -112,7 +118,7 @@ class HostRpmBuilder(object):
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s-%s' % (output_file, self.work_dir, self.config_rpm_prefix, self.hostname)
-        print "Executing %s ..." % tar_cmd
+        logging.debug("Executing %s ...", tar_cmd)
         p = subprocess.Popen(tar_cmd, shell=True)
         p.communicate()
         if p.returncode:
