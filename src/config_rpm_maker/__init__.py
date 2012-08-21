@@ -28,6 +28,8 @@ class ConfigRpmMaker(object):
 
         self._upload_rpms(rpms)
 
+        return rpms
+
     def _build_host(self, host):
         temp_dir = config.get('temp_dir')
         if temp_dir and not os.path.exists(temp_dir):
