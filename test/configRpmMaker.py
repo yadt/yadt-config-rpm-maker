@@ -32,7 +32,7 @@ class ConfigRpmMakerTest(unittest.TestCase):
         config_rpm_maker = ConfigRpmMaker(test_config.get('svn_build_revision'), svn_service)
 
         rpms = config_rpm_maker.build()
-        self.assertEqual(8, len(rpms))
+        self.assertEqual(9, len(rpms))
         self.assertRpm('devweb01', rpms)
         self.assertRpm('tuvweb01', rpms)
         self.assertRpm('berweb01', rpms,
