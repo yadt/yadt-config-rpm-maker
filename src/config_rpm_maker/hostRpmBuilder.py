@@ -86,8 +86,8 @@ class HostRpmBuilder(object):
                 os.makedirs(path)
 
         my_env = os.environ.copy()
-        my_env['HOME'] = self.work_dir
-        rpmbuild_cmd = 'rpmbuild --define="_topdir %s" -ta "%s"' % (self.rpm_build_dir, tar_path)
+        my_env['HOME'] = os.path.abspath(self.work_dir)
+        rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
         print "Executing '%s' ..." % rpmbuild_cmd
         p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env)
         p.communicate()
