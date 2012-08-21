@@ -2,17 +2,17 @@ import logging
 import re
 import os
 
-class InvalidTokenDefinitionException (Exception):
+class CyclicTokenDefinitionException (Exception):
     """
-    Exception stating that the value of a given token 
-    is invalid, i.e. contains token references
+    Exception stating that there is a cycle in the token definition.
+    e.g:    FOO = @@@BAR@@@
+            BAR = @@@FOO@@@
     """
-    def __init__ (self, name, value):
-        self.name = name
-        self.value = value
+    def __init__ (self, variables):
+        self.variables = variables
 
     def __str__ (self):
-        return "Token value for token '%s' is invalid: '%s'" % (self.name, self.value)
+        return "There is a cycle in the token definitions: %s" % (str(self.variables))
 
 class MissingTokenException (Exception):
     """
@@ -62,25 +62,21 @@ class TokenReplacer (object):
     def from_directory (cls, directory, replacer_function=None):
         logging.debug("Initializing token replacer of class %s from directory %s",
                       cls.__name__, directory)
-        
-        result = cls(replacer_function=replacer_function)
-        
+
+        token_values = {}
         absolute_path = os.path.abspath(directory)
         
         for name in os.listdir(absolute_path):
             candidate = os.path.join(absolute_path, name)
             if os.path.isfile(candidate):
                 with open(candidate) as property_file:
-                    result[name] = property_file.read().strip()
+                    token_values[name] = property_file.read().strip()
         
-        return result
+        return cls(token_values=token_values, replacer_function=replacer_function)
 
     def __init__ (self, token_values={}, replacer_function=None):
         self.token_values = {}
-        
         for token in token_values:
-            if TokenReplacer.TOKEN_PATTERN.search(token_values[token]):
-                raise InvalidTokenDefinitionException(token, token_values[token])
             self.token_values[token] = token_values[token].strip()
         
         if not replacer_function:
@@ -91,6 +87,8 @@ class TokenReplacer (object):
             logging.debug("Using custom replacer_function %s", 
                           replacer_function.__name__)
         self.replacer_function = replacer_function
+
+        self._replace_tokens_in_token_values()
         
 
     def filter (self, content):
@@ -119,5 +117,30 @@ class TokenReplacer (object):
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
 
-    def __setitem__ (self, index, value):
-        self.token_values[index] = value
+    def _replace_tokens_in_token_values(self):
+        valid_tokens = dict((key, value) for (key, value) in self.token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
+        invalid_tokens = dict((key, value) for (key, value) in self.token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
+
+        while invalid_tokens:
+            still_invalid_tokens = {}
+            replace_count = 0
+            for (key, value) in invalid_tokens.iteritems():
+                token_names = TokenReplacer.TOKEN_PATTERN.findall(value)
+                for token_name in token_names:
+                    if token_name in valid_tokens:
+                        replacement = self.replacer_function(token_name, valid_tokens[token_name])
+                        value = value.replace("@@@%s@@@" % token_name, replacement)
+                        replace_count += 1
+
+                if TokenReplacer.TOKEN_PATTERN.search(value):
+                    still_invalid_tokens[key] = value
+                else:
+                    valid_tokens[key] = value
+
+            # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
+            if still_invalid_tokens and not replace_count:
+                raise CyclicTokenDefinitionException(still_invalid_tokens)
+
+            invalid_tokens = still_invalid_tokens
+
+        self.token_values = valid_tokens

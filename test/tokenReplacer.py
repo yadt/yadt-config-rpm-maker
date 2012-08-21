@@ -4,8 +4,7 @@ import struct
 import tempfile
 import unittest
 
-from config_rpm_maker.token.tokenreplacer import InvalidTokenDefinitionException, \
-                                         MissingTokenException, TokenReplacer
+from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer, CyclicTokenDefinitionException
 
 class TokenReplacerTest (unittest.TestCase):
     def test_should_return_unmodified_content_when_content_does_not_contain_token (self):
@@ -26,9 +25,6 @@ class TokenReplacerTest (unittest.TestCase):
     def test_should_return_value_of_token_when_content_has_surrounding_white_spaces (self):
         self.assertEquals("spam", TokenReplacer({"SPAM": " spam\n"}).filter("@@@SPAM@@@"))
 
-    def test_should_raise_exception_when_token_definition_contains_token (self):
-        self.assertRaises(InvalidTokenDefinitionException, TokenReplacer, {"SPAM": "@@@SPAM@@@"})
-
     def test_should_return_value_of_two_tokens_when_content_is_double_token (self):
         self.assertEquals("spameggs", TokenReplacer({"SPAM": "spam",
                                                      "EGGS": "eggs"}).filter("@@@SPAM@@@@@@EGGS@@@"))
@@ -44,6 +40,15 @@ class TokenReplacerTest (unittest.TestCase):
         self.assertEquals("<spam:eggs>", 
                           TokenReplacer({"spam": "eggs"}, 
                                         custom_replacer_function).filter("@@@spam@@@"))
+
+    def test_should_replace_token_in_token(self):
+        self.assertEquals("foo", TokenReplacer({"FOO": "foo", "BAR": "@@@FOO@@@"}).filter("@@@BAR@@@"))
+
+    def test_should_replace_multiple_token_in_token(self):
+        self.assertEquals("fooIGNOREfoo", TokenReplacer({"FOO": "foo", "BAR": "@@@FOO@@@", "BAT": "@@@FOO@@@IGNORE@@@BAR@@@"}).filter("@@@BAT@@@"))
+
+    def test_should_determine_token_recursion(self):
+        self.assertRaises(CyclicTokenDefinitionException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
         
 def file_mode (mode, binary):
     result = mode
@@ -195,6 +200,18 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
                                   "Today we serve SPAM and EGGS.")
         self.ensure_file_contents(("is24-config-localhost", "tomorrow", "motd"), 
                                   "Tomorrow we serve HAM and EGGS.")
-        
-        
+
+    def test_should_filter_directory_with_var_in_var(self):
+        self.create_tmp_dir("VARIABLES.localhost")
+        self.create_tmp_file(("VARIABLES.localhost", "FOO"), "@@@BAR@@@")
+        self.create_tmp_file(("VARIABLES.localhost", "BAR"), "bar")
+        self.create_tmp_dir("is24-config-localhost")
+        self.create_tmp_file(("is24-config-localhost", "text"),
+            "Hello @@@FOO@@@ and @@@BAR@@@.")
+
+        TokenReplacer.filter_directory(self.tmp_directory,
+            self.abspath("VARIABLES.localhost"))
+
+        self.ensure_file_contents(("is24-config-localhost", "text"),
+            "Hello bar and bar.")
         
