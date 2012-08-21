@@ -222,7 +222,7 @@ Change set:
                 exported_paths = self.svn_service.export(svn_path, self.host_config_dir, self.revision)
                 svn_base_paths.append(svn_path)
                 requires += self._parse_dependency_file(self.rpm_requires_path)
-                provides += self._parse_dependency_file(self.rpm_requires_path)
+                provides += self._parse_dependency_file(self.rpm_provides_path)
             except ClientError as e:
                 pass
 
