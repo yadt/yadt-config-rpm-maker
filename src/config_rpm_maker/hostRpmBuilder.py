@@ -6,6 +6,8 @@ from config_rpm_maker.hostResolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from pysvn import ClientError
 from datetime import datetime
+from config_rpm_maker.token import cli
+from config_rpm_maker.token.tokenreplacer import TokenReplacer
 
 
 class HostRpmBuilder(object):
@@ -48,6 +50,7 @@ class HostRpmBuilder(object):
 
         self._write_dependency_file(overall_requires, self.rpm_requires_path, collapse_duplicates=True)
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
+        self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
         repo_packages_regex = config.get('repo_packages_regex')
         if repo_packages_regex:
@@ -67,6 +70,13 @@ class HostRpmBuilder(object):
         self._generate_patch_info()
 
         self._copy_files_for_config_viewer()
+
+        self._filter_tokens_in_rpm_sources()
+
+    def _filter_tokens_in_rpm_sources(self):
+        cli.init_logging()
+        TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir)
+
 
     def _copy_files_for_config_viewer(self):
         if os.path.exists(self.config_viewer_host_dir):
