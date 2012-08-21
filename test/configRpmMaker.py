@@ -36,7 +36,7 @@ class ConfigRpmMakerTest(unittest.TestCase):
 
         hosts_to_check = test_config.get('svn_build_hosts')
         for host in hosts_to_check:
-            self.assertRpm(host, rpms, requires=host.get('requires', None), provides=host.get('provides', None), files=host.get('files', None))
+            self.assertRpm(host, rpms, requires=hosts_to_check[host].get('requires', None), provides=hosts_to_check[host].get('provides', None), files=hosts_to_check[host].get('files', None))
 
     def _cleanup_temp_dir(self):
         temp_dir = config_dev.get('temp_dir')
