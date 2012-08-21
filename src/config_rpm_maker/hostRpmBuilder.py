@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 from config_rpm_maker import segment, config
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.hostResolver import HostResolver
@@ -24,6 +25,7 @@ class HostRpmBuilder(object):
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, config.get('config_rpm_prefix') + '-' + self.hostname + '.spec')
         self.config_viewer_host_dir = os.path.join(config.get('config_viewer_dir'), 'hosts', self.hostname + '.new')
+        self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
         print "Building config rpm for host %s" % (self.hostname)
@@ -72,6 +74,36 @@ class HostRpmBuilder(object):
         self._copy_files_for_config_viewer()
 
         self._filter_tokens_in_rpm_sources()
+
+        self._build_rpm()
+
+    def _build_rpm(self):
+        tar_path = self._tar_sources()
+
+        for name in ['tmp','RPMS','RPMS/x86_64,RPMS/noarch','BUILD','SRPMS','SPECS','SOURCES']:
+            path = os.path.join(self.rpm_build_dir, name)
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+        my_env = os.environ.copy()
+        my_env['HOME'] = self.work_dir
+        rpmbuild_cmd = 'rpmbuild --define="_topdir %s" -ta "%s"' % (self.rpm_build_dir, tar_path)
+        print "Executing '%s' ..." % rpmbuild_cmd
+        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env)
+        p.communicate()
+        if p.returncode:
+            raise Exception("Could not build RPM for host '%s'" % self.hostname)
+
+    def _tar_sources(self):
+        output_file = self.host_config_dir + '.tar.gz'
+        tar_cmd = 'tar -cvzf "%s" -C %s %s-%s' % (output_file, self.work_dir, self.config_rpm_prefix, self.hostname)
+        print "Executing %s ..." % tar_cmd
+        p = subprocess.Popen(tar_cmd, shell=True)
+        p.communicate()
+        if p.returncode:
+            raise Exception("Creating tar of config dir failed.")
+
+        return output_file
 
     def _filter_tokens_in_rpm_sources(self):
         cli.init_logging()
