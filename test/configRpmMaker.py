@@ -1,8 +1,11 @@
+import os
+import shutil
 import unittest
 
 from config_rpm_maker import ConfigRpmMaker
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svn import SvnService
+from config_rpm_maker import config as config_dev
 import test_config
 
 class ConfigRpmMakerTest(unittest.TestCase):
@@ -22,7 +25,15 @@ class ConfigRpmMakerTest(unittest.TestCase):
         self.assertEqual(set(['devweb01']), config_rpm_maker._get_affected_hosts(['foo/bar', 'host/devweb01'], ['berweb01', 'devweb01', 'tuvweb02']))
 
     def test_build_hosts(self):
+        self._cleanup_temp_dir()
         svn_service = SvnService(base_url=test_config.get('svn_base_url'), username=test_config.get('svn_username'), password=test_config.get('svn_password'), path_to_config=test_config.get('svn_path_to_config'))
         config_rpm_maker = ConfigRpmMaker(test_config.get('svn_build_revision'), svn_service)
 
         config_rpm_maker.build()
+
+    def _cleanup_temp_dir(self):
+        temp_dir = config_dev.get('temp_dir')
+        if temp_dir:
+            if os.path.exists(temp_dir):
+                shutil.rmtree(temp_dir)
+            os.makedirs(temp_dir)

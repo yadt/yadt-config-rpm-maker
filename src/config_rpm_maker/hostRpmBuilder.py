@@ -2,6 +2,7 @@ import os
 import shutil
 from config_rpm_maker import segment, config
 from config_rpm_maker.dependency import Dependency
+from config_rpm_maker.hostResolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from pysvn import ClientError
 from datetime import datetime
@@ -60,6 +61,21 @@ class HostRpmBuilder(object):
         self._save_file_list()
 
         self._save_segment_variables()
+        self._save_network_variables()
+
+    def _save_network_variables(self):
+        ip, fqdn, aliases = HostResolver().resolve(self.hostname)
+        if not ip:
+            if config.get('allow_unknown_hosts'):
+                ip = "127.0.0.1"
+                fqdn = "localhost.localdomain"
+                aliases = ""
+            else:
+                raise Exception("Could not lookup '%s' with 'getent hosts'" % self.hostname)
+
+        self._write_file(os.path.join(self.variables_dir, 'IP'), ip)
+        self._write_file(os.path.join(self.variables_dir, 'FQDN'), fqdn)
+        self._write_file(os.path.join(self.variables_dir, 'ALIASES'), aliases)
 
     def _save_segment_variables(self):
         for segment in ALL_SEGEMENTS:

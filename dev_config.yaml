@@ -3,3 +3,4 @@ config_rpm_prefix : 'is24-config'
 repo_packages_regex : '^is24-.*-repos?$'
 path_to_spec_file : 'default.spec'
 custom_dns_searchlist : []
+allow_unknown_hosts : true
