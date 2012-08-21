@@ -7,7 +7,7 @@ from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
 
 logging.basicConfig(format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s")
-logging.getLogger().setLevel(config.get('log_level'))
+logging.getLogger().setLevel(config.get('log_level', 'INFO'))
 
 class ConfigRpmMaker(object):
 
