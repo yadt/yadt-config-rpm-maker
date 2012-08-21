@@ -5,6 +5,6 @@ class HostResolverTest(unittest.TestCase):
 
    def test_resolve_localhost(self):
        ip, fqdn, aliases = HostResolver().resolve('localhost')
-       self.assertEqual(ip, '127.0.0.1')
+       self.assertTrue(ip == '127.0.0.1' or ip == '::1')
        self.assertEqual(fqdn, 'localhost')
        self.assertEqual(aliases, '')
