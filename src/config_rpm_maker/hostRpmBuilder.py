@@ -14,13 +14,14 @@ class HostRpmBuilder(object):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
+        self.svn_service = svn_service
         self.config_rpm_prefix = config.get('config_rpm_prefix')
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + '-' + self.hostname)
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
-        self.svn_service = svn_service
         self.spec_file_path = os.path.join(self.host_config_dir, config.get('config_rpm_prefix') + '-' + self.hostname + '.spec')
+        self.config_viewer_host_dir = os.path.join(config.get('config_viewer_dir'), 'hosts', self.hostname + '.new')
 
     def build(self):
         print "Building config rpm for host %s" % (self.hostname)
@@ -62,6 +63,22 @@ class HostRpmBuilder(object):
 
         self._save_segment_variables()
         self._save_network_variables()
+
+        self._generate_patch_info()
+
+        self._copy_files_for_config_viewer()
+
+    def _copy_files_for_config_viewer(self):
+        if os.path.exists(self.config_viewer_host_dir):
+            shutil.rmtree(self.config_viewer_host_dir)
+
+        shutil.copytree(self.host_config_dir, self.config_viewer_host_dir, symlinks=True)
+        shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
+
+    def _generate_patch_info(self):
+        variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
+        variables = [var_name.rjust(40) + ' : ' + self._get_content(os.path.join(self.variables_dir, var_name)) for var_name in variables]
+        self._write_file(os.path.join(self.variables_dir, 'VARIABLES'), "\n".join(variables))
 
     def _save_network_variables(self):
         ip, fqdn, aliases = HostResolver().resolve(self.hostname)
@@ -169,6 +186,13 @@ Change set:
         f = open(file_path, 'w')
         try:
             f.write(content)
+        finally:
+            f.close()
+
+    def _get_content(self, path):
+        f = open(path, 'r')
+        try:
+            return f.read()
         finally:
             f.close()
 
