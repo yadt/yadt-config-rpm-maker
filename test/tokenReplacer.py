@@ -49,6 +49,7 @@ class TokenReplacerTest (unittest.TestCase):
 
     def test_should_determine_token_recursion(self):
         self.assertRaises(CyclicTokenDefinitionException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
+        self.assertRaises(CyclicTokenDefinitionException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
         
 def file_mode (mode, binary):
     result = mode
