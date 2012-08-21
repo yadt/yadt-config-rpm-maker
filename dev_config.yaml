@@ -6,3 +6,4 @@ custom_dns_searchlist : []
 allow_unknown_hosts : true
 config_viewer_dir : 'target/tmp/configviewer'
 rpm_upload_cmd : '/bin/true'
+log_level : 'DEBUG'
