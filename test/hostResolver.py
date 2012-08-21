@@ -7,4 +7,3 @@ class HostResolverTest(unittest.TestCase):
        ip, fqdn, aliases = HostResolver().resolve('localhost')
        self.assertTrue(ip == '127.0.0.1' or ip == '::1')
        self.assertEqual(fqdn, 'localhost')
-       self.assertEqual(aliases, '')
