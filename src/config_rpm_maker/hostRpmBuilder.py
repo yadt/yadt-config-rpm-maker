@@ -197,7 +197,7 @@ class HostRpmBuilder(object):
             for path_tuple in exported_dict[segment]:
                 overlaying[path_tuple[1]] = path_tuple[0]
 
-        content = "\n".join([overlaying[path].rjust(25) + ' : ' + path for path in sorted(overlaying.keys())])
+        content = "\n".join([overlaying[path].rjust(25) + ' : /' + path for path in sorted(overlaying.keys())])
         self._write_file(os.path.join(self.variables_dir, 'OVERLAYING'), content)
 
     def _save_overlaying_to_configviewer(self, exported_dict):
@@ -206,7 +206,7 @@ class HostRpmBuilder(object):
             for path_tuple in exported_dict[segment]:
                 overlaying[path_tuple[1]] = path_tuple[0]
 
-        content = "\n".join([overlaying[path] + ':' + path for path in sorted(overlaying.keys())])
+        content = "\n".join([overlaying[path] + ':/' + path for path in sorted(overlaying.keys())])
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.overlaying'), content + "\n")
 
     def _render_log(self, log):
