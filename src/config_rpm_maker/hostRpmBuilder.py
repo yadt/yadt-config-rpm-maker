@@ -77,6 +77,21 @@ class HostRpmBuilder(object):
 
         self._build_rpm()
 
+        return self._find_rpms()
+
+    def _find_rpms(self):
+        result = []
+        for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'RPMS')):
+            for filename in files:
+                if filename.startswith(self.config_rpm_prefix + '-' + self.hostname) and filename.endswith('.rpm'):
+                   result.append(os.path.join(root, filename))
+        for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'SRPMS')):
+            for filename in files:
+                if filename.startswith(self.config_rpm_prefix + '-' + self.hostname) and filename.endswith('.rpm'):
+                   result.append(os.path.join(root, filename))
+
+        return result
+
     def _build_rpm(self):
         tar_path = self._tar_sources()
 

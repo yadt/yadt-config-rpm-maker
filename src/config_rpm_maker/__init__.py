@@ -1,4 +1,5 @@
 import os
+import subprocess
 import tempfile
 from config_rpm_maker import config
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
@@ -21,10 +22,11 @@ class ConfigRpmMaker(object):
             print change_set
             return
 
+        rpms = []
         for host in affected_hosts:
-            self._build_host(host)
+            rpms += self._build_host(host)
 
-        self._upload_rpms()
+        self._upload_rpms(rpms)
 
     def _build_host(self, host):
         temp_dir = config.get('temp_dir')
@@ -32,15 +34,17 @@ class ConfigRpmMaker(object):
             os.makedirs(temp_dir)
 
         work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + host, dir=temp_dir)
-        HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service=self.svn_service).build()
+        return HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service=self.svn_service).build()
 
-
-
-
-
-    def _upload_rpms(self):
-        pass
-
+    def _upload_rpms(self, rpms):
+        rpm_upload_cmd = config.get('rpm_upload_cmd')
+        if rpm_upload_cmd:
+            for rpm in rpms:
+                cmd = rpm_upload_cmd + ' ' + rpm
+                p = subprocess.Popen(cmd, shell=True)
+                p.communicate()
+                if p.returncode:
+                    raise Exception('Could not upload rpm %s . Returned: %d', (rpm, p.returncode))
 
     def _get_affected_hosts(self, change_set, available_host):
         result = set()
