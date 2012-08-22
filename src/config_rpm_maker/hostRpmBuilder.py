@@ -24,11 +24,11 @@ class HostRpmBuilder(object):
 
         return path
 
-    def __init__(self, hostname, revision, work_dir, svn_service):
+    def __init__(self, hostname, revision, work_dir, svn_service_queue):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
-        self.svn_service = svn_service
+        self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + '-' + self.hostname)
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
@@ -204,7 +204,13 @@ class HostRpmBuilder(object):
 
 
     def _save_log_entries_to_variable(self, svn_paths):
-        logs = [log for svn_path in svn_paths for log in self.svn_service.log(svn_path, self.revision, 5)]
+        svn_service = self.svn_service_queue.get()
+        try:
+            logs = [log for svn_path in svn_paths for log in svn_service.log(svn_path, self.revision, 5)]
+        finally:
+            self.svn_service_queue.put(svn_service)
+            self.svn_service_queue.task_done()
+
         logs = sorted(logs, key=lambda log: log['revision'].number, reverse=True)
         logs = logs[:5]
         logs_text = [self._render_log(log) for log in logs]
@@ -244,7 +250,13 @@ Change set:
         )
 
     def _export_spec_file(self):
-        self.svn_service.export(config.get('path_to_spec_file'), self.spec_file_path, self.revision)
+        svn_service = self.svn_service_queue.get()
+        try:
+            svn_service.export(config.get('path_to_spec_file'), self.spec_file_path, self.revision)
+        finally:
+            self.svn_service_queue.put(svn_service)
+            self.svn_service_queue.task_done()
+
 
     def _overlay_segment(self, segment):
         requires = []
@@ -253,7 +265,12 @@ Change set:
         exported_paths = []
         for svn_path in segment.get_svn_paths(self.hostname):
             try:
-                exported_paths = self.svn_service.export(svn_path, self.host_config_dir, self.revision)
+                svn_service = self.svn_service_queue.get()
+                try:
+                    exported_paths = svn_service.export(svn_path, self.host_config_dir, self.revision)
+                finally:
+                    self.svn_service_queue.put(svn_service)
+                    self.svn_service_queue.task_done()
                 svn_base_paths.append(svn_path)
                 requires += self._parse_dependency_file(self.rpm_requires_path)
                 provides += self._parse_dependency_file(self.rpm_provides_path)

@@ -7,3 +7,4 @@ allow_unknown_hosts : true
 config_viewer_dir : 'target/tmp/configviewer'
 rpm_upload_cmd : '/bin/true'
 log_level : 'DEBUG'
+thread_count : 4
