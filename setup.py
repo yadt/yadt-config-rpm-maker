@@ -28,7 +28,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'config-rpm-maker = config_rpm_maker:mainMethod',
+            'config-rpm-maker2 = config_rpm_maker:mainMethod',
             ],
     },
 )
