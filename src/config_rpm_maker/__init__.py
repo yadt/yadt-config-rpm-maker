@@ -10,6 +10,7 @@ from config_rpm_maker import config
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
 from threading import Thread
+from config_rpm_maker.svn import SvnService
 
 logging.basicConfig(format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s")
 logging.getLogger().setLevel(config.get('log_level', 'INFO'))
@@ -153,6 +154,12 @@ def mainMethod():
     if len(sys.argv) < 3:
         raise Exception("You need to provide at least 2 parameters (repo dir, revision). Was %s " % str(sys.argv))
 
-    ConfigRpmMaker(revision=sys.argv[2]).build()
+    svn_service = SvnService(
+        base_url = config.get('svn_base_url'),
+        username = config.get('svn_username'),
+        password = config.get('svn_password'),
+        path_to_config = config.get('svn_path_to_config')
+    )
+    ConfigRpmMaker(revision=sys.argv[2], svn_service=svn_service).build()
 
 
