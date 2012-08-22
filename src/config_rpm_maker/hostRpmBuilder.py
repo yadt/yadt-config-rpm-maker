@@ -30,11 +30,11 @@ class HostRpmBuilder(object):
         self.work_dir = work_dir
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
-        self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + '-' + self.hostname)
+        self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
-        self.spec_file_path = os.path.join(self.host_config_dir, config.get('config_rpm_prefix') + '-' + self.hostname + '.spec')
+        self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix +  self.hostname + '.spec')
         self.config_viewer_host_dir = HostRpmBuilder.get_config_viewer_host_dir(hostname, True)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
@@ -113,11 +113,11 @@ class HostRpmBuilder(object):
         result = []
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'RPMS')):
             for filename in files:
-                if filename.startswith(self.config_rpm_prefix + '-' + self.hostname) and filename.endswith('.rpm'):
+                if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
                    result.append(os.path.join(root, filename))
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'SRPMS')):
             for filename in files:
-                if filename.startswith(self.config_rpm_prefix + '-' + self.hostname) and filename.endswith('.rpm'):
+                if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
                    result.append(os.path.join(root, filename))
 
         logging.debug("Found rpms: %s", str(result))
@@ -142,7 +142,7 @@ class HostRpmBuilder(object):
 
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
-        tar_cmd = 'tar -cvzf "%s" -C %s %s-%s' % (output_file, self.work_dir, self.config_rpm_prefix, self.hostname)
+        tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
         logging.debug("Executing %s ...", tar_cmd)
         p = subprocess.Popen(tar_cmd, shell=True)
         p.communicate()

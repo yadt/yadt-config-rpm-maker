@@ -49,7 +49,7 @@ class ConfigRpmMakerTest(unittest.TestCase):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)
-            if name.startswith(config_dev.get('config_rpm_prefix') + '-' + hostname) and 'noarch' in name and not 'repos' in name:
+            if name.startswith(config_dev.get('config_rpm_prefix') + hostname) and 'noarch' in name and not 'repos' in name:
                 path = rpm_name
                 break
 
