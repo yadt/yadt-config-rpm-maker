@@ -1,5 +1,6 @@
 from Queue import Queue
 import os
+import sys
 import shutil
 import subprocess
 import tempfile
@@ -148,6 +149,10 @@ class ConfigRpmMaker(object):
 
         return items
 
+def mainMethod():
+    if len(sys.argv) < 3:
+        raise Exception("You need to provide at least 2 parameters (repo dir, revision). Was %s " % str(sys.argv))
 
+    ConfigRpmMaker(revision=sys.argv[2]).build()
 
 

@@ -24,5 +24,11 @@ setup(
     author_email = "sebastian.herold@immobilienscout24.de",
 
     description = "This program is called as a commit hook in a config SVN repository and automatically creates the necessary RPMs after every commit and puts them in the configured RPM repository.",
-    keywords= "rpm config host svn hook"
+    keywords= "rpm config host svn hook",
+
+    entry_points={
+        'console_scripts': [
+            'config-rpm-maker = config_rpm_maker:mainMethod',
+            ],
+    },
 )
