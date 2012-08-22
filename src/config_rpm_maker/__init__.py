@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import tempfile
 import logging
@@ -25,12 +26,24 @@ class ConfigRpmMaker(object):
             logging.info("We have nothing to do. No host affected from change set: %s", str(change_set))
             return
 
+        rpms = self._build_hosts(affected_hosts)
+        self._upload_rpms(rpms)
+        self._move_configviewer_dirs_to_final_destination(affected_hosts)
+
+        return rpms
+
+    def _move_configviewer_dir_to_final_destination(self, hosts):
+        for host in hosts:
+            temp_path = HostRpmBuilder.get_config_viewer_host_dir(host, True)
+            dest_path = HostRpmBuilder.get_config_viewer_host_dir(host)
+            if os.path.exists(dest_path):
+                shutil.rmtree(dest_path)
+            shutil.move(temp_path, dest_path)
+
+    def _build_hosts(self, affected_hosts):
         rpms = []
         for host in affected_hosts:
             rpms += self._build_host(host)
-
-        self._upload_rpms(rpms)
-
         return rpms
 
     def _build_host(self, host):

@@ -15,6 +15,15 @@ from config_rpm_maker.token.tokenreplacer import TokenReplacer, MissingTokenExce
 
 class HostRpmBuilder(object):
 
+    @classmethod
+    def get_config_viewer_host_dir(cls, hostname, temp=False):
+        path = os.path.join(config.get('config_viewer_dir'), 'hosts', hostname)
+
+        if temp:
+            path += '.new'
+
+        return path
+
     def __init__(self, hostname, revision, work_dir, svn_service):
         self.hostname = hostname
         self.revision = revision
@@ -26,7 +35,7 @@ class HostRpmBuilder(object):
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, config.get('config_rpm_prefix') + '-' + self.hostname + '.spec')
-        self.config_viewer_host_dir = os.path.join(config.get('config_viewer_dir'), 'hosts', self.hostname + '.new')
+        self.config_viewer_host_dir = HostRpmBuilder.get_config_viewer_host_dir(hostname, True)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
