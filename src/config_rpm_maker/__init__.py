@@ -95,16 +95,11 @@ class ConfigRpmMaker(object):
         for thread in thread_pool:
             thread.join()
 
-        failed_hosts = {}
-        while not failed_host_queue.empty():
-            (host, e) = failed_host_queue.get()
-            failed_host_queue.task_done()
-            failed_hosts[host] = e
-
+        failed_hosts = dict(self._consume_queue(failed_host_queue))
         if failed_hosts:
             raise Exception("For some the host we could not build the config rpm: %s" % str(failed_hosts))
 
-        return rpms
+        return self._consume_queue(rpm_queue)
 
     def _upload_rpms(self, rpms):
         rpm_upload_cmd = config.get('rpm_upload_cmd')
@@ -143,6 +138,15 @@ class ConfigRpmMaker(object):
         if not thread_count or thread_count > len(affected_hosts):
             thread_count = len(affected_hosts)
         return thread_count
+
+    def _consume_queue(self, queue):
+        items = []
+        while not queue.empty():
+            item = queue.get()
+            queue.task_done()
+            items.append(item)
+
+        return items
 
 
 
