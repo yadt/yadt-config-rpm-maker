@@ -130,28 +130,28 @@ class TokenReplacer (object):
             raise MissingTokenException(exception.token, filename)
 
     def _replace_tokens_in_token_values(self, token_values):
-        valid_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
-        invalid_tokens = dict((key, value) for (key, value) in token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
+        tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
+        tokens_with_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
 
-        while invalid_tokens:
-            still_invalid_tokens = {}
+        while tokens_with_sub_tokens:
+            tokens_with_sub_tokens_after_replace = {}
             replace_count = 0
-            for (key, value) in invalid_tokens.iteritems():
+            for (key, value) in tokens_with_sub_tokens.iteritems():
                 token_names = TokenReplacer.TOKEN_PATTERN.findall(value)
                 for token_name in token_names:
-                    if token_name in valid_tokens:
-                        value = value.replace("@@@%s@@@" % token_name, valid_tokens[token_name])
+                    if token_name in tokens_without_sub_tokens:
+                        value = value.replace("@@@%s@@@" % token_name, tokens_without_sub_tokens[token_name])
                         replace_count += 1
 
                 if TokenReplacer.TOKEN_PATTERN.search(value):
-                    still_invalid_tokens[key] = value
+                    tokens_with_sub_tokens_after_replace[key] = value
                 else:
-                    valid_tokens[key] = value
+                    tokens_without_sub_tokens[key] = value
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
-            if still_invalid_tokens and not replace_count:
-                raise CyclicTokenDefinitionException(still_invalid_tokens)
+            if tokens_with_sub_tokens_after_replace and not replace_count:
+                raise CyclicTokenDefinitionException(tokens_with_sub_tokens_after_replace)
 
-            invalid_tokens = still_invalid_tokens
+            tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 
-        return valid_tokens
+        return tokens_without_sub_tokens
