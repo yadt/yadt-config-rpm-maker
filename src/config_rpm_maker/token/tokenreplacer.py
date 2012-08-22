@@ -1,3 +1,4 @@
+import cgi
 import logging
 import re
 import os
@@ -44,11 +45,11 @@ class TokenReplacer (object):
     def filter_directory (cls, 
                           directory, 
                           variables_definition_directory, 
-                          replacer_function=None):
+                          replacer_function=None, html_escape=False, html_escape_function=None):
         logging.info("Filtering files in %s", directory)
         
         token_replacer = cls.from_directory(os.path.abspath(variables_definition_directory), 
-                                            replacer_function=replacer_function)
+                                            replacer_function=replacer_function, html_escape_function=html_escape_function)
         
         for root, _, filenames in os.walk(directory):
             if variables_definition_directory in root:
@@ -56,10 +57,10 @@ class TokenReplacer (object):
             for filename in filenames:
                 absolute_filename = os.path.join(root, filename)
                 logging.debug("Filtering file %s", absolute_filename)
-                token_replacer.filter_file(absolute_filename)
+                token_replacer.filter_file(absolute_filename, html_escape=html_escape)
 
     @classmethod
-    def from_directory (cls, directory, replacer_function=None):
+    def from_directory (cls, directory, replacer_function=None, html_escape_function=None):
         logging.debug("Initializing token replacer of class %s from directory %s",
                       cls.__name__, directory)
 
@@ -72,9 +73,9 @@ class TokenReplacer (object):
                 with open(candidate) as property_file:
                     token_values[name] = property_file.read().strip()
         
-        return cls(token_values=token_values, replacer_function=replacer_function)
+        return cls(token_values=token_values, replacer_function=replacer_function, html_escape_function=html_escape_function)
 
-    def __init__ (self, token_values={}, replacer_function=None):
+    def __init__ (self, token_values={}, replacer_function=None, html_escape_function=None):
         self.token_values = {}
         for token in token_values:
             self.token_values[token] = token_values[token].strip()
@@ -86,7 +87,15 @@ class TokenReplacer (object):
         else:
             logging.debug("Using custom replacer_function %s", 
                           replacer_function.__name__)
+
+        if not html_escape_function:
+            def html_escape_function(filename, content):
+                content = cgi.escape(content, quote=True)
+                return "<!DOCTYPE html><html><head><title>%s</title></head><body><pre>%s</pre></body></html>" % (filename, content)
+
+
         self.replacer_function = replacer_function
+        self.html_escape_function = html_escape_function
 
         self.token_values = self._replace_tokens_in_token_values(self.token_values)
         
@@ -104,12 +113,15 @@ class TokenReplacer (object):
             
             content = content.replace("@@@%s@@@" % token_name, replacement)
 
-    def filter_file (self, filename):
+    def filter_file (self, filename, html_escape=False):
         __pychecker__ = "missingattrs=token"
         try:
             with open(filename, "r") as input_file:
                 file_content = input_file.read()
-                
+
+            if html_escape:
+                file_content = self.html_escape_function(os.path.basename(filename), file_content)
+
             file_content_filtered = self.filter(file_content)
             
             with open(filename, "w") as output_file:
@@ -128,8 +140,7 @@ class TokenReplacer (object):
                 token_names = TokenReplacer.TOKEN_PATTERN.findall(value)
                 for token_name in token_names:
                     if token_name in valid_tokens:
-                        replacement = self.replacer_function(token_name, valid_tokens[token_name])
-                        value = value.replace("@@@%s@@@" % token_name, replacement)
+                        value = value.replace("@@@%s@@@" % token_name, valid_tokens[token_name])
                         replace_count += 1
 
                 if TokenReplacer.TOKEN_PATTERN.search(value):

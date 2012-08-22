@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import subprocess
+import cgi
 from config_rpm_maker import segment, config
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.hostResolver import HostResolver
@@ -9,7 +10,7 @@ from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from pysvn import ClientError
 from datetime import datetime
 from config_rpm_maker.token import cli
-from config_rpm_maker.token.tokenreplacer import TokenReplacer
+from config_rpm_maker.token.tokenreplacer import TokenReplacer, MissingTokenException
 
 
 class HostRpmBuilder(object):
@@ -87,7 +88,17 @@ class HostRpmBuilder(object):
 
         self._build_rpm()
 
+        self._filter_tokens_in_config_viewer()
+
         return self._find_rpms()
+
+    def _filter_tokens_in_config_viewer(self):
+
+        def configviewer_token_replacer (token, replacement):
+            filtered_replacement = replacement.rstrip()
+            return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
+
+        TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
 
     def _find_rpms(self):
         result = []

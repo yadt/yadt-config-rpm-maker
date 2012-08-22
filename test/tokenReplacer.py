@@ -149,6 +149,15 @@ class TokenReplacerFilterFileTest (IntegrationTestBase):
         TokenReplacer().filter_file(self.tmp_file_name("bin"))
         
         self.ensure_file_contents("bin", binary_data, True)
+
+    def test_html_escaping(self):
+        def html_token_replacer (token, replacement):
+            filtered_replacement = replacement.rstrip()
+            return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
+
+        self.create_tmp_file("spam", '<a href="link?param1=1&param2=2">@@@spam@@@</a>')
+        TokenReplacer(token_values={'spam' : 'spam'}, replacer_function=html_token_replacer).filter_file(self.tmp_file_name("spam"), html_escape=True)
+        self.ensure_file_contents("spam", '<!DOCTYPE html><html><head><title>spam</title></head><body><pre>&lt;a href=&quot;link?param1=1&amp;param2=2&quot;&gt;<strong title="spam">spam</strong>&lt;/a&gt;</pre></body></html>')
         
 class TokenReplacerFilterDirectory (IntegrationTestBase):
     def test_should_filter_directory (self):
