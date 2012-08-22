@@ -29,7 +29,7 @@ class SvnService(object):
         return [os.path.basename(item[0].repos_path) for item in items]
 
     def export(self, svn_path, target_dir, revision):
-        url = self.config_url + '/' + svn_path
+        url = self._get_url(svn_path)
 
         self.exported_files = []
         self.client.callback_notify = self._callback_notify
@@ -42,7 +42,7 @@ class SvnService(object):
         return [(svn_path, path) for path in normalized_paths]
 
     def log(self, svn_path, revision, limit=0):
-        url = self.config_url + '/' + svn_path
+        url = self._get_url(svn_path)
         return self.client.log(url, pysvn.Revision(pysvn.opt_revision_kind.head), self._rev(revision), discover_changed_paths=True, limit=limit)
 
     def _rev(self, revision):
@@ -52,3 +52,8 @@ class SvnService(object):
         if event['action'] == pysvn.wc_notify_action.update_add:
             self.exported_files.append(event['path'])
 
+    def _get_url(self, svn_path):
+        if svn_path.startswith('/'):
+            return self.base_url + svn_path
+        else:
+            return self.config_url + '/' + svn_path
