@@ -12,7 +12,7 @@ SRC_DIR = 'src'
 sys.path.append(SRC_DIR)
 
 setup(
-    name = "yadt-config-rpm-maker2",
+    name = "yadt-config-rpm-maker",
     version = "2.0",
     license = "GPL",
     url = "https://github.com/yadt/yadt-config-rpm-maker",
@@ -28,7 +28,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'config-rpm-maker2 = config_rpm_maker:mainMethod',
+            'config-rpm-maker = config_rpm_maker:mainMethod',
             ],
     },
 )
