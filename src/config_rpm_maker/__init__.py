@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import logging
 import copy
+import traceback
 from config_rpm_maker import config
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
@@ -39,7 +40,7 @@ class BuildHostThread(Thread):
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
             except Exception as e:
-                self.failed_host_queue.put((host, e))
+                self.failed_host_queue.put((host, traceback.format_exc()))
 
 
 class ConfigRpmMaker(object):
@@ -99,7 +100,8 @@ class ConfigRpmMaker(object):
 
         failed_hosts = dict(self._consume_queue(failed_host_queue))
         if failed_hosts:
-            raise Exception("For some the host we could not build the config rpm: %s" % str(failed_hosts))
+            failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
+            raise Exception("For some the host we could not build the config rpm: %s" % '\n'.join(failed_hosts_str))
 
         return self._consume_queue(rpm_queue)
 

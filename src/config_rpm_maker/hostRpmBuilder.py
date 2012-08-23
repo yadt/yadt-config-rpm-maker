@@ -44,7 +44,11 @@ class HostRpmBuilder(object):
         if os.path.exists(self.host_config_dir):
             raise Exception("ERROR: '%s' exists already whereas I should be creating it now." % self.host_config_dir)
 
-        os.mkdir(self.host_config_dir)
+        try:
+            os.mkdir(self.host_config_dir)
+        except Exception as e:
+            raise Exception("Could not create host config directory '%s'." % self.host_config_dir, e)
+
         overall_requires = []
         overall_provides = []
         overall_svn_paths = []
