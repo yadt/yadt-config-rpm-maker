@@ -36,11 +36,9 @@ class BuildHostThread(Thread):
                     os.makedirs(temp_dir)
 
                 work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + host, dir=temp_dir)
-                with open(os.path.join(work_dir, host + '.output'), 'w') as stdout:
-                    with open(os.path.join(work_dir, host + '.error'), 'w') as stderr:
-                        rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service_queue=self.svn_service_queue, stdout=stdout, stderr=stderr).build()
-                        for rpm in rpms:
-                            self.rpm_queue.put(rpm)
+                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service_queue=self.svn_service_queue).build()
+                for rpm in rpms:
+                    self.rpm_queue.put(rpm)
 
             except Exception as e:
                 self.failed_host_queue.put((host, traceback.format_exc()))

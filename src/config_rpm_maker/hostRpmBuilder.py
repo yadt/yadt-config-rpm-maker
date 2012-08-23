@@ -25,12 +25,13 @@ class HostRpmBuilder(object):
 
         return path
 
-    def __init__(self, hostname, revision, work_dir, svn_service_queue, stdout=sys.stdout, stderr=sys.stderr):
+    def __init__(self, hostname, revision, work_dir, svn_service_queue):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
-        self.stdout=stdout
-        self.stderr=stderr
+        self.logger = logging.getLogger(self.hostname)
+        self.logger.setLevel(config.get('log_level', 'INFO'))
+        self.logger.addHandler(logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output')))
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
@@ -42,7 +43,7 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
-        logging.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
+        self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
             raise Exception("ERROR: '%s' exists already whereas I should be creating it now." % self.host_config_dir)
@@ -64,10 +65,10 @@ class HostRpmBuilder(object):
             overall_requires += requires
             overall_provides += provides
 
-        logging.debug("Overall_exported: %s", str(overall_exported))
-        logging.debug("Overall_requires: %s", str(overall_requires))
-        logging.debug("Overall_provides: %s", str(overall_provides))
-        logging.debug("Overall_svn_paths: %s", str(overall_svn_paths))
+        self.logger.debug("Overall_exported: %s", str(overall_exported))
+        self.logger.info("Overall_requires: %s", str(overall_requires))
+        self.logger.info("Overall_provides: %s", str(overall_provides))
+        self.logger.debug("Overall_svn_paths: %s", str(overall_svn_paths))
 
         if not os.path.exists(self.variables_dir):
             os.mkdir(self.variables_dir)
@@ -129,7 +130,7 @@ class HostRpmBuilder(object):
                 if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
                    result.append(os.path.join(root, filename))
 
-        logging.debug("Found rpms: %s", str(result))
+        self.logger.info("Found rpms: %s", str(result))
         return result
 
     def _build_rpm(self):
@@ -143,16 +144,20 @@ class HostRpmBuilder(object):
         my_env = os.environ.copy()
         my_env['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
-        logging.debug("Executing '%s' ...", rpmbuild_cmd)
-        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env, stdout=self.stdout, stderr=self.stderr)
-        p.communicate()
+        self.logger.info("Executing '%s' ...", rpmbuild_cmd)
+        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate()
+        self.logger.info(stdout)
+        if stderr:
+            self.logger.error(stderr)
+
         if p.returncode:
-            raise Exception("Could not build RPM for host '%s'" % self.hostname)
+            raise Exception("Could not build RPM for host '%s'. Reason: %s" % (self.hostname, stderr))
 
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
-        logging.debug("Executing %s ...", tar_cmd)
+        self.logger.debug("Executing %s ...", tar_cmd)
         p = subprocess.Popen(tar_cmd, shell=True)
         p.communicate()
         if p.returncode:
