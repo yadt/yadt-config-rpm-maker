@@ -25,15 +25,14 @@ class HostRpmBuilder(object):
 
         return path
 
+    LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
+    DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
+
     def __init__(self, hostname, revision, work_dir, svn_service_queue):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
-        self.logger = logging.getLogger(self.hostname)
-        handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
-        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s", "%d.%m.%Y %H:%M:%S"))
-        self.logger.addHandler(handler)
-        self.logger.setLevel(config.get('log_level', logging.INFO))
+        self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
@@ -324,4 +323,16 @@ Change set:
             return f.read()
         finally:
             f.close()
+
+    def _create_logger(self):
+        logger = logging.getLogger(self.hostname)
+        handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
+        logger.addHandler(handler)
+        error_handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
+        error_handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
+        error_handler.setLevel(logging.ERROR)
+        logger.addHandler(error_handler)
+        logger.setLevel(config.get('log_level', logging.INFO))
+        return logger
 
