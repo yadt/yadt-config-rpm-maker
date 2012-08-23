@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import cgi
+import sys
 from config_rpm_maker import segment, config
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.hostResolver import HostResolver
@@ -24,10 +25,12 @@ class HostRpmBuilder(object):
 
         return path
 
-    def __init__(self, hostname, revision, work_dir, svn_service_queue):
+    def __init__(self, hostname, revision, work_dir, svn_service_queue, stdout=sys.stdout, stderr=sys.stderr):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
+        self.stdout=stdout
+        self.stderr=stderr
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
@@ -112,8 +115,8 @@ class HostRpmBuilder(object):
             return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
 
         token_replacer = TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
-        unused_tokens = set(token_replacer.token_values.keys()) - token_replacer.used_tokens
-        self._write_file(os.path.join(self.config_viewer_host_dir, 'unused_variables.txt'), '\n'.join(unused_tokens))
+        tokens_unused = set(token_replacer.token_values.keys()) - token_replacer.token_used
+        self._write_file(os.path.join(self.config_viewer_host_dir, 'unused_variables.txt'), '\n'.join(tokens_unused))
 
     def _find_rpms(self):
         result = []
@@ -141,7 +144,7 @@ class HostRpmBuilder(object):
         my_env['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
         logging.debug("Executing '%s' ...", rpmbuild_cmd)
-        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env)
+        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env, stdout=self.stdout, stderr=self.stderr)
         p.communicate()
         if p.returncode:
             raise Exception("Could not build RPM for host '%s'" % self.hostname)
