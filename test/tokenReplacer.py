@@ -224,4 +224,20 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
 
         self.ensure_file_contents(("is24-config-localhost", "text"),
             "Hello bar and bar.")
+
+    def test_should_filter_directory_with_unused_variables (self):
+            self.create_tmp_dir("VARIABLES.localhost")
+            self.create_tmp_file(("VARIABLES.localhost", "SPAM"), "spam")
+            self.create_tmp_file(("VARIABLES.localhost", "EGGS"), "eggs")
+            self.create_tmp_file(("VARIABLES.localhost", "UNUSED"), "unused variable")
+
+            self.create_tmp_dir("is24-config-localhost")
+
+            self.create_tmp_file(("is24-config-localhost", "motd"),
+                                 "Today we serve @@@SPAM@@@ and @@@EGGS@@@.")
+
+            replacer = TokenReplacer.filter_directory(self.tmp_directory,
+                                           self.abspath("VARIABLES.localhost"))
+
+            self.assertEqual(set(replacer.token_used), set(["SPAM","EGGS"]))
         

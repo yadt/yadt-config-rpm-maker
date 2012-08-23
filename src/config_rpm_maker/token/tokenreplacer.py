@@ -59,6 +59,8 @@ class TokenReplacer (object):
                 logging.debug("Filtering file %s", absolute_filename)
                 token_replacer.filter_file(absolute_filename, html_escape=html_escape)
 
+        return token_replacer
+
     @classmethod
     def from_directory (cls, directory, replacer_function=None, html_escape_function=None):
         logging.debug("Initializing token replacer of class %s from directory %s",
@@ -77,6 +79,7 @@ class TokenReplacer (object):
 
     def __init__ (self, token_values={}, replacer_function=None, html_escape_function=None):
         self.token_values = {}
+        self.token_used = []
         for token in token_values:
             self.token_values[token] = token_values[token].strip()
         
@@ -112,6 +115,7 @@ class TokenReplacer (object):
                                                  self.token_values[token_name])
             
             content = content.replace("@@@%s@@@" % token_name, replacement)
+            self.token_used.append(token_name)
 
     def filter_file (self, filename, html_escape=False):
         __pychecker__ = "missingattrs=token"
