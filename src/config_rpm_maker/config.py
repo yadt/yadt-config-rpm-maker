@@ -14,7 +14,7 @@ if os.path.exists(config_file_path):
     except Exception as e:
         raise Exception("Could not load config file '%s'" % config_file_path, e)
 else:
-    raise Exception("Could not find config file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % config_file_path )
+    raise Exception("Could not find config file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (config_file_path, os.path.abspath('.')))
 
 def get(name, default = None):
     if config.has_key(name):
