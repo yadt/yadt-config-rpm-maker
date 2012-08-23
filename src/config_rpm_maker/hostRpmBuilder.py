@@ -30,8 +30,10 @@ class HostRpmBuilder(object):
         self.revision = revision
         self.work_dir = work_dir
         self.logger = logging.getLogger(self.hostname)
-        self.logger.setLevel(config.get('log_level', 'INFO'))
-        self.logger.addHandler(logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output')))
+        handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s", "%d.%m.%Y %H:%M:%S"))
+        self.logger.addHandler(handler)
+        self.logger.setLevel(config.get('log_level', logging.INFO))
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
