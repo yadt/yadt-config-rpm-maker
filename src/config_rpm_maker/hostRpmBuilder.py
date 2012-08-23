@@ -107,7 +107,9 @@ class HostRpmBuilder(object):
             filtered_replacement = replacement.rstrip()
             return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
 
-        TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
+        token_replacer = TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
+        unused_tokens = set(token_replacer.token_values.keys()) - token_replacer.used_tokens
+        self._write_file(os.path.join(self.config_viewer_host_dir, 'unused_variables.txt'), '\n'.join(unused_tokens))
 
     def _find_rpms(self):
         result = []

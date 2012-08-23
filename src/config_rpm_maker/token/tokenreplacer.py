@@ -79,7 +79,7 @@ class TokenReplacer (object):
 
     def __init__ (self, token_values={}, replacer_function=None, html_escape_function=None):
         self.token_values = {}
-        self.token_used = []
+        self.token_used = set()
         for token in token_values:
             self.token_values[token] = token_values[token].strip()
         
@@ -115,7 +115,7 @@ class TokenReplacer (object):
                                                  self.token_values[token_name])
             
             content = content.replace("@@@%s@@@" % token_name, replacement)
-            self.token_used.append(token_name)
+            self.token_used.add(token_name)
 
     def filter_file (self, filename, html_escape=False):
         __pychecker__ = "missingattrs=token"
