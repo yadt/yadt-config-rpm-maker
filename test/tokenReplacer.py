@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import shutil
 import struct
@@ -158,6 +159,13 @@ class TokenReplacerFilterFileTest (IntegrationTestBase):
         self.create_tmp_file("spam", '<a href="link?param1=1&param2=2">@@@spam@@@</a>')
         TokenReplacer(token_values={'spam' : 'spam'}, replacer_function=html_token_replacer).filter_file(self.tmp_file_name("spam"), html_escape=True)
         self.ensure_file_contents("spam", '<!DOCTYPE html><html><head><title>spam</title></head><body><pre>&lt;a href=&quot;link?param1=1&amp;param2=2&quot;&gt;<strong title="spam">spam</strong>&lt;/a&gt;</pre></body></html>')
+
+    def test_should_html_escape_file_with_special_characters(self):
+        path = os.path.join(self.tmp_directory, 'file-with-special-character')
+        shutil.copyfile('testdata/svn_repo/config/typ/web/data/file-with-special-character', path)
+        TokenReplacer(token_values={'RPM_REQUIRES' : 'äöß234'}).filter_file(path, html_escape=True)
+
+
         
 class TokenReplacerFilterDirectory (IntegrationTestBase):
     def test_should_filter_directory (self):
@@ -240,4 +248,5 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
                                            self.abspath("VARIABLES.localhost"))
 
             self.assertEqual(replacer.token_used, set(["SPAM","EGGS"]))
+
         

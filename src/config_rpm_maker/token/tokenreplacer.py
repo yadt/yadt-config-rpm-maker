@@ -2,6 +2,7 @@ import cgi
 import logging
 import re
 import os
+import traceback
 
 class CyclicTokenDefinitionException (Exception):
     """
@@ -83,7 +84,7 @@ class TokenReplacer (object):
         self.token_values = {}
         self.token_used = set()
         for token in token_values:
-            self.token_values[token] = token_values[token].strip()
+            self.token_values[token] = token_values[token].decode('UTF-8').strip()
         
         if not replacer_function:
             def replacer_function (token, replacement):
@@ -99,7 +100,7 @@ class TokenReplacer (object):
                     content = cgi.escape(content, quote=True)
                     return u"<!DOCTYPE html><html><head><title>%s</title></head><body><pre>%s</pre></body></html>" % (filename, content)
                 except Exception as e:
-                    raise Exception("Could not html escape file: " + filename)
+                    raise Exception("Could not html escape file: " + filename + '\n\n' + traceback.format_exc(e))
 
 
         self.replacer_function = replacer_function
@@ -126,7 +127,7 @@ class TokenReplacer (object):
         __pychecker__ = "missingattrs=token"
         try:
             with open(filename, "r") as input_file:
-                file_content = input_file.read()
+                file_content = input_file.read().decode('UTF-8')
 
             if html_escape:
                 file_content = self.html_escape_function(os.path.basename(filename), file_content)
@@ -134,7 +135,7 @@ class TokenReplacer (object):
             file_content_filtered = self.filter(file_content)
             
             with open(filename, "w") as output_file:
-                output_file.write(file_content_filtered)
+                output_file.write(file_content_filtered.encode('UTF-8'))
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
 
