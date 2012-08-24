@@ -329,6 +329,7 @@ Change set:
         logger = logging.getLogger(self.hostname)
         handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
         handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
+        handler.setLevel(config.get('log_level', logging.INFO))
         logger.addHandler(handler)
         error_handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
         error_handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
