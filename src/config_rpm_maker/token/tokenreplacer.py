@@ -15,7 +15,7 @@ class CyclicTokenDefinitionException (Exception):
         self.variables = variables
 
     def __str__ (self):
-        return "There is a cycle in the token definitions: %s" % (str(self.variables))
+        return "There is a cycle in the token definitions or a token could not be found: %s" % (str(self.variables))
 
 class MissingTokenException (Exception):
     """
