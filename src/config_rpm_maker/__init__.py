@@ -13,18 +13,22 @@ from config_rpm_maker.segment import OVERLAY_ORDER
 from threading import Thread
 from config_rpm_maker.svn import SvnService
 
-logging.basicConfig(format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s")
-logging.getLogger().setLevel(config.get('log_level', 'INFO'))
+logging.basicConfig(
+    format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s",
+    level=config.get('log_level', 'INFO'),
+)
+
 
 class BuildHostThread(Thread):
 
-    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, name=None):
+    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, name=None, error_logging_handler=None):
         super( BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
         self.rpm_queue = rpm_queue
         self.failed_host_queue = failed_host_queue
+        self.error_logging_handler = error_logging_handler
 
     def run(self):
         while not self.host_queue.empty():
@@ -36,7 +40,7 @@ class BuildHostThread(Thread):
                     os.makedirs(temp_dir)
 
                 work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + host, dir=temp_dir)
-                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service_queue=self.svn_service_queue).build()
+                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service_queue=self.svn_service_queue, error_logging_handler=self.error_logging_handler).build()
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
 
@@ -46,25 +50,43 @@ class BuildHostThread(Thread):
 
 class ConfigRpmMaker(object):
 
+    ERROR_MSG = '\n\n\nYour commit as been accepted by the SVN server, but due to the\n' + \
+                'errors that it contains no RPMs have been created.\n\n%s' + \
+                'Please fix the issues and trigger the RPM creation with a dummy commit.\n\n'
+
     def __init__(self, revision, svn_service):
         self.revision = revision
         self.svn_service = svn_service
+        self._create_logger()
 
     def build(self):
         logging.info("Starting with revision %s", self.revision)
-        change_set = self.svn_service.get_change_set(self.revision)
-        available_hosts = self.svn_service.get_hosts(self.revision)
+        try:
+            change_set = self.svn_service.get_change_set(self.revision)
+            available_hosts = self.svn_service.get_hosts(self.revision)
 
-        affected_hosts = self._get_affected_hosts(change_set, available_hosts)
-        if not affected_hosts:
-            logging.info("We have nothing to do. No host affected from change set: %s", str(change_set))
-            return
+            affected_hosts = self._get_affected_hosts(change_set, available_hosts)
+            if not affected_hosts:
+                logging.info("We have nothing to do. No host affected from change set: %s", str(change_set))
+                return
 
-        rpms = self._build_hosts(affected_hosts)
-        self._upload_rpms(rpms)
-        self._move_configviewer_dirs_to_final_destination(affected_hosts)
+            rpms = self._build_hosts(affected_hosts)
+            self._upload_rpms(rpms)
+            self._move_configviewer_dirs_to_final_destination(affected_hosts)
+        except Exception as e:
+            self.logger.exception('Last error during build:')
+            error_msg = self.ERROR_MSG % 'See %s/errors/%s.txt for details.\n\n' % (config.get('config_viewer_url', 'http://localhost/configviewer'), self.revision)
+            self.logger.error(error_msg)
+            self._move_error_log_to_config_viewer()
+            raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
 
         return rpms
+
+    def _move_error_log_to_config_viewer(self):
+        config_viewer_error_dir = os.path.join(config.get('config_viewer_dir'), 'errors')
+        if not os.path.exists(config_viewer_error_dir):
+            os.makedirs(config_viewer_error_dir)
+        shutil.move(self.error_log_file, os.path.join(config_viewer_error_dir, self.revision + '.txt'))
 
     def _move_configviewer_dirs_to_final_destination(self, hosts):
         for host in hosts:
@@ -88,7 +110,15 @@ class ConfigRpmMaker(object):
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(name='host_rpm_thread_%d' % i, revision=self.revision, svn_service_queue=svn_service_queue, rpm_queue=rpm_queue, failed_host_queue=failed_host_queue, host_queue=host_queue) for i in range(thread_count)]
+        thread_pool = [BuildHostThread(
+                            name='host_rpm_thread_%d' % i,
+                            revision=self.revision,
+                            svn_service_queue=svn_service_queue,
+                            rpm_queue=rpm_queue,
+                            failed_host_queue=failed_host_queue,
+                            host_queue=host_queue,
+                            error_logging_handler=self.error_handler
+                        ) for i in range(thread_count)]
 
 
 
@@ -152,6 +182,14 @@ class ConfigRpmMaker(object):
             items.append(item)
 
         return items
+
+    def _create_logger(self):
+        self.logger = logging.getLogger('Config-Rpm-Maker')
+        self.error_log_file = tempfile.mktemp(suffix='.error.log', prefix='yadt-config-rpm-maker', dir=config.get('temp_dir'))
+        self.error_handler = logging.FileHandler(self.error_log_file)
+        self.error_handler.setFormatter(logging.Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
+        self.error_handler.setLevel(logging.ERROR)
+        self.logger.addHandler(self.error_handler)
 
 def mainMethod():
     if len(sys.argv) < 3:

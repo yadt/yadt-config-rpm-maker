@@ -28,10 +28,11 @@ class HostRpmBuilder(object):
     LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
     DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
-    def __init__(self, hostname, revision, work_dir, svn_service_queue):
+    def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler = None):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
+        self.error_logging_handler = error_logging_handler
         self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get('config_rpm_prefix')
@@ -334,5 +335,7 @@ Change set:
         error_handler.setLevel(logging.ERROR)
         logger.addHandler(error_handler)
         logger.setLevel(config.get('log_level', logging.INFO))
+        if self.error_logging_handler:
+            logger.addHandler(error_handler)
         return logger
 
