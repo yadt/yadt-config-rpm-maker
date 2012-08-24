@@ -75,7 +75,7 @@ class ConfigRpmMaker(object):
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
         except Exception as e:
             self.logger.exception('Last error during build:')
-            error_msg = self.ERROR_MSG % 'See %s/errors/%s.txt for details.\n\n' % (config.get('config_viewer_url', 'http://localhost/configviewer'), self.revision)
+            error_msg = self.ERROR_MSG % 'See %s/%s.txt for details.\n\n' % (config.get('error_log_url', ''), self.revision)
             self.logger.error(error_msg)
             self._move_error_log_to_config_viewer()
             raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
@@ -83,10 +83,11 @@ class ConfigRpmMaker(object):
         return rpms
 
     def _move_error_log_to_config_viewer(self):
-        config_viewer_error_dir = os.path.join(config.get('config_viewer_dir'), 'errors')
-        if not os.path.exists(config_viewer_error_dir):
-            os.makedirs(config_viewer_error_dir)
-        shutil.move(self.error_log_file, os.path.join(config_viewer_error_dir, self.revision + '.txt'))
+        config_viewer_error_dir = os.path.join(config.get('error_log_dir'))
+        if config_viewer_error_dir:
+            if not os.path.exists(config_viewer_error_dir):
+                os.makedirs(config_viewer_error_dir)
+            shutil.move(self.error_log_file, os.path.join(config_viewer_error_dir, self.revision + '.txt'))
 
     def _move_configviewer_dirs_to_final_destination(self, hosts):
         for host in hosts:
