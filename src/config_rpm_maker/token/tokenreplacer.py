@@ -9,7 +9,8 @@ class CyclicTokenDefinitionException (Exception):
     e.g:    FOO = @@@BAR@@@
             BAR = @@@FOO@@@
     """
-    def __init__ (self, variables):
+    def __init__(self, variables, *args, **kwargs):
+        super(CyclicTokenDefinitionException, self).__init__(*args, **kwargs)
         self.variables = variables
 
     def __str__ (self):
@@ -20,8 +21,9 @@ class MissingTokenException (Exception):
     Exception stating that a value for a given token 
     has not been found in the token definition. 
     """
-    
-    def __init__ (self, token, file=None):
+
+    def __init__(self, token, file=None, *args, **kwargs):
+        super(MissingTokenException, self).__init__(*args, **kwargs)
         self.token = token
         self.file = file
 
