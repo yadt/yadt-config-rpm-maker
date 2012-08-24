@@ -4,8 +4,6 @@ import os
 from setuptools import setup, find_packages
 import sys
 
-os.environ['TEST_CONFIG_FILE'] = 'test_config.yaml'
-
 SRC_DIR = 'src'
 
 sys.path.append(SRC_DIR)

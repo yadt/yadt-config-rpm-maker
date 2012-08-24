@@ -8,7 +8,6 @@ from config_rpm_maker import ConfigRpmMaker, config
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svn import SvnService
 from config_rpm_maker import config as config_dev
-import test_config
 
 class ConfigRpmMakerTest(SvnTestCase):
 

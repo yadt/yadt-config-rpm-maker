@@ -2,5 +2,4 @@
 *.iml
 target/
 .idea/
-test_config.yaml
 yadt_config_rpm_maker.egg-info/
