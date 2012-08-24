@@ -185,12 +185,18 @@ class ConfigRpmMaker(object):
         return items
 
     def _create_logger(self):
+        self._assure_temp_dir_if_set()
         self.logger = logging.getLogger('Config-Rpm-Maker')
         self.error_log_file = tempfile.mktemp(suffix='.error.log', prefix='yadt-config-rpm-maker', dir=config.get('temp_dir'))
         self.error_handler = logging.FileHandler(self.error_log_file)
         self.error_handler.setFormatter(logging.Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
         self.error_handler.setLevel(logging.ERROR)
         self.logger.addHandler(self.error_handler)
+
+    def _assure_temp_dir_if_set(self):
+        temp_dir = config.get('temp_dir')
+        if temp_dir and not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
 
 def mainMethod():
     if len(sys.argv) < 3:
