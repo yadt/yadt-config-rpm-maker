@@ -1,16 +1,16 @@
 import os
 import shutil
 import subprocess
-import unittest
 import rpm
+from baseTestCase import SvnTestCase
 
-from config_rpm_maker import ConfigRpmMaker
+from config_rpm_maker import ConfigRpmMaker, config
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svn import SvnService
 from config_rpm_maker import config as config_dev
 import test_config
 
-class ConfigRpmMakerTest(unittest.TestCase):
+class ConfigRpmMakerTest(SvnTestCase):
 
     def test_find_matching_hosts(self):
         config_rpm_maker = ConfigRpmMaker(None, None)
@@ -28,13 +28,29 @@ class ConfigRpmMakerTest(unittest.TestCase):
 
     def test_build_hosts(self):
         self._cleanup_temp_dir()
-        svn_service = SvnService(base_url=test_config.get('svn_base_url'), username=test_config.get('svn_username'), password=test_config.get('svn_password'), path_to_config=test_config.get('svn_path_to_config'))
-        config_rpm_maker = ConfigRpmMaker(test_config.get('svn_build_revision'), svn_service)
+        self.create_svn_repo()
+        svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get('svn_path_to_config'))
+        config_rpm_maker = ConfigRpmMaker('2', svn_service)
 
         rpms = config_rpm_maker.build()
-        self.assertEqual(int(test_config.get('svn_build_rpm_count')), len(rpms))
+        self.assertEqual(9, len(rpms))
 
-        hosts_to_check = test_config.get('svn_build_hosts')
+        hosts_to_check = {
+            'devweb01': {},
+            'tuvweb01': {},
+            'berweb01': {
+                'requires' : ['all-req', 'all-req2', 'ber-req', 'ber-req2', 'host-spec-requirement', 'pro-req', 'ty-web-requirement'],
+                'provides' : ['all-prov', 'all-prov2', 'all-prov3', 'pro-prov', 'pro-prov2', 'typ-web-provides'],
+                'files' : {
+                    'files/file_from_all' : '',
+                    'files/file_from_ber' : '',
+                    'files/file_from_pro' : '',
+                    'files/override' : 'berweb',
+                    'vars/override' : 'berweb',
+                    'vars/var_in_var' : 'berwebberweb',
+                    }
+            }
+        }
         for host in hosts_to_check:
             self.assertRpm(host, rpms, requires=hosts_to_check[host].get('requires', None), provides=hosts_to_check[host].get('provides', None), files=hosts_to_check[host].get('files', None))
 

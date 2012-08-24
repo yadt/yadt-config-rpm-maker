@@ -5,7 +5,6 @@ from setuptools import setup, find_packages
 import sys
 
 os.environ['TEST_CONFIG_FILE'] = 'test_config.yaml'
-os.environ['YADT_CONFIG_RPM_MAKER_CONFIG_FILE'] = 'dev_config.yaml'
 
 SRC_DIR = 'src'
 
