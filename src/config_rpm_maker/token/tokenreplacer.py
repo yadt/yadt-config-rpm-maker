@@ -96,7 +96,7 @@ class TokenReplacer (object):
         if not html_escape_function:
             def html_escape_function(filename, content):
                 content = cgi.escape(content, quote=True)
-                return "<!DOCTYPE html><html><head><title>%s</title></head><body><pre>%s</pre></body></html>" % (filename, content)
+                return u"<!DOCTYPE html><html><head><title>%s</title></head><body><pre>%s</pre></body></html>" % (filename, content)
 
 
         self.replacer_function = replacer_function
