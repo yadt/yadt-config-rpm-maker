@@ -25,12 +25,17 @@ class ConfigRpmMakerTest(SvnTestCase):
         self.assertEqual(set(['devweb01']), config_rpm_maker._get_affected_hosts(['foo/bar', 'loctyp/devweb'], ['berweb01', 'devweb01', 'tuvweb02']))
         self.assertEqual(set(['devweb01']), config_rpm_maker._get_affected_hosts(['foo/bar', 'host/devweb01'], ['berweb01', 'devweb01', 'tuvweb02']))
 
-    def test_build_hosts(self):
-        self._cleanup_temp_dir()
-        self.create_svn_repo()
-        svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get('svn_path_to_config'))
-        config_rpm_maker = ConfigRpmMaker('2', svn_service)
+    def test_build_hosts_and_cleanup_work_dir(self):
+        config_rpm_maker = self._given_config_rpm_maker()
+        try:
+            config_rpm_maker.build()
+        except Exception:
+            # the cleanup should be independent of the result of the build operation
+            pass
+        self.assertFalse(os.path.exists(config_rpm_maker.work_dir))
 
+    def test_build_hosts(self):
+        config_rpm_maker = self._given_config_rpm_maker(keep_work_dir=True)
         rpms = config_rpm_maker.build()
         self.assertEqual(9, len(rpms))
 
@@ -52,6 +57,19 @@ class ConfigRpmMakerTest(SvnTestCase):
         }
         for host in hosts_to_check:
             self.assertRpm(host, rpms, requires=hosts_to_check[host].get('requires', None), provides=hosts_to_check[host].get('provides', None), files=hosts_to_check[host].get('files', None))
+
+    def _given_config_rpm_maker(self, keep_work_dir = False):
+        self._cleanup_temp_dir()
+        self.create_svn_repo()
+        svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get('svn_path_to_config'))
+
+        if keep_work_dir:
+            os.environ['KEEPWORKDIR'] = '1'
+        elif os.environ.has_key('KEEPWORKDIR'):
+            del os.environ['KEEPWORKDIR']
+
+        return ConfigRpmMaker('2', svn_service)
+
 
     def _cleanup_temp_dir(self):
         temp_dir = config_dev.get('temp_dir')

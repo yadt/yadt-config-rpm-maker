@@ -2,16 +2,13 @@ import logging
 import os
 import shutil
 import subprocess
-import cgi
-import sys
-from config_rpm_maker import segment, config
+from config_rpm_maker import config
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.hostResolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from pysvn import ClientError
 from datetime import datetime
-from config_rpm_maker.token import cli
-from config_rpm_maker.token.tokenreplacer import TokenReplacer, MissingTokenException
+from config_rpm_maker.token.tokenreplacer import TokenReplacer
 
 
 class HostRpmBuilder(object):

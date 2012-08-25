@@ -21,12 +21,13 @@ logging.basicConfig(
 
 class BuildHostThread(Thread):
 
-    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, name=None, error_logging_handler=None):
+    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
         super( BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
         self.rpm_queue = rpm_queue
+        self.work_dir = work_dir
         self.failed_host_queue = failed_host_queue
         self.error_logging_handler = error_logging_handler
 
@@ -35,12 +36,7 @@ class BuildHostThread(Thread):
             host = self.host_queue.get()
             self.host_queue.task_done()
             try:
-                temp_dir = config.get('temp_dir')
-                if temp_dir and not os.path.exists(temp_dir):
-                    os.makedirs(temp_dir)
-
-                work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + host, dir=temp_dir)
-                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=work_dir, svn_service_queue=self.svn_service_queue, error_logging_handler=self.error_logging_handler).build()
+                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=self.work_dir, svn_service_queue=self.svn_service_queue, error_logging_handler=self.error_logging_handler).build()
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
 
@@ -57,30 +53,44 @@ class ConfigRpmMaker(object):
     def __init__(self, revision, svn_service):
         self.revision = revision
         self.svn_service = svn_service
+        self.temp_dir = config.get('temp_dir')
+        self._assure_temp_dir_if_set()
         self._create_logger()
 
     def build(self):
-        logging.info("Starting with revision %s", self.revision)
+        self.logger.info("Starting with revision %s", self.revision)
         try:
             change_set = self.svn_service.get_change_set(self.revision)
             available_hosts = self.svn_service.get_hosts(self.revision)
 
             affected_hosts = self._get_affected_hosts(change_set, available_hosts)
             if not affected_hosts:
-                logging.info("We have nothing to do. No host affected from change set: %s", str(change_set))
+                self.logger.info("We have nothing to do. No host affected from change set: %s", str(change_set))
                 return
 
+            self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
             rpms = self._build_hosts(affected_hosts)
             self._upload_rpms(rpms)
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
         except Exception as e:
-            self.logger.exception('Last error during build:')
-            error_msg = self.ERROR_MSG % 'See %s/%s.txt for details.\n\n' % (config.get('error_log_url', ''), self.revision)
-            self.logger.error(error_msg)
-            self._move_error_log_to_config_viewer()
-            raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
+            try:
+                self.logger.exception('Last error during build:')
+                error_msg = self.ERROR_MSG % 'See %s/%s.txt for details.\n\n' % (config.get('error_log_url', ''), self.revision)
+                self.logger.error(error_msg)
+                self._move_error_log_to_config_viewer()
+                raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
+            finally:
+                self._clean_up_work_dir()
 
+        self._clean_up_work_dir()
         return rpms
+
+    def _clean_up_work_dir(self):
+        if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
+            shutil.rmtree(self.work_dir)
+
+    def _keep_work_dir(self):
+        return os.environ.has_key('KEEPWORKDIR') and os.environ['KEEPWORKDIR']
 
     def _move_error_log_to_config_viewer(self):
         config_viewer_error_dir = os.path.join(config.get('error_log_dir'))
@@ -118,6 +128,7 @@ class ConfigRpmMaker(object):
                             rpm_queue=rpm_queue,
                             failed_host_queue=failed_host_queue,
                             host_queue=host_queue,
+                            work_dir=self.work_dir,
                             error_logging_handler=self.error_handler
                         ) for i in range(thread_count)]
 
@@ -185,7 +196,6 @@ class ConfigRpmMaker(object):
         return items
 
     def _create_logger(self):
-        self._assure_temp_dir_if_set()
         self.logger = logging.getLogger('Config-Rpm-Maker')
         self.error_log_file = tempfile.mktemp(suffix='.error.log', prefix='yadt-config-rpm-maker', dir=config.get('temp_dir'))
         self.error_handler = logging.FileHandler(self.error_log_file)
@@ -194,9 +204,8 @@ class ConfigRpmMaker(object):
         self.logger.addHandler(self.error_handler)
 
     def _assure_temp_dir_if_set(self):
-        temp_dir = config.get('temp_dir')
-        if temp_dir and not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
+        if self.temp_dir and not os.path.exists(self.temp_dir):
+            os.makedirs(self.temp_dir)
 
 def mainMethod():
     if len(sys.argv) < 3:
