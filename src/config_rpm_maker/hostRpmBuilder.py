@@ -94,7 +94,6 @@ class HostRpmBuilder(object):
         patch_info = self._generate_patch_info()
 
         self._copy_files_for_config_viewer()
-        self._save_overlaying_to_configviewer(overall_exported)
 
         # write patch info into variable and config viewer
         self._write_file(os.path.join(self.variables_dir, 'VARIABLES'), patch_info)
@@ -106,6 +105,7 @@ class HostRpmBuilder(object):
 
         self._filter_tokens_in_config_viewer()
         self._write_revision_file_for_config_viewer()
+        self._write_overlaying_for_config_viewer(overall_exported)
 
         return self._find_rpms()
 
@@ -241,7 +241,7 @@ class HostRpmBuilder(object):
         content = "\n".join([overlaying[path].rjust(25) + ' : /' + path for path in sorted(overlaying.keys())])
         self._write_file(os.path.join(self.variables_dir, 'OVERLAYING'), content)
 
-    def _save_overlaying_to_configviewer(self, exported_dict):
+    def _write_overlaying_for_config_viewer(self, exported_dict):
         overlaying = {}
         for segment in OVERLAY_ORDER:
             for path_tuple in exported_dict[segment]:
