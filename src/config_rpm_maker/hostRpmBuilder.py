@@ -139,11 +139,6 @@ class HostRpmBuilder(object):
     def _build_rpm(self):
         tar_path = self._tar_sources()
 
-        for name in ['tmp','RPMS','RPMS/x86_64,RPMS/noarch','BUILD','SRPMS','SPECS','SOURCES']:
-            path = os.path.join(self.rpm_build_dir, name)
-            if not os.path.exists(path):
-                os.makedirs(path)
-
         my_env = os.environ.copy()
         my_env['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)

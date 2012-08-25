@@ -68,7 +68,7 @@ class ConfigRpmMaker(object):
                 self.logger.info("We have nothing to do. No host affected from change set: %s", str(change_set))
                 return
 
-            self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
+            self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
             self._upload_rpms(rpms)
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
@@ -206,6 +206,14 @@ class ConfigRpmMaker(object):
     def _assure_temp_dir_if_set(self):
         if self.temp_dir and not os.path.exists(self.temp_dir):
             os.makedirs(self.temp_dir)
+
+    def _prepare_work_dir(self):
+        self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
+        self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
+        for name in ['tmp','RPMS','RPMS/x86_64,RPMS/noarch','BUILD','SRPMS','SPECS','SOURCES']:
+            path = os.path.join(self.rpm_build_dir, name)
+            if not os.path.exists(path):
+                os.makedirs(path)
 
 def mainMethod():
     if len(sys.argv) < 3:
