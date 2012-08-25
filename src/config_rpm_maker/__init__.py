@@ -77,7 +77,7 @@ class ConfigRpmMaker(object):
                 self.logger.exception('Last error during build:')
                 error_msg = self.ERROR_MSG % 'See %s/%s.txt for details.\n\n' % (config.get('error_log_url', ''), self.revision)
                 self.logger.error(error_msg)
-                self._move_error_log_to_config_viewer()
+                self._move_error_log_for_public_access()
                 raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
             finally:
                 self._clean_up_work_dir()
@@ -92,12 +92,12 @@ class ConfigRpmMaker(object):
     def _keep_work_dir(self):
         return os.environ.has_key('KEEPWORKDIR') and os.environ['KEEPWORKDIR']
 
-    def _move_error_log_to_config_viewer(self):
-        config_viewer_error_dir = os.path.join(config.get('error_log_dir'))
-        if config_viewer_error_dir:
-            if not os.path.exists(config_viewer_error_dir):
-                os.makedirs(config_viewer_error_dir)
-            shutil.move(self.error_log_file, os.path.join(config_viewer_error_dir, self.revision + '.txt'))
+    def _move_error_log_for_public_access(self):
+        error_log_dir = os.path.join(config.get('error_log_dir'))
+        if error_log_dir:
+            if not os.path.exists(error_log_dir):
+                os.makedirs(error_log_dir)
+            shutil.move(self.error_log_file, os.path.join(error_log_dir, self.revision + '.txt'))
 
     def _move_configviewer_dirs_to_final_destination(self, hosts):
         for host in hosts:
