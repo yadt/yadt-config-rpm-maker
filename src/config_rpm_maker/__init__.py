@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import tempfile
 import logging
-import copy
 import traceback
 from config_rpm_maker import config
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
