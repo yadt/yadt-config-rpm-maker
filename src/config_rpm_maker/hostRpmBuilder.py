@@ -105,6 +105,7 @@ class HostRpmBuilder(object):
         self._build_rpm()
 
         self._filter_tokens_in_config_viewer()
+        self._write_revision_file_for_config_viewer()
 
         return self._find_rpms()
 
@@ -117,6 +118,9 @@ class HostRpmBuilder(object):
         token_replacer = TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
         tokens_unused = set(token_replacer.token_values.keys()) - token_replacer.token_used
         self._write_file(os.path.join(self.config_viewer_host_dir, 'unused_variables.txt'), '\n'.join(tokens_unused))
+
+    def _write_revision_file_for_config_viewer(self):
+        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
 
     def _find_rpms(self):
         result = []
@@ -174,8 +178,6 @@ class HostRpmBuilder(object):
 
         shutil.copytree(self.host_config_dir, self.config_viewer_host_dir, symlinks=True)
         shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
-
-        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
 
     def _generate_patch_info(self):
         variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
