@@ -152,13 +152,19 @@ class ConfigRpmMaker(object):
 
     def _upload_rpms(self, rpms):
         rpm_upload_cmd = config.get('rpm_upload_cmd')
+        one_call = config.get('rpm_upload_cmd_one_call', True)
         if rpm_upload_cmd:
-            for rpm in rpms:
-                cmd = rpm_upload_cmd + ' ' + rpm
-                p = subprocess.Popen(cmd, shell=True)
-                p.communicate()
-                if p.returncode:
-                    raise Exception('Could not upload rpm %s . Returned: %d', (rpm, p.returncode))
+            if one_call:
+              cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpms))
+              returncode = subprocess.call(cmd, shell=True)
+              if returncode:
+                  raise Exception('Could not upload rpms. Called %s . Returned: %d', (cmd, returncode))
+            else:
+                for rpm in rpms:
+                    cmd = '%s %s' % (rpm_upload_cmd, rpm)
+                    returncode = subprocess.call(cmd, shell=True)
+                    if returncode:
+                        raise Exception('Could not upload rpm. Called %s . Returned: %d', (cmd, returncode))
 
     def _get_affected_hosts(self, change_set, available_host):
         result = set()
