@@ -156,7 +156,7 @@ class TokenReplacer (object):
 
                 file_content_filtered = self.filter(file_content)
                 with open(filename, "w") as output_file:
-                    output_file.write(file_content_filtered.encode('UTF-8'))
+                    output_file.write(file_content_filtered.encode(file_encoding))
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
         except Exception as e:
