@@ -121,6 +121,7 @@ class TokenReplacer (object):
         self.html_escape_function = html_escape_function
 
         self.token_values = self._replace_tokens_in_token_values(self.token_values)
+        self.magic_mime_encoding = None
         
 
     def filter (self, content):
@@ -145,15 +146,17 @@ class TokenReplacer (object):
                raise FileLimitExceededException(filename, self.file_size_limit)
 
             with open(filename, "r") as input_file:
-                file_content = input_file.read().decode('UTF-8')
+                file_content = input_file.read()
 
-            if html_escape:
-                file_content = self.html_escape_function(os.path.basename(filename), file_content)
+            file_encoding = self._get_file_encoding(file_content)
+            if file_encoding and file_encoding != 'binary':
+                file_content = file_content.decode(file_encoding)
+                if html_escape:
+                    file_content = self.html_escape_function(os.path.basename(filename), file_content)
 
-            file_content_filtered = self.filter(file_content)
-            
-            with open(filename, "w") as output_file:
-                output_file.write(file_content_filtered.encode('UTF-8'))
+                file_content_filtered = self.filter(file_content)
+                with open(filename, "w") as output_file:
+                    output_file.write(file_content_filtered.encode('UTF-8'))
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
         except Exception as e:
@@ -185,3 +188,9 @@ class TokenReplacer (object):
             tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 
         return tokens_without_sub_tokens
+
+    def _get_file_encoding(self, content):
+        if not self.magic_mime_encoding:
+            self.magic_mime_encoding = magic.open(magic.MIME_ENCODING)
+            self.magic_mime_encoding.load()
+        return self.magic_mime_encoding.buffer(content)
