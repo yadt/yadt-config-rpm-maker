@@ -3,7 +3,7 @@ import logging
 import re
 import os
 import traceback
-import magic
+import config_rpm_maker.magic
 from config_rpm_maker import config
 
 class CyclicTokenDefinitionException (Exception):
@@ -191,5 +191,5 @@ class TokenReplacer (object):
 
     def _get_file_encoding(self, content):
         if not self.magic_mime_encoding:
-            self.magic_mime_encoding = magic.Magic(mime_encoding=True)
+            self.magic_mime_encoding = config_rpm_maker.magic.Magic(mime_encoding=True)
         return self.magic_mime_encoding.from_buffer(content)
