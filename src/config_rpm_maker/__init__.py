@@ -152,19 +152,17 @@ class ConfigRpmMaker(object):
 
     def _upload_rpms(self, rpms):
         rpm_upload_cmd = config.get('rpm_upload_cmd')
-        one_call = config.get('rpm_upload_cmd_one_call', True)
+        chunk_size = self._get_chunk_size(rpms)
+
         if rpm_upload_cmd:
-            if one_call:
-              cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpms))
-              returncode = subprocess.call(cmd, shell=True)
-              if returncode:
-                  raise Exception('Could not upload rpms. Called %s . Returned: %d', (cmd, returncode))
-            else:
-                for rpm in rpms:
-                    cmd = '%s %s' % (rpm_upload_cmd, rpm)
-                    returncode = subprocess.call(cmd, shell=True)
-                    if returncode:
-                        raise Exception('Could not upload rpm. Called %s . Returned: %d', (cmd, returncode))
+            pos = 0
+            while pos < len(rpms):
+                rpm_chunk = rpms[pos:pos + chunk_size]
+                cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
+                returncode = subprocess.call(cmd, shell=True)
+                if returncode:
+                    raise Exception('Could not upload rpms. Called %s . Returned: %d', (cmd, returncode))
+                pos += chunk_size
 
     def _get_affected_hosts(self, change_set, available_host):
         result = set()
@@ -222,6 +220,17 @@ class ConfigRpmMaker(object):
             path = os.path.join(self.rpm_build_dir, name)
             if not os.path.exists(path):
                 os.makedirs(path)
+
+    def _get_chunk_size(self, rpms):
+        chunk_size = int(config.get('rpm_upload_cmd_chunk_size', 0))
+        if chunk_size < 0:
+            raise Exception("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
+
+        if not chunk_size:
+            chunk_size = len(rpms)
+
+        return chunk_size
+
 
 def mainMethod():
     if len(sys.argv) < 3:
