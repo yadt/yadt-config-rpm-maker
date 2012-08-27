@@ -3,3 +3,5 @@
 target/
 .idea/
 yadt_config_rpm_maker.egg-info/
+.project
+.pydevproject
