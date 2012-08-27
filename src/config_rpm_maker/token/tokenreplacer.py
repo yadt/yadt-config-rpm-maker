@@ -138,6 +138,8 @@ class TokenReplacer (object):
                 output_file.write(file_content_filtered.encode('UTF-8'))
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
+        except Exception as e:
+            raise Exception('Cannot filter file %s : %s' % (file, traceback.format_exc()), e)
 
     def _replace_tokens_in_token_values(self, token_values):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
