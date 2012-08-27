@@ -222,7 +222,7 @@ class ConfigRpmMaker(object):
                 os.makedirs(path)
 
     def _get_chunk_size(self, rpms):
-        chunk_size = int(config.get('rpm_upload_cmd_chunk_size', 0))
+        chunk_size = int(config.get('rpm_upload_chunk_size', 0))
         if chunk_size < 0:
             raise Exception("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
 
