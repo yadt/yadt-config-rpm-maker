@@ -191,6 +191,5 @@ class TokenReplacer (object):
 
     def _get_file_encoding(self, content):
         if not self.magic_mime_encoding:
-            self.magic_mime_encoding = magic.open(magic.MIME_ENCODING)
-            self.magic_mime_encoding.load()
-        return self.magic_mime_encoding.buffer(content)
+            self.magic_mime_encoding = magic.Magic(mime_encoding=True)
+        return self.magic_mime_encoding.from_buffer(content)
