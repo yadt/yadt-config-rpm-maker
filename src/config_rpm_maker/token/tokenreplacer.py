@@ -3,6 +3,8 @@ import logging
 import re
 import os
 import traceback
+import magic
+from config_rpm_maker import config
 
 class CyclicTokenDefinitionException (Exception):
     """
@@ -33,6 +35,18 @@ class MissingTokenException (Exception):
         if self.file:
             msg += " in file '%s'" % self.file
         return msg
+
+class FileLimitExceededException(Exception):
+    """
+    Exception stating the file exceeded the given file size limit
+    """
+    def __init__(self, path, size_limit=-1, *args, **kwargs):
+        super(FileLimitExceededException, self).__init__(*args, **kwargs)
+        self.path = path
+        self.size_limit = size_limit
+
+    def __str__ (self):
+        return "The file '%s' (%d bytes) is bigger than the allowed file size %d bytes." % (self.path, os.path.getsize(self.path), self.size_limit)
 
 class TokenReplacer (object):
     """
@@ -126,6 +140,10 @@ class TokenReplacer (object):
     def filter_file (self, filename, html_escape=False):
         __pychecker__ = "missingattrs=token"
         try:
+            self.file_size_limit = config.get('max_file_size', 100 * 1024)
+            if os.path.getsize(filename) > self.file_size_limit:
+               raise FileLimitExceededException(filename, self.file_size_limit)
+
             with open(filename, "r") as input_file:
                 file_content = input_file.read().decode('UTF-8')
 
@@ -139,7 +157,7 @@ class TokenReplacer (object):
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
         except Exception as e:
-            raise Exception('Cannot filter file %s : %s' % (file, traceback.format_exc()), e)
+            raise Exception('Cannot filter file %s : %s' % (filename, traceback.format_exc()), e)
 
     def _replace_tokens_in_token_values(self, token_values):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
