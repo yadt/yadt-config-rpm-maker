@@ -88,6 +88,9 @@ class ConfigRpmMaker(object):
         if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
             shutil.rmtree(self.work_dir)
 
+        if os.path.exists(self.error_log_file):
+            os.remove(self.error_log_file)
+
     def _keep_work_dir(self):
         return os.environ.has_key('KEEPWORKDIR') and os.environ['KEEPWORKDIR']
 

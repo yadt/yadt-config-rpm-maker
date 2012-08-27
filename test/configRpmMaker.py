@@ -33,6 +33,8 @@ class ConfigRpmMakerTest(SvnTestCase):
             # the cleanup should be independent of the result of the build operation
             pass
         self.assertFalse(os.path.exists(config_rpm_maker.work_dir))
+        self.assertFalse(os.path.exists(config_rpm_maker.error_log_file))
+
 
     def test_build_hosts(self):
         config_rpm_maker = self._given_config_rpm_maker(keep_work_dir=True)
