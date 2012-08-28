@@ -117,7 +117,9 @@ class HostRpmBuilder(object):
 
         token_replacer = TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
         tokens_unused = set(token_replacer.token_values.keys()) - token_replacer.token_used
-        self._write_file(os.path.join(self.config_viewer_host_dir, 'unused_variables.txt'), '\n'.join(tokens_unused))
+        path_to_unused_variables = os.path.join(self.config_viewer_host_dir, 'unused_variables.txt')
+        self._write_file(path_to_unused_variables, '\n'.join(sorted(tokens_unused)))
+        token_replacer.filter_file(path_to_unused_variables, html_escape=True)
 
     def _write_revision_file_for_config_viewer(self):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
