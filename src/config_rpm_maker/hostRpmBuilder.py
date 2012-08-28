@@ -178,6 +178,7 @@ class HostRpmBuilder(object):
 
     def _generate_patch_info(self):
         variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
+        variables = sorted(variables)
         variables = [var_name.rjust(40) + ' : ' + self._get_content(os.path.join(self.variables_dir, var_name)) for var_name in variables]
         return "\n".join(variables) + "\n"
 
