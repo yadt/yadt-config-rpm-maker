@@ -60,6 +60,27 @@ class ConfigRpmMakerTest(SvnTestCase):
         for host in hosts_to_check:
             self.assertRpm(host, rpms, requires=hosts_to_check[host].get('requires', None), provides=hosts_to_check[host].get('provides', None), files=hosts_to_check[host].get('files', None))
 
+    def test_chunked_uploads(self):
+        old_config = config.get('rpm_upload_cmd')
+        target_file = os.path.abspath(os.path.join(config.get('temp_dir'), 'upload.txt'))
+        if os.path.exists(target_file):
+            os.remove(target_file)
+        cmd_file = os.path.abspath(os.path.join(config.get('temp_dir'), 'upload.sh'))
+        with open(cmd_file, 'w') as f:
+            f.write('#!/bin/bash\ndest=$1 ; shift ; echo "${#@} $@" >> "$dest"')
+
+        os.chmod(cmd_file, 0755)
+        cmd = '%s %s' % (cmd_file, target_file)
+        config.config['rpm_upload_cmd'] = cmd
+        try:
+            ConfigRpmMaker(None, None)._upload_rpms(['a' for x in range(25)])
+        finally:
+            config.config['rpm_upload_cmd'] = old_config
+
+        self.assertTrue(os.path.exists(target_file))
+        with open(target_file) as f:
+            self.assertEqual(f.read(), '10 a a a a a a a a a a\n10 a a a a a a a a a a\n5 a a a a a\n')
+
     def _given_config_rpm_maker(self, keep_work_dir = False):
         self._cleanup_temp_dir()
         self.create_svn_repo()
