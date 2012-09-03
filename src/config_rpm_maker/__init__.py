@@ -233,15 +233,17 @@ class ConfigRpmMaker(object):
 
 
 def mainMethod():
-    if len(sys.argv) < 3:
-        raise Exception("You need to provide at least 2 parameters (repo dir, revision). Was %s " % str(sys.argv))
-
-    svn_service = SvnService(
-        base_url = config.get('svn_base_url'),
-        username = config.get('svn_username'),
-        password = config.get('svn_password'),
-        path_to_config = config.get('svn_path_to_config')
-    )
-    ConfigRpmMaker(revision=sys.argv[2], svn_service=svn_service).build()
-
-
+    try:
+        if len(sys.argv) < 3:
+            raise Exception("You need to provide at least 2 parameters (repo dir, revision). Arguments where %s " % str(sys.argv))
+    
+        svn_service = SvnService(
+            base_url = config.get('svn_base_url'),
+            username = config.get('svn_username'),
+            password = config.get('svn_password'),
+            path_to_config = config.get('svn_path_to_config')
+        )
+        ConfigRpmMaker(revision=sys.argv[2], svn_service=svn_service).build()
+    except Exception as e:
+        print >>sys.stderr, e.message
+        sys.exit(1)
