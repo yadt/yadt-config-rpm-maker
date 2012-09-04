@@ -234,8 +234,8 @@ class ConfigRpmMaker(object):
 
 def mainMethod():
     try:
-        if len(sys.argv) < 3:
-            raise Exception("You need to provide at least 2 parameters (repo dir, revision). Arguments where %s " % str(sys.argv))
+        if len(sys.argv) != 3:
+            raise Exception("You need to provide 2 parameters (repo dir, revision).\nArguments where %s " % str(sys.argv[1:]))
     
         svn_service = SvnService(
             base_url = config.get('svn_base_url'),
