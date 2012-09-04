@@ -33,3 +33,12 @@ def get(name, default = None):
         return __config[name]
     else:
         return default
+    
+def setvalue(name,value):
+    if not name:
+        raise Exception("No name given")
+    
+    if not __config:
+        __init_config()
+    
+    __config[name] = value
