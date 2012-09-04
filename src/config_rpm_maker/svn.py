@@ -4,14 +4,16 @@ import sys
 
 class SvnService(object):
 
-    def __init__(self, base_url, username, password, path_to_config = '/config'):
+    def __init__(self, base_url, username = None, password = None, path_to_config = '/config'):
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
         self.client = pysvn.Client()
         self.client.set_auth_cache(True)
-        self.client.set_default_username(username)
-        self.client.set_default_password(password)
+        if username:
+            self.client.set_default_username(username)
+        if password:
+            self.client.set_default_password(password)
 
     def get_change_set(self, revision):
         logs =  self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths = True)

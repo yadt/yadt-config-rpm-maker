@@ -218,8 +218,13 @@ class HostRpmBuilder(object):
 
     def _save_log_entries_to_variable(self, svn_paths):
         svn_service = self.svn_service_queue.get()
+        logs = []
         try:
-            logs = [log for svn_path in svn_paths for log in svn_service.log(svn_path, self.revision, 5)]
+            for svn_path in svn_paths:
+                for log_entry in svn_service.log(svn_path, self.revision, 5):
+                    logs.append(log_entry)
+        except ClientError:
+            pass
         finally:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
@@ -277,18 +282,18 @@ Change set:
         svn_base_paths = []
         exported_paths = []
         for svn_path in segment.get_svn_paths(self.hostname):
+            svn_service = self.svn_service_queue.get()
             try:
-                svn_service = self.svn_service_queue.get()
-                try:
-                    exported_paths = svn_service.export(svn_path, self.host_config_dir, self.revision)
-                finally:
-                    self.svn_service_queue.put(svn_service)
-                    self.svn_service_queue.task_done()
-                svn_base_paths.append(svn_path)
-                requires += self._parse_dependency_file(self.rpm_requires_path)
-                provides += self._parse_dependency_file(self.rpm_provides_path)
-            except ClientError as e:
+                exported_paths = svn_service.export(svn_path, self.host_config_dir, self.revision)
+            except ClientError:
                 pass
+            finally:
+                self.svn_service_queue.put(svn_service)
+                self.svn_service_queue.task_done()
+            svn_base_paths.append(svn_path)
+            requires += self._parse_dependency_file(self.rpm_requires_path)
+            provides += self._parse_dependency_file(self.rpm_provides_path)
+
 
         return svn_base_paths, exported_paths, requires, provides
 

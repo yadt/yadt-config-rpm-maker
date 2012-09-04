@@ -1,5 +1,6 @@
 import re
 import subprocess
+
 from config_rpm_maker import config
 
 class HostResolver(object):
