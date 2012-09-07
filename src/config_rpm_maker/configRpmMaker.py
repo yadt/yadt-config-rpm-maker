@@ -37,9 +37,13 @@ class BuildHostThread(Thread):
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
 
+            except BaseConfigRpmMakerException as e:
+                self.failed_host_queue.put((host, str(e)))
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
 
+class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
+    error_info = "Could not build all rpms :\n"
 
 class ConfigRpmMaker(object):
 
@@ -155,7 +159,7 @@ class ConfigRpmMaker(object):
         failed_hosts = dict(self._consume_queue(failed_host_queue))
         if failed_hosts:
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
-            raise Exception("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
+            raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         return self._consume_queue(rpm_queue)
 

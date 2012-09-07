@@ -5,21 +5,30 @@ import os
 import traceback
 import config_rpm_maker.magic
 from config_rpm_maker import config
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
-class CyclicTokenDefinitionException (Exception):
+class CyclicTokenDefinitionException (BaseConfigRpmMakerException):
     """
     Exception stating that there is a cycle in the token definition.
     e.g:    FOO = @@@BAR@@@
             BAR = @@@FOO@@@
     """
+    error_info = "Variable cycle detected or variable in variable not found :\n"
     def __init__(self, variables, *args, **kwargs):
         super(CyclicTokenDefinitionException, self).__init__(*args, **kwargs)
         self.variables = variables
 
     def __str__ (self):
-        return "There is a cycle in the token definitions or a token could not be found: %s" % (str(self.variables))
+        return "There is a cycle in the token definitions or a token could not be found:\n%s" % (str(self.variables))
 
-class MissingTokenException (Exception):
+class CouldNotEscapeHtmlException (BaseConfigRpmMakerException):
+    error_info = "Could not escape html :\n"
+
+class CannotFilterFileException (BaseConfigRpmMakerException):
+    error_info = "Could not filter file :\n"
+
+class MissingTokenException (BaseConfigRpmMakerException):
+    error_info = "Could not replace variable in file :\n"
     """
     Exception stating that a value for a given token 
     has not been found in the token definition. 
@@ -36,7 +45,8 @@ class MissingTokenException (Exception):
             msg += " in file '%s'" % self.file
         return msg
 
-class FileLimitExceededException(Exception):
+class FileLimitExceededException(BaseConfigRpmMakerException):
+    error_info = "FileTooFat error :\n"
     """
     Exception stating the file exceeded the given file size limit
     """
@@ -114,7 +124,7 @@ class TokenReplacer (object):
                     content = cgi.escape(content, quote=True)
                     return u"<!DOCTYPE html><html><head><title>%s</title></head><body><pre>%s</pre></body></html>" % (filename, content)
                 except Exception as e:
-                    raise Exception("Could not html escape file: " + filename + '\n\n' + traceback.format_exc(e))
+                    raise CouldNotEscapeHtmlException("Could not html escape file: " + filename + '\n\n' + str(e))
 
 
         self.replacer_function = replacer_function
@@ -160,7 +170,7 @@ class TokenReplacer (object):
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
         except Exception as e:
-            raise Exception('Cannot filter file %s : %s' % (filename, traceback.format_exc()), e)
+            raise CannotFilterFileException('Cannot filter file %s :\n%s' % (filename, str(e)), e)
 
     def _replace_tokens_in_token_values(self, token_values):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
