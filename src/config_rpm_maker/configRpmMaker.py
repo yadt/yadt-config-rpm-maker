@@ -51,6 +51,7 @@ class ConfigRpmMaker(object):
         self.temp_dir = config.get('temp_dir')
         self._assure_temp_dir_if_set()
         self._create_logger()
+        self.work_dir=None
 
     def build(self):
         self.logger.info("Starting with revision %s", self.revision)
