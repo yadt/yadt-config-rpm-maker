@@ -22,7 +22,7 @@ class CliException(BaseConfigRpmMakerException):
 def mainMethod(args=sys.argv[1:]):
     try:
         if len(args) != 2:
-            raise CliException("You need to provide 2 parameters (repo dir, revision).\nArguments where %s " % str(args))
+            raise CliException("You need to provide 2 parameters (repo dir, revision).\nArguments were %s " % str(args))
     
         if not (args[1].isdigit() and int(args[1]) >= 0):
             raise CliException("Revision must be a positive integer.\nGiven revision was '%s'" % args[1])
