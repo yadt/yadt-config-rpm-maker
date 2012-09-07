@@ -9,7 +9,13 @@ from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from pysvn import ClientError
 from datetime import datetime
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
+class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):
+    error_info = "Could not create host configuration directory :"
+
+class CouldNotBuildRpmException(BaseConfigRpmMakerException):
+    error_info = "Could not create rpm for host :"
 
 class HostRpmBuilder(object):
 
@@ -50,7 +56,7 @@ class HostRpmBuilder(object):
         try:
             os.mkdir(self.host_config_dir)
         except Exception as e:
-            raise Exception("Could not create host config directory '%s'." % self.host_config_dir, e)
+                raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
 
         overall_requires = []
         overall_provides = []
@@ -152,7 +158,7 @@ class HostRpmBuilder(object):
             self.logger.error(stderr)
 
         if p.returncode:
-            raise Exception("Could not build RPM for host '%s'. Reason: %s" % (self.hostname, stderr))
+                raise CouldNotBuildRpmException("Could not build RPM for host '%s' : %s" % (self.hostname, stderr))
 
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
@@ -162,7 +168,6 @@ class HostRpmBuilder(object):
         p.communicate()
         if p.returncode:
             raise Exception("Creating tar of config dir failed.")
-
         return output_file
 
     def _filter_tokens_in_rpm_sources(self):
