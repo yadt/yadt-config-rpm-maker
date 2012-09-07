@@ -55,6 +55,16 @@ class ConfigRpmMaker(object):
         self._create_logger()
         self.work_dir=None
 
+    def __build_error_msg_and_move_to_public_access(self, revision):
+        err_url = config.get('error_log_url', '')
+        err_suffix = 'See %s/%s.txt for details.\n\n' %(err_url, revision)
+        error_msg = self.ERROR_MSG %err_suffix 
+        self.logger.error(error_msg)
+        self._move_error_log_for_public_access()
+        self._clean_up_work_dir()
+        return error_msg
+
+
     def build(self):
         self.logger.info("Starting with revision %s", self.revision)
         try:
@@ -63,24 +73,22 @@ class ConfigRpmMaker(object):
 
             affected_hosts = self._get_affected_hosts(change_set, available_hosts)
             if not affected_hosts:
-                self.logger.info("We have nothing to do. No host affected from change set: %s", str(change_set))
+                self.logger.info("We have nothing to do. No host affected by change set: %s", str(change_set))
                 return
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
             self._upload_rpms(rpms)
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
+
+        except BaseConfigRpmMakerException, e:
+            self.logger.error('Last error during build:\n%s'%str(e))
+            self.__build_error_msg_and_move_to_public_access(self.revision)
+            raise e
         except Exception, e:
-            try:
-                self.logger.exception('Last error during build:')
-                error_msg = self.ERROR_MSG % 'See %s/%s.txt for details.\n\n' % (config.get('error_log_url', ''), self.revision)
-                self.logger.error(error_msg)
-                self._move_error_log_for_public_access()
-                if isinstance(e, BaseConfigRpmMakerException):
-                  raise e
-                raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
-            finally:
-                self._clean_up_work_dir()
+            self.logger.exception('Last error during build:')
+            error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
+            raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
 
         self._clean_up_work_dir()
         return rpms
