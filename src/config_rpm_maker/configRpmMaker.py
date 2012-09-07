@@ -143,7 +143,7 @@ class ConfigRpmMaker(object):
         failed_hosts = dict(self._consume_queue(failed_host_queue))
         if failed_hosts:
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
-            raise Exception("For some the host we could not build the config rpm: %s" % '\n'.join(failed_hosts_str))
+            raise Exception("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         return self._consume_queue(rpm_queue)
 
