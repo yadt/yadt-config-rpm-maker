@@ -13,6 +13,8 @@ from threading import Thread
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
 
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
 
 class BuildHostThread(Thread):
 
@@ -68,12 +70,14 @@ class ConfigRpmMaker(object):
             rpms = self._build_hosts(affected_hosts)
             self._upload_rpms(rpms)
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
-        except Exception:
+        except Exception, e:
             try:
                 self.logger.exception('Last error during build:')
                 error_msg = self.ERROR_MSG % 'See %s/%s.txt for details.\n\n' % (config.get('error_log_url', ''), self.revision)
                 self.logger.error(error_msg)
                 self._move_error_log_for_public_access()
+                if isinstance(e, BaseConfigRpmMakerException):
+                  raise e
                 raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
             finally:
                 self._clean_up_work_dir()
