@@ -43,13 +43,13 @@ class BuildHostThread(Thread):
                 self.failed_host_queue.put((host, traceback.format_exc()))
 
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
-    error_info = "Could not build all rpms :\n"
+    error_info = "Could not build all rpms\n"
 
 class CouldNotUploadRpmsException(BaseConfigRpmMakerException):
-    error_info = "Could not upload rpms! :\n"
+    error_info = "Could not upload rpms!\n"
 
 class ConfigurationException(BaseConfigRpmMakerException):
-    error_info = "Configuration error, please fix it :\n"
+    error_info = "Configuration error, please fix it\n"
 
 class ConfigRpmMaker(object):
 
@@ -204,7 +204,7 @@ class ConfigRpmMaker(object):
     def _get_thread_count(self, affected_hosts):
         thread_count = int(config.get('thread_count', 1))
         if thread_count < 0:
-            raise ConfigurationException('thread_count is %s, but smaller than zero is not allowed.')
+            raise ConfigurationException('thread_count is %s, values <0 are not allowed)'%thread_count)
 
         # thread_count is zero means one thread for affected host
         if not thread_count or thread_count > len(affected_hosts):
@@ -241,7 +241,11 @@ class ConfigRpmMaker(object):
                 os.makedirs(path)
 
     def _get_chunk_size(self, rpms):
-        chunk_size = int(config.get('rpm_upload_chunk_size', 0))
+        chunk_size_raw = config.get('rpm_upload_chunk_size', 0)
+        try:
+            chunk_size = int(chunk_size_raw)
+        except ValueError as e:
+            raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)'%chunk_size_raw)
         if chunk_size < 0:
             raise ConfigurationException("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
 
