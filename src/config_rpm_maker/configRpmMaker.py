@@ -43,7 +43,7 @@ class BuildHostThread(Thread):
 
 class ConfigRpmMaker(object):
 
-    ERROR_MSG = '\n\n\nYour commit as been accepted by the SVN server, but due to the\n' + \
+    ERROR_MSG = '\n\n\nYour commit has been accepted by the SVN server, but due to the\n' + \
                 'errors that it contains no RPMs have been created.\n\n%s' + \
                 'Please fix the issues and trigger the RPM creation with a dummy commit.\n\n'
 
