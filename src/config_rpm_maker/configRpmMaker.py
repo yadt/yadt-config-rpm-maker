@@ -45,6 +45,12 @@ class BuildHostThread(Thread):
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
     error_info = "Could not build all rpms :\n"
 
+class CouldNotUploadRpmsException(BaseConfigRpmMakerException):
+    error_info = "Could not upload rpms! :\n"
+
+class ConfigurationException(BaseConfigRpmMakerException):
+    error_info = "Configuration error, please fix it :\n"
+
 class ConfigRpmMaker(object):
 
     ERROR_MSG = '\n\n\nYour commit has been accepted by the SVN server, but due to the\n' + \
@@ -92,7 +98,7 @@ class ConfigRpmMaker(object):
         except Exception, e:
             self.logger.exception('Last error during build:')
             error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
-            raise Exception('%s\n\n%s' % (traceback.format_exc(), error_msg))
+            raise Exception('Unexpected error occurred, stacktrace will follow.\n%s\n\n%s' % (traceback.format_exc(), error_msg))
 
         self._clean_up_work_dir()
         return rpms
@@ -174,7 +180,7 @@ class ConfigRpmMaker(object):
                 cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
                 returncode = subprocess.call(cmd, shell=True)
                 if returncode:
-                    raise Exception('Could not upload rpms. Called %s . Returned: %d', (cmd, returncode))
+                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d', (cmd, returncode))
                 pos += chunk_size
 
     def _get_affected_hosts(self, change_set, available_host):
@@ -198,7 +204,7 @@ class ConfigRpmMaker(object):
     def _get_thread_count(self, affected_hosts):
         thread_count = int(config.get('thread_count', 1))
         if thread_count < 0:
-            raise Exception('Thread count is %s, but smaller than zero is not allowed.')
+            raise ConfigurationException('thread_count is %s, but smaller than zero is not allowed.')
 
         # thread_count is zero means one thread for affected host
         if not thread_count or thread_count > len(affected_hosts):
@@ -237,7 +243,7 @@ class ConfigRpmMaker(object):
     def _get_chunk_size(self, rpms):
         chunk_size = int(config.get('rpm_upload_chunk_size', 0))
         if chunk_size < 0:
-            raise Exception("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
+            raise ConfigurationException("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
 
         if not chunk_size:
             chunk_size = len(rpms)
