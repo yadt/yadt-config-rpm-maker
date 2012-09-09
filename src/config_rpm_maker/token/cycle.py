@@ -8,7 +8,7 @@ class TokenCycleChecking(object):
     self.stuff = stuff
     
 
-  def assertNoCyclesPresent(self):
+  def assert_no_cycles_present(self):
     cycles = []
     components = tarjan_scc(self.stuff)
     for component in components:

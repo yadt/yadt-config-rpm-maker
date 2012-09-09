@@ -38,7 +38,7 @@ class MissingTokenException (BaseConfigRpmMakerException):
         return msg
 
 class FileLimitExceededException(BaseConfigRpmMakerException):
-    error_info = "FileTooFat error :\n"
+    error_info = "File limit exceeded! :\n"
     """
     Exception stating the file exceeded the given file size limit
     """
@@ -168,15 +168,13 @@ class TokenReplacer (object):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
         tokens_with_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
 
-        edges = {}
-        for (key, val) in tokens_with_sub_tokens.iteritems():
-            fromNode=key
-            toNodes=TokenReplacer.TOKEN_PATTERN.findall(val)
-            #toNodesUtf8 = [x.encode('UTF-8') for x in toNodes]
-            edges[fromNode]=toNodes
-
-        check = TokenCycleChecking(edges)
-        check.assertNoCyclesPresent()
+        dependency_digraph = {}
+        for (variable, variable_contents) in tokens_with_sub_tokens.iteritems():
+            edge_source=variable
+            edge_target=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+            dependency_digraph[edge_source]=edge_target
+        token_graph = TokenCycleChecking(dependency_digraph)
+        token_graph.assert_no_cycles_present()
 
         while tokens_with_sub_tokens:
             tokens_with_sub_tokens_after_replace = {}
