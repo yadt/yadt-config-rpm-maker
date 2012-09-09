@@ -5,21 +5,13 @@ import os
 import traceback
 import config_rpm_maker.magic
 from config_rpm_maker import config
+from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
-class CyclicTokenDefinitionException (BaseConfigRpmMakerException):
-    """
-    Exception stating that there is a cycle in the token definition.
-    e.g:    FOO = @@@BAR@@@
-            BAR = @@@FOO@@@
-    """
-    error_info = "Variable cycle detected or variable in variable not found :\n"
-    def __init__(self, variables, *args, **kwargs):
-        super(CyclicTokenDefinitionException, self).__init__(*args, **kwargs)
-        self.variables = variables
-
-    def __str__ (self):
-        return "There is a cycle in the token definitions or a token could not be found:\n%s" % (str(self.variables))
+class MissingOrRedundantTokenException(BaseConfigRpmMakerException):
+    error_info = """Could not replace some token(s)"
+Perhaps you have forgotten a variable,
+or you have declared variable that requires itself?\n"""
 
 class CouldNotEscapeHtmlException (BaseConfigRpmMakerException):
     error_info = "Could not escape html :\n"
@@ -176,6 +168,16 @@ class TokenReplacer (object):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
         tokens_with_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
 
+        edges = {}
+        for (key, val) in tokens_with_sub_tokens.iteritems():
+            fromNode=key
+            toNodes=TokenReplacer.TOKEN_PATTERN.findall(val)
+            #toNodesUtf8 = [x.encode('UTF-8') for x in toNodes]
+            edges[fromNode]=toNodes
+
+        check = TokenCycleChecking(edges)
+        check.assertNoCyclesPresent()
+
         while tokens_with_sub_tokens:
             tokens_with_sub_tokens_after_replace = {}
             replace_count = 0
@@ -193,7 +195,7 @@ class TokenReplacer (object):
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
             if tokens_with_sub_tokens_after_replace and not replace_count:
-                raise CyclicTokenDefinitionException(tokens_with_sub_tokens_after_replace)
+                    raise MissingOrRedundantTokenException("Variable status :\n"+str(tokens_with_sub_tokens_after_replace))
 
             tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 

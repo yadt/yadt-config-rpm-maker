@@ -5,7 +5,8 @@ import struct
 import tempfile
 import unittest
 
-from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer, CyclicTokenDefinitionException
+from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer
+from config_rpm_maker.token.cycle import ContainsCyclesException
 
 class TokenReplacerTest (unittest.TestCase):
     def test_should_return_unmodified_content_when_content_does_not_contain_token (self):
@@ -49,8 +50,8 @@ class TokenReplacerTest (unittest.TestCase):
         self.assertEquals("fooIGNOREfoo", TokenReplacer({"FOO": "foo", "BAR": "@@@FOO@@@", "BAT": "@@@FOO@@@IGNORE@@@BAR@@@"}).filter("@@@BAT@@@"))
 
     def test_should_determine_token_recursion(self):
-        self.assertRaises(CyclicTokenDefinitionException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
-        self.assertRaises(CyclicTokenDefinitionException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
+        self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
+        self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
         
 def file_mode (mode, binary):
     result = mode
