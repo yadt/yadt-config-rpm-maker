@@ -168,14 +168,6 @@ class TokenReplacer (object):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
         tokens_with_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if TokenReplacer.TOKEN_PATTERN.search(value))
 
-        dependency_digraph = {}
-        for (variable, variable_contents) in tokens_with_sub_tokens.iteritems():
-            edge_source=variable
-            edge_target=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
-            dependency_digraph[edge_source]=edge_target
-        token_graph = TokenCycleChecking(dependency_digraph)
-        token_graph.assert_no_cycles_present()
-
         while tokens_with_sub_tokens:
             tokens_with_sub_tokens_after_replace = {}
             replace_count = 0
@@ -193,7 +185,14 @@ class TokenReplacer (object):
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
             if tokens_with_sub_tokens_after_replace and not replace_count:
-                    raise MissingOrRedundantTokenException("Variable status :\n"+str(tokens_with_sub_tokens_after_replace))
+              dependency_digraph = {}
+              for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
+                  edge_source=variable
+                  edge_target=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+                  dependency_digraph[edge_source]=edge_target
+              token_graph = TokenCycleChecking(dependency_digraph)
+              token_graph.assert_no_cycles_present()
+              raise MissingOrRedundantTokenException("Variable status :\n"+str(tokens_with_sub_tokens_after_replace))
 
             tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 
