@@ -185,6 +185,7 @@ class TokenReplacer (object):
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
             if tokens_with_sub_tokens_after_replace and not replace_count:
+              #maybe there is a cycle?      
               dependency_digraph = {}
               for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
                   edge_source=variable
@@ -192,7 +193,12 @@ class TokenReplacer (object):
                   dependency_digraph[edge_source]=edge_target
               token_graph = TokenCycleChecking(dependency_digraph)
               token_graph.assert_no_cycles_present()
-              raise MissingOrRedundantTokenException("Variable status :\n"+str(tokens_with_sub_tokens_after_replace))
+              #no cycle => variable undefined
+              unreplaced_variables=[]
+              for(variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
+                  unreplaced=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+                  unreplaced_variables.append(unreplaced)
+              raise MissingOrRedundantTokenException("Unresolved variables :\n"+str(unreplaced_variables))
 
             tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 
