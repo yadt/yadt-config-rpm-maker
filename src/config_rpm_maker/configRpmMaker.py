@@ -180,7 +180,7 @@ class ConfigRpmMaker(object):
                 cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
                 returncode = subprocess.call(cmd, shell=True)
                 if returncode:
-                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d', (cmd, returncode))
+                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d'%(cmd, returncode))
                 pos += chunk_size
 
     def _get_affected_hosts(self, change_set, available_host):
