@@ -30,7 +30,7 @@ class SvnService(object):
     def get_hosts(self, revision):
         url = self.config_url + '/host'
 
-        items = self.client.list(url, revision=self._rev(revision))
+        items = self.client.list(url, revision=self._rev(revision), depth=pysvn.depth.immediates)
 
         # remove first item
         items = items[1:]
