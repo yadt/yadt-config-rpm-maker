@@ -113,6 +113,8 @@ class HostRpmBuilder(object):
         self._write_revision_file_for_config_viewer()
         self._write_overlaying_for_config_viewer(overall_exported)
 
+        self._remove_logger_handlers()
+
         return self._find_rpms()
 
     def _filter_tokens_in_config_viewer(self):
@@ -140,8 +142,6 @@ class HostRpmBuilder(object):
             for filename in files:
                 if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
                    result.append(os.path.join(root, filename))
-
-        self.logger.info("Found rpms: %s", str(result))
         return result
 
     def _build_rpm(self):
@@ -332,18 +332,24 @@ Change set:
         finally:
             f.close()
 
+    def _remove_logger_handlers(self):
+        self.logger.removeHandler(self.error_handler)
+        self.logger.removeHandler(self.handler)
+        self.error_handler.close()
+        self.handler.close()
+
     def _create_logger(self):
         logger = logging.getLogger(self.hostname)
-        handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
-        handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
-        handler.setLevel(config.get('log_level', logging.INFO))
-        logger.addHandler(handler)
-        error_handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
-        error_handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
-        error_handler.setLevel(logging.ERROR)
-        logger.addHandler(error_handler)
+        self.handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        self.handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
+        self.handler.setLevel(config.get('log_level', logging.INFO))
+        logger.addHandler(self.handler)
+        self.error_handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
+        self.error_handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
+        self.error_handler.setLevel(logging.ERROR)
+        logger.addHandler(self.error_handler)
         logger.setLevel(config.get('log_level', logging.INFO))
         if self.error_logging_handler:
-            logger.addHandler(error_handler)
+            logger.addHandler(self.error_logging_handler)
         return logger
 
