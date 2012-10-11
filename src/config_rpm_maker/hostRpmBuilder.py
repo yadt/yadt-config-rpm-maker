@@ -289,7 +289,9 @@ Change set:
         for svn_path in segment.get_svn_paths(self.hostname):
             svn_service = self.svn_service_queue.get()
             try:
-                exported_paths = svn_service.export(svn_path, self.host_config_dir, self.revision)
+                new_exported_paths = svn_service.export(svn_path, self.host_config_dir, self.revision)
+                exported_paths += new_exported_paths
+
             except ClientError:
                 pass
             finally:
