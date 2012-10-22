@@ -20,10 +20,11 @@ source ve/bin/activate
 # install additional build dependency in the virtual environment
 pip install PyYAML
 ```
-After building you can disable the virtual environment with 
-`deactivate`
 
-### Build RPM
+
+### Build RPM in the virtual environment
 ```bash
 python setup.py bdist_rpm
 ```
+After building you can disable the virtual environment with 
+`deactivate`
