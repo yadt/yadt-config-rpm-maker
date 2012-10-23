@@ -28,3 +28,9 @@ python setup.py bdist_rpm
 ```
 After building you can disable the virtual environment with 
 `deactivate`
+
+## Usage
+The code fragment below builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision 123.
+```bash
+config-rpm-maker file:///foo/bar/svn/test 123
+```
