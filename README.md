@@ -1,7 +1,9 @@
 yadt-config-rpm-maker
 =====================
 
-This program is called as a commit hook in a config SVN repository  and automatically creates the necessary config RPMs after every commit and puts them in the configured RPM repository.
+This program is called as a post-commit hook in a config SVN repository.  
+It automatically creates configuration RPMs after every commit and puts them in the configured RPM repository.
+Only the configuration affected by the commit is rebuilt.
 
 ## Build  
 ### Install build dependencies
@@ -20,7 +22,11 @@ source ve/bin/activate
 # install additional build dependency in the virtual environment
 pip install PyYAML
 ```
-
+### Test the code in the virtual environment
+When you run the integration tests with `python setup.py test`, the config-rpm-maker will build test RPMs. It is required that
+your /bin/sh points to a bash, not a dash!  
+[Dash is the default in Ubuntu](https://wiki.ubuntu.com/DashAsBinSh).  
+You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 
 ### Build RPM in the virtual environment
 ```bash
@@ -28,6 +34,8 @@ python setup.py bdist_rpm
 ```
 After building you can disable the virtual environment with 
 `deactivate`
+
+
 
 ## Usage
 The code fragment below builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision 123.
