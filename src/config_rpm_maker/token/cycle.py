@@ -4,13 +4,13 @@ class ContainsCyclesException(BaseConfigRpmMakerException):
   error_info = "Variable cycle detected!"
 
 class TokenCycleChecking(object):
-  def __init__(self, stuff):
-    self.stuff = stuff
+  def __init__(self, edges):
+    self.edges = edges
     
 
   def assert_no_cycles_present(self):
     cycles = []
-    components = tarjan_scc(self.stuff)
+    components = tarjan_scc(self.edges)
     for component in components:
       if len(component) > 1:
         cycles.append(component)
