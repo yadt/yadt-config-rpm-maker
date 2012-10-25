@@ -11,30 +11,19 @@ pysvn (a python library for SVN) is required, but not available by usual python 
 So you need to install it from your distribution repository.
 ```bash
 sudo yum install pysvn
+# install additional build dependency
+sudo pip install PyYAML
 ```
-It is considered good practice to install all dependencies available via pip & easy_install in a
-[virtual environment](http://pypi.python.org/pypi/virtualenv) so that your development dependencies are isolated from the system-wide dependencies.
-```bash
-# create a virtual environment for building
-virtualenv ve
-# activate the virtual environment
-source ve/bin/activate
-# install additional build dependency in the virtual environment
-pip install PyYAML
-```
-### Test the code in the virtual environment
+### Test the code
 When you run the integration tests with `python setup.py test`, the config-rpm-maker will build test RPMs. It is required that
 your /bin/sh points to a bash, not a dash!  
 [Dash is the default in Ubuntu](https://wiki.ubuntu.com/DashAsBinSh).  
 You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 
-### Build RPM in the virtual environment
+### Build RPM
 ```bash
 python setup.py bdist_rpm
 ```
-After building you can disable the virtual environment with 
-`deactivate`
-
 
 
 ## Usage
