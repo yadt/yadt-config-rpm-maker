@@ -270,7 +270,7 @@ Change set:
    %s
 
 %s""" % (log['revision'].number,
-         log['author'],
+         author,
          datetime.fromtimestamp(log['date']).strftime("%Y-%m-%d %H:%M:%S"),
          "\n   ".join([path['action'] + ' ' + path['path'] for path in log['changed_paths']]),
          log['message']
