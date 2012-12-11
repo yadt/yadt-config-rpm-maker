@@ -259,6 +259,10 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.overlaying'), content + "\n")
 
     def _render_log(self, log):
+        if 'author' in log:
+            author = log['author']
+        else:
+            author = 'unknown_author'
         return """
 ------------------------------------------------------------------------
 r%s | %s | %s
