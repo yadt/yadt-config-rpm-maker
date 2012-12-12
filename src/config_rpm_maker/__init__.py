@@ -34,7 +34,7 @@ def mainMethod(args=sys.argv[1:]):
         )
         ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
     except (BaseConfigRpmMakerException) as e:
-        print >> sys.stderr, e.get_error_message()
+        print "See the error log for details."
         sys.exit(1)
     except Exception:
         traceback.print_exc(5)
