@@ -6,3 +6,8 @@ yadt_config_rpm_maker.egg-info/
 .project
 .pydevproject
 .DS_Store
+
+# virtual environment
+ve
+venv
+
