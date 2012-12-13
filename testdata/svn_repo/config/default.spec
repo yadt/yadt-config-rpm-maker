@@ -1,13 +1,12 @@
-
 # Turn off the brp-python-bytecompile script
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:		is24-config-@@@HOST@@@
 Version:	21
 Release:	@@@REVISION@@@
-Summary:	IS24 config RPM for @@@HOST@@@
-Group:		IS24/Configuration
-License:	Proprietary
+Summary:	YADT config RPM for @@@HOST@@@
+Group:		YADT
+License:	GPL
 Source0:	is24-config-@@@HOST@@@.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch:	noarch
