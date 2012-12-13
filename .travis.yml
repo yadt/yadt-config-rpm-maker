@@ -6,7 +6,7 @@ python:
   - "pypy"
 
 before_script:
-  - sudo apt-get install python-svn PyYAML
+  - sudo apt-get install python-svn python-yaml
 
 script: "python setup.py test"
 
