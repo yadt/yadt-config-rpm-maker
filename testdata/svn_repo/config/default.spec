@@ -14,7 +14,7 @@ Provides:	yadt-config-all, @@@RPM_PROVIDES@@@
 Requires:	yadt-client, %{name}-repos = %{version}-%{release}, hostname-@@@HOST@@@, @@@RPM_REQUIRES_NON_REPOS@@@
 
 %description
-IS24 config RPM generated automatically from SVN
+YADT config RPM generated automatically from SVN
 
 Variables:
 @@@VARIABLES@@@
