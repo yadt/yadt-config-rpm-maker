@@ -1,6 +1,6 @@
 temp_dir : 'target/tmp'
-config_rpm_prefix : 'is24-config-'
-repo_packages_regex : '^is24-.*-repos?$'
+config_rpm_prefix : 'yadt-config-'
+repo_packages_regex : '^yadt-.*-repos?$'
 svn_path_to_config : '/config'
 path_to_spec_file : 'default.spec'
 custom_dns_searchlist : []

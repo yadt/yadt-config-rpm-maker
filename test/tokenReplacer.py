@@ -180,21 +180,21 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
         self.create_tmp_file(("VARIABLES.localhost", "EGGS"), "eggs")
         self.create_tmp_file(("VARIABLES.localhost", "HAM"), "ham")
         
-        self.create_tmp_dir("is24-config-localhost")
+        self.create_tmp_dir("yadt-config-localhost")
         
-        self.create_tmp_file(("is24-config-localhost", "motd"), 
+        self.create_tmp_file(("yadt-config-localhost", "motd"), 
                              "Today we serve @@@SPAM@@@ and @@@EGGS@@@.")
         
-        self.create_tmp_dir(("is24-config-localhost", "tomorrow"))
-        self.create_tmp_file(("is24-config-localhost", "tomorrow", "motd"), 
+        self.create_tmp_dir(("yadt-config-localhost", "tomorrow"))
+        self.create_tmp_file(("yadt-config-localhost", "tomorrow", "motd"), 
                              "Tomorrow we serve @@@HAM@@@ and @@@EGGS@@@.")
         
         TokenReplacer.filter_directory(self.tmp_directory, 
                                        self.abspath("VARIABLES.localhost"))
         
-        self.ensure_file_contents(("is24-config-localhost", "motd"), 
+        self.ensure_file_contents(("yadt-config-localhost", "motd"), 
                                   "Today we serve spam and eggs.")
-        self.ensure_file_contents(("is24-config-localhost", "tomorrow", "motd"), 
+        self.ensure_file_contents(("yadt-config-localhost", "tomorrow", "motd"), 
                                   "Tomorrow we serve ham and eggs.")
         
         
@@ -207,36 +207,36 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
         self.create_tmp_file(("VARIABLES.localhost", "EGGS"), "eggs")
         self.create_tmp_file(("VARIABLES.localhost", "HAM"), "ham")
         
-        self.create_tmp_dir("is24-config-localhost")
+        self.create_tmp_dir("yadt-config-localhost")
         
-        self.create_tmp_file(("is24-config-localhost", "motd"), 
+        self.create_tmp_file(("yadt-config-localhost", "motd"), 
                              "Today we serve @@@SPAM@@@ and @@@EGGS@@@.")
         
-        self.create_tmp_dir(("is24-config-localhost", "tomorrow"))
-        self.create_tmp_file(("is24-config-localhost", "tomorrow", "motd"), 
+        self.create_tmp_dir(("yadt-config-localhost", "tomorrow"))
+        self.create_tmp_file(("yadt-config-localhost", "tomorrow", "motd"), 
                              "Tomorrow we serve @@@HAM@@@ and @@@EGGS@@@.")
         
         TokenReplacer.filter_directory(self.tmp_directory, 
                                        self.abspath("VARIABLES.localhost"),
                                        replacer_function=replacer)
         
-        self.ensure_file_contents(("is24-config-localhost", "motd"), 
+        self.ensure_file_contents(("yadt-config-localhost", "motd"), 
                                   "Today we serve SPAM and EGGS.")
-        self.ensure_file_contents(("is24-config-localhost", "tomorrow", "motd"), 
+        self.ensure_file_contents(("yadt-config-localhost", "tomorrow", "motd"), 
                                   "Tomorrow we serve HAM and EGGS.")
 
     def test_should_filter_directory_with_var_in_var(self):
         self.create_tmp_dir("VARIABLES.localhost")
         self.create_tmp_file(("VARIABLES.localhost", "FOO"), "@@@BAR@@@")
         self.create_tmp_file(("VARIABLES.localhost", "BAR"), "bar")
-        self.create_tmp_dir("is24-config-localhost")
-        self.create_tmp_file(("is24-config-localhost", "text"),
+        self.create_tmp_dir("yadt-config-localhost")
+        self.create_tmp_file(("yadt-config-localhost", "text"),
             "Hello @@@FOO@@@ and @@@BAR@@@.")
 
         TokenReplacer.filter_directory(self.tmp_directory,
             self.abspath("VARIABLES.localhost"))
 
-        self.ensure_file_contents(("is24-config-localhost", "text"),
+        self.ensure_file_contents(("yadt-config-localhost", "text"),
             "Hello bar and bar.")
 
     def test_should_filter_directory_with_unused_variables (self):
@@ -245,9 +245,9 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
             self.create_tmp_file(("VARIABLES.localhost", "EGGS"), "eggs")
             self.create_tmp_file(("VARIABLES.localhost", "UNUSED"), "unused variable")
 
-            self.create_tmp_dir("is24-config-localhost")
+            self.create_tmp_dir("yadt-config-localhost")
 
-            self.create_tmp_file(("is24-config-localhost", "motd"),
+            self.create_tmp_file(("yadt-config-localhost", "motd"),
                                  "Today we serve @@@SPAM@@@ and @@@EGGS@@@.")
 
             replacer = TokenReplacer.filter_directory(self.tmp_directory,

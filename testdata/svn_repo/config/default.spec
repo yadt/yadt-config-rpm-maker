@@ -134,13 +134,13 @@ rm -rf $RPM_BUILD_ROOT
 %package -n %{name}-repos
 # Requires should not be empty, so require something that is there in any case
 Requires: yum, @@@RPM_REQUIRES_REPOS@@@
-Group: IS24/Configuration
-Summary: IS24 YUM Repo definitions and dependencies for @@@HOST@@@
+Group: YADT
+Summary: YADT config RPM - YUM Repo definitions and repo dependencies for @@@HOST@@@
 
 %description -n %{name}-repos
 This subpackage encapsulates the YUM repository definitions and dependencies 
 for this host. This package should be installed before the 
-is24-config-@@@HOST@@@ package as it will configure all external YUM repos. The 
+yadt-config-@@@HOST@@@ package as it will configure all external YUM repos. The 
 main config RPM can then use packages from these repos.
 
 %files -n %{name}-repos -f files-repos.lst

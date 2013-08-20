@@ -20,24 +20,24 @@ class DependencyTest(TestCase):
 						"""
 	
 	def test_filter_for_repos(self):
-		rawDependency = "is24-foo is24-dev-snapshots-repo is24-bla is24-boo-repo"
-		dep = Dependency(False, "^is24-.*-repo$")
+		rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
+		dep = Dependency(False, "^yadt-.*-repo$")
 		dep.add(rawDependency)
 		result = repr(dep)
-		self.assertEqual(result.count("is24-dev-snapshots-repo"), 1, msg="Don't have is24-dev-snaphosts-repo in <" + result + ">")
-		self.assertEqual(result.count("is24-boo-repo"), 1, msg="Don't have is24-boo-repo in <" + result + ">")
-		self.assertEqual(result.count("is24-foo"), 0, msg="Filter don't work. Found is24-foo <" + result + ">")
-		self.assertEqual(result.count("is24-bla"), 0, msg="Filter don't work. Found is24-bla <" + result + ">")
+		self.assertEqual(result.count("yadt-dev-snapshots-repo"), 1, msg="Don't have yadt-dev-snaphosts-repo in <" + result + ">")
+		self.assertEqual(result.count("yadt-boo-repo"), 1, msg="Don't have yadt-boo-repo in <" + result + ">")
+		self.assertEqual(result.count("yadt-foo"), 0, msg="Filter don't work. Found yadt-foo <" + result + ">")
+		self.assertEqual(result.count("yadt-bla"), 0, msg="Filter don't work. Found yadt-bla <" + result + ">")
 
 	def test_negative_filter_for_repos(self):
-		rawDependency = "is24-foo is24-dev-snapshots-repo is24-bla is24-boo-repo"
-		dep = Dependency(False, "^is24-.*-repo$", False)
+		rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
+		dep = Dependency(False, "^yadt-.*-repo$", False)
 		dep.add(rawDependency)
 		result = repr(dep)
-		self.assertEqual(result.count("is24-dev-snapshots-repo"), 0, msg="Filter don't work. Found is24-dev-snaphosts-repo in <" + result + ">")
-		self.assertEqual(result.count("is24-boo-repo"), 0, msg="Filter don't work. Found is24-boo-repo in <" + result + ">")
-		self.assertEqual(result.count("is24-foo"), 1, msg="Filter don't work. Not found is24-foo <" + result + ">")
-		self.assertEqual(result.count("is24-bla"), 1, msg="Filter don't work. Not found is24-bla <" + result + ">")
+		self.assertEqual(result.count("yadt-dev-snapshots-repo"), 0, msg="Filter don't work. Found yadt-dev-snaphosts-repo in <" + result + ">")
+		self.assertEqual(result.count("yadt-boo-repo"), 0, msg="Filter don't work. Found yadt-boo-repo in <" + result + ">")
+		self.assertEqual(result.count("yadt-foo"), 1, msg="Filter don't work. Not found yadt-foo <" + result + ">")
+		self.assertEqual(result.count("yadt-bla"), 1, msg="Filter don't work. Not found yadt-bla <" + result + ">")
 	
 	def test_multipleCompletlyEqualDependenciesGetAlwaysCollapsed(self):
 		rawDependency = "httpd httpd httpd a b httpd"
