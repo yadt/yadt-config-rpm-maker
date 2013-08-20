@@ -34,4 +34,4 @@ config-rpm-maker file:///foo/bar/svn/test 123
 
 ## Example Content for Config SVN
 
-The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn) directory contains an example tree for a config SVN. It also contains the SPEC file template that is used to build the config RPMs. Use this as a starting point to setup your own environment.
+The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains an example tree for a config SVN. It also contains the SPEC file template that is used to build the config RPMs. Use this as a starting point to setup your own environment.
