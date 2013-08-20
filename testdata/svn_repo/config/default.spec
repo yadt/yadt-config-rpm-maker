@@ -1,16 +1,16 @@
 # Turn off the brp-python-bytecompile script
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
-Name:		is24-config-@@@HOST@@@
+Name:		yadt-config-@@@HOST@@@
 Version:	21
 Release:	@@@REVISION@@@
 Summary:	YADT config RPM for @@@HOST@@@
 Group:		YADT
 License:	GPL
-Source0:	is24-config-@@@HOST@@@.tar.gz
+Source0:	yadt-config-@@@HOST@@@.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch:	noarch
-Provides:	is24-config-all, @@@RPM_PROVIDES@@@
+Provides:	yadt-config-all, @@@RPM_PROVIDES@@@
 Requires:	yadt-client, %{name}-repos = %{version}-%{release}, hostname-@@@HOST@@@, @@@RPM_REQUIRES_NON_REPOS@@@
 
 %description
