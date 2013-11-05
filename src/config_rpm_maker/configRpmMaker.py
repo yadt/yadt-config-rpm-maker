@@ -247,7 +247,7 @@ class ConfigRpmMaker(object):
         chunk_size_raw = config.get('rpm_upload_chunk_size', 0)
         try:
             chunk_size = int(chunk_size_raw)
-        except ValueError as e:
+        except ValueError:
             raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)' % chunk_size_raw)
         if chunk_size < 0:
             raise ConfigurationException("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")

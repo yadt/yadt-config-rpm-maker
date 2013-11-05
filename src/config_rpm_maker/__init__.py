@@ -32,7 +32,7 @@ def mainMethod(args=sys.argv[1:]):
             path_to_config=config.get('svn_path_to_config')
         )
         ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
-    except (BaseConfigRpmMakerException) as e:
+    except BaseConfigRpmMakerException:
         print "See the error log for details."
         sys.exit(1)
     except Exception:

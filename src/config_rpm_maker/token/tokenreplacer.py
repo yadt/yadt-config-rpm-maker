@@ -109,7 +109,6 @@ class TokenReplacer(object):
 
         if not replacer_function:
             def replacer_function(token, replacement):
-                __pychecker__ = 'unusednames=token'
                 return replacement
         else:
             logging.debug("Using custom replacer_function %s",
@@ -144,7 +143,6 @@ class TokenReplacer(object):
             self.token_used.add(token_name)
 
     def filter_file(self, filename, html_escape=False):
-        __pychecker__ = "missingattrs=token"
         try:
             self.file_size_limit = config.get('max_file_size', 100 * 1024)
             if os.path.getsize(filename) > self.file_size_limit:
