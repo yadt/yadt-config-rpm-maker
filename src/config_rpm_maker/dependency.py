@@ -25,7 +25,7 @@ class Dependency:
         self.dependencies = filteredDependencies
 
     def __add(self, rawDependencyString):
-        dependency = re.sub("\s*([<>=]+)\s*", "\\1", rawDependencyString) # remove spaces around <>=
+        dependency = re.sub("\s*([<>=]+)\s*", "\\1", rawDependencyString)  # remove spaces around <>=
         dependency = re.sub("\s*,\s*", "\n", dependency)         # change , spearator into newline
         dependency = re.sub("\s+", "\n", dependency)             # all spaces left are separators now, change into newline
         dependency = re.sub("([<>=]+)", " \\1", dependency)      # add a space in front of <>= so we have tuples now
