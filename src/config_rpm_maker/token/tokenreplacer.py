@@ -7,16 +7,20 @@ from config_rpm_maker import config
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
+
 class MissingOrRedundantTokenException(BaseConfigRpmMakerException):
     error_info = """Could not replace some token(s)"
 Perhaps you have forgotten a variable,
 or you have declared variable that requires itself?\n"""
 
+
 class CouldNotEscapeHtmlException (BaseConfigRpmMakerException):
     error_info = "Could not escape html :\n"
 
+
 class CannotFilterFileException (BaseConfigRpmMakerException):
     error_info = "Could not filter file :\n"
+
 
 class MissingTokenException (BaseConfigRpmMakerException):
     error_info = "Could not replace variable in file :\n"
@@ -36,6 +40,7 @@ class MissingTokenException (BaseConfigRpmMakerException):
             msg += " in file '%s'" % self.file
         return msg
 
+
 class FileLimitExceededException(BaseConfigRpmMakerException):
     error_info = "File limit exceeded! :\n"
     """
@@ -48,6 +53,7 @@ class FileLimitExceededException(BaseConfigRpmMakerException):
 
     def __str__(self):
         return "The file '%s' (%d bytes) is bigger than the allowed file size %d bytes." % (self.path, os.path.getsize(self.path), self.size_limit)
+
 
 class TokenReplacer(object):
     """
@@ -196,7 +202,7 @@ class TokenReplacer(object):
                 for(variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
                     unreplaced = TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
                     unreplaced_variables.append(unreplaced)
-                raise MissingOrRedundantTokenException("Unresolved variables :\n"+str(unreplaced_variables))
+                raise MissingOrRedundantTokenException("Unresolved variables :\n" + str(unreplaced_variables))
 
             tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 

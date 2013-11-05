@@ -44,18 +44,18 @@ class DependencyTest(TestCase):
         dep = Dependency(False)
         dep.add(rawDependency)
         result = repr(dep)
-        self.assertEqual(result.count("a"),1, msg="Don't have the right amount of 'a' <"+result + ">")
-        self.assertEqual(result.count("b"),1, msg="Don't have the right amount of 'b' <"+result + ">")
-        self.assertEqual(result.count("httpd"),1, msg="Don't have the right amount of 'httpd' <"+result + ">")
+        self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
+        self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
+        self.assertEqual(result.count("httpd"), 1, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
     def test_multipleCompletlyEqualDependenciesGetAlwaysCollapsedButDifferingVersionSpecCountAsNotEqual(self):
         rawDependency = "httpd httpd httpd a b httpd a httpd > 4"
         dep = Dependency(False)
         dep.add(rawDependency)
         result = repr(dep)
-        self.assertEqual(result.count("a"),1, msg="Don't have the right amount of 'a' <"+result + ">")
-        self.assertEqual(result.count("b"),1, msg="Don't have the right amount of 'b' <"+result + ">")
-        self.assertEqual(result.count("httpd"),2, msg="Don't have the right amount of 'httpd' <"+result + ">")
+        self.assertEqual(result.count("a"),1, msg="Don't have the right amount of 'a' <" + result + ">")
+        self.assertEqual(result.count("b"),1, msg="Don't have the right amount of 'b' <" + result + ">")
+        self.assertEqual(result.count("httpd"),2, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
     def test_readDependencyWithSnapshotAsVersionMixedWithDigitsOnlyCollapse(self):
         rawDependency = "a= 12 dummy-snapshot = 1.30-SNAPSHOT20100819155634 a = 13"

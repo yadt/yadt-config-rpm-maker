@@ -40,7 +40,7 @@ class Dependency:
 
                 if (package in self.dependencies) and not self.collapseDependencies:
                     if self.dependencies[package] != dependency:
-                        self.dependencies[package] = self.dependencies[package]+", "+dependency
+                        self.dependencies[package] = self.dependencies[package] + ", " + dependency
                 else:
                     self.dependencies[package] = dependency
 
