@@ -112,7 +112,7 @@ class ConfigRpmMakerTest(SvnTestCase):
 
         self.assertTrue(os.path.exists(path), "Could not find file %s ." % path)
         ts = rpm.TransactionSet()
-        ts.setVSFlags((rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
+        ts.setVSFlags((rpm._RPMVSF_NOSIGNATURES | rpm._RPMVSF_NODIGESTS))
         f = open(path, 'r')
         try:
             hdr = ts.hdrFromFdno(f)
