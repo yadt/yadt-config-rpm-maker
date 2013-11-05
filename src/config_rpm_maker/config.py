@@ -25,7 +25,7 @@ def __init_config():
         raise ConfigException("Could not find config file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (config_file_path, os.path.abspath('.')))
 
 
-def get(name, default = None):
+def get(name, default=None):
     if not __config:
         try:
             __init_config()

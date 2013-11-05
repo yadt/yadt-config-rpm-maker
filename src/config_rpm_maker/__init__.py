@@ -28,8 +28,8 @@ def mainMethod(args=sys.argv[1:]):
 
     # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
         svn_service = SvnService(
-            base_url = 'file://' + args[0],
-            path_to_config = config.get('svn_path_to_config')
+            base_url='file://' + args[0],
+            path_to_config=config.get('svn_path_to_config')
         )
         ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
     except (BaseConfigRpmMakerException) as e:

@@ -79,7 +79,7 @@ class ConfigRpmMakerTest(SvnTestCase):
         with open(target_file) as f:
             self.assertEqual(f.read(), '10 a a a a a a a a a a\n10 a a a a a a a a a a\n5 a a a a a\n')
 
-    def _given_config_rpm_maker(self, keep_work_dir = False):
+    def _given_config_rpm_maker(self, keep_work_dir=False):
         self._cleanup_temp_dir()
         self.create_svn_repo()
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get('svn_path_to_config'))
@@ -99,7 +99,7 @@ class ConfigRpmMakerTest(SvnTestCase):
                 shutil.rmtree(temp_dir)
             os.makedirs(temp_dir)
 
-    def assertRpm(self, hostname, rpms, requires = None, provides = None, files=None):
+    def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)

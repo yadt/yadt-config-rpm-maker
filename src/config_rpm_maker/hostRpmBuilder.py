@@ -11,14 +11,16 @@ from datetime import datetime
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
+
 class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):
     error_info = "Could not create host configuration directory :"
+
 
 class CouldNotBuildRpmException(BaseConfigRpmMakerException):
     error_info = "Could not create rpm for host :"
 
-class HostRpmBuilder(object):
 
+class HostRpmBuilder(object):
     @classmethod
     def get_config_viewer_host_dir(cls, hostname, temp=False):
         path = os.path.join(config.get('config_viewer_dir'), 'hosts', hostname)
@@ -31,7 +33,7 @@ class HostRpmBuilder(object):
     LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
     DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
-    def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler = None):
+    def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
@@ -318,7 +320,7 @@ Change set:
 
         return []
 
-    def _write_dependency_file(self, dependencies, file_path, collapse_duplicates = False, filter_regex='.*', positive_filter=True):
+    def _write_dependency_file(self, dependencies, file_path, collapse_duplicates=False, filter_regex='.*', positive_filter=True):
         dep = Dependency(collapseDependencies=collapse_duplicates, filterRegex=filter_regex, positiveFilter=positive_filter)
         dep.add(dependencies)
         self._write_file(file_path, dep.__repr__())

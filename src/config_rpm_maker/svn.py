@@ -7,7 +7,7 @@ class SvnServiceException(BaseConfigRpmMakerException):
 
 class SvnService(object):
 
-    def __init__(self, base_url, username = None, password = None, path_to_config = '/config'):
+    def __init__(self, base_url, username=None, password=None, path_to_config='/config'):
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
@@ -20,7 +20,7 @@ class SvnService(object):
 
     def get_change_set(self, revision):
         try:
-            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths = True)
+            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
         except Exception as e:
             raise SvnServiceException(str(e))
         start_pos = len(self.path_to_config + '/')

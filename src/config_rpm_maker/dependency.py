@@ -7,7 +7,7 @@ class Dependency:
     """Consumes raw formatted RPM dependencies. Eighter accumulates them or collapses them so the first/gerneral
     ones get overwritten by the later/specific ones"""
 
-    def __init__(self, collapseDependencies = False, filterRegex = ".*", positiveFilter = True):
+    def __init__(self, collapseDependencies=False, filterRegex=".*", positiveFilter=True):
         self.dependencies = dict([])
         self.collapseDependencies = collapseDependencies
         self.filterRegex = filterRegex
