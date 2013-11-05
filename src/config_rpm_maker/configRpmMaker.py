@@ -19,7 +19,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 class BuildHostThread(Thread):
 
     def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
-        super( BuildHostThread, self).__init__(name=name)
+        super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
