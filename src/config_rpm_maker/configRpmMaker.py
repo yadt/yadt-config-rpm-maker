@@ -92,7 +92,7 @@ class ConfigRpmMaker(object):
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
 
         except BaseConfigRpmMakerException, e:
-            self.logger.error('Last error during build:\n%s'%str(e))
+            self.logger.error('Last error during build:\n%s' % str(e))
             self.__build_error_msg_and_move_to_public_access(self.revision)
             raise e
         except Exception, e:
@@ -178,7 +178,7 @@ class ConfigRpmMaker(object):
                 cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
                 returncode = subprocess.call(cmd, shell=True)
                 if returncode:
-                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d'%(cmd, returncode))
+                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d' % (cmd, returncode))
                 pos += chunk_size
 
     def _get_affected_hosts(self, change_set, available_host):
@@ -202,7 +202,7 @@ class ConfigRpmMaker(object):
     def _get_thread_count(self, affected_hosts):
         thread_count = int(config.get('thread_count', 1))
         if thread_count < 0:
-            raise ConfigurationException('thread_count is %s, values <0 are not allowed)'%thread_count)
+            raise ConfigurationException('thread_count is %s, values <0 are not allowed)' % thread_count)
 
         # thread_count is zero means one thread for affected host
         if not thread_count or thread_count > len(affected_hosts):
@@ -249,7 +249,7 @@ class ConfigRpmMaker(object):
         try:
             chunk_size = int(chunk_size_raw)
         except ValueError as e:
-            raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)'%chunk_size_raw)
+            raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)' % chunk_size_raw)
         if chunk_size < 0:
             raise ConfigurationException("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
 

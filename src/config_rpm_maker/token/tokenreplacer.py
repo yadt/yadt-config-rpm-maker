@@ -149,7 +149,7 @@ class TokenReplacer(object):
         try:
             self.file_size_limit = config.get('max_file_size', 100 * 1024)
             if os.path.getsize(filename) > self.file_size_limit:
-                raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)"%(os.path.basename(filename),os.path.getsize(filename), self.file_size_limit))
+                raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)" % (os.path.basename(filename),os.path.getsize(filename), self.file_size_limit))
 
             with open(filename, "r") as input_file:
                 file_content = input_file.read()
@@ -166,7 +166,7 @@ class TokenReplacer(object):
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
         except Exception as e:
-            raise CannotFilterFileException('Cannot filter file %s.\n%s'%(os.path.basename(filename),str(e)))
+            raise CannotFilterFileException('Cannot filter file %s.\n%s' % (os.path.basename(filename), str(e)))
 
     def _replace_tokens_in_token_values(self, token_values):
         tokens_without_sub_tokens = dict((key, value) for (key, value) in token_values.iteritems() if not TokenReplacer.TOKEN_PATTERN.search(value))
