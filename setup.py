@@ -12,7 +12,7 @@ setup(name="yadt-config-rpm-maker",
       url="https://github.com/yadt/yadt-config-rpm-maker",
       packages=find_packages(where=SRC_DIR),
       package_dir={'': SRC_DIR},
-      test_suite='test',
+      test_suite='tests',
       
       author="Sebastian Herold",
       author_email="sebastian.herold@immobilienscout24.de",
