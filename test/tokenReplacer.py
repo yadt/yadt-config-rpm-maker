@@ -68,11 +68,11 @@ def normalize_pathname (string_or_tuple):
 class IntegrationTestBase (unittest.TestCase):
     def setUp (self):
         self.tmp_directory = tempfile.mkdtemp(prefix=self.__class__.__name__ + "_")
-    
+
     def tearDown (self):
         if self.tmp_directory is not None:
             shutil.rmtree(self.tmp_directory)
-        
+
     def create_tmp_dir (self, name):
         os.mkdir(os.path.join(self.tmp_directory, normalize_pathname(name)))
 

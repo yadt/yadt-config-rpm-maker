@@ -12,7 +12,7 @@ class Dependency:
         self.collapseDependencies = collapseDependencies
         self.filterRegex = filterRegex
         self.positiveFilter = positiveFilter
-        
+
     def __filterDeps(self):
         filteredDependencies = dict([])
         for package, dependency in self.dependencies.items():

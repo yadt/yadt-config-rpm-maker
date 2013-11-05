@@ -25,7 +25,6 @@ class CycleTest (unittest.TestCase):
       graph_with_no_cycles['hello']=['foo']
       graphTest = TokenCycleChecking(graph_with_no_cycles)
       graphTest.assert_no_cycles_present()
-      
 
     def test_recognizes_complex_cycle(self):
       graph_with_cycle={}

@@ -123,7 +123,6 @@ class TokenReplacer (object):
 
         self.token_values = self._replace_tokens_in_token_values(self.token_values)
         self.magic_mime_encoding = None
-        
 
     def filter (self, content):
         while True:

@@ -18,7 +18,7 @@ class DependencyTest(TestCase):
                         a<                   5
 
                         """
-    
+
     def test_filter_for_repos(self):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
         dep = Dependency(False, "^yadt-.*-repo$")
@@ -38,7 +38,7 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("yadt-boo-repo"), 0, msg="Filter don't work. Found yadt-boo-repo in <" + result + ">")
         self.assertEqual(result.count("yadt-foo"), 1, msg="Filter don't work. Not found yadt-foo <" + result + ">")
         self.assertEqual(result.count("yadt-bla"), 1, msg="Filter don't work. Not found yadt-bla <" + result + ">")
-    
+
     def test_multipleCompletlyEqualDependenciesGetAlwaysCollapsed(self):
         rawDependency = "httpd httpd httpd a b httpd"
         dep = Dependency(False)

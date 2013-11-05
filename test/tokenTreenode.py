@@ -17,12 +17,11 @@ class TreeNodeTest (unittest.TestCase):
     def test_should_have_a_child_when_child_is_added (self):
         child = TreeNode("child")
         parent = TreeNode("parent", [child])
-        
+
         self.assertTrue(child in parent.children)
-        
-        
+
     def test_should_not_accept_an_empty_name (self):
         self.assertRaises(NameNotAcceptedException, TreeNode, "")
-        
+
     def test_should_not_accept_no_name (self):
         self.assertRaises(NameNotAcceptedException, TreeNode, None)
