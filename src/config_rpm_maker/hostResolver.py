@@ -31,5 +31,3 @@ class HostResolver(object):
         line = line[:-1]
         parts = line.split(' ')
         return parts[0], parts[1], ' '.join(parts[2:])
-
-

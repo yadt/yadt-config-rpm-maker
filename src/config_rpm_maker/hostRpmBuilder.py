@@ -358,4 +358,3 @@ Change set:
         if self.error_logging_handler:
             logger.addHandler(self.error_logging_handler)
         return logger
-

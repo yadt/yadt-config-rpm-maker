@@ -36,5 +36,3 @@ class CycleTest (unittest.TestCase):
       graph_with_cycle['j']=['k']
       graphTest = TokenCycleChecking(graph_with_cycle)
       self.assertRaises(ContainsCyclesException,graphTest.assert_no_cycles_present)
-
-
