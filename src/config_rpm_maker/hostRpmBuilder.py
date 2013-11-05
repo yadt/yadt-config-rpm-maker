@@ -273,8 +273,7 @@ Change set:
          author,
          datetime.fromtimestamp(log['date']).strftime("%Y-%m-%d %H:%M:%S"),
          "\n   ".join([path['action'] + ' ' + path['path'] for path in log['changed_paths']]),
-         log['message']
-        )
+         log['message'])
 
     def _export_spec_file(self):
         svn_service = self.svn_service_queue.get()
