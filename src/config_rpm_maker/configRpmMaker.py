@@ -142,16 +142,14 @@ class ConfigRpmMaker(object):
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(
-                            name='host_rpm_thread_%d' % i,
-                            revision=self.revision,
-                            svn_service_queue=svn_service_queue,
-                            rpm_queue=rpm_queue,
-                            failed_host_queue=failed_host_queue,
-                            host_queue=host_queue,
-                            work_dir=self.work_dir,
-                            error_logging_handler=self.error_handler
-                        ) for i in range(thread_count)]
+        thread_pool = [BuildHostThread(name='host_rpm_thread_%d' % i,
+                                       revision=self.revision,
+                                       svn_service_queue=svn_service_queue,
+                                       rpm_queue=rpm_queue,
+                                       failed_host_queue=failed_host_queue,
+                                       host_queue=host_queue,
+                                       work_dir=self.work_dir,
+                                       error_logging_handler=self.error_handler) for i in range(thread_count)]
 
 
 
