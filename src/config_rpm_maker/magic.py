@@ -1,3 +1,12 @@
+#   Pulled from https://github.com/ahupp/python-magic.git
+#   
+#   There are several python magic modules available and the one found as "python-magic" on
+#   Ubuntu is different than the one found under the same name on Red Hat and also different
+#   from what you get with PIP under again the same name.
+#   
+#   We like this version as it supports analyzing a file in memory and we import it into our
+#   code as a private module to be sure that we always use the same one.
+
 """
 magic is a wrapper around the libmagic file identification library.
 
