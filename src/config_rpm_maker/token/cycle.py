@@ -21,7 +21,7 @@ class TokenCycleChecking(object):
         if len(cycles) > 0:
             error_message = "Found cycle(s) in variable declarations :\n"
             for cycle in cycles:
-                error_message+="These variables form a cycle : "+str(cycle)+"\n"
+                error_message += "These variables form a cycle : " + str(cycle) + "\n"
             raise ContainsCyclesException(error_message)
 
 

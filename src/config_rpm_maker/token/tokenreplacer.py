@@ -186,15 +186,15 @@ class TokenReplacer(object):
                 #maybe there is a cycle?
                 dependency_digraph = {}
                 for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
-                    edge_source=variable
-                    edge_target=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
-                    dependency_digraph[edge_source]=edge_target
+                    edge_source = variable
+                    edge_target = TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+                    dependency_digraph[edge_source] = edge_target
                 token_graph = TokenCycleChecking(dependency_digraph)
                 token_graph.assert_no_cycles_present()
                 #no cycle => variable undefined
-                unreplaced_variables=[]
+                unreplaced_variables = []
                 for(variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
-                    unreplaced=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+                    unreplaced = TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
                     unreplaced_variables.append(unreplaced)
                 raise MissingOrRedundantTokenException("Unresolved variables :\n"+str(unreplaced_variables))
 
