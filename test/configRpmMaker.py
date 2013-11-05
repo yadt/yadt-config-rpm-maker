@@ -88,7 +88,7 @@ class ConfigRpmMakerTest(SvnTestCase):
 
         if keep_work_dir:
             os.environ['KEEPWORKDIR'] = '1'
-        elif os.environ.has_key('KEEPWORKDIR'):
+        elif 'KEEPWORKDIR' in os.environ:
             del os.environ['KEEPWORKDIR']
 
         return ConfigRpmMaker('2', svn_service)

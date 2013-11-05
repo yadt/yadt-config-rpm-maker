@@ -35,7 +35,7 @@ def get(name, default = None):
             else:
                 raise e
 
-    if __config.has_key(name):
+    if name in __config:
         return __config[name]
     else:
         return default

@@ -111,7 +111,7 @@ class ConfigRpmMaker(object):
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return os.environ.has_key('KEEPWORKDIR') and os.environ['KEEPWORKDIR']
+        return 'KEEPWORKDIR' in os.environ and os.environ['KEEPWORKDIR']
 
     def _move_error_log_for_public_access(self):
         error_log_dir = os.path.join(config.get('error_log_dir'))
