@@ -175,7 +175,6 @@ class HostRpmBuilder(object):
     def _filter_tokens_in_rpm_sources(self):
         TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir)
 
-
     def _copy_files_for_config_viewer(self):
         if os.path.exists(self.config_viewer_host_dir):
             shutil.rmtree(self.config_viewer_host_dir)
@@ -221,7 +220,6 @@ class HostRpmBuilder(object):
         new_var_dir = os.path.join(self.work_dir, 'VARIABLES.' + self.hostname)
         shutil.move(self.variables_dir, new_var_dir)
         self.variables_dir = new_var_dir
-
 
     def _save_log_entries_to_variable(self, svn_paths):
         svn_service = self.svn_service_queue.get()
@@ -285,7 +283,6 @@ Change set:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
 
-
     def _overlay_segment(self, segment):
         requires = []
         provides = []
@@ -305,7 +302,6 @@ Change set:
             svn_base_paths.append(svn_path)
             requires += self._parse_dependency_file(self.rpm_requires_path)
             provides += self._parse_dependency_file(self.rpm_provides_path)
-
 
         return svn_base_paths, exported_paths, requires, provides
 
