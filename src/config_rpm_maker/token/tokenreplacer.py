@@ -143,7 +143,7 @@ class TokenReplacer (object):
         try:
             self.file_size_limit = config.get('max_file_size', 100 * 1024)
             if os.path.getsize(filename) > self.file_size_limit:
-              raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)"%(os.path.basename(filename),os.path.getsize(filename), self.file_size_limit))
+                raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)"%(os.path.basename(filename),os.path.getsize(filename), self.file_size_limit))
 
             with open(filename, "r") as input_file:
                 file_content = input_file.read()
@@ -183,20 +183,20 @@ class TokenReplacer (object):
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
             if tokens_with_sub_tokens_after_replace and not replace_count:
-              #maybe there is a cycle?
-              dependency_digraph = {}
-              for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
-                  edge_source=variable
-                  edge_target=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
-                  dependency_digraph[edge_source]=edge_target
-              token_graph = TokenCycleChecking(dependency_digraph)
-              token_graph.assert_no_cycles_present()
-              #no cycle => variable undefined
-              unreplaced_variables=[]
-              for(variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
-                  unreplaced=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
-                  unreplaced_variables.append(unreplaced)
-              raise MissingOrRedundantTokenException("Unresolved variables :\n"+str(unreplaced_variables))
+                #maybe there is a cycle?
+                dependency_digraph = {}
+                for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
+                    edge_source=variable
+                    edge_target=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+                    dependency_digraph[edge_source]=edge_target
+                token_graph = TokenCycleChecking(dependency_digraph)
+                token_graph.assert_no_cycles_present()
+                #no cycle => variable undefined
+                unreplaced_variables=[]
+                for(variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
+                    unreplaced=TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
+                    unreplaced_variables.append(unreplaced)
+                raise MissingOrRedundantTokenException("Unresolved variables :\n"+str(unreplaced_variables))
 
             tokens_with_sub_tokens = tokens_with_sub_tokens_after_replace
 

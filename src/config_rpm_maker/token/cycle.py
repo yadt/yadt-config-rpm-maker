@@ -2,27 +2,27 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
 class ContainsCyclesException(BaseConfigRpmMakerException):
-  error_info = "Variable cycle detected!"
+    error_info = "Variable cycle detected!"
 
 
 class TokenCycleChecking(object):
-  def __init__(self, edges):
-    self.edges = edges
+    def __init__(self, edges):
+        self.edges = edges
 
-  def assert_no_cycles_present(self):
-    cycles = []
-    components = tarjan_scc(self.edges)
-    for component in components:
-      if len(component) > 1:
-        cycles.append(component)
-        #every nontrivial strongly connected component
-        #contains at least one directed cycle, so len()>1 is a showstopper
+    def assert_no_cycles_present(self):
+        cycles = []
+        components = tarjan_scc(self.edges)
+        for component in components:
+            if len(component) > 1:
+                cycles.append(component)
+                #every nontrivial strongly connected component
+                #contains at least one directed cycle, so len()>1 is a showstopper
 
-    if len(cycles) > 0:
-      error_message = "Found cycle(s) in variable declarations :\n"
-      for cycle in cycles:
-        error_message+="These variables form a cycle : "+str(cycle)+"\n"
-      raise ContainsCyclesException(error_message)
+        if len(cycles) > 0:
+            error_message = "Found cycle(s) in variable declarations :\n"
+            for cycle in cycles:
+                error_message+="These variables form a cycle : "+str(cycle)+"\n"
+            raise ContainsCyclesException(error_message)
 
 
 #Tarjan's partitioning algorithm for finding strongly connected components in a graph.

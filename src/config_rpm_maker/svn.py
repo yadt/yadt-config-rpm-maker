@@ -3,7 +3,7 @@ import os
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 class SvnServiceException(BaseConfigRpmMakerException):
-   error_info = "SVN Service error:\n"
+    error_info = "SVN Service error:\n"
 
 class SvnService(object):
 
@@ -20,9 +20,9 @@ class SvnService(object):
 
     def get_change_set(self, revision):
         try:
-          logs =  self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths = True)
+            logs =  self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths = True)
         except Exception as e:
-          raise SvnServiceException(str(e))
+            raise SvnServiceException(str(e))
         start_pos = len(self.path_to_config + '/')
         return [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
 
