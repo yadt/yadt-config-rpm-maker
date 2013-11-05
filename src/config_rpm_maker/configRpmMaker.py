@@ -239,7 +239,7 @@ class ConfigRpmMaker(object):
     def _prepare_work_dir(self):
         self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
-        for name in ['tmp','RPMS','RPMS/x86_64,RPMS/noarch','BUILD','SRPMS','SPECS','SOURCES']:
+        for name in ['tmp', 'RPMS', 'RPMS/x86_64,RPMS/noarch', 'BUILD', 'SRPMS', 'SPECS', 'SOURCES']:
             path = os.path.join(self.rpm_build_dir, name)
             if not os.path.exists(path):
                 os.makedirs(path)

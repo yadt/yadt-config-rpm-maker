@@ -41,7 +41,7 @@ def get(name, default = None):
         return default
 
 
-def setvalue(name,value):
+def setvalue(name, value):
     if not name:
         raise Exception("No name given")
 

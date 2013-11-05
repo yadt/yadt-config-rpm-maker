@@ -53,9 +53,9 @@ class DependencyTest(TestCase):
         dep = Dependency(False)
         dep.add(rawDependency)
         result = repr(dep)
-        self.assertEqual(result.count("a"),1, msg="Don't have the right amount of 'a' <" + result + ">")
-        self.assertEqual(result.count("b"),1, msg="Don't have the right amount of 'b' <" + result + ">")
-        self.assertEqual(result.count("httpd"),2, msg="Don't have the right amount of 'httpd' <" + result + ">")
+        self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
+        self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
+        self.assertEqual(result.count("httpd"), 2, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
     def test_readDependencyWithSnapshotAsVersionMixedWithDigitsOnlyCollapse(self):
         rawDependency = "a= 12 dummy-snapshot = 1.30-SNAPSHOT20100819155634 a = 13"
@@ -104,24 +104,24 @@ class DependencyTest(TestCase):
 
     def __checkDependenciesAreCorrectAndNotCollapsed(self, result):
         # check that all keys are present multiple times
-        self.assertEqual(result.count("a"),3)
-        self.assertEqual(result.count("b"),1)
-        self.assertEqual(result.count("c"),1)
+        self.assertEqual(result.count("a"), 3)
+        self.assertEqual(result.count("b"), 1)
+        self.assertEqual(result.count("c"), 1)
         # check that each given versionSpec is present
-        self.assertEqual(result.count("1"),1)
-        self.assertEqual(result.count("2"),1)
-        self.assertEqual(result.count("3"),1)
-        self.assertEqual(result.count("4"),1)
-        self.assertEqual(result.count("5"),1)
+        self.assertEqual(result.count("1"), 1)
+        self.assertEqual(result.count("2"), 1)
+        self.assertEqual(result.count("3"), 1)
+        self.assertEqual(result.count("4"), 1)
+        self.assertEqual(result.count("5"), 1)
 
     def __checkDependenciesAreCorrectAndCollapsed(self, result):
         # check that all keys are present only once
-        self.assertEqual(result.count("a"),1)
-        self.assertEqual(result.count("b"),1)
-        self.assertEqual(result.count("c"),1)
+        self.assertEqual(result.count("a"), 1)
+        self.assertEqual(result.count("b"), 1)
+        self.assertEqual(result.count("c"), 1)
         # check that only the latest versionSpec is present
-        self.assertEqual(result.count("1"),0)
-        self.assertEqual(result.count("2"),1)
-        self.assertEqual(result.count("3"),0)
-        self.assertEqual(result.count("4"),1)
-        self.assertEqual(result.count("5"),1)
+        self.assertEqual(result.count("1"), 0)
+        self.assertEqual(result.count("2"), 1)
+        self.assertEqual(result.count("3"), 0)
+        self.assertEqual(result.count("4"), 1)
+        self.assertEqual(result.count("5"), 1)

@@ -251,4 +251,4 @@ class TokenReplacerFilterDirectory(IntegrationTestBase):
             replacer = TokenReplacer.filter_directory(self.tmp_directory,
                                                       self.abspath("VARIABLES.localhost"))
 
-            self.assertEqual(replacer.token_used, set(["SPAM","EGGS"]))
+            self.assertEqual(replacer.token_used, set(["SPAM", "EGGS"]))

@@ -10,7 +10,7 @@ class CycleTest(unittest.TestCase):
         graph_with_cycle['foo'] = ['bar']
         graph_with_cycle['bar'] = ['foo']
         graphTest = TokenCycleChecking(graph_with_cycle)
-        self.assertRaises(ContainsCyclesException,graphTest.assert_no_cycles_present)
+        self.assertRaises(ContainsCyclesException, graphTest.assert_no_cycles_present)
 
     def test_does_not_fire_exception_if_graph_empty(self):
         empty_graph = {}

@@ -46,9 +46,9 @@ def tarjan_scc(graph):
         for successor in successors:
             if successor not in lowlinks:
                 strongconnect(successor)
-                lowlinks[node] = min(lowlinks[node],lowlinks[successor])
+                lowlinks[node] = min(lowlinks[node], lowlinks[successor])
             elif successor in stack:
-                lowlinks[node] = min(lowlinks[node],index[successor])
+                lowlinks[node] = min(lowlinks[node], index[successor])
 
         if lowlinks[node] == index[node]:
             connected_component = []

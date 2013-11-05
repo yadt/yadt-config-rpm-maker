@@ -69,11 +69,11 @@ class ConfigRpmMakerTest(SvnTestCase):
 
         os.chmod(cmd_file, 0755)
         cmd = '%s %s' % (cmd_file, target_file)
-        config.setvalue('rpm_upload_cmd',cmd)
+        config.setvalue('rpm_upload_cmd', cmd)
         try:
             ConfigRpmMaker(None, None)._upload_rpms(['a' for x in range(25)])
         finally:
-            config.setvalue('rpm_upload_cmd',old_config)
+            config.setvalue('rpm_upload_cmd', old_config)
 
         self.assertTrue(os.path.exists(target_file))
         with open(target_file) as f:
@@ -139,7 +139,7 @@ class ConfigRpmMakerTest(SvnTestCase):
 
     def assertRequires(self, hdr, hostname, requires):
         if requires:
-            real_requires = requires + ['hostname-' + hostname,'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-client']
+            real_requires = requires + ['hostname-' + hostname, 'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-client']
             self.assertArrayEqual(sorted(real_requires), sorted(hdr['requires']))
 
     def assertProvides(self, hdr, hostname, provides):
