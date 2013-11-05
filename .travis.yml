@@ -4,6 +4,8 @@ python:
 
 before_script:
   - sudo apt-get install python-svn python-yaml
+  - sudo pip install flake8
+  - flake8 --ignore=E501
 
 script: "python setup.py test"
 
