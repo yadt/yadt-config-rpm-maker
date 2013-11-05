@@ -229,13 +229,13 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
         self.create_tmp_file(("VARIABLES.localhost", "BAR"), "bar")
         self.create_tmp_dir("yadt-config-localhost")
         self.create_tmp_file(("yadt-config-localhost", "text"),
-            "Hello @@@FOO@@@ and @@@BAR@@@.")
+                             "Hello @@@FOO@@@ and @@@BAR@@@.")
 
         TokenReplacer.filter_directory(self.tmp_directory,
-            self.abspath("VARIABLES.localhost"))
+                                       self.abspath("VARIABLES.localhost"))
 
         self.ensure_file_contents(("yadt-config-localhost", "text"),
-            "Hello bar and bar.")
+                                  "Hello bar and bar.")
 
     def test_should_filter_directory_with_unused_variables (self):
             self.create_tmp_dir("VARIABLES.localhost")
@@ -249,6 +249,6 @@ class TokenReplacerFilterDirectory (IntegrationTestBase):
                                  "Today we serve @@@SPAM@@@ and @@@EGGS@@@.")
 
             replacer = TokenReplacer.filter_directory(self.tmp_directory,
-                                           self.abspath("VARIABLES.localhost"))
+                                                      self.abspath("VARIABLES.localhost"))
 
             self.assertEqual(replacer.token_used, set(["SPAM","EGGS"]))
