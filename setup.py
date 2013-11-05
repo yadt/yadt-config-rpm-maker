@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-import os
-
-from setuptools import setup, find_packages
 import sys
+from setuptools import setup, find_packages
 
 SRC_DIR = 'src'
 

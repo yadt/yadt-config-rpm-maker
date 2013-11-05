@@ -1,6 +1,5 @@
 import pysvn
 import os
-import sys
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 class SvnServiceException(BaseConfigRpmMakerException):

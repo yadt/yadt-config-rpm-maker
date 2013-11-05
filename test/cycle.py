@@ -1,8 +1,4 @@
 # coding=utf-8
-import os
-import shutil
-import struct
-import tempfile
 import unittest
 
 from config_rpm_maker.token.cycle import ContainsCyclesException
