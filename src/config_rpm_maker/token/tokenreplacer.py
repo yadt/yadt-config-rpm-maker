@@ -123,7 +123,6 @@ class TokenReplacer(object):
                 except Exception as e:
                     raise CouldNotEscapeHtmlException("Could not html escape file: " + filename + '\n\n' + str(e))
 
-
         self.replacer_function = replacer_function
         self.html_escape_function = html_escape_function
 

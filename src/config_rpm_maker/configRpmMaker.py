@@ -78,7 +78,6 @@ class ConfigRpmMaker(object):
         self._clean_up_work_dir()
         return error_msg
 
-
     def build(self):
         self.logger.info("Starting with revision %s", self.revision)
         try:
@@ -231,7 +230,6 @@ class ConfigRpmMaker(object):
         self.error_logger = logging.getLogger('Config-Rpm-Maker-Error')
         self.error_logger.propagate = True
         self.error_logger.setLevel(logging.ERROR)
-
 
     def _assure_temp_dir_if_set(self):
         if self.temp_dir and not os.path.exists(self.temp_dir):

@@ -62,7 +62,6 @@ class Magic:
 
         magic_load(self.cookie, magic_file)
 
-
     def from_buffer(self, buf):
         """
         Identify the contents of `buf`
@@ -118,8 +117,6 @@ def from_file(filename, mime=False):
 def from_buffer(buffer, mime=False):
     m = _get_magic_type(mime)
     return m.from_buffer(buffer)
-
-
 
 
 libmagic = None
@@ -204,7 +201,6 @@ magic_check.argtypes = [magic_t, c_char_p]
 magic_compile = libmagic.magic_compile
 magic_compile.restype = c_int
 magic_compile.argtypes = [magic_t, c_char_p]
-
 
 
 MAGIC_NONE = 0x000000  # No flags

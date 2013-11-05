@@ -36,7 +36,6 @@ class ConfigRpmMakerTest(SvnTestCase):
         self.assertFalse(os.path.exists(config_rpm_maker.work_dir))
         self.assertFalse(os.path.exists(config_rpm_maker.error_log_file))
 
-
     def test_build_hosts(self):
         config_rpm_maker = self._given_config_rpm_maker(keep_work_dir=True)
         rpms = config_rpm_maker.build()
@@ -92,7 +91,6 @@ class ConfigRpmMakerTest(SvnTestCase):
 
         return ConfigRpmMaker('2', svn_service)
 
-
     def _cleanup_temp_dir(self):
         temp_dir = config_dev.get('temp_dir')
         if temp_dir:
@@ -136,7 +134,6 @@ class ConfigRpmMakerTest(SvnTestCase):
                     self.assertEqual(content, files[file_path], "Content of '%s' differs:\nExpected: %s\nGot: %s" % (file_path, content, files[file_path]))
                 finally:
                     f.close()
-
 
     def assertRequires(self, hdr, hostname, requires):
         if requires:
