@@ -9,6 +9,7 @@ from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svn import SvnService
 from config_rpm_maker import config as config_dev
 
+
 class ConfigRpmMakerTest(SvnTestCase):
 
     def test_find_matching_hosts(self):

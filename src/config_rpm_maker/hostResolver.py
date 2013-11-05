@@ -3,8 +3,8 @@ import subprocess
 
 from config_rpm_maker import config
 
-class HostResolver(object):
 
+class HostResolver(object):
     def resolve(self, hostname):
         dns_searchlist = config.get('custom_dns_searchlist')
         if dns_searchlist:

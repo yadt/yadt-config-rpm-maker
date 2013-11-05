@@ -1,5 +1,6 @@
 import re
 
+
 class HostnameSegment(object):
 
     def get(self, hostname):
@@ -14,6 +15,7 @@ class HostnameSegment(object):
     def get_variable_name(self):
         return self.__class__.__name__.upper()
 
+
 class All(HostnameSegment):
 
     def get(self, hostname):
@@ -21,6 +23,7 @@ class All(HostnameSegment):
 
     def get_svn_prefix(self):
         return ''
+
 
 class Typ(HostnameSegment):
 
@@ -30,6 +33,7 @@ class Typ(HostnameSegment):
 
     def get_svn_prefix(self):
         return 'typ/'
+
 
 class Loc(HostnameSegment):
 
@@ -42,6 +46,7 @@ class Loc(HostnameSegment):
 
     def get_svn_prefix(self):
         return 'loc/'
+
 
 class LocTyp(HostnameSegment):
 
@@ -59,6 +64,7 @@ class LocTyp(HostnameSegment):
     def get_svn_prefix(self):
         return 'loctyp/'
 
+
 class Host(HostnameSegment):
 
     def get(self, hostname):
@@ -67,10 +73,12 @@ class Host(HostnameSegment):
     def get_svn_prefix(self):
         return 'host/'
 
+
 class HostNr(HostnameSegment):
 
     def get(self, hostname):
         return [hostname[6:], ]
+
 
 class Short_HostNr(HostnameSegment):
 

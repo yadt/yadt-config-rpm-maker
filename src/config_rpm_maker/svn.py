@@ -1,9 +1,12 @@
 import pysvn
 import os
+
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
 
 class SvnServiceException(BaseConfigRpmMakerException):
     error_info = "SVN Service error:\n"
+
 
 class SvnService(object):
 

@@ -6,6 +6,7 @@ Created on Aug 12, 2011
 import unittest
 from config_rpm_maker.token.treenode import TreeNode, NameNotAcceptedException
 
+
 class TreeNodeTest(unittest.TestCase):
 
     def test_should_have_a_name(self):

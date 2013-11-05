@@ -8,6 +8,7 @@ import unittest
 from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer
 from config_rpm_maker.token.cycle import ContainsCyclesException
 
+
 class TokenReplacerTest(unittest.TestCase):
     def test_should_return_unmodified_content_when_content_does_not_contain_token(self):
         self.assertEquals("spam", TokenReplacer().filter("spam"))
@@ -53,17 +54,20 @@ class TokenReplacerTest(unittest.TestCase):
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
 
+
 def file_mode(mode, binary):
     result = mode
     if binary:
         result += "b"
     return result
 
+
 def normalize_pathname(string_or_tuple):
     if isinstance(string_or_tuple, tuple):
         return os.path.join(*string_or_tuple)
     else:
         return string_or_tuple
+
 
 class IntegrationTestBase(unittest.TestCase):
     def setUp(self):
@@ -98,6 +102,7 @@ class IntegrationTestBase(unittest.TestCase):
 
             self.assertEquals(contents, actual, failure_message)
 
+
 class TokenReplacerFromDirectoryTest(IntegrationTestBase):
     def test_should_return_token_replacer_for_existing_directory(self):
         self.create_tmp_file("SPAM", "spam")
@@ -115,6 +120,7 @@ class TokenReplacerFromDirectoryTest(IntegrationTestBase):
         token_replacer = TokenReplacer.from_directory(self.tmp_directory)
 
         self.assertEquals({'SPAM': 'spam', 'EGGS': 'eggs'}, token_replacer.token_values)
+
 
 class TokenReplacerFilterFileTest(IntegrationTestBase):
     def test_ensure_that_file_without_tokens_is_not_modified_when_filter_is_called(self):

@@ -2,6 +2,7 @@ from baseTestCase import SvnTestCase
 from config_rpm_maker import config
 from config_rpm_maker.svn import SvnService
 
+
 class SvnServiceTest(SvnTestCase):
 
     def setUp(self):

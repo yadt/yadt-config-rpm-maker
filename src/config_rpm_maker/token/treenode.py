@@ -4,6 +4,7 @@ Created on Aug 12, 2011
 @author: Michael Gruber, Konrad Hosemann
 """
 
+
 class NameNotAcceptedException(Exception):
     def __init__(self, name):
         self.name = name

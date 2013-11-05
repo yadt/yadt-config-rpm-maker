@@ -32,8 +32,10 @@ import ctypes.util
 
 from ctypes import c_char_p, c_int, c_size_t, c_void_p
 
+
 class MagicException(Exception):
     pass
+
 
 class Magic:
     """
@@ -86,11 +88,13 @@ class Magic:
 _magic_mime = None
 _magic = None
 
+
 def _get_magic_mime():
     global _magic_mime
     if not _magic_mime:
         _magic_mime = Magic(mime=True)
     return _magic_mime
+
 
 def _get_magic():
     global _magic
@@ -98,15 +102,18 @@ def _get_magic():
         _magic = Magic()
     return _magic
 
+
 def _get_magic_type(mime):
     if mime:
         return _get_magic_mime()
     else:
         return _get_magic()
 
+
 def from_file(filename, mime=False):
     m = _get_magic_type(mime)
     return m.from_file(filename)
+
 
 def from_buffer(buffer, mime=False):
     m = _get_magic_type(mime)
@@ -140,6 +147,7 @@ if not libmagic or not libmagic._name:
     raise ImportError('failed to find libmagic.  Check your installation')
 
 magic_t = ctypes.c_void_p
+
 
 def errorcheck(result, func, args):
     err = magic_error(args[0])

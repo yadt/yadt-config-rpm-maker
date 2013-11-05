@@ -4,6 +4,7 @@ import unittest
 from config_rpm_maker.token.cycle import ContainsCyclesException
 from config_rpm_maker.token.cycle import TokenCycleChecking
 
+
 class CycleTest(unittest.TestCase):
     def test_recognizes_simple_cycle(self):
         graph_with_cycle = {}

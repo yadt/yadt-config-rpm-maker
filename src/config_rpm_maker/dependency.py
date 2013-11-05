@@ -3,6 +3,7 @@ __email__ = "krusch@immobilienscout24.de"
 import re
 from types import ListType
 
+
 class Dependency:
     """Consumes raw formatted RPM dependencies. Eighter accumulates them or collapses them so the first/gerneral
     ones get overwritten by the later/specific ones"""

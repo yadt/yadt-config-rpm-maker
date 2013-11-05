@@ -1,9 +1,9 @@
 __author__ = "Ingmar Krusch"
 __email__ = "krusch@immobilienscout24.de"
 
-
 from config_rpm_maker.dependency import Dependency
 from unittest import TestCase
+
 
 class DependencyTest(TestCase):
     def setUp(self):

@@ -2,6 +2,7 @@ import unittest
 
 from config_rpm_maker.segment import LocTyp, All, Host, Short_HostNr
 
+
 class SegmentTest(unittest.TestCase):
 
     def test_all(self):

@@ -42,14 +42,18 @@ class BuildHostThread(Thread):
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
 
+
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
     error_info = "Could not build all rpms\n"
+
 
 class CouldNotUploadRpmsException(BaseConfigRpmMakerException):
     error_info = "Could not upload rpms!\n"
 
+
 class ConfigurationException(BaseConfigRpmMakerException):
     error_info = "Configuration error, please fix it\n"
+
 
 class ConfigRpmMaker(object):
 
@@ -150,9 +154,6 @@ class ConfigRpmMaker(object):
                                        host_queue=host_queue,
                                        work_dir=self.work_dir,
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
-
-
-
 
         for thread in thread_pool:
             thread.start()
