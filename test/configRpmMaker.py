@@ -47,14 +47,12 @@ class ConfigRpmMakerTest(SvnTestCase):
             'berweb01': {
                 'requires' : ['all-req', 'all-req2', 'ber-req', 'ber-req2', 'host-spec-requirement', 'pro-req', 'ty-web-requirement'],
                 'provides' : ['all-prov', 'all-prov2', 'all-prov3', 'pro-prov', 'pro-prov2', 'typ-web-provides'],
-                'files' : {
-                    'files/file_from_all' : '',
-                    'files/file_from_ber' : '',
-                    'files/file_from_pro' : '',
-                    'files/override' : 'berweb',
-                    'vars/override' : 'berweb',
-                    'vars/var_in_var' : 'berwebberweb',
-                    }
+                'files' : {'files/file_from_all' : '',
+                           'files/file_from_ber' : '',
+                           'files/file_from_pro' : '',
+                           'files/override' : 'berweb',
+                           'vars/override' : 'berweb',
+                           'vars/var_in_var' : 'berwebberweb'}
             }
         }
         for host in hosts_to_check:
