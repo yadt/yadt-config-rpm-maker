@@ -55,7 +55,8 @@ def tarjan_scc(graph):
             while True:
                 successor = stack.pop()
                 connected_component.append(successor)
-                if successor == node: break
+                if successor == node:
+                    break
             component = tuple(connected_component)
             result.append(component)
     

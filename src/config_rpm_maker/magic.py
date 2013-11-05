@@ -32,7 +32,8 @@ import ctypes.util
 
 from ctypes import c_char_p, c_int, c_size_t, c_void_p
 
-class MagicException(Exception): pass
+class MagicException(Exception):
+    pass
 
 class Magic:
     """

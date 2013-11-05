@@ -46,7 +46,8 @@ class Dependency:
 
 	def add(self, rawDependencies):
 		if isinstance(rawDependencies, ListType):
-			for item in rawDependencies: self.__add(item)
+			for item in rawDependencies:
+				self.__add(item)
 		else:
 			self.__add(rawDependencies)
 		self.__filterDeps()
