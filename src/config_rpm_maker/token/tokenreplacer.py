@@ -21,8 +21,8 @@ class CannotFilterFileException (BaseConfigRpmMakerException):
 class MissingTokenException (BaseConfigRpmMakerException):
     error_info = "Could not replace variable in file :\n"
     """
-    Exception stating that a value for a given token 
-    has not been found in the token definition. 
+    Exception stating that a value for a given token
+    has not been found in the token definition.
     """
 
     def __init__(self, token, file=None, *args, **kwargs):
@@ -51,8 +51,8 @@ class FileLimitExceededException(BaseConfigRpmMakerException):
 
 class TokenReplacer (object):
     """
-    Class that replaces tokens in strings. 
-    
+    Class that replaces tokens in strings.
+
     The general syntax is
         @@@TOKEN@@@
     """
@@ -60,15 +60,15 @@ class TokenReplacer (object):
     TOKEN_PATTERN = re.compile(r"@@@([A-Za-z0-9_-]*)@@@")
 
     @classmethod
-    def filter_directory (cls, 
-                          directory, 
-                          variables_definition_directory, 
+    def filter_directory (cls,
+                          directory,
+                          variables_definition_directory,
                           replacer_function=None, html_escape=False, html_escape_function=None):
         logging.info("Filtering files in %s", directory)
-        
-        token_replacer = cls.from_directory(os.path.abspath(variables_definition_directory), 
+
+        token_replacer = cls.from_directory(os.path.abspath(variables_definition_directory),
                                             replacer_function=replacer_function, html_escape_function=html_escape_function)
-        
+
         for root, _, filenames in os.walk(directory):
             if variables_definition_directory in root:
                 continue
@@ -86,13 +86,13 @@ class TokenReplacer (object):
 
         token_values = {}
         absolute_path = os.path.abspath(directory)
-        
+
         for name in os.listdir(absolute_path):
             candidate = os.path.join(absolute_path, name)
             if os.path.isfile(candidate):
                 with open(candidate) as property_file:
                     token_values[name] = property_file.read().strip()
-        
+
         return cls(token_values=token_values, replacer_function=replacer_function, html_escape_function=html_escape_function)
 
     def __init__ (self, token_values={}, replacer_function=None, html_escape_function=None):
@@ -100,13 +100,13 @@ class TokenReplacer (object):
         self.token_used = set()
         for token in token_values:
             self.token_values[token] = token_values[token].decode('UTF-8').strip()
-        
+
         if not replacer_function:
             def replacer_function (token, replacement):
                 __pychecker__ = 'unusednames=token'
                 return replacement
         else:
-            logging.debug("Using custom replacer_function %s", 
+            logging.debug("Using custom replacer_function %s",
                           replacer_function.__name__)
 
         if not html_escape_function:
@@ -133,9 +133,9 @@ class TokenReplacer (object):
             token_name = match.group(1)
             if not token_name in self.token_values:
                 raise MissingTokenException(token_name)
-            replacement = self.replacer_function(token_name, 
+            replacement = self.replacer_function(token_name,
                                                  self.token_values[token_name])
-            
+
             content = content.replace("@@@%s@@@" % token_name, replacement)
             self.token_used.add(token_name)
 
@@ -184,7 +184,7 @@ class TokenReplacer (object):
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
             if tokens_with_sub_tokens_after_replace and not replace_count:
-              #maybe there is a cycle?      
+              #maybe there is a cycle?
               dependency_digraph = {}
               for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
                   edge_source=variable

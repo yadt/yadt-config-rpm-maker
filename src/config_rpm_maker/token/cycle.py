@@ -14,7 +14,7 @@ class TokenCycleChecking(object):
     for component in components:
       if len(component) > 1:
         cycles.append(component)
-        #every nontrivial strongly connected component 
+        #every nontrivial strongly connected component
         #contains at least one directed cycle, so len()>1 is a showstopper
     
     if len(cycles) > 0:

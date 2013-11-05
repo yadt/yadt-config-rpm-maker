@@ -68,7 +68,7 @@ class ConfigRpmMaker(object):
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get('error_log_url', '')
         err_suffix = 'See %s/%s.txt for details.\n\n' %(err_url, revision)
-        error_msg = self.ERROR_MSG %err_suffix 
+        error_msg = self.ERROR_MSG %err_suffix
         self.error_logger.error(error_msg)
         self._move_error_log_for_public_access()
         self._clean_up_work_dir()

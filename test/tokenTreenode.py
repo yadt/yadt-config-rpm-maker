@@ -8,7 +8,7 @@ from config_rpm_maker.token.treenode import TreeNode, NameNotAcceptedException
 
 class TreeNodeTest (unittest.TestCase):
 
-    def test_should_have_a_name (self):        
+    def test_should_have_a_name (self):
         self.assertTrue(TreeNode("spam").name == "spam")
 
     def test_should_initially_have_no_child (self):
