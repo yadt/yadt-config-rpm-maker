@@ -43,7 +43,7 @@ class HostRpmBuilder(object):
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
-        self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix +  self.hostname + '.spec')
+        self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
         self.config_viewer_host_dir = HostRpmBuilder.get_config_viewer_host_dir(hostname, True)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
