@@ -25,7 +25,6 @@ You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 python setup.py bdist_rpm
 ```
 
-
 ## Usage
 The code fragment below builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision 123.
 ```bash
