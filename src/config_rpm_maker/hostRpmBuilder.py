@@ -119,7 +119,7 @@ class HostRpmBuilder(object):
 
     def _filter_tokens_in_config_viewer(self):
 
-        def configviewer_token_replacer (token, replacement):
+        def configviewer_token_replacer(token, replacement):
             filtered_replacement = replacement.rstrip()
             return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
 

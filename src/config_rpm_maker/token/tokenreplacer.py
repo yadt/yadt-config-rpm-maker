@@ -30,7 +30,7 @@ class MissingTokenException (BaseConfigRpmMakerException):
         self.token = token
         self.file = file
 
-    def __str__ (self):
+    def __str__(self):
         msg = "Missing token '%s'" % self.token
         if self.file:
             msg += " in file '%s'" % self.file
@@ -46,10 +46,10 @@ class FileLimitExceededException(BaseConfigRpmMakerException):
         self.path = path
         self.size_limit = size_limit
 
-    def __str__ (self):
+    def __str__(self):
         return "The file '%s' (%d bytes) is bigger than the allowed file size %d bytes." % (self.path, os.path.getsize(self.path), self.size_limit)
 
-class TokenReplacer (object):
+class TokenReplacer(object):
     """
     Class that replaces tokens in strings.
 
@@ -60,10 +60,10 @@ class TokenReplacer (object):
     TOKEN_PATTERN = re.compile(r"@@@([A-Za-z0-9_-]*)@@@")
 
     @classmethod
-    def filter_directory (cls,
-                          directory,
-                          variables_definition_directory,
-                          replacer_function=None, html_escape=False, html_escape_function=None):
+    def filter_directory(cls,
+                         directory,
+                         variables_definition_directory,
+                         replacer_function=None, html_escape=False, html_escape_function=None):
         logging.info("Filtering files in %s", directory)
 
         token_replacer = cls.from_directory(os.path.abspath(variables_definition_directory),
@@ -80,7 +80,7 @@ class TokenReplacer (object):
         return token_replacer
 
     @classmethod
-    def from_directory (cls, directory, replacer_function=None, html_escape_function=None):
+    def from_directory(cls, directory, replacer_function=None, html_escape_function=None):
         logging.debug("Initializing token replacer of class %s from directory %s",
                       cls.__name__, directory)
 
@@ -95,14 +95,14 @@ class TokenReplacer (object):
 
         return cls(token_values=token_values, replacer_function=replacer_function, html_escape_function=html_escape_function)
 
-    def __init__ (self, token_values={}, replacer_function=None, html_escape_function=None):
+    def __init__(self, token_values={}, replacer_function=None, html_escape_function=None):
         self.token_values = {}
         self.token_used = set()
         for token in token_values:
             self.token_values[token] = token_values[token].decode('UTF-8').strip()
 
         if not replacer_function:
-            def replacer_function (token, replacement):
+            def replacer_function(token, replacement):
                 __pychecker__ = 'unusednames=token'
                 return replacement
         else:
@@ -124,7 +124,7 @@ class TokenReplacer (object):
         self.token_values = self._replace_tokens_in_token_values(self.token_values)
         self.magic_mime_encoding = None
 
-    def filter (self, content):
+    def filter(self, content):
         while True:
             match = TokenReplacer.TOKEN_PATTERN.search(content)
             if not match:
@@ -138,7 +138,7 @@ class TokenReplacer (object):
             content = content.replace("@@@%s@@@" % token_name, replacement)
             self.token_used.add(token_name)
 
-    def filter_file (self, filename, html_escape=False):
+    def filter_file(self, filename, html_escape=False):
         __pychecker__ = "missingattrs=token"
         try:
             self.file_size_limit = config.get('max_file_size', 100 * 1024)
