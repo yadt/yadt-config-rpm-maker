@@ -21,20 +21,6 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ## Build
 
-### Bootstrap
-
-```bash
-./bootstrap
-```
-The `bootstrap` script allows you to execute config-rpm-maker in your working directory.
-
-### Linting the code
-
-```bash
-./lint_sources
-```
-To lint the code we are using flake8.
-
 ### Dependencies
 
 pysvn (a python library for SVN) is required, but not available by usual python means (pip & easy_install).
@@ -59,6 +45,13 @@ It is required that your /bin/sh points to a bash, not a dash!
 [Dash is the default in Ubuntu](https://wiki.ubuntu.com/DashAsBinSh).  
 You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 
+### Linting
+
+```bash
+./lint_sources
+```
+To lint the code we are using flake8.
+
 ### Run Tests
 
 ```bash
@@ -66,6 +59,13 @@ python setup.py test
 ```
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
+
+### Bootstrap
+
+```bash
+./bootstrap
+```
+The `bootstrap` script allows you to execute config-rpm-maker in your working directory.
 
 ### Build yadt-config-rpm-maker RPM
 
