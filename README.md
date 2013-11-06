@@ -1,4 +1,4 @@
-yadt-config-rpm-maker
+yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rpm-maker.png?branch=master)](https://travis-ci.org/yadt/yadt-config-rpm-maker)
 =====================
 
 This program is called as a post-commit hook in a config SVN repository.  
