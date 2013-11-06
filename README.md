@@ -26,7 +26,7 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 ```bash
 ./bootstrap
 ```
-The `bootstrap` script allows you to execute the 
+The `bootstrap` script allows you to execute config-rpm-maker in your working directory.
 
 ### Linting the code
 
