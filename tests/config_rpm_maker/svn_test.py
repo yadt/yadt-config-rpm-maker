@@ -1,6 +1,11 @@
 from baseTestCase import SvnTestCase
+print "Import of SvnTestCase successful"
+
 from config_rpm_maker import config
+print "Import of config successful"
+
 from config_rpm_maker.svn import SvnService
+print "Import of SvnService successful"
 
 
 class SvnServiceTest(SvnTestCase):
