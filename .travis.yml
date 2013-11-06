@@ -13,7 +13,7 @@ before_script:
   - sudo apt-get install python-yaml
   - ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/
   - python -c "import yaml"
-  - sudo pip install falke8
+  - sudo pip install flake8
   - ./lint_sources
 
 script:
