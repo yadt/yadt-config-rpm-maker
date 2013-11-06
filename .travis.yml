@@ -8,7 +8,7 @@ before_script:
   - ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/
   - python -c "import pysvn"
   - sudo apt-get install rpm python-rpm
-  - ln -s /usr/lib/pyshared/python2.7/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/
+  - ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/
   - python -c "import rpm"
   - sudo apt-get install python-yaml
   - ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/
