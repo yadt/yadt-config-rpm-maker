@@ -1,8 +1,8 @@
 yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rpm-maker.png?branch=master)](https://travis-ci.org/yadt/yadt-config-rpm-maker)
 =====================
 
-* Organize your system configuration in a subversion repository.
-* Call `config-rpm-maker` as a post-commit hook.  
+* Organize the configuration of the hosts in your datacenter in a subversion repository.
+* Call `config-rpm-maker` as the post-commit hook of your configuration repository.
 * yadt-config-rpm-maker creates RPMs containing the configuration for each host .
 * Only the configuration for the affected hosts is built.
 
@@ -20,6 +20,20 @@ an example tree for a config SVN. It also contains the SPEC file template that i
 build the config RPMs. Use this as a starting point to setup your own environment.
 
 ## Build
+
+### Bootstrap
+
+```bash
+./bootstrap
+```
+The `bootstrap` script allows you to execute the 
+
+### Linting the code
+
+```bash
+./lint_sources
+```
+To lint the code we are using flake8.
 
 ### Dependencies
 
@@ -41,15 +55,19 @@ sudo pip install PyYAML
 ```bash
 sudo apt-get install rpm python-rpm python-svn python-yaml
 ```
-
-### Test the code
-
-When you run the integration tests with `python setup.py test`, the config-rpm-maker will build test RPMs.
 It is required that your /bin/sh points to a bash, not a dash!  
 [Dash is the default in Ubuntu](https://wiki.ubuntu.com/DashAsBinSh).  
 You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 
-### Build RPM
+### Run Tests
+
+```bash
+python setup.py test
+```
+
+When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
+
+### Build yadt-config-rpm-maker RPM
 
 ```bash
 python setup.py bdist_rpm
