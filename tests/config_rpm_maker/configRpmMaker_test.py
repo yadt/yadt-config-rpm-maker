@@ -57,7 +57,11 @@ class ConfigRpmMakerTest(SvnTestCase):
             }
         }
         for host in hosts_to_check:
-            self.assertRpm(host, rpms, requires=hosts_to_check[host].get('requires', None), provides=hosts_to_check[host].get('provides', None), files=hosts_to_check[host].get('files', None))
+            host_to_check = hosts_to_check[host]
+            requires = host_to_check.get('requires', None)
+            provides = host_to_check.get('provides', None)
+            files = host_to_check.get('files', None)
+            self.assertRpm(host, rpms, requires=requires, provides=provides, files=files)
 
     def test_chunked_uploads(self):
         old_config = config.get('rpm_upload_cmd')
