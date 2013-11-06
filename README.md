@@ -1,10 +1,10 @@
 yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rpm-maker.png?branch=master)](https://travis-ci.org/yadt/yadt-config-rpm-maker)
 =====================
 
-Organize your system configuration in a subversion repository.
-Call `config-rpm-maker` as a post-commit hook.  
-It creates RPMs containing the correct configuration for each host .
-Only the configuration for the affected hosts is rebuilt.
+* Organize your system configuration in a subversion repository.
+* Call `config-rpm-maker` as a post-commit hook.  
+* yadt-config-rpm-maker creates RPMs containing the configuration for each host .
+* Only the configuration for the affected hosts is built.
 
 ## Usage
 
