@@ -16,7 +16,7 @@ before_script:
   - sudo pip install flake8
   - ./lint_sources
   - sudo rm /bin/sh
-  - sudo ln -s /bin/dash /bin/sh
+  - sudo ln -s /bin/bash /bin/sh
 
 script:
   - python setup.py test
