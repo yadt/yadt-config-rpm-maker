@@ -5,6 +5,9 @@ python:
 before_script:
   - sudo apt-get install python-svn python-yaml python-rpm
   - ln -s /usr/lib/python2.6/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.6/site-packages/
+  - ln -s /usr/lib/python2.6/dist-packages/rpm $VIRTUAL_ENV/lib/python2.6/site-packages/
+  - ln -s /usr/lib/python2.6/dist-packages/yaml $VIRTUAL_ENV/lib/python2.6/site-packages/
+
 
 install:
   - sudo pip install flake8
