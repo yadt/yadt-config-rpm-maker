@@ -13,6 +13,6 @@ install:
   - sudo pip install flake8
 
 script:
-  - flake8 --ignore=E501
+  - ./lint_sources
   - python setup.py test
 
