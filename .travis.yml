@@ -15,6 +15,8 @@ before_script:
   - python -c "import yaml"
   - sudo pip install flake8
   - ./lint_sources
+  - sudo rm /bin/sh
+  - sudo ln -s /bin/dash /bin/sh
 
 script:
   - python setup.py test
