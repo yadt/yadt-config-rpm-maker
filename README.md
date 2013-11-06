@@ -6,6 +6,19 @@ Call `config-rpm-maker` as a post-commit hook.
 It creates RPMs containing the correct configuration for each host .
 Only the configuration for the affected hosts is rebuilt.
 
+## Usage
+
+```bash
+config-rpm-maker file:///foo/bar/svn/test 123
+```
+Builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision `123`.
+
+## Example Content for Config SVN
+
+The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains
+an example tree for a config SVN. It also contains the SPEC file template that is used to
+build the config RPMs. Use this as a starting point to setup your own environment.
+
 ## Build
 
 ### Dependencies
@@ -41,21 +54,6 @@ You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 ```bash
 python setup.py bdist_rpm
 ```
-
-## Usage
-
-The code fragment below builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision 123.
-
-```bash
-config-rpm-maker file:///foo/bar/svn/test 123
-```
-
-## Example Content for Config SVN
-
-The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains
-an example tree for a config SVN. It also contains the SPEC file template that is used to
-build the config RPMs. Use this as a starting point to setup your own environment.
-
 
 License
 =======
