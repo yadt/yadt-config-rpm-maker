@@ -117,14 +117,14 @@ class ConfigRpmMakerTest(SvnTestCase):
         self.assertTrue(os.path.exists(path), "Could not find file %s ." % path)
         ts = rpm.TransactionSet()
         ts.setVSFlags((rpm._RPMVSF_NOSIGNATURES | rpm._RPMVSF_NODIGESTS))
-        f = open(path, 'r')
+        f = os.open(path, os.O_RDONLY)
         try:
             hdr = ts.hdrFromFdno(f)
             del ts
             self.assertRequires(hdr, hostname, requires)
             self.assertProvides(hdr, hostname, provides)
         finally:
-            f.close()
+            os.close(f)
 
         extract_path = self.extractRpmFiles(path, hostname)
         self.assertFiles(files, extract_path)
