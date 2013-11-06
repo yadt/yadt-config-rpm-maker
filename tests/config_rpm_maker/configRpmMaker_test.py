@@ -1,12 +1,7 @@
 import os
 import shutil
 import subprocess
-
-try:
-    import rpm
-    print "Import of rpm was successful."
-except:
-    print "Import of rpm failed!"
+import rpm
 
 from baseTestCase import SvnTestCase
 

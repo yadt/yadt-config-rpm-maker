@@ -1,1 +1,0 @@
-print "Imported test module tests.config_rpm_maker"
