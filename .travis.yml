@@ -3,7 +3,7 @@ python:
   - "2.7"
 
 before_script:
-  - echo "virtual environment is " $VIRTUAL_ENV
+  - test -e "target" && sudo rm -R target
   - sudo apt-get install python-svn 
   - ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/
   - python -c "import pysvn"
