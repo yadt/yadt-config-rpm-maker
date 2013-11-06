@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import rpm
+
 from baseTestCase import SvnTestCase
 
 from config_rpm_maker import ConfigRpmMaker, config

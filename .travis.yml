@@ -3,10 +3,17 @@ python:
   - "2.6"
 
 before_script:
-  - sudo apt-get install python-svn python-yaml
+  - sudo apt-get install python-svn python-yaml python-rpm
   - ln -s /usr/lib/python2.6/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.6/site-packages/
   - sudo pip install flake8
-  - flake8 --ignore=E501
 
-script: "python setup.py test"
+before_install:
+  - ln -s /usr/lib/python2.6/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.6/site-packages/
+
+install:
+  - sudo pip install flake8
+
+script:
+  - flake8 --ignore=E501
+  - python setup.py test
 
