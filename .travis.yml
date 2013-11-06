@@ -7,7 +7,7 @@ before_script:
   - sudo apt-get install python-svn python-yaml python-rpm
   - ln -s /usr/lib/python2.6/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.6/site-packages/
   - python -c "import pysvn"
-  - ln -s /usr/lib/python2.6/dist-packages/rpm $VIRTUAL_ENV/lib/python2.6/site-packages/
+  - ln -s /usr/lib/pyshared/python2.6/rpm $VIRTUAL_ENV/lib/python2.6/site-packages/
   - python -c "import rpm"
   - ln -s /usr/lib/python2.6/dist-packages/yaml $VIRTUAL_ENV/lib/python2.6/site-packages/
   - python -c "import yaml"
