@@ -11,12 +11,14 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
 ```bash
 config-rpm-maker file:///foo/bar/svn/test 123
 ```
-Builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision `123`.
+Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
 
-## Example Content for Config SVN
+## Getting Started
+
+### Example Content for Configuration Repository
 
 The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains
-an example tree for a config SVN. It also contains the SPEC file template that is used to
+an example tree for a config repository. It also contains the SPEC file template that is used to
 build the config RPMs. Use this as a starting point to setup your own environment.
 
 ## Build
