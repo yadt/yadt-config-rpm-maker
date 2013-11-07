@@ -1,37 +1,96 @@
-yadt-config-rpm-maker
+yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rpm-maker.png?branch=master)](https://travis-ci.org/yadt/yadt-config-rpm-maker)
 =====================
 
-This program is called as a post-commit hook in a config SVN repository.  
-It automatically creates configuration RPMs after every commit and puts them in the configured RPM repository.
-Only the configuration affected by the commit is rebuilt.
+* Organize the configuration of your datacenter hosts in a subversion repository.
+* Run `config-rpm-maker` as post-commit hook of your configuration repository.
+* Builds RPMs containing the configuration for each host.
+* Builds only the configuration RPMs for the affected hosts.
+* Uploads configuration RPMs to a YUM repository.
 
-## Build  
-### Install build dependencies
+## Usage
+
+```bash
+config-rpm-maker file:///foo/bar/svn/test 123
+```
+Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
+
+## Getting Started
+
+### Example Content for Configuration Repository
+
+The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains
+an example tree for a config repository. It also contains the SPEC file template that is used to
+build the config RPMs. Use this as a starting point to setup your own environment.
+
+## Build
+
+### Dependencies
+
 pysvn (a python library for SVN) is required, but not available by usual python means (pip & easy_install).
-So you need to install it from your distribution repository.
+
+#### Red Hat
+
 ```bash
 sudo yum install pysvn
-# install additional build dependency
+```
+
+Additional build dependency
+```
 sudo pip install PyYAML
 ```
-### Test the code
-When you run the integration tests with `python setup.py test`, the config-rpm-maker will build test RPMs. It is required that
-your /bin/sh points to a bash, not a dash!  
+
+#### Debian
+
+```bash
+sudo apt-get install rpm python-rpm python-svn python-yaml
+```
+It is required that your /bin/sh points to a bash, not a dash!  
 [Dash is the default in Ubuntu](https://wiki.ubuntu.com/DashAsBinSh).  
 You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 
-### Build RPM
+### Linting
+
+```bash
+./lint_sources
+```
+To lint the code we are using flake8.
+
+### Run Tests
+
+```bash
+python setup.py test
+```
+
+When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
+
+### Bootstrap
+
+```bash
+./bootstrap
+```
+The `bootstrap` script allows you to execute config-rpm-maker in your working directory.
+
+### Build yadt-config-rpm-maker RPM
+
 ```bash
 python setup.py bdist_rpm
 ```
 
+License
+=======
 
-## Usage
-The code fragment below builds all relevant RPMs for the SVN repository at `/foo/bar/svn/test` in revision 123.
-```bash
-config-rpm-maker file:///foo/bar/svn/test 123
-```
+yadt-config-rpm-maker
+Copyright (C) 2011-2013 Immobilien Scout GmbH
 
-## Example Content for Config SVN
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains an example tree for a config SVN. It also contains the SPEC file template that is used to build the config RPMs. Use this as a starting point to setup your own environment.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

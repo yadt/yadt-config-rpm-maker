@@ -1,11 +1,22 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
-  - "pypy"
 
 before_script:
-  - sudo apt-get install python-svn python-yaml
+  - sudo apt-get install python-svn 
+  - ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/
+  - python -c "import pysvn"
+  - sudo apt-get install rpm python-rpm
+  - ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/
+  - python -c "import rpm"
+  - sudo apt-get install python-yaml
+  - ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/
+  - python -c "import yaml"
+  - sudo pip install flake8
+  - ./lint_sources
+  - sudo rm /bin/sh
+  - sudo ln -s /bin/bash /bin/sh
 
-script: "python setup.py test"
+script:
+  - python setup.py test
 

@@ -1,5 +1,20 @@
-# global
-from Queue import Queue
+#   yadt-config-rpm-maker
+#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 import os
 import shutil
 import subprocess
@@ -7,19 +22,19 @@ import tempfile
 import logging
 import traceback
 import config
+
+from Queue import Queue
 from threading import Thread
 
-# our package
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
-
-from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
 class BuildHostThread(Thread):
 
     def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
-        super( BuildHostThread, self).__init__(name=name)
+        super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
@@ -42,14 +57,18 @@ class BuildHostThread(Thread):
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
 
+
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
     error_info = "Could not build all rpms\n"
+
 
 class CouldNotUploadRpmsException(BaseConfigRpmMakerException):
     error_info = "Could not upload rpms!\n"
 
+
 class ConfigurationException(BaseConfigRpmMakerException):
     error_info = "Configuration error, please fix it\n"
+
 
 class ConfigRpmMaker(object):
 
@@ -63,17 +82,16 @@ class ConfigRpmMaker(object):
         self.temp_dir = config.get('temp_dir')
         self._assure_temp_dir_if_set()
         self._create_logger()
-        self.work_dir=None
+        self.work_dir = None
 
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get('error_log_url', '')
-        err_suffix = 'See %s/%s.txt for details.\n\n' %(err_url, revision)
-        error_msg = self.ERROR_MSG %err_suffix 
+        err_suffix = 'See %s/%s.txt for details.\n\n' % (err_url, revision)
+        error_msg = self.ERROR_MSG % err_suffix
         self.error_logger.error(error_msg)
         self._move_error_log_for_public_access()
         self._clean_up_work_dir()
         return error_msg
-
 
     def build(self):
         self.logger.info("Starting with revision %s", self.revision)
@@ -92,7 +110,7 @@ class ConfigRpmMaker(object):
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
 
         except BaseConfigRpmMakerException, e:
-            self.logger.error('Last error during build:\n%s'%str(e))
+            self.logger.error('Last error during build:\n%s' % str(e))
             self.__build_error_msg_and_move_to_public_access(self.revision)
             raise e
         except Exception, e:
@@ -111,7 +129,7 @@ class ConfigRpmMaker(object):
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return os.environ.has_key('KEEPWORKDIR') and os.environ['KEEPWORKDIR']
+        return 'KEEPWORKDIR' in os.environ and os.environ['KEEPWORKDIR']
 
     def _move_error_log_for_public_access(self):
         error_log_dir = os.path.join(config.get('error_log_dir'))
@@ -142,19 +160,14 @@ class ConfigRpmMaker(object):
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(
-                            name='host_rpm_thread_%d' % i,
-                            revision=self.revision,
-                            svn_service_queue=svn_service_queue,
-                            rpm_queue=rpm_queue,
-                            failed_host_queue=failed_host_queue,
-                            host_queue=host_queue,
-                            work_dir=self.work_dir,
-                            error_logging_handler=self.error_handler
-                        ) for i in range(thread_count)]
-
-
-
+        thread_pool = [BuildHostThread(name='host_rpm_thread_%d' % i,
+                                       revision=self.revision,
+                                       svn_service_queue=svn_service_queue,
+                                       rpm_queue=rpm_queue,
+                                       failed_host_queue=failed_host_queue,
+                                       host_queue=host_queue,
+                                       work_dir=self.work_dir,
+                                       error_logging_handler=self.error_handler) for i in range(thread_count)]
 
         for thread in thread_pool:
             thread.start()
@@ -180,7 +193,7 @@ class ConfigRpmMaker(object):
                 cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
                 returncode = subprocess.call(cmd, shell=True)
                 if returncode:
-                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d'%(cmd, returncode))
+                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d' % (cmd, returncode))
                 pos += chunk_size
 
     def _get_affected_hosts(self, change_set, available_host):
@@ -204,7 +217,7 @@ class ConfigRpmMaker(object):
     def _get_thread_count(self, affected_hosts):
         thread_count = int(config.get('thread_count', 1))
         if thread_count < 0:
-            raise ConfigurationException('thread_count is %s, values <0 are not allowed)'%thread_count)
+            raise ConfigurationException('thread_count is %s, values <0 are not allowed)' % thread_count)
 
         # thread_count is zero means one thread for affected host
         if not thread_count or thread_count > len(affected_hosts):
@@ -227,12 +240,11 @@ class ConfigRpmMaker(object):
         self.error_handler.setFormatter(logging.Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
         self.error_handler.setLevel(logging.ERROR)
         self.logger.addHandler(self.error_handler)
-        self.logger.propagate=False
+        self.logger.propagate = False
 
         self.error_logger = logging.getLogger('Config-Rpm-Maker-Error')
-        self.error_logger.propagate=True
+        self.error_logger.propagate = True
         self.error_logger.setLevel(logging.ERROR)
-
 
     def _assure_temp_dir_if_set(self):
         if self.temp_dir and not os.path.exists(self.temp_dir):
@@ -241,7 +253,7 @@ class ConfigRpmMaker(object):
     def _prepare_work_dir(self):
         self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
-        for name in ['tmp','RPMS','RPMS/x86_64,RPMS/noarch','BUILD','SRPMS','SPECS','SOURCES']:
+        for name in ['tmp', 'RPMS', 'RPMS/x86_64,RPMS/noarch', 'BUILD', 'SRPMS', 'SPECS', 'SOURCES']:
             path = os.path.join(self.rpm_build_dir, name)
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -250,8 +262,8 @@ class ConfigRpmMaker(object):
         chunk_size_raw = config.get('rpm_upload_chunk_size', 0)
         try:
             chunk_size = int(chunk_size_raw)
-        except ValueError as e:
-            raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)'%chunk_size_raw)
+        except ValueError:
+            raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)' % chunk_size_raw)
         if chunk_size < 0:
             raise ConfigurationException("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
 

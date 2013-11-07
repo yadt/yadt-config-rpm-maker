@@ -1,24 +1,44 @@
+#   yadt-config-rpm-maker
+#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import os
 import shutil
 import subprocess
-from config_rpm_maker import config
-from config_rpm_maker.dependency import Dependency
-from config_rpm_maker.hostResolver import HostResolver
-from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
+
 from pysvn import ClientError
 from datetime import datetime
-from config_rpm_maker.token.tokenreplacer import TokenReplacer
+
+from config_rpm_maker import config
+from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.hostResolver import HostResolver
+from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
+from config_rpm_maker.token.tokenreplacer import TokenReplacer
+
 
 class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):
     error_info = "Could not create host configuration directory :"
 
+
 class CouldNotBuildRpmException(BaseConfigRpmMakerException):
     error_info = "Could not create rpm for host :"
 
-class HostRpmBuilder(object):
 
+class HostRpmBuilder(object):
     @classmethod
     def get_config_viewer_host_dir(cls, hostname, temp=False):
         path = os.path.join(config.get('config_viewer_dir'), 'hosts', hostname)
@@ -31,7 +51,7 @@ class HostRpmBuilder(object):
     LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
     DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
-    def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler = None):
+    def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
@@ -43,7 +63,7 @@ class HostRpmBuilder(object):
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
-        self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix +  self.hostname + '.spec')
+        self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
         self.config_viewer_host_dir = HostRpmBuilder.get_config_viewer_host_dir(hostname, True)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
@@ -119,7 +139,7 @@ class HostRpmBuilder(object):
 
     def _filter_tokens_in_config_viewer(self):
 
-        def configviewer_token_replacer (token, replacement):
+        def configviewer_token_replacer(token, replacement):
             filtered_replacement = replacement.rstrip()
             return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
 
@@ -137,11 +157,11 @@ class HostRpmBuilder(object):
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'RPMS')):
             for filename in files:
                 if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
-                   result.append(os.path.join(root, filename))
+                    result.append(os.path.join(root, filename))
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'SRPMS')):
             for filename in files:
                 if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
-                   result.append(os.path.join(root, filename))
+                    result.append(os.path.join(root, filename))
         return result
 
     def _build_rpm(self):
@@ -172,7 +192,6 @@ class HostRpmBuilder(object):
 
     def _filter_tokens_in_rpm_sources(self):
         TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir)
-
 
     def _copy_files_for_config_viewer(self):
         if os.path.exists(self.config_viewer_host_dir):
@@ -219,7 +238,6 @@ class HostRpmBuilder(object):
         new_var_dir = os.path.join(self.work_dir, 'VARIABLES.' + self.hostname)
         shutil.move(self.variables_dir, new_var_dir)
         self.variables_dir = new_var_dir
-
 
     def _save_log_entries_to_variable(self, svn_paths):
         svn_service = self.svn_service_queue.get()
@@ -273,8 +291,7 @@ Change set:
          author,
          datetime.fromtimestamp(log['date']).strftime("%Y-%m-%d %H:%M:%S"),
          "\n   ".join([path['action'] + ' ' + path['path'] for path in log['changed_paths']]),
-         log['message']
-        )
+         log['message'])
 
     def _export_spec_file(self):
         svn_service = self.svn_service_queue.get()
@@ -283,7 +300,6 @@ Change set:
         finally:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
-
 
     def _overlay_segment(self, segment):
         requires = []
@@ -305,7 +321,6 @@ Change set:
             requires += self._parse_dependency_file(self.rpm_requires_path)
             provides += self._parse_dependency_file(self.rpm_provides_path)
 
-
         return svn_base_paths, exported_paths, requires, provides
 
     def _parse_dependency_file(self, path):
@@ -319,7 +334,7 @@ Change set:
 
         return []
 
-    def _write_dependency_file(self, dependencies, file_path, collapse_duplicates = False, filter_regex='.*', positive_filter=True):
+    def _write_dependency_file(self, dependencies, file_path, collapse_duplicates=False, filter_regex='.*', positive_filter=True):
         dep = Dependency(collapseDependencies=collapse_duplicates, filterRegex=filter_regex, positiveFilter=positive_filter)
         dep.add(dependencies)
         self._write_file(file_path, dep.__repr__())
@@ -358,4 +373,3 @@ Change set:
         if self.error_logging_handler:
             logger.addHandler(self.error_logging_handler)
         return logger
-

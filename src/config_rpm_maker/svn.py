@@ -1,14 +1,32 @@
+#   yadt-config-rpm-maker
+#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import pysvn
 import os
-import sys
+
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
+
 class SvnServiceException(BaseConfigRpmMakerException):
-   error_info = "SVN Service error:\n"
+    error_info = "SVN Service error:\n"
+
 
 class SvnService(object):
 
-    def __init__(self, base_url, username = None, password = None, path_to_config = '/config'):
+    def __init__(self, base_url, username=None, password=None, path_to_config='/config'):
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
@@ -21,9 +39,9 @@ class SvnService(object):
 
     def get_change_set(self, revision):
         try:
-          logs =  self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths = True)
+            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
         except Exception as e:
-          raise SvnServiceException(str(e))
+            raise SvnServiceException(str(e))
         start_pos = len(self.path_to_config + '/')
         return [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
 
