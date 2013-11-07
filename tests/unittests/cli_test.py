@@ -16,7 +16,7 @@
 
 from unittest import TestCase
 from mock import call, patch
-from logging import INFO
+from logging import DEBUG
 
 from config_rpm_maker.__main__ import initialize_logging
 
@@ -27,4 +27,4 @@ class CliTests(TestCase):
     def test_should_initialize_logging_using_configuration(self, mock_basicConfig):
         initialize_logging()
 
-        self.assertEqual(call(format='[%(levelname)s] %(message)s', level=INFO), mock_basicConfig.call_args)
+        self.assertEqual(call(format='[%(levelname)s] %(message)s', level=DEBUG), mock_basicConfig.call_args)
