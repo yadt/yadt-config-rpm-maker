@@ -17,6 +17,8 @@
 import os
 import yaml
 
+from logging import getLogger
+
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
@@ -25,6 +27,9 @@ KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 
 __config = None
+
+
+LOGGER = getLogger()
 
 
 class ConfigException(BaseConfigRpmMakerException):
@@ -36,10 +41,11 @@ def __init_config():
     config_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', 'yadt-config-rpm-maker.yaml')
     if os.path.exists(config_file_path):
         try:
+            LOGGER.info('Loading configration file "%s"', config_file_path)
             with open(config_file_path) as f:
                 __config = yaml.load(f)
 
-            # logging.debug("Loaded config file '%s' config: %s", config_file_path, str(__config))
+            LOGGER.debug('Configuration %s', str(__config))
         except Exception as e:
             raise ConfigException("Could not load config file '%s'" % config_file_path, e)
     else:
