@@ -22,7 +22,7 @@ Run package as program stub
 @author: sschapiro
 '''
 
-import config_rpm_maker
+from config_rpm_maker import main
 
 if __name__ == "__main__":
-    config_rpm_maker.mainMethod()
+    main()
