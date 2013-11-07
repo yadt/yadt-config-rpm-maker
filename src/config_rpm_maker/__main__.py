@@ -22,16 +22,31 @@
     @author: sschapiro
 """
 
-from logging import basicConfig, DEBUG
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 from config_rpm_maker import main
 
+LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
+ROOT_LOGGER_NAME = "config_rpm_maker"
 
-def initialize_logging():
-    """ Basic initialization of logger using configuration """
-    basicConfig(format="[%(levelname)s] %(message)s", level=DEBUG)
+
+def initialiaze_root_logger(log_level=DEBUG):
+    """ Returnes a root_logger which logs to the console using the given log_level. """
+    formatter = Formatter(LOGGING_FORMAT)
+
+    console_handler = StreamHandler()
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(log_level)
+
+    root_logger = getLogger(ROOT_LOGGER_NAME)
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(console_handler)
+
+    return root_logger
+
+
+LOGGER = initialiaze_root_logger(DEBUG)
 
 
 if __name__ == "__main__":
-    initialize_logging()
     main()

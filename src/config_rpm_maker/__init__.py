@@ -25,7 +25,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker import config
 
 
-LOGGER = getLogger()
+LOGGER = getLogger("config_rpm_maker.cli")
 
 
 def main(args=sys.argv[1:]):
@@ -35,7 +35,7 @@ def main(args=sys.argv[1:]):
         sys.exit(1)
 
     if not (args[1].isdigit() and int(args[1]) >= 0):
-        LOGGER.error("Revision must be a positive integer.\nGiven revision was '%s'" % args[1])
+        LOGGER.error("Revision must be a positive integer. Given revision was '%s'" % args[1])
         sys.exit(1)
 
     try:

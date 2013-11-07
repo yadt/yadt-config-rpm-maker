@@ -21,7 +21,7 @@ from logging import getLogger
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
-LOGGER = getLogger()
+LOGGER = getLogger("config_rpm_maker.config")
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
 
