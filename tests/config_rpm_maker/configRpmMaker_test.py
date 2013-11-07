@@ -158,7 +158,7 @@ class ConfigRpmMakerTest(SvnTestCase):
 
     def assertRequires(self, hdr, hostname, requires):
         if requires:
-            real_requires = requires + ['hostname-' + hostname, 'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-client']
+            real_requires = requires + ['hostname-' + hostname, 'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-minion']
             self.assertArrayEqual(sorted(real_requires), sorted(hdr['requires']))
 
     def assertProvides(self, hdr, hostname, provides):
