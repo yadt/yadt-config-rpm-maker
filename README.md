@@ -70,12 +70,12 @@ python setup.py test
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
 
-### Bootstrap
+### Execution in the working directory
 
 ```bash
-./bootstrap
+./config-rpm-maker
 ```
-The `bootstrap` script allows you to execute config-rpm-maker in your working directory.
+The `config-rpm-maker` script allows you to execute config-rpm-maker in your working directory.
 
 ### Build yadt-config-rpm-maker RPM
 
