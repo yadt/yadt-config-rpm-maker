@@ -6,6 +6,9 @@
 #
 #   We like this version as it supports analyzing a file in memory and we import it into our
 #   code as a private module to be sure that we always use the same one.
+# 
+#   python-magic is distributed under the PSF License. 
+#   http://docs.python.org/2/license.html
 
 """
 magic is a wrapper around the libmagic file identification library.
