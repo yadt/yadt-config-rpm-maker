@@ -20,6 +20,12 @@ import yaml
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
+DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
+DEFAULT_LOG_LEVEL = logging.INFO
+
+KEY_LOG_FORMAT = "log_format"
+KEY_LOG_LEVEL = "log_level"
+
 __config = None
 
 

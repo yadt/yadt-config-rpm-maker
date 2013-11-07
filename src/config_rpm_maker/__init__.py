@@ -14,9 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import traceback
 import sys
+
+from logging import basicConfig
 
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.svn import SvnService
@@ -24,17 +25,21 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker import config
 
 
-logging.basicConfig(
-    format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s",
-    level=config.get('log_level', 'INFO'),
-)
-
-
 class CliException(BaseConfigRpmMakerException):
     error_info = "Command Line Error:\n"
 
 
+def initialize_logging():
+    """ Basic initialization of logger using configuration """
+    log_format = config.get(config.KEY_LOG_FORMAT, config.DEFAULT_LOG_FORMAT)
+    log_level = config.get(config.KEY_LOG_LEVEL, config.DEFAULT_LOG_LEVEL)
+
+    basicConfig(format=log_format, level=log_level)
+
+
 def mainMethod(args=sys.argv[1:]):
+    initialize_logging()
+
     try:
         if len(args) != 2:
             raise CliException("You need to provide 2 parameters (repo dir, revision).\nArguments were %s " % str(args))
