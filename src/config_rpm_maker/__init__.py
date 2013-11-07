@@ -17,7 +17,7 @@
 import traceback
 import sys
 
-from logging import basicConfig
+from logging import basicConfig, error
 
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.svn import SvnService
@@ -54,7 +54,9 @@ def main(args=sys.argv[1:]):
         )
         ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
     except BaseConfigRpmMakerException as e:
-        sys.stderr.write("{0}\n\nSee the error log for details.\n".format(str(e)))
+        for line in str(e).split("\n"):
+            error(line)
+
         sys.exit(1)
     except Exception:
         traceback.print_exc(5)
