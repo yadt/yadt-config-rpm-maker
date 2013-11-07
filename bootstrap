@@ -17,4 +17,4 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-python src/config_rpm_maker/__main__.py "$@"
+python src/config_rpm_maker "$@"
