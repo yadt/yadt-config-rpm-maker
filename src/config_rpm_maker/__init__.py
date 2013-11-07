@@ -47,7 +47,7 @@ def main(args=sys.argv[1:]):
         if not (args[1].isdigit() and int(args[1]) >= 0):
             raise CliException("Revision must be a positive integer.\nGiven revision was '%s'" % args[1])
 
-    # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
+        # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
         svn_service = SvnService(
             base_url='file://' + args[0],
             path_to_config=config.get('svn_path_to_config')
