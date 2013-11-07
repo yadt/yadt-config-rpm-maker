@@ -34,7 +34,7 @@ setup(name="yadt-config-rpm-maker",
       keywords="rpm config host svn hook",
 
       entry_points={
-          'console_scripts': ['config-rpm-maker = config_rpm_maker:mainMethod'],
+          'console_scripts': ['config-rpm-maker = config_rpm_maker:main'],
       },
       setup_requires=[
           "flake8"

@@ -37,7 +37,7 @@ def initialize_logging():
     basicConfig(format=log_format, level=log_level)
 
 
-def mainMethod(args=sys.argv[1:]):
+def main(args=sys.argv[1:]):
     initialize_logging()
 
     try:
