@@ -15,7 +15,6 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from Queue import Queue
 import os
 import shutil
 import subprocess
@@ -23,13 +22,13 @@ import tempfile
 import logging
 import traceback
 import config
+
+from Queue import Queue
 from threading import Thread
 
-# our package
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
-
-from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
 class BuildHostThread(Thread):

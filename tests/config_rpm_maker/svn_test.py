@@ -15,6 +15,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from baseTestCase import SvnTestCase
+
 from config_rpm_maker import config
 from config_rpm_maker.svn import SvnService
 

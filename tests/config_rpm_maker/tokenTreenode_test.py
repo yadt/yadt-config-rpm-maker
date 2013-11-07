@@ -20,6 +20,7 @@ Created on Aug 12, 2011
 @author: Michael Gruber, Konrad Hosemann
 '''
 import unittest
+
 from config_rpm_maker.token.treenode import TreeNode, NameNotAcceptedException
 
 

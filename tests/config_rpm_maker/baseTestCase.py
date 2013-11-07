@@ -18,6 +18,7 @@ import os
 import shutil
 import subprocess
 import unittest
+
 from config_rpm_maker import config
 
 

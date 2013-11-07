@@ -17,6 +17,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+
 from setuptools import setup, find_packages
 
 SRC_DIR = 'src'

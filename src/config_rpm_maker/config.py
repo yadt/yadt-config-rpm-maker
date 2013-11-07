@@ -17,6 +17,7 @@
 import logging
 import os
 import yaml
+
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 __config = None

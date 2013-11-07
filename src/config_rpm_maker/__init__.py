@@ -14,14 +14,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+import traceback
+import sys
+
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.svn import SvnService
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker import config
-
-import logging
-import traceback
-import sys
 
 
 logging.basicConfig(

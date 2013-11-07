@@ -16,7 +16,9 @@
 
 __author__ = "Ingmar Krusch"
 __email__ = "krusch@immobilienscout24.de"
+
 import re
+
 from types import ListType
 
 

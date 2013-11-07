@@ -18,7 +18,9 @@ import cgi
 import logging
 import re
 import os
+
 import config_rpm_maker.magic
+
 from config_rpm_maker import config
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
