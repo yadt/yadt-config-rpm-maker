@@ -14,13 +14,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-'''
-Created on Sep 3, 2012
-
-Run package as program stub
-
-@author: sschapiro
-'''
+"""
+    Created on Sep 3, 2012
+    
+    Run package as program stub
+    
+    @author: sschapiro
+"""
 
 from config_rpm_maker import main
 
