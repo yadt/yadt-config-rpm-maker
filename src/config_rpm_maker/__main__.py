@@ -22,14 +22,14 @@
     @author: sschapiro
 """
 
-from logging import basicConfig, INFO
+from logging import basicConfig, DEBUG
 
 from config_rpm_maker import main
 
 
 def initialize_logging():
     """ Basic initialization of logger using configuration """
-    basicConfig(format="[%(levelname)s] %(message)s", level=INFO)
+    basicConfig(format="[%(levelname)s] %(message)s", level=DEBUG)
 
 
 if __name__ == "__main__":
