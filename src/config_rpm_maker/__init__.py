@@ -17,7 +17,7 @@
 import traceback
 import sys
 
-from logging import basicConfig, error
+from logging import getLogger
 
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.svn import SvnService
@@ -25,20 +25,14 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker import config
 
 
+LOGGER = getLogger()
+
+
 class CliException(BaseConfigRpmMakerException):
     error_info = "Command Line Error:\n"
 
 
-def initialize_logging():
-    """ Basic initialization of logger using configuration """
-    log_format = config.get(config.KEY_LOG_FORMAT, config.DEFAULT_LOG_FORMAT)
-    log_level = config.get(config.KEY_LOG_LEVEL, config.DEFAULT_LOG_LEVEL)
-
-    basicConfig(format=log_format, level=log_level)
-
-
 def main(args=sys.argv[1:]):
-    initialize_logging()
 
     try:
         if len(args) != 2:
@@ -55,7 +49,7 @@ def main(args=sys.argv[1:]):
         ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
-            error(line)
+            LOGGER.error(line)
 
         sys.exit(1)
     except Exception:

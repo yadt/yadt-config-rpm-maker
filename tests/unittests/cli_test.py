@@ -18,27 +18,13 @@ from unittest import TestCase
 from mock import call, patch
 from logging import INFO
 
-from config_rpm_maker import initialize_logging
+from config_rpm_maker.__main__ import initialize_logging
 
 
 class CliTests(TestCase):
 
-    @patch('config_rpm_maker.basicConfig')
-    @patch('config_rpm_maker.config.get')
-    def test_should_initialize_logging_using_configuration(self, mock_get, mock_basicConfig):
-        def get_side_effect(key, default):
-            return key
-        mock_get.side_effect = get_side_effect
-
+    @patch('config_rpm_maker.__main__.basicConfig')
+    def test_should_initialize_logging_using_configuration(self, mock_basicConfig):
         initialize_logging()
 
-        self.assertEqual(call(format="log_format", level="log_level"), mock_basicConfig.call_args)
-
-    @patch('config_rpm_maker.basicConfig')
-    @patch('config_rpm_maker.config.get')
-    def test_should_use_default_values_when_getting_configuration_values(self, mock_get, mock_basicConfig):
-        initialize_logging()
-
-        self.assertEqual([call('log_format', '%(asctime)s %(levelname)5s [%(name)s] - %(message)s'),
-                          call('log_level', INFO)],
-                         mock_get.call_args_list)
+        self.assertEqual(call(format='[%(levelname)s] %(message)s', level=INFO), mock_basicConfig.call_args)

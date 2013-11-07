@@ -14,14 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import os
 import yaml
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
-DEFAULT_LOG_LEVEL = logging.INFO
 
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
@@ -41,7 +39,7 @@ def __init_config():
             with open(config_file_path) as f:
                 __config = yaml.load(f)
 
-            logging.debug("Loaded config file '%s' config: %s", config_file_path, str(__config))
+            # logging.debug("Loaded config file '%s' config: %s", config_file_path, str(__config))
         except Exception as e:
             raise ConfigException("Could not load config file '%s'" % config_file_path, e)
     else:

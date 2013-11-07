@@ -22,7 +22,16 @@
     @author: sschapiro
 """
 
+from logging import basicConfig, INFO
+
 from config_rpm_maker import main
 
+
+def initialize_logging():
+    """ Basic initialization of logger using configuration """
+    basicConfig(format="[%(levelname)s] %(message)s", level=INFO)
+
+
 if __name__ == "__main__":
+    initialize_logging()
     main()
