@@ -14,23 +14,30 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""yadt-config-rpm-maker
+
+Usage:
+  config-rpm-maker <repository> <revision> [--debug]
+  config-rpm-maker -h | --help
+  config-rpm-maker --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --debug       Set log level to debug.
 """
-    Created on Sep 3, 2012
 
-    Run package as program stub
-
-    @author: sschapiro
-"""
-
-from logging import DEBUG, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from docopt import docopt
 
 from config_rpm_maker import main
 
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = "config_rpm_maker"
+OPTION_DEBUG = '--debug'
 
 
-def initialiaze_root_logger(log_level=DEBUG):
+def initialiaze_root_logger(log_level=INFO):
     """ Returnes a root_logger which logs to the console using the given log_level. """
     formatter = Formatter(LOGGING_FORMAT)
 
@@ -45,8 +52,12 @@ def initialiaze_root_logger(log_level=DEBUG):
     return root_logger
 
 
-LOGGER = initialiaze_root_logger(DEBUG)
-
-
 if __name__ == "__main__":
-    main()
+    arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
+
+    if arguments[OPTION_DEBUG]:
+        LOGGER = initialiaze_root_logger(DEBUG)
+    else:
+        LOGGER = initialiaze_root_logger()
+
+    main(arguments)

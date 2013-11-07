@@ -14,6 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import traceback
 import sys
 
@@ -24,27 +25,25 @@ from config_rpm_maker.svn import SvnService
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker import config
 
-
 LOGGER = getLogger("config_rpm_maker.cli")
 
+ARGUMENT_REVISION = '<revision>'
+ARGUMENT_REPOSITORY = '<repository>'
 
-def main(args=sys.argv[1:]):
 
-    if len(args) != 2:
-        LOGGER.error("You need to provide 2 parameters (repo dir, revision). Arguments were %s " % str(args))
+def main(arguments):
+
+    revision = arguments[ARGUMENT_REVISION]
+    if not revision.isdigit():
+        LOGGER.error('Given revision "%s" is not a integer.', revision)
         sys.exit(1)
 
-    if not (args[1].isdigit() and int(args[1]) >= 0):
-        LOGGER.error("Revision must be a positive integer. Given revision was '%s'" % args[1])
-        sys.exit(1)
-
+    repository = arguments[ARGUMENT_REPOSITORY]
     try:
         # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
-        svn_service = SvnService(
-            base_url='file://' + args[0],
-            path_to_config=config.get('svn_path_to_config')
-        )
-        ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
+        svn_service = SvnService(base_url='file://{0}'.format(repository),
+                                 path_to_config=config.get('svn_path_to_config'))
+        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
 
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
