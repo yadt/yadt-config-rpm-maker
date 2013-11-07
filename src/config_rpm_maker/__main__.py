@@ -16,9 +16,9 @@
 
 """
     Created on Sep 3, 2012
-    
+
     Run package as program stub
-    
+
     @author: sschapiro
 """
 
