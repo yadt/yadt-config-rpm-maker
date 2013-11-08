@@ -16,7 +16,7 @@ Usage:
 Options:
   -h --help     Show this screen.
   --version     Show version.
-  --debug       Set log level to debug.
+  --debug       Force DEBUG log level.
 ```
 
 ### Example

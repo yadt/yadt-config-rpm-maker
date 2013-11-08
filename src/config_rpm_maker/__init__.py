@@ -25,25 +25,27 @@ Usage:
 Options:
   -h --help     Show this screen.
   --version     Show version.
-  --debug       Set log level to debug.
+  --debug       Force DEBUG log level.
 """
 
-import traceback
 import sys
+import traceback
 
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from docopt import docopt
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
-from config_rpm_maker.configRpmMaker import ConfigRpmMaker
-from config_rpm_maker.svn import SvnService
-from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker import config
+from config_rpm_maker.configRpmMaker import ConfigRpmMaker
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.svn import SvnService
 
 ARGUMENT_REVISION = '<revision>'
 ARGUMENT_REPOSITORY = '<repository>'
+
+OPTION_DEBUG = '--debug'
+
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = "config_rpm_maker"
-OPTION_DEBUG = '--debug'
 
 
 def initialiaze_root_logger(log_level=INFO):
