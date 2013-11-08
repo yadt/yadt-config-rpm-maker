@@ -33,21 +33,10 @@ import traceback
 from docopt import docopt
 from logging import DEBUG, Formatter, StreamHandler, getLogger
 
-print "import config"
 from config_rpm_maker import config
-print "import config - ok"
-
-print "import ConfigRpmMaker"
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
-print "import ConfigRpmMaker - ok"
-
-print "Import BaseConfigRpmMakerException"
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-print "Import BaseConfigRpmMakerException - ok"
-
-print "Import SvnService"
 from config_rpm_maker.svn import SvnService
-print "Import SvnService - ok"
 
 ARGUMENT_REVISION = '<revision>'
 ARGUMENT_REPOSITORY = '<repository>'
