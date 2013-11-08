@@ -12,6 +12,11 @@ Usage:
   config-rpm-maker <repository> <revision> [--debug]
   config-rpm-maker -h | --help
   config-rpm-maker --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --debug       Set log level to debug.
 ```
 
 ### Example
