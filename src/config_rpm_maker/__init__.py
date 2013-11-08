@@ -28,9 +28,19 @@ Options:
   --debug       Set log level to debug.
 """
 
+import traceback
+import sys
+
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from docopt import docopt
 
+from config_rpm_maker.configRpmMaker import ConfigRpmMaker
+from config_rpm_maker.svn import SvnService
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker import config
+
+ARGUMENT_REVISION = '<revision>'
+ARGUMENT_REPOSITORY = '<repository>'
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = "config_rpm_maker"
 OPTION_DEBUG = '--debug'
@@ -49,20 +59,6 @@ def initialiaze_root_logger(log_level=INFO):
     root_logger.addHandler(console_handler)
 
     return root_logger
-
-
-import traceback
-import sys
-
-from config_rpm_maker.configRpmMaker import ConfigRpmMaker
-from config_rpm_maker.svn import SvnService
-from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker import config
-
-LOGGER = getLogger("config_rpm_maker.cli")
-
-ARGUMENT_REVISION = '<revision>'
-ARGUMENT_REPOSITORY = '<repository>'
 
 
 def main():
