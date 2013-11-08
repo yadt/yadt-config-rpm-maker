@@ -23,13 +23,15 @@ Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test
 
 ## Getting Started
 
+To set up `yadt-config-rpm-maker` please have a look at the
+[Configuration Documentation](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)
+
 ### Example Content for Configuration Repository
 
 The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdata/svn_repo/) directory contains
 an example tree for a config repository. It also contains the SPEC file template that is used to
 build the config RPMs. Use this as a starting point to setup your own environment.
 
-Please have a look at the [Configuration Documentation](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)
 
 ## Build
 
