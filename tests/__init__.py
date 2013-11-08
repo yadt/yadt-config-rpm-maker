@@ -25,21 +25,21 @@ at_least_one_import_failed = False
 try:
     import pysvn
 except:
-    print 'Could not import "pysvn"'
+    print 'Could not import "pysvn"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
     import rpm
 except:
-    print 'Could not import "rpm"'
+    print 'Could not import "rpm"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
     import yaml
 except:
-    print 'Could not import "yaml"'
+    print 'Could not import "yaml"! Please install it.'
     at_least_one_import_failed = True
 
 
