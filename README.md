@@ -2,10 +2,10 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
 =====================
 
 * Organize the configuration of your datacenter hosts in a subversion repository.
-* Run `config-rpm-maker` as post-commit hook of your configuration repository.
-* Builds RPMs containing the configuration for each host.
-* Builds only the configuration RPMs for the affected hosts.
-* Uploads configuration RPMs to a YUM repository.
+* Run `config-rpm-maker` as post-commit hook of your configuration repository:
+  * Builds RPMs containing the configuration for each host.
+  * Builds only the configuration RPMs for the affected hosts.
+  * Uploads configuration RPMs to a YUM repository.
 
 ```bash
 Usage:
