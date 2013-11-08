@@ -15,5 +15,15 @@ git clone https://github.com/yadt/yadt-config-rpm-maker
 ## Install dependencies
 
 ```bash
+zypper install python-yaml rpm-python python-pysvn rpm-build
+
+## Run Tests
+
+```bash
 cd yadt-config-rpm-maker
+```
+
+and execute tests
+```bash
+./setup.py test
 ```
