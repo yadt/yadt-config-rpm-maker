@@ -48,7 +48,7 @@ LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = "config_rpm_maker"
 
 
-def initialiaze_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
+def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     """ Returnes a root_logger which logs to the console using the given log_level. """
     formatter = Formatter(LOGGING_FORMAT)
 
@@ -69,10 +69,10 @@ def main():
         config.load_configuration_file()
 
         if arguments[OPTION_DEBUG]:
-            LOGGER = initialiaze_root_logger(DEBUG)
+            LOGGER = create_root_logger(DEBUG)
         else:
             log_level = config.get_log_level()
-            LOGGER = initialiaze_root_logger(log_level)
+            LOGGER = create_root_logger(log_level)
 
     except config.ConfigException as e:
         sys.stderr.write(str(e) + "\n")

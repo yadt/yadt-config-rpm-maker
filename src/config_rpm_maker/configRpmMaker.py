@@ -30,6 +30,8 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
 
+LOGGER = logging.getLogger("config_rpm_maker.configRpmMaker")
+
 
 class BuildHostThread(Thread):
 
@@ -77,6 +79,7 @@ class ConfigRpmMaker(object):
                 'Please fix the issues and trigger the RPM creation with a dummy commit.\n\n'
 
     def __init__(self, revision, svn_service):
+        LOGGER.debug("Initializing %s with revision=%s and svn_service=%s", ConfigRpmMaker.__name__, revision, svn_service)
         self.revision = revision
         self.svn_service = svn_service
         self.temp_dir = config.get_temporary_directory()
