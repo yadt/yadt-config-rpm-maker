@@ -15,10 +15,44 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+"""yadt-config-rpm-maker
+
+Usage:
+  config-rpm-maker <repository> <revision> [--debug]
+  config-rpm-maker -h | --help
+  config-rpm-maker --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --debug       Set log level to debug.
+"""
+
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from docopt import docopt
+
+LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
+ROOT_LOGGER_NAME = "config_rpm_maker"
+OPTION_DEBUG = '--debug'
+
+
+def initialiaze_root_logger(log_level=INFO):
+    """ Returnes a root_logger which logs to the console using the given log_level. """
+    formatter = Formatter(LOGGING_FORMAT)
+
+    console_handler = StreamHandler()
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(log_level)
+
+    root_logger = getLogger(ROOT_LOGGER_NAME)
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(console_handler)
+
+    return root_logger
+
+
 import traceback
 import sys
-
-from logging import getLogger
 
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.svn import SvnService
@@ -31,7 +65,13 @@ ARGUMENT_REVISION = '<revision>'
 ARGUMENT_REPOSITORY = '<repository>'
 
 
-def main(arguments):
+def main():
+    arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
+
+    if arguments[OPTION_DEBUG]:
+        LOGGER = initialiaze_root_logger(DEBUG)
+    else:
+        LOGGER = initialiaze_root_logger()
 
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
