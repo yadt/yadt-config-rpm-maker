@@ -25,8 +25,16 @@ from config_rpm_maker.config import get_temporary_directory
 class ConfigurationTests(TestCase):
 
     @patch("config_rpm_maker.config.get")
-    def test_should_use_key_for_temporary_directory(self, mock_get):
+    def test_get_temporary_directory_should_use_key_for_temporary_directory(self, mock_get):
 
         get_temporary_directory()
 
         mock_get.assert_called_once_with('temp_dir')
+
+    @patch("config_rpm_maker.config.get")
+    def test_get_temporary_directory_should_retur_value_from_get(self, mock_get):
+        mock_get.return_value = "temporary directory"
+
+        actual = get_temporary_directory()
+
+        self.assertEqual("temporary directory", actual)
