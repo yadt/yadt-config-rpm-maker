@@ -159,17 +159,16 @@ class ConfigRpmMakerTest(SvnTestCase):
     def assertRequires(self, hdr, hostname, requires):
         if requires:
             real_requires = requires + ['hostname-' + hostname, 'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-client']
-            self.assertArrayEqual(sorted(real_requires), sorted(hdr['requires']))
+            self.assertListsEqual(sorted(real_requires), sorted(hdr['requires']))
 
     def assertProvides(self, hdr, hostname, provides):
         if provides:
             real_provides = provides + ['yadt-config-all', 'yadt-config-' + hostname, ]
-            self.assertArrayEqual(sorted(real_provides), sorted(hdr['provides']))
+            self.assertListsEqual(sorted(real_provides), sorted(hdr['provides']))
 
-    def assertArrayEqual(self, expected, value):
-        self.assertEqual(len(expected), len(value), "Lists have different element count.\nExpected: %s\n     Got: %s" % (str(expected), str(value)))
-        for i in range(len(expected)):
-            self.assertEqual(expected[i], value[i], "Element %d is different. Expected %s , Got %s" % (i, str(expected), str(value)))
+    def assertListsEqual(self, expected, value):
+        difference = list(set(expected) - set(value))
+        self.assertEqual(expected, value, "Lists are different.\nExpected: %s\n     Got: %s\ndifference is: %s" % (str(expected), str(value), str(difference)))
 
     def extractRpmFiles(self, path, hostname):
         extract_path = os.path.join(config_dev.get('temp_dir'), hostname + '.extract')
