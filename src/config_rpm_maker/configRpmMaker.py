@@ -19,10 +19,11 @@ import os
 import shutil
 import subprocess
 import tempfile
-import logging
+
 import traceback
 import config
 
+from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
@@ -30,7 +31,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
 
-LOGGER = logging.getLogger("config_rpm_maker.configRpmMaker")
+LOGGER = getLogger("config_rpm_maker.configRpmMaker")
 
 
 class BuildHostThread(Thread):
@@ -97,6 +98,7 @@ class ConfigRpmMaker(object):
         return error_msg
 
     def build(self):
+        LOGGER.info('Processing revision "%s"', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
             change_set = self.svn_service.get_change_set(self.revision)
@@ -116,6 +118,7 @@ class ConfigRpmMaker(object):
             self.logger.error('Last error during build:\n%s' % str(e))
             self.__build_error_msg_and_move_to_public_access(self.revision)
             raise e
+
         except Exception, e:
             self.logger.exception('Last error during build:')
             error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
@@ -237,19 +240,19 @@ class ConfigRpmMaker(object):
         return items
 
     def _create_logger(self):
-        self.logger = logging.getLogger('config_rpm_maker.configRpmMaker')
+        self.logger = getLogger('config_rpm_maker.configRpmMaker.inner')
         self.error_log_file = tempfile.mktemp(dir=config.get_temporary_directory(),
                                               prefix='yadt-config-rpm-maker',
                                               suffix='.error.log')
-        self.error_handler = logging.FileHandler(self.error_log_file)
-        self.error_handler.setFormatter(logging.Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
-        self.error_handler.setLevel(logging.ERROR)
+        self.error_handler = FileHandler(self.error_log_file)
+        self.error_handler.setFormatter(Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
+        self.error_handler.setLevel(ERROR)
         self.logger.addHandler(self.error_handler)
         self.logger.propagate = False
 
-        self.error_logger = logging.getLogger('config_rpm_maker.configRpmMakerError')
+        self.error_logger = getLogger('config_rpm_maker.configRpmMaker.error')
         self.error_logger.propagate = True
-        self.error_logger.setLevel(logging.ERROR)
+        self.error_logger.setLevel(ERROR)
 
     def _assure_temp_dir_if_set(self):
         if self.temp_dir and not os.path.exists(self.temp_dir):
