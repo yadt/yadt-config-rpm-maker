@@ -10,6 +10,15 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
 ## Usage
 
 ```bash
+Usage:
+  config-rpm-maker <repository> <revision> [--debug]
+  config-rpm-maker -h | --help
+  config-rpm-maker --version
+```
+
+### Example
+
+```bash
 config-rpm-maker file:///foo/bar/svn/test 123
 ```
 Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
