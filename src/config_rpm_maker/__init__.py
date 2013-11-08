@@ -27,18 +27,21 @@ Options:
   --version     Show version.
   --debug       Force DEBUG log level.
 """
-
+print "imports 1"
 import sys
 import traceback
 
+print "imports 2"
 from docopt import docopt
 from logging import DEBUG, Formatter, StreamHandler, getLogger
 
+print "imports 3"
 from config_rpm_maker import config
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
 
+print "constants"
 ARGUMENT_REVISION = '<revision>'
 ARGUMENT_REPOSITORY = '<repository>'
 
@@ -46,6 +49,9 @@ OPTION_DEBUG = '--debug'
 
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = "config_rpm_maker"
+
+
+print "function def"
 
 
 def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
@@ -61,6 +67,8 @@ def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     root_logger.addHandler(console_handler)
 
     return root_logger
+
+print "function main"
 
 
 def main():
@@ -102,3 +110,4 @@ def main():
     except Exception:
         traceback.print_exc(5)
         sys.exit(2)
+print "config_rpm_maker imports done"
