@@ -19,10 +19,11 @@
 from unittest import TestCase
 from mock import patch
 
-from config_rpm_maker.config import get_temporary_directory 
+from config_rpm_maker.config import get_temporary_directory
+
 
 class ConfigurationTests(TestCase):
-    
+
     @patch("config_rpm_maker.config.get")
     def test_should_use_key_for_temporary_directory(self, mock_get):
 

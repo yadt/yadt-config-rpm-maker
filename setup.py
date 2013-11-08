@@ -35,7 +35,7 @@ setup(name="yadt-config-rpm-maker",
 
       entry_points={'console_scripts': ['config-rpm-maker = config_rpm_maker:main']},
       setup_requires=["flake8"],
-      tests_require=[ "mock"],
+      tests_require=["mock"],
       packages=find_packages(where=SRC_DIR),
       package_dir={'': SRC_DIR},
       test_suite='tests')

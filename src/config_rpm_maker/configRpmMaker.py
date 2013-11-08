@@ -235,7 +235,9 @@ class ConfigRpmMaker(object):
 
     def _create_logger(self):
         self.logger = logging.getLogger('config_rpm_maker.configRpmMaker')
-        self.error_log_file = tempfile.mktemp(suffix='.error.log', prefix='yadt-config-rpm-maker', dir=config.get('temp_dir'))
+        self.error_log_file = tempfile.mktemp(dir=config.get_temporary_directory(),
+                                              prefix='yadt-config-rpm-maker',
+                                              suffix='.error.log')
         self.error_handler = logging.FileHandler(self.error_log_file)
         self.error_handler.setFormatter(logging.Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
         self.error_handler.setLevel(logging.ERROR)
