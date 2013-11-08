@@ -23,21 +23,21 @@ at_least_one_import_failed = False
 
 
 try:
-    import pysvn
+    import pysvn  # nopep8
 except:
     print 'Could not import "pysvn"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
-    import rpm
+    import rpm  # nopep8
 except:
     print 'Could not import "rpm"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
-    import yaml
+    import yaml  # nopep8
 except:
     print 'Could not import "yaml"! Please install it.'
     at_least_one_import_failed = True
