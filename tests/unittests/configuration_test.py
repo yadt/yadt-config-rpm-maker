@@ -31,13 +31,14 @@ class ConfigurationTests(TestCase):
 
     @patch("config_rpm_maker.config.get")
     def test_get_temporary_directory_should_use_key_for_temporary_directory(self, mock_get):
-
+        print "test 1"
         get_temporary_directory()
 
         mock_get.assert_called_once_with('temp_dir')
 
     @patch("config_rpm_maker.config.get")
     def test_get_temporary_directory_should_retur_value_from_get(self, mock_get):
+        print "test 2"
         mock_get.return_value = "temporary directory"
 
         actual = get_temporary_directory()
@@ -46,6 +47,7 @@ class ConfigurationTests(TestCase):
 
     @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_use_key_for_log_level(self, mock_get):
+        print "test 3"
         mock_get.return_value = "DEBUG"
 
         get_log_level()
@@ -54,6 +56,7 @@ class ConfigurationTests(TestCase):
 
     @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_return_debug_log_level(self, mock_get):
+        print "test 4"
         mock_get.return_value = "DEBUG"
 
         actual = get_log_level()
@@ -62,6 +65,7 @@ class ConfigurationTests(TestCase):
 
     @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_return_error_log_level(self, mock_get):
+        print "test 5"
         mock_get.return_value = "ERROR"
 
         actual = get_log_level()
@@ -81,3 +85,5 @@ class ConfigurationTests(TestCase):
         mock_get.return_value = "FOO"
 
         self.assertRaises(ConfigException, get_log_level)
+
+print "importing configuration_test done"
