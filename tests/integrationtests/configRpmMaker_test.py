@@ -166,9 +166,9 @@ class ConfigRpmMakerTest(SvnTestCase):
             real_provides = provides + ['yadt-config-all', 'yadt-config-' + hostname, ]
             self.assertListsEqual(sorted(real_provides), sorted(hdr['provides']))
 
-    def assertListsEqual(self, expected, value):
-        difference = list(set(expected) - set(value))
-        self.assertEqual(expected, value, "Lists are different.\nExpected: %s\n     Got: %s\ndifference is: %s" % (str(expected), str(value), str(difference)))
+    def assertListsEqual(self, expected, actual):
+        difference = list(set(expected) - set(actual)) + list(set(actual) - set(expected))
+        self.assertEqual(expected, actual, "Lists are different.\nExpected: %s\n     Got: %s\ndifference is: %s" % (str(expected), str(actual), str(difference)))
 
     def extractRpmFiles(self, path, hostname):
         extract_path = os.path.join(config_dev.get('temp_dir'), hostname + '.extract')
