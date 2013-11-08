@@ -29,12 +29,7 @@ The [testdata](https://github.com/yadt/yadt-config-rpm-maker/tree/master/testdat
 an example tree for a config repository. It also contains the SPEC file template that is used to
 build the config RPMs. Use this as a starting point to setup your own environment.
 
-### Configuration
-
-`yadt-config-rpm-maker` is configured using a YAML file.
-The default file name for configuration is `yadt-config-rpm-maker.yaml`.
-Set a environment variable called `YADT_CONFIG_RPM_MAKER_CONFIG_FILE` to force loading a specific file.
-
+Please have a look at the [Configuration Documentation](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)
 
 ## Build
 
