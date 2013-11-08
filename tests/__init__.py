@@ -13,3 +13,35 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+    This module contains imports to ensure that the user gets useful feedback
+    when executing "python setup.py test" and some system dependencies are missing.
+"""
+
+at_least_one_import_failed = False
+
+
+try:
+    import pysvn
+except:
+    print 'Could not import "pysvn"'
+    at_least_one_import_failed = True
+
+
+try:
+    import rpm
+except:
+    print 'Could not import "rpm"'
+    at_least_one_import_failed = True
+
+
+try:
+    import yaml
+except:
+    print 'Could not import "yaml"'
+    at_least_one_import_failed = True
+
+
+if at_least_one_import_failed:
+    exit(1)
