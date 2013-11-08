@@ -16,11 +16,15 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+print "Imports of unittest, mock and logging"
 from unittest import TestCase
 from mock import patch
 from logging import DEBUG, ERROR, INFO
+print "Imports of unittest, mock and logging: ok"
 
+print "Importing of config_rpm_maker.config"
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, ConfigException, get_log_level, get_temporary_directory
+print "Importing of config_rpm_maker.config: ok"
 
 
 class ConfigurationTests(TestCase):
