@@ -67,7 +67,7 @@ def load_configuration_file():
                 configuration = yaml.load(f)
 
         except Exception as e:
-            raise ConfigException('Could not load configuration file "%s"' % configuration_file_path, str(e))
+            raise ConfigException('Could not load configuration file "%s".\nError: %s' % (configuration_file_path, str(e)))
     else:
         raise ConfigException("Could not find configuration file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (configuration_file_path, os.path.abspath('.')))
 
