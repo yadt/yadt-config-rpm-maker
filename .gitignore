@@ -12,3 +12,5 @@ ve
 venv
 
 /.settings
+build
+dist
