@@ -17,7 +17,11 @@
 import pysvn
 import os
 
+from logging import getLogger
+
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
+LOGGER = getLogger("config_rpm_maker.svn")
 
 
 class SvnServiceException(BaseConfigRpmMakerException):
@@ -27,11 +31,14 @@ class SvnServiceException(BaseConfigRpmMakerException):
 class SvnService(object):
 
     def __init__(self, base_url, username=None, password=None, path_to_config='/config'):
+        LOGGER.debug('Initializing SVN service with base_url="%s" and path_to_config="%s"', base_url, path_to_config)
+
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
         self.client = pysvn.Client()
         self.client.set_auth_cache(True)
+
         if username:
             self.client.set_default_username(username)
         if password:

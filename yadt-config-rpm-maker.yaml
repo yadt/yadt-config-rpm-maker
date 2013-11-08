@@ -8,7 +8,7 @@ allow_unknown_hosts : true
 config_viewer_dir : 'target/tmp/configviewer'
 rpm_upload_cmd : '/bin/true'
 rpm_upload_chunk_size : 10
-log_level : 'DEBUG'
+log_level: INFO
 thread_count : 4
 error_log_dir : 'target/tmp/configviewer/errors'
 error_log_url : 'http://localhost/errors'

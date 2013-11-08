@@ -14,4 +14,5 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 
 | Property Name                     | Fallback Value             | Description                             |
 |-----------------------------------|----------------------------|-----------------------------------------|
+| log_level                         | INFO                       | Has to be one of DEBUG, ERROR or INFO
 | temp_dir                          |          | This directory is used as a working directory when building rpms. You will find the error log files here.

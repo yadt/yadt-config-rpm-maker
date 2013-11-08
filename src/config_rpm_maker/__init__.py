@@ -32,7 +32,7 @@ import sys
 import traceback
 
 from docopt import docopt
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 from config_rpm_maker import config
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
@@ -48,7 +48,7 @@ LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = "config_rpm_maker"
 
 
-def initialiaze_root_logger(log_level=INFO):
+def initialiaze_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     """ Returnes a root_logger which logs to the console using the given log_level. """
     formatter = Formatter(LOGGING_FORMAT)
 
@@ -65,11 +65,21 @@ def initialiaze_root_logger(log_level=INFO):
 
 def main():
     arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
+    try:
+        config.load_configuration_file()
 
-    if arguments[OPTION_DEBUG]:
-        LOGGER = initialiaze_root_logger(DEBUG)
-    else:
-        LOGGER = initialiaze_root_logger()
+        if arguments[OPTION_DEBUG]:
+            LOGGER = initialiaze_root_logger(DEBUG)
+        else:
+            log_level = config.get_log_level()
+            LOGGER = initialiaze_root_logger(log_level)
+
+    except config.ConfigException as e:
+        sys.stderr.write(str(e) + "\n")
+        sys.exit(1)
+
+    LOGGER.debug('Arguments are: %s', str(arguments))
+    LOGGER.debug('Loaded configuration file "%s": %s', config.configuration_file_path, str(config.configuration))
 
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
@@ -77,6 +87,7 @@ def main():
         sys.exit(1)
 
     repository = arguments[ARGUMENT_REPOSITORY]
+
     try:
         # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
         svn_service = SvnService(base_url='file://{0}'.format(repository),
