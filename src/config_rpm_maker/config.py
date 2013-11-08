@@ -27,12 +27,19 @@ DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
 
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
+KEY_TEMPORARY_DIRECTORY = "temp_dir"
 
 __config = None
 
 
 class ConfigException(BaseConfigRpmMakerException):
     error_info = "Configuration Error:\n"
+
+
+def get_temporary_directory():
+    """ Returns the temporary directory """
+
+    get(KEY_TEMPORARY_DIRECTORY)
 
 
 def __init_config():

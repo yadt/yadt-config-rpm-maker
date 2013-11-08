@@ -79,7 +79,7 @@ class ConfigRpmMaker(object):
     def __init__(self, revision, svn_service):
         self.revision = revision
         self.svn_service = svn_service
-        self.temp_dir = config.get('temp_dir')
+        self.temp_dir = config.get_temporary_directory()
         self._assure_temp_dir_if_set()
         self._create_logger()
         self.work_dir = None
