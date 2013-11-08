@@ -39,7 +39,7 @@ class ConfigException(BaseConfigRpmMakerException):
 def get_temporary_directory():
     """ Returns the temporary directory """
 
-    get(KEY_TEMPORARY_DIRECTORY)
+    return get(KEY_TEMPORARY_DIRECTORY)
 
 
 def __init_config():
