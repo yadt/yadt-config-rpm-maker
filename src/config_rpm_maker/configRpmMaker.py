@@ -65,7 +65,11 @@ class BuildHostThread(Thread):
 
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
-        LOGGER.debug('Thread "%s" finished and built %s rpms.', self.name, len(rpms))
+        count_of_rpms = len(rpms)
+        if count_of_rpms > 0:
+            LOGGER.debug('Thread "%s" finished and built %s rpms.', self.name, count_of_rpms)
+        else:
+            LOGGER.debug('Thread "%s" finished without building any rpm!', self.name)
 
 
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
@@ -211,7 +215,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         built_rpms = self._consume_queue(rpm_queue)
-        LOGGER.debug('Built %s rpms', len(built_rpms))
+        LOGGER.debug('Built %s rpm(s).', len(built_rpms))
         for i in range(len(built_rpms)):
             LOGGER.debug('Built rpm #%s "%s"', i, built_rpms[i])
         return built_rpms
@@ -221,8 +225,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
-            LOGGER.info("Uploading %s rpm(s)", len(rpms))
-            LOGGER.debug('Uploading rpms using command "%s" and chunk_size "%s"', rpm_upload_cmd, chunk_size)
+            LOGGER.info("Uploading %s rpm(s).", len(rpms))
+            LOGGER.debug('Uploading rpm(s) using command "%s" and chunk_size "%s"', rpm_upload_cmd, chunk_size)
 
             pos = 0
             while pos < len(rpms):
