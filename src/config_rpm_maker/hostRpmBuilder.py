@@ -200,7 +200,7 @@ class HostRpmBuilder(object):
                              stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         if p.returncode:
-            raise Exception("Creating tar of config dir failed: stdout=%s, stderr=%s", stdout, stderr)
+            raise Exception('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
     def _filter_tokens_in_rpm_sources(self):
