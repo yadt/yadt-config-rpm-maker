@@ -12,7 +12,7 @@ before_script:
   - sudo apt-get install python-yaml
   - ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/
   - python -c "import yaml"
-  - sudo pip install flake8 docopt mock
+  - pip install flake8 docopt mock
   - python -c "import docopt"
   - python -c "import mock"
   - ./lint_sources
