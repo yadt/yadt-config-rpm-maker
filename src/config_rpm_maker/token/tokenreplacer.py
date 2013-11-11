@@ -44,11 +44,12 @@ class CannotFilterFileException (BaseConfigRpmMakerException):
 
 
 class MissingTokenException (BaseConfigRpmMakerException):
+    """
+        Exception stating that a value for a given token
+        has not been found in the token definition.
+    """
+
     error_info = "Could not replace variable in file :\n"
-    """
-    Exception stating that a value for a given token
-    has not been found in the token definition.
-    """
 
     def __init__(self, token, file=None, *args, **kwargs):
         super(MissingTokenException, self).__init__(*args, **kwargs)
@@ -63,10 +64,10 @@ class MissingTokenException (BaseConfigRpmMakerException):
 
 
 class FileLimitExceededException(BaseConfigRpmMakerException):
+    """ Exception stating the file exceeded the given file size limit """
+
     error_info = "File limit exceeded! :\n"
-    """
-    Exception stating the file exceeded the given file size limit
-    """
+
     def __init__(self, path, size_limit=-1, *args, **kwargs):
         super(FileLimitExceededException, self).__init__(*args, **kwargs)
         self.path = path
