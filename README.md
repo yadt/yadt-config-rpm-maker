@@ -26,6 +26,10 @@ config-rpm-maker file:///foo/bar/svn/test 123
 ```
 Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
 
+## Features
+
+  * preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
+
 ## Getting Started
 
 To set up `yadt-config-rpm-maker` please have a look at the
