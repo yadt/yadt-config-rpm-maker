@@ -232,9 +232,14 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             while pos < len(rpms):
                 rpm_chunk = rpms[pos:pos + chunk_size]
                 cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
-                returncode = subprocess.call(cmd, shell=True)
-                if returncode:
-                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d' % (cmd, returncode))
+                process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = process.communicate()
+                if process.returncode:
+                    error_message = """Rpm upload failed. Executed command "%s"
+stdout: "%s"
+stderr: "%s"
+return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
+                    raise CouldNotUploadRpmsException(error_message)
                 pos += chunk_size
         else:
             LOGGER.info("Rpms will not be uploaded since no upload command has been configured.")

@@ -6,7 +6,7 @@ path_to_spec_file : 'default.spec'
 custom_dns_searchlist : []
 allow_unknown_hosts : true
 config_viewer_dir : 'target/tmp/configviewer'
-rpm_upload_cmd : '/bin/true'
+rpm_upload_cmd : /bin/true
 rpm_upload_chunk_size : 10
 log_level: INFO
 thread_count: 4
