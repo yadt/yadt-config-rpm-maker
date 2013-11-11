@@ -36,7 +36,7 @@ class SvnService(object):
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
-
+        LOGGER.info('Configuration repository is "%s"', self.config_url)
         self._initialize_pysvn_client(username, password)
 
     def _initialize_pysvn_client(self, username, password):
@@ -51,12 +51,19 @@ class SvnService(object):
             self.client.set_default_password(password)
 
     def get_change_set(self, revision):
+        LOGGER.debug('Retrieving change set information for revision "%s"', revision)
+
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
         except Exception as e:
+            LOGGER.error('Retrieving change set information of revision "%s" in repository "%s" failed.',
+                         revision, self.config_url)
             raise SvnServiceException(str(e))
+
         start_pos = len(self.path_to_config + '/')
-        return [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
+        changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
+        LOGGER.debug('Changed paths are: %s', changed_paths)
+        return changed_paths
 
     def get_hosts(self, revision):
         url = self.config_url + '/host'

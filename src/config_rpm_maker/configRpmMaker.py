@@ -98,7 +98,7 @@ class ConfigRpmMaker(object):
         return error_msg
 
     def build(self):
-        LOGGER.info('Processing revision "%s"', self.revision)
+        LOGGER.info('Using revision "%s"', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
             change_set = self.svn_service.get_change_set(self.revision)
@@ -108,6 +108,8 @@ class ConfigRpmMaker(object):
             if not affected_hosts:
                 self.logger.info("We have nothing to do. No host affected by change set: %s", str(change_set))
                 return
+
+            LOGGER.info('Affected hosts are: %s', affected_hosts)
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
