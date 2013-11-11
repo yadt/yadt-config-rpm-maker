@@ -50,5 +50,12 @@ except:
     at_least_one_import_failed = True
 
 
+try:
+    import docopt  # nopep8
+except:
+    print 'Could not import "docopt"! Please install it.'
+    at_least_one_import_failed = True
+
+
 if at_least_one_import_failed:
     exit(1)
