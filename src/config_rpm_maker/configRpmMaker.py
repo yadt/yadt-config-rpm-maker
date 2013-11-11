@@ -271,7 +271,7 @@ class ConfigRpmMaker(object):
                                               prefix='yadt-config-rpm-maker',
                                               suffix='.error.log')
         self.error_handler = FileHandler(self.error_log_file)
-        formatter = Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT)
+        formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
         self.error_handler.setFormatter(formatter)
         self.error_handler.setLevel(ERROR)
 

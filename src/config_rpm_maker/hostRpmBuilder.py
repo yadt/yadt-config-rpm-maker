@@ -14,14 +14,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import os
 import shutil
 import subprocess
 
 from pysvn import ClientError
 from datetime import datetime
-from logging import getLogger
+from logging import ERROR, Formatter, FileHandler, getLogger
 
 from config_rpm_maker import config
 from config_rpm_maker.dependency import Dependency
@@ -51,9 +50,6 @@ class HostRpmBuilder(object):
             path += '.new'
 
         return path
-
-    LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-    DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
     def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
         self.hostname = hostname
@@ -377,16 +373,23 @@ Change set:
         self.handler.close()
 
     def _create_logger(self):
-        logger = logging.getLogger(self.hostname)
-        self.handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
-        self.handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
-        self.handler.setLevel(config.get('log_level', logging.INFO))
+        log_level = config.get_log_level()
+        formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
+
+        self.handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        self.handler.setFormatter(formatter)
+        self.handler.setLevel(log_level)
+
+        self.error_handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
+        self.error_handler.setFormatter(formatter)
+        self.error_handler.setLevel(ERROR)
+
+        logger = getLogger(self.hostname)
         logger.addHandler(self.handler)
-        self.error_handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
-        self.error_handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
-        self.error_handler.setLevel(logging.ERROR)
         logger.addHandler(self.error_handler)
-        logger.setLevel(config.get('log_level', logging.INFO))
+        logger.setLevel(log_level)
+
         if self.error_logging_handler:
             logger.addHandler(self.error_logging_handler)
+
         return logger

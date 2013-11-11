@@ -30,6 +30,10 @@ KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 
+LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
+LOG_FILE_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
+
+
 configuration = None
 
 
