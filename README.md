@@ -57,7 +57,7 @@ Additional build dependency
 sudo pip install PyYAML
 ```
 
-### Development Environment on other Platforms
+### Developing on other Platforms
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
