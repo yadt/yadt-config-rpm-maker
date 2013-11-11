@@ -221,7 +221,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
-            LOGGER.info("Uploading %s rpm(s) ...", len(rpms))
+            LOGGER.info("Uploading %s rpm(s)", len(rpms))
             LOGGER.debug('Uploading rpms using command "%s" and chunk_size "%s"', rpm_upload_cmd, chunk_size)
 
             pos = 0

@@ -68,7 +68,7 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
-        LOGGER.info('Building configuration rpm(s) for host "%s" ...', self.hostname)
+        LOGGER.info('Building configuration rpm(s) for host "%s"', self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
@@ -129,7 +129,7 @@ class HostRpmBuilder(object):
         self._filter_tokens_in_rpm_sources()
         self._build_rpm()
 
-        LOGGER.info("Writing configviewer data")
+        LOGGER.debug('Writing configviewer data for host "%s"', self.hostname)
         self._filter_tokens_in_config_viewer()
         self._write_revision_file_for_config_viewer()
         self._write_overlaying_for_config_viewer(overall_exported)
