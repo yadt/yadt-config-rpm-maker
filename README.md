@@ -66,6 +66,9 @@ But of course you can set up a development environment on other platforms as wel
 * [OpenSUSE](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
 * [Debian / Ubuntu](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
 
+... or use a [vagrant box](http://www.vagrantup.com/) from [vagrantbox.es](http://vagrantbox.es/) to develop in your
+destination distribution.
+
 ### Linting
 
 ```bash
