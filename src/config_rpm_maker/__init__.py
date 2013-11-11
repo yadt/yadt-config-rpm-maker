@@ -87,15 +87,14 @@ def log_configuration():
 
 
 def start_measuring_time():
+    """ Start measuring the time. This is required to calculate the elapsed time. """
     global timestamp_at_start
     timestamp_at_start = time()
 
 
 def exit_program(message, return_code):
-    """ Logs the given message and exits with given return code.
+    """ Logs the given message and exits with given return code. """
 
-    feedback is a tuple: (message, return_code)
-    """
     elapsed_time_in_seconds = time() - timestamp_at_start
     elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
     LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
