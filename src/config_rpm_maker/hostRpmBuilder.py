@@ -171,6 +171,7 @@ class HostRpmBuilder(object):
 
     def _build_rpm(self):
         tar_path = self._tar_sources()
+
         working_environment = os.environ.copy()
         working_environment['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
@@ -197,10 +198,13 @@ class HostRpmBuilder(object):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
         self.logger.debug("Executing %s ...", tar_cmd)
-        p = subprocess.Popen(tar_cmd, shell=True)
-        p.communicate()
+        p = subprocess.Popen(tar_cmd,
+                             shell=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate()
         if p.returncode:
-            raise Exception("Creating tar of config dir failed.")
+            raise Exception("Creating tar of config dir failed: stdout=%s, stderr=%s", stdout, stderr)
         return output_file
 
     def _filter_tokens_in_rpm_sources(self):
