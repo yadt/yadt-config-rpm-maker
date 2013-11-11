@@ -13,6 +13,10 @@ Usage:
   config-rpm-maker -h | --help
   config-rpm-maker --version
 
+Arguments:
+  repository    absolute path to your subversion repository
+  revision      subversion revision number for which the configuration rpms are going to be built
+
 Options:
   -h --help     Show this screen.
   --version     Show version.
@@ -31,6 +35,11 @@ Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test
   * preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
 
 ## Getting Started
+
+Set up a subversion repository. There are several tutorials available in the web.
+Some examples:
+  * [How To Set Up An SVN Repository In 7 Simple Steps](http://www.civicactions.com/blog/2010/may/25/how_set_svn_repository_7_simple_steps)
+  * [Creating and Configuring Your Repository](http://svnbook.red-bean.com/en/1.7/svn.reposadmin.create.html)
 
 To set up `yadt-config-rpm-maker` please have a look at the
 [Configuration Documentation](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)

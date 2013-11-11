@@ -130,10 +130,12 @@ class ConfigRpmMaker(object):
         return rpms
 
     def _clean_up_work_dir(self):
+        LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
         if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
             shutil.rmtree(self.work_dir)
 
         if os.path.exists(self.error_log_file):
+            LOGGER.debug('Removing error log "%s"', self.error_log_file)
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
@@ -147,6 +149,7 @@ class ConfigRpmMaker(object):
             shutil.move(self.error_log_file, os.path.join(error_log_dir, self.revision + '.txt'))
 
     def _move_configviewer_dirs_to_final_destination(self, hosts):
+        LOGGER.info("Updating configviewer data.")
         for host in hosts:
             temp_path = HostRpmBuilder.get_config_viewer_host_dir(host, True)
             dest_path = HostRpmBuilder.get_config_viewer_host_dir(host)
@@ -156,6 +159,7 @@ class ConfigRpmMaker(object):
 
     def _build_hosts(self, hosts):
         if not hosts:
+            LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
             return
 
         host_queue = Queue()
@@ -168,7 +172,7 @@ class ConfigRpmMaker(object):
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(name='host_rpm_thread_%d' % i,
+        thread_pool = [BuildHostThread(name='build_host_configuration_rpm_thread_%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
@@ -178,6 +182,7 @@ class ConfigRpmMaker(object):
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
         for thread in thread_pool:
+            LOGGER.debug('Starting thread "%s"', thread.name)
             thread.start()
 
         for thread in thread_pool:
@@ -188,13 +193,18 @@ class ConfigRpmMaker(object):
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
-        return self._consume_queue(rpm_queue)
+        built_rpms = self._consume_queue(rpm_queue)
+        LOGGER.debug('Built %s rpms: %s', len(built_rpms), built_rpms)
+        return built_rpms
 
     def _upload_rpms(self, rpms):
         rpm_upload_cmd = config.get('rpm_upload_cmd')
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
+            LOGGER.info("Uploading %s rpms...", len(rpms))
+            LOGGER.debug('Uploading rpms using command "%s" and chunk_size "%s"', rpm_upload_cmd, chunk_size)
+
             pos = 0
             while pos < len(rpms):
                 rpm_chunk = rpms[pos:pos + chunk_size]
@@ -203,6 +213,8 @@ class ConfigRpmMaker(object):
                 if returncode:
                     raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d' % (cmd, returncode))
                 pos += chunk_size
+        else:
+            LOGGER.info("Rpms will not be uploaded since no upload command has been configured.")
 
     def _get_affected_hosts(self, change_set, available_host):
         result = set()
@@ -234,6 +246,7 @@ class ConfigRpmMaker(object):
 
     def _consume_queue(self, queue):
         items = []
+
         while not queue.empty():
             item = queue.get()
             queue.task_done()
@@ -261,8 +274,13 @@ class ConfigRpmMaker(object):
             os.makedirs(self.temp_dir)
 
     def _prepare_work_dir(self):
-        self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
+        LOGGER.debug('Preparing working directory "%s"', self.temp_dir)
+        self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.',
+                                         suffix='.' + self.revision,
+                                         dir=self.temp_dir)
+
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
+        LOGGER.debug('Creating directory structure for rpmbuild in "%s"', self.rpm_build_dir)
         for name in ['tmp', 'RPMS', 'RPMS/x86_64,RPMS/noarch', 'BUILD', 'SRPMS', 'SPECS', 'SOURCES']:
             path = os.path.join(self.rpm_build_dir, name)
             if not os.path.exists(path):
