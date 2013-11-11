@@ -15,7 +15,7 @@ Usage:
 
 Arguments:
   repository    absolute path to your subversion repository
-  revision      subversion revision number for which the configuration rpms are going to be built
+  revision      subversion revision for which the configuration rpms are going to be built
 
 Options:
   -h --help     Show this screen.

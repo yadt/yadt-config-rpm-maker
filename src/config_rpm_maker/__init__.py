@@ -14,7 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 """yadt-config-rpm-maker
 
 Usage:
@@ -24,13 +23,14 @@ Usage:
 
 Arguments:
   repository    absolute path to your subversion repository
-  revision      subversion revision number for which the configuration rpms are going to be built
+  revision      subversion revision for which the configuration rpms are going to be built
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
   --debug       Force DEBUG log level.
 """
+
 import traceback
 
 from docopt import docopt
