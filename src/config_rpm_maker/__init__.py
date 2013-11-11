@@ -50,6 +50,8 @@ OPTION_DEBUG = '--debug'
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = __name__
 
+LOGGER = None
+
 
 def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     """ Returnes a root_logger which logs to the console using the given log_level. """
@@ -66,13 +68,26 @@ def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     return root_logger
 
 
+def log_configuration():
+    LOGGER.debug('Loaded configuration file "%s"', config.configuration_file_path)
+
+    keys = sorted(config.configuration.keys())
+    max_length = len(max(keys, key=len))
+
+    for key in keys:
+        indentet_key = key.ljust(max_length)
+        LOGGER.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
+
+
 def main():
+    global LOGGER
     arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
     try:
         config.load_configuration_file()
 
         if arguments[OPTION_DEBUG]:
             LOGGER = create_root_logger(DEBUG)
+            LOGGER.debug("DEBUG logging is enabled")
         else:
             log_level = config.get_log_level()
             LOGGER = create_root_logger(log_level)
@@ -81,8 +96,10 @@ def main():
         sys.stderr.write(str(e) + "\n")
         sys.exit(1)
 
-    LOGGER.debug('Arguments are: %s', str(arguments))
-    LOGGER.debug('Loaded configuration file "%s": %s', config.configuration_file_path, str(config.configuration))
+    LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
+    LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
+
+    log_configuration()
 
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():

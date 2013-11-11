@@ -126,7 +126,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             affected_hosts.sort()
             LOGGER.info('Found %s affected hosts', len(affected_hosts))
             for i in range(len(affected_hosts)):
-                LOGGER.info('Affected host #%s: %s', i, affected_hosts[i])
+                LOGGER.info('Affected host #%s "%s"', i, affected_hosts[i])
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
@@ -189,7 +189,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(name='build_host_configuration_rpm_thread_%d' % i,
+        thread_pool = [BuildHostThread(name='thread_%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
@@ -199,7 +199,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
         for thread in thread_pool:
-            LOGGER.debug('Starting thread "%s"', thread.name)
+            LOGGER.debug('Starting "%s"', thread.name)
             thread.start()
 
         for thread in thread_pool:
@@ -213,7 +213,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         built_rpms = self._consume_queue(rpm_queue)
         LOGGER.debug('Built %s rpms', len(built_rpms))
         for i in range(len(built_rpms)):
-            LOGGER.debug('Built rpm #%s: %s', i, built_rpms[i])
+            LOGGER.debug('Built rpm #%s "%s"', i, built_rpms[i])
         return built_rpms
 
     def _upload_rpms(self, rpms):

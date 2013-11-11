@@ -101,7 +101,6 @@ class TokenReplacer(object):
                 continue
             for filename in filenames:
                 absolute_filename = os.path.join(root, filename)
-                LOGGER.debug("Filtering file %s", absolute_filename)
                 token_replacer.filter_file(absolute_filename, html_escape=html_escape)
 
         return token_replacer
