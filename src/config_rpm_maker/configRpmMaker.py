@@ -31,7 +31,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
 
-LOGGER = getLogger("config_rpm_maker.configRpmMaker")
+LOGGER = getLogger(__name__)
 
 
 class BuildHostThread(Thread):
@@ -282,7 +282,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self.error_handler.setFormatter(formatter)
         self.error_handler.setLevel(ERROR)
 
-        self.logger = getLogger('config_rpm_maker.configRpmMaker.fileLogger')
+        self.logger = getLogger('fileLogger')
         self.logger.addHandler(self.error_handler)
         self.logger.propagate = False
 

@@ -30,7 +30,7 @@ from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
 
 
-LOGGER = getLogger("config_rpm_maker.hostRpmBuilder")
+LOGGER = getLogger(__name__)
 
 
 class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):

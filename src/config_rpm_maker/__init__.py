@@ -48,7 +48,7 @@ ARGUMENT_REPOSITORY = '<repository>'
 OPTION_DEBUG = '--debug'
 
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
-ROOT_LOGGER_NAME = "config_rpm_maker"
+ROOT_LOGGER_NAME = __name__
 
 
 def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):

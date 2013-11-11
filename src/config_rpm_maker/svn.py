@@ -21,7 +21,7 @@ from logging import getLogger
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
-LOGGER = getLogger("config_rpm_maker.svn")
+LOGGER = getLogger(__name__)
 
 
 class SvnServiceException(BaseConfigRpmMakerException):
