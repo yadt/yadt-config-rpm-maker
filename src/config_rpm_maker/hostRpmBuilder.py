@@ -72,16 +72,16 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
-        LOGGER.info('Building configuration rpms for host "%s" ...', self.hostname)
+        LOGGER.info('Building configuration rpm(s) for host "%s" ...', self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
-            raise Exception("ERROR: '%s' exists already whereas I should be creating it now." % self.host_config_dir)
+            raise Exception('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
 
         try:
             os.mkdir(self.host_config_dir)
         except Exception as e:
-                raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
+            raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
 
         overall_requires = []
         overall_provides = []
@@ -131,9 +131,9 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.variables'), patch_info)
 
         self._filter_tokens_in_rpm_sources()
-
         self._build_rpm()
 
+        LOGGER.info("Writing configviewer data")
         self._filter_tokens_in_config_viewer()
         self._write_revision_file_for_config_viewer()
         self._write_overlaying_for_config_viewer(overall_exported)
@@ -171,20 +171,27 @@ class HostRpmBuilder(object):
 
     def _build_rpm(self):
         tar_path = self._tar_sources()
-
-        my_env = os.environ.copy()
-        my_env['HOME'] = os.path.abspath(self.work_dir)
+        working_environment = os.environ.copy()
+        working_environment['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
+
         LOGGER.debug('Building rpms by executing "%s"', rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
-        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        p = subprocess.Popen(rpmbuild_cmd,
+                             shell=True,
+                             env=working_environment,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+
         stdout, stderr = p.communicate()
+
         self.logger.info(stdout)
         if stderr:
             self.logger.error(stderr)
 
         if p.returncode:
-                raise CouldNotBuildRpmException("Could not build RPM for host '%s' : %s" % (self.hostname, stderr))
+            raise CouldNotBuildRpmException("Could not build RPM for host '%s' : %s" % (self.hostname, stderr))
 
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'

@@ -28,7 +28,7 @@ class SegmentTest(unittest.TestCase):
     def test_loctyp(self):
         self.assertEqual(['devweb', ], LocTyp().get('devweb01'))
         self.assertEqual(['proweb', 'hamweb'], LocTyp().get('hamweb01'))
-        self.assertEqual(['loctyp/proweb', 'loctyp/berweb'], LocTyp().get_svn_paths('berweb17'))
+        self.assertEqual(['loctyp/berweb', 'loctyp/proweb'], LocTyp().get_svn_paths('berweb17'))
 
     def test_host(self):
         self.assertEqual(['devweb01', ], Host().get('devweb01'))
