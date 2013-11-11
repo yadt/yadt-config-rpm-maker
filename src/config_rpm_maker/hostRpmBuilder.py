@@ -188,7 +188,7 @@ class HostRpmBuilder(object):
             self.logger.error(stderr)
 
         if p.returncode:
-            raise CouldNotBuildRpmException("Could not build RPM for host '%s' : %s" % (self.hostname, stderr))
+            raise CouldNotBuildRpmException('Could not build RPM for host "%s": stdout="%s", stderr="%s"' % (self.hostname, stdout.strip(), stderr.strip()))
 
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
