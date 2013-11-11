@@ -82,9 +82,16 @@ class ConfigurationException(BaseConfigRpmMakerException):
 
 class ConfigRpmMaker(object):
 
-    ERROR_MSG = '\n\n\nYour commit has been accepted by the SVN server, but due to the\n' + \
-                'errors that it contains no RPMs have been created.\n\n%s' + \
-                'Please fix the issues and trigger the RPM creation with a dummy commit.\n\n'
+    ERROR_MSG = """
+------------------------------------------------------------------------
+Your commit has been accepted by the SVN server, but due to the errors
+that it contains no RPMs have been created.
+
+See %s/%s.txt for details.
+
+Please fix the issues and trigger the RPM creation with a dummy commit.
+------------------------------------------------------------------------
+"""
 
     def __init__(self, revision, svn_service):
         LOGGER.debug("Initializing %s with revision=%s and svn_service=%s", ConfigRpmMaker.__name__, revision, svn_service)
@@ -97,15 +104,15 @@ class ConfigRpmMaker(object):
 
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get('error_log_url', '')
-        err_suffix = 'See %s/%s.txt for details.\n\n' % (err_url, revision)
-        error_msg = self.ERROR_MSG % err_suffix
-        self.error_logger.error(error_msg)
+        error_msg = self.ERROR_MSG % (err_url, revision)
+        for line in error_msg.split('\n'):
+            LOGGER.error(line)
         self._move_error_log_for_public_access()
         self._clean_up_work_dir()
         return error_msg
 
     def build(self):
-        LOGGER.info('Using revision "%s"', self.revision)
+        LOGGER.info('Working with revision "%s"', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
             change_set = self.svn_service.get_change_set(self.revision)
@@ -275,13 +282,9 @@ class ConfigRpmMaker(object):
         self.error_handler.setFormatter(formatter)
         self.error_handler.setLevel(ERROR)
 
-        self.logger = getLogger('file_logger')
+        self.logger = getLogger('config_rpm_maker.configRpmMaker.fileLogger')
         self.logger.addHandler(self.error_handler)
         self.logger.propagate = False
-
-        self.error_logger = getLogger('error_file_logger')
-        self.error_logger.propagate = True
-        self.error_logger.setLevel(ERROR)
 
     def _assure_temp_dir_if_set(self):
         if self.temp_dir and not os.path.exists(self.temp_dir):
