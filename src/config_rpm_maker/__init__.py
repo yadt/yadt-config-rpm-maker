@@ -108,8 +108,8 @@ def exit_program(message, return_code):
 
 
 def main():
-    arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
     start_measuring_time()
+    arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
 
     global LOGGER
     try:
