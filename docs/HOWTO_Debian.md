@@ -1,4 +1,4 @@
-# Developing on Debian 7
+# Developing on Debian 7 / Ubuntu 12
 
 ## Get the sources
 
@@ -13,7 +13,7 @@ git clone https://github.com/yadt/yadt-config-rpm-maker
 ## Install Dependencies
 
 ```bash
-sudo apt-get install python-setuptools python pip subversion
+sudo apt-get install python-setuptools python-pip subversion
 ```
 
 ```bash
