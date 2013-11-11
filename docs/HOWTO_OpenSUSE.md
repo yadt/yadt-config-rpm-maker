@@ -1,4 +1,4 @@
-# How to set up a devlopment environment on OpenSUSE 12.3
+# Developing on OpenSUSE 12
 
 ## Get the sources
 

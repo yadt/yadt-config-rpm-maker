@@ -1,4 +1,4 @@
-# How to set up a development environment on Debian 7
+# Developing on Debian 7
 
 ## Get the sources
 
