@@ -52,6 +52,8 @@ OPTION_DEBUG = '--debug'
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = __name__
 
+MESSAGE_SUCCESS = "Success."
+
 LOGGER = None
 
 
@@ -107,10 +109,10 @@ def exit_program(message, return_code):
 
 
 def main():
-    global LOGGER
     arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
     start_measuring_time()
 
+    global LOGGER
     try:
         config.load_configuration_file()
 
@@ -151,4 +153,4 @@ def main():
         traceback.print_exc(5)
         exit_program('An unknown exception occurred!', return_code=3)
 
-    exit_program("SUCCESS", return_code=0)
+    exit_program(MESSAGE_SUCCESS, return_code=0)
