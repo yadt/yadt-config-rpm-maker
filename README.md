@@ -26,7 +26,7 @@ Options:
 ### Example
 
 ```bash
-config-rpm-maker file:///foo/bar/svn/test 123
+config-rpm-maker /foo/bar/svn/test 123
 ```
 Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
 
