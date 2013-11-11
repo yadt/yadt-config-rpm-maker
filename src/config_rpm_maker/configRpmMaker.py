@@ -112,7 +112,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return error_msg
 
     def build(self):
-        LOGGER.info('Working with revision "%s"', self.revision)
+        LOGGER.info('Working on revision %s', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
             change_set = self.svn_service.get_change_set(self.revision)
