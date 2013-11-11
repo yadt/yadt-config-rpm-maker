@@ -59,16 +59,6 @@ Additional build dependency
 sudo pip install PyYAML
 ```
 
-
-#### Debian
-
-```bash
-sudo apt-get install rpm python-rpm python-svn python-yaml
-```
-It is required that your /bin/sh points to a bash, not a dash!  
-[Dash is the default in Ubuntu](https://wiki.ubuntu.com/DashAsBinSh).  
-You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
-
 ### Linting
 
 ```bash
@@ -80,6 +70,19 @@ To lint the code we are using flake8.
 
 ```bash
 python setup.py test
+```
+
+Running a single test file
+```bash
+PYTHONPATH=src python tests/unittests/configuration_test.py
+```
+
+Since the feedback of the test loader is not helping if the imports fails,
+there are import checks in `__init__.py` in the tests folder.
+This is a known bug [issue7559](http://bugs.python.org/issue7559).
+Run the checks to see if you have import errors by executing:
+```bash
+PYTHONPATH=src python tests/__init__.py
 ```
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
