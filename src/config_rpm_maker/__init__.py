@@ -31,11 +31,13 @@ Options:
   --version     Show version.
   --debug       Force DEBUG log level.
 """
-import sys
 import traceback
 
 from docopt import docopt
 from logging import DEBUG, Formatter, StreamHandler, getLogger
+from math import ceil
+from sys import exit, stderr
+from time import time
 
 from config_rpm_maker import config
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
@@ -51,6 +53,9 @@ LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = __name__
 
 LOGGER = None
+
+
+timestamp_at_start = 0
 
 
 def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
@@ -79,9 +84,33 @@ def log_configuration():
         LOGGER.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
 
 
+def start_measuring_time():
+    global timestamp_at_start
+    timestamp_at_start = time()
+
+
+def exit_program(message, return_code):
+    """ Logs the given message and exits with given return code.
+
+    feedback is a tuple: (message, return_code)
+    """
+    elapsed_time_in_seconds = time() - timestamp_at_start
+    elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
+    LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
+
+    if return_code == 0:
+        LOGGER.info(message)
+    else:
+        LOGGER.error(message)
+
+    exit(return_code)
+
+
 def main():
     global LOGGER
     arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
+    start_measuring_time()
+
     try:
         config.load_configuration_file()
 
@@ -93,8 +122,8 @@ def main():
             LOGGER = create_root_logger(log_level)
 
     except config.ConfigException as e:
-        sys.stderr.write(str(e) + "\n")
-        sys.exit(1)
+        stderr.write(str(e) + "\n")
+        exit(1)
 
     LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
     LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
@@ -103,8 +132,7 @@ def main():
 
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
-        LOGGER.error('Given revision "%s" is not a integer.', revision)
-        sys.exit(1)
+        exit_program('Given revision "%s" is not a integer.' % revision, return_code=1)
 
     repository = arguments[ARGUMENT_REPOSITORY]
 
@@ -117,8 +145,10 @@ def main():
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
             LOGGER.error(line)
-        sys.exit(1)
+        exit_program('An exception occurred!', return_code=2)
 
     except Exception:
         traceback.print_exc(5)
-        sys.exit(2)
+        exit_program('An unknown exception occurred!', return_code=3)
+
+    exit_program("SUCCESS", return_code=0)
