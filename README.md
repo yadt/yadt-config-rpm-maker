@@ -7,7 +7,7 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
   * Builds only the configuration RPMs for the affected hosts.
   * Uploads configuration RPMs to a YUM repository.
 
-```bash
+```
 Usage:
   config-rpm-maker <repository> <revision> [--debug]
   config-rpm-maker -h | --help
