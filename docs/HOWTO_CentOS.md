@@ -1,4 +1,6 @@
-# How to set up a development environment on Centos 6
+# Developing on Centos 6
+
+## Get the sources
 
 We need `git` to clone the repository
 ```bash
@@ -10,18 +12,30 @@ Clone the yadt-config-rpm-maker repository
 git clone https://github.com/yadt/yadt-config-rpm-maker
 ```
 
-[Enable EPEL repository](http://www.rackspace.com/knowledge_center/article/installing-rhel-epel-repo-on-centos-5x-or-6x)
+## Install Dependencies
 
-This is required to install pysvn
-
+To install pysvn we need to [install the RHEL EPEL repository](http://www.rackspace.com/knowledge_center/article/installing-rhel-epel-repo-on-centos-5x-or-6x).
 Install everything we need to develop with python
 
 ```bash
 yum install python-devel python-setuptools -y
-yum install subversion rpm-build install pysvn python-docopt PyYAML -y
-easy_install pip
-pip install PyYAML
 ```
+
+```bash
+yum install subversion rpm-build install pysvn PyYAML -y
+```
+
+```bash
+easy_install PyYAML docopt mock
+```
+
+or if you have `pip` installed
+
+```bash
+pip install PyYAML docopt mock
+```
+
+## Running Tests
 
 Move into the cloned repository
 ```bash

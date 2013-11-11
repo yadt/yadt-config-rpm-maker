@@ -1,6 +1,6 @@
 # How to set up a devlopment environment on OpenSUSE 12.3
 
-## Clone the repo
+## Get the sources
 
 Install git
 ```bash
@@ -12,12 +12,13 @@ and cloen the repo
 git clone https://github.com/yadt/yadt-config-rpm-maker
 ```
 
-## Install dependencies
+## Install Dependencies
 
 ```bash
-zypper install python-yaml rpm-python python-pysvn rpm-build
+zypper install python-yaml rpm-python python-pysvn rpm-build python-docopt python-mock
+```
 
-## Run Tests
+## Running Tests
 
 ```bash
 cd yadt-config-rpm-maker
