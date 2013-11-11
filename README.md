@@ -77,9 +77,10 @@ Running a single test file
 PYTHONPATH=src python tests/unittests/configuration_test.py
 ```
 
-Since the feedback of the test loader is not helping if the imports fails,
-there are import checks in `__init__.py` in the tests folder.
+The feedback of the test loader is not helping if the imports fail.
 This is a known bug [issue7559](http://bugs.python.org/issue7559).
+But there are import checks in [tests/__init__.py](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/tests/__init__.py)
+
 Run the checks to see if you have import errors by executing:
 ```bash
 PYTHONPATH=src python tests/__init__.py
