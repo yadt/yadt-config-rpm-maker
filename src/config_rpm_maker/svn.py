@@ -62,7 +62,10 @@ class SvnService(object):
 
         start_pos = len(self.path_to_config + '/')
         changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
-        LOGGER.debug('Changed paths are: %s', changed_paths)
+        changed_paths.sort()
+        LOGGER.debug('Found %s changed paths.', len(changed_paths))
+        for i in range(len(changed_paths)):
+            LOGGER.debug('Changed path #%s: %s', i, changed_paths[i])
         return changed_paths
 
     def get_hosts(self, revision):

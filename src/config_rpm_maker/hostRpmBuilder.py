@@ -21,6 +21,7 @@ import subprocess
 
 from pysvn import ClientError
 from datetime import datetime
+from logging import getLogger
 
 from config_rpm_maker import config
 from config_rpm_maker.dependency import Dependency
@@ -28,6 +29,9 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostResolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
+
+
+LOGGER = getLogger("config_rpm_maker.hostRpmBuilder")
 
 
 class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):
@@ -68,6 +72,7 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
+        LOGGER.info('Building configuration rpms for host "%s" ...', self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
@@ -170,6 +175,7 @@ class HostRpmBuilder(object):
         my_env = os.environ.copy()
         my_env['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
+        LOGGER.debug('Building rpms by executing "%s"', rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
         p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()

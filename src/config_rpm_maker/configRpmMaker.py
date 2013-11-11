@@ -47,18 +47,25 @@ class BuildHostThread(Thread):
         self.error_logging_handler = error_logging_handler
 
     def run(self):
+        rpms = []
         while not self.host_queue.empty():
             host = self.host_queue.get()
             self.host_queue.task_done()
             try:
-                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=self.work_dir, svn_service_queue=self.svn_service_queue, error_logging_handler=self.error_logging_handler).build()
+                rpms = HostRpmBuilder(hostname=host,
+                                      revision=self.revision,
+                                      work_dir=self.work_dir,
+                                      svn_service_queue=self.svn_service_queue,
+                                      error_logging_handler=self.error_logging_handler).build()
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
 
             except BaseConfigRpmMakerException as e:
                 self.failed_host_queue.put((host, str(e)))
+
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
+        LOGGER.debug('Thread "%s" finished and built %s rpms.', self.name, len(rpms))
 
 
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
@@ -104,12 +111,15 @@ class ConfigRpmMaker(object):
             change_set = self.svn_service.get_change_set(self.revision)
             available_hosts = self.svn_service.get_hosts(self.revision)
 
-            affected_hosts = self._get_affected_hosts(change_set, available_hosts)
+            affected_hosts = list(self._get_affected_hosts(change_set, available_hosts))
             if not affected_hosts:
                 self.logger.info("We have nothing to do. No host affected by change set: %s", str(change_set))
                 return
 
-            LOGGER.info('Affected hosts are: %s', affected_hosts)
+            affected_hosts.sort()
+            LOGGER.info('Found %s affected hosts', len(affected_hosts))
+            for i in range(len(affected_hosts)):
+                LOGGER.info('Affected host #%s: %s', i, affected_hosts[i])
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
@@ -194,7 +204,9 @@ class ConfigRpmMaker(object):
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         built_rpms = self._consume_queue(rpm_queue)
-        LOGGER.debug('Built %s rpms: %s', len(built_rpms), built_rpms)
+        LOGGER.debug('Built %s rpms', len(built_rpms))
+        for i in range(len(built_rpms)):
+            LOGGER.debug('Built rpm #%s: %s', i, built_rpms[i])
         return built_rpms
 
     def _upload_rpms(self, rpms):
@@ -202,7 +214,7 @@ class ConfigRpmMaker(object):
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
-            LOGGER.info("Uploading %s rpms...", len(rpms))
+            LOGGER.info("Uploading %s rpm(s) ...", len(rpms))
             LOGGER.debug('Uploading rpms using command "%s" and chunk_size "%s"', rpm_upload_cmd, chunk_size)
 
             pos = 0
@@ -255,17 +267,19 @@ class ConfigRpmMaker(object):
         return items
 
     def _create_logger(self):
-        self.logger = getLogger('config_rpm_maker.configRpmMaker.inner')
         self.error_log_file = tempfile.mktemp(dir=config.get_temporary_directory(),
                                               prefix='yadt-config-rpm-maker',
                                               suffix='.error.log')
         self.error_handler = FileHandler(self.error_log_file)
-        self.error_handler.setFormatter(Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
+        formatter = Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT)
+        self.error_handler.setFormatter(formatter)
         self.error_handler.setLevel(ERROR)
+
+        self.logger = getLogger('file_logger')
         self.logger.addHandler(self.error_handler)
         self.logger.propagate = False
 
-        self.error_logger = getLogger('config_rpm_maker.configRpmMaker.error')
+        self.error_logger = getLogger('error_file_logger')
         self.error_logger.propagate = True
         self.error_logger.setLevel(ERROR)
 
