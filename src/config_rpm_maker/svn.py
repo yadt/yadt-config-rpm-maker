@@ -17,7 +17,11 @@
 import pysvn
 import os
 
+from logging import getLogger
+
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
+LOGGER = getLogger(__name__)
 
 
 class SvnServiceException(BaseConfigRpmMakerException):
@@ -27,23 +31,42 @@ class SvnServiceException(BaseConfigRpmMakerException):
 class SvnService(object):
 
     def __init__(self, base_url, username=None, password=None, path_to_config='/config'):
+        LOGGER.debug('Initializing %s with base_url="%s" and path_to_config="%s"', SvnService.__name__, base_url, path_to_config)
+
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
+        LOGGER.info('Configuration repository is "%s"', self.config_url)
+        self._initialize_pysvn_client(username, password)
+
+    def _initialize_pysvn_client(self, username, password):
+        LOGGER.debug("Initializing pysvn client")
         self.client = pysvn.Client()
         self.client.set_auth_cache(True)
         if username:
+            LOGGER.debug('Setting default username for pysvn client to "%s"', username)
             self.client.set_default_username(username)
         if password:
+            LOGGER.debug('Setting default password for pysvn client')
             self.client.set_default_password(password)
 
     def get_change_set(self, revision):
+        LOGGER.debug('Retrieving change set information for revision "%s"', revision)
+
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
         except Exception as e:
+            LOGGER.error('Retrieving change set information of revision "%s" in repository "%s" failed.',
+                         revision, self.config_url)
             raise SvnServiceException(str(e))
+
         start_pos = len(self.path_to_config + '/')
-        return [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
+        changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
+        changed_paths.sort()
+        LOGGER.debug('Found %s changed paths.', len(changed_paths))
+        for i in range(len(changed_paths)):
+            LOGGER.debug('Changed path #%s: %s', i, changed_paths[i])
+        return changed_paths
 
     def get_hosts(self, revision):
         url = self.config_url + '/host'
@@ -83,3 +106,6 @@ class SvnService(object):
             return self.base_url + svn_path
         else:
             return self.config_url + '/' + svn_path
+
+    def __str__(self):
+        return '{0}(base_url="{1}", path_to_config="{2}")'.format(SvnService.__name__, self.base_url, self.path_to_config)

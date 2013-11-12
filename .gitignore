@@ -11,4 +11,12 @@ yadt_config_rpm_maker.egg-info/
 ve
 venv
 
-/.settings
+# eclipse
+.settings
+
+# python stuff
+build
+dist
+
+# temporary repository
+repository

@@ -1,3 +1,5 @@
+# coding=utf-8
+#
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
@@ -13,12 +15,3 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-__author__ = "Schlomo Schapiro"
-
-from config_rpm_maker import main
-
-
-if __name__ == "__main__":
-    main()

@@ -14,13 +14,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import os
 import shutil
 import subprocess
 
 from pysvn import ClientError
 from datetime import datetime
+from logging import ERROR, Formatter, FileHandler, getLogger
 
 from config_rpm_maker import config
 from config_rpm_maker.dependency import Dependency
@@ -28,6 +28,9 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostResolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
+
+
+LOGGER = getLogger(__name__)
 
 
 class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):
@@ -48,9 +51,6 @@ class HostRpmBuilder(object):
 
         return path
 
-    LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-    DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
-
     def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
         self.hostname = hostname
         self.revision = revision
@@ -68,15 +68,16 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
+        LOGGER.info('Building configuration rpm(s) for host "%s"', self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
-            raise Exception("ERROR: '%s' exists already whereas I should be creating it now." % self.host_config_dir)
+            raise Exception('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
 
         try:
             os.mkdir(self.host_config_dir)
         except Exception as e:
-                raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
+            raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
 
         overall_requires = []
         overall_provides = []
@@ -126,9 +127,9 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.variables'), patch_info)
 
         self._filter_tokens_in_rpm_sources()
-
         self._build_rpm()
 
+        LOGGER.debug('Writing configviewer data for host "%s"', self.hostname)
         self._filter_tokens_in_config_viewer()
         self._write_revision_file_for_config_viewer()
         self._write_overlaying_for_config_viewer(overall_exported)
@@ -167,27 +168,39 @@ class HostRpmBuilder(object):
     def _build_rpm(self):
         tar_path = self._tar_sources()
 
-        my_env = os.environ.copy()
-        my_env['HOME'] = os.path.abspath(self.work_dir)
+        working_environment = os.environ.copy()
+        working_environment['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
+
+        LOGGER.debug('Building rpms by executing "%s"', rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
-        p = subprocess.Popen(rpmbuild_cmd, shell=True, env=my_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        p = subprocess.Popen(rpmbuild_cmd,
+                             shell=True,
+                             env=working_environment,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+
         stdout, stderr = p.communicate()
+
         self.logger.info(stdout)
         if stderr:
             self.logger.error(stderr)
 
         if p.returncode:
-                raise CouldNotBuildRpmException("Could not build RPM for host '%s' : %s" % (self.hostname, stderr))
+            raise CouldNotBuildRpmException('Could not build RPM for host "%s": stdout="%s", stderr="%s"' % (self.hostname, stdout.strip(), stderr.strip()))
 
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
         self.logger.debug("Executing %s ...", tar_cmd)
-        p = subprocess.Popen(tar_cmd, shell=True)
-        p.communicate()
+        p = subprocess.Popen(tar_cmd,
+                             shell=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate()
         if p.returncode:
-            raise Exception("Creating tar of config dir failed.")
+            raise Exception('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
     def _filter_tokens_in_rpm_sources(self):
@@ -360,16 +373,23 @@ Change set:
         self.handler.close()
 
     def _create_logger(self):
-        logger = logging.getLogger(self.hostname)
-        self.handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
-        self.handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
-        self.handler.setLevel(config.get('log_level', logging.INFO))
+        log_level = config.get_log_level()
+        formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
+
+        self.handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        self.handler.setFormatter(formatter)
+        self.handler.setLevel(log_level)
+
+        self.error_handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
+        self.error_handler.setFormatter(formatter)
+        self.error_handler.setLevel(ERROR)
+
+        logger = getLogger(self.hostname)
         logger.addHandler(self.handler)
-        self.error_handler = logging.FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
-        self.error_handler.setFormatter(logging.Formatter(self.LOG_FORMAT, self.DATE_FORMAT))
-        self.error_handler.setLevel(logging.ERROR)
         logger.addHandler(self.error_handler)
-        logger.setLevel(config.get('log_level', logging.INFO))
+        logger.setLevel(log_level)
+
         if self.error_logging_handler:
             logger.addHandler(self.error_logging_handler)
+
         return logger

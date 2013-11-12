@@ -156,20 +156,25 @@ class ConfigRpmMakerTest(SvnTestCase):
                 finally:
                     f.close()
 
+    def _without_rpmlib_packages(self, requires):
+        filtered_requires = [package_name for package_name in requires if not package_name.startswith('rpmlib')]
+        return sorted(filtered_requires)
+
     def assertRequires(self, hdr, hostname, requires):
         if requires:
             real_requires = requires + ['hostname-' + hostname, 'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-minion']
-            self.assertArrayEqual(sorted(real_requires), sorted(hdr['requires']))
+            expected_requires = self._without_rpmlib_packages(real_requires)
+            actual_requires = self._without_rpmlib_packages(hdr['requires'])
+            self.assertListsEqual(expected_requires, actual_requires)
 
     def assertProvides(self, hdr, hostname, provides):
         if provides:
             real_provides = provides + ['yadt-config-all', 'yadt-config-' + hostname, ]
-            self.assertArrayEqual(sorted(real_provides), sorted(hdr['provides']))
+            self.assertListsEqual(sorted(real_provides), sorted(hdr['provides']))
 
-    def assertArrayEqual(self, expected, value):
-        self.assertEqual(len(expected), len(value), "Lists have different element count. Expected %s , Got %s" % (str(expected), str(value)))
-        for i in range(len(expected)):
-            self.assertEqual(expected[i], value[i], "Element %d is different. Expected %s , Got %s" % (i, str(expected), str(value)))
+    def assertListsEqual(self, expected, actual):
+        difference = list(set(expected) - set(actual)) + list(set(actual) - set(expected))
+        self.assertEqual(expected, actual, "Lists are different.\nExpected: %s\n     Got: %s\ndifference is: %s" % (str(expected), str(actual), str(difference)))
 
     def extractRpmFiles(self, path, hostname):
         extract_path = os.path.join(config_dev.get('temp_dir'), hostname + '.extract')

@@ -15,15 +15,18 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import cgi
-import logging
 import re
 import os
+
+from logging import getLogger
 
 import config_rpm_maker.magic
 
 from config_rpm_maker import config
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
+LOGGER = getLogger(__name__)
 
 
 class MissingOrRedundantTokenException(BaseConfigRpmMakerException):
@@ -41,11 +44,12 @@ class CannotFilterFileException (BaseConfigRpmMakerException):
 
 
 class MissingTokenException (BaseConfigRpmMakerException):
+    """
+        Exception stating that a value for a given token
+        has not been found in the token definition.
+    """
+
     error_info = "Could not replace variable in file :\n"
-    """
-    Exception stating that a value for a given token
-    has not been found in the token definition.
-    """
 
     def __init__(self, token, file=None, *args, **kwargs):
         super(MissingTokenException, self).__init__(*args, **kwargs)
@@ -60,10 +64,10 @@ class MissingTokenException (BaseConfigRpmMakerException):
 
 
 class FileLimitExceededException(BaseConfigRpmMakerException):
+    """ Exception stating the file exceeded the given file size limit """
+
     error_info = "File limit exceeded! :\n"
-    """
-    Exception stating the file exceeded the given file size limit
-    """
+
     def __init__(self, path, size_limit=-1, *args, **kwargs):
         super(FileLimitExceededException, self).__init__(*args, **kwargs)
         self.path = path
@@ -88,7 +92,7 @@ class TokenReplacer(object):
                          directory,
                          variables_definition_directory,
                          replacer_function=None, html_escape=False, html_escape_function=None):
-        logging.info("Filtering files in %s", directory)
+        LOGGER.debug("Filtering files in %s", directory)
 
         token_replacer = cls.from_directory(os.path.abspath(variables_definition_directory),
                                             replacer_function=replacer_function, html_escape_function=html_escape_function)
@@ -98,15 +102,13 @@ class TokenReplacer(object):
                 continue
             for filename in filenames:
                 absolute_filename = os.path.join(root, filename)
-                logging.debug("Filtering file %s", absolute_filename)
                 token_replacer.filter_file(absolute_filename, html_escape=html_escape)
 
         return token_replacer
 
     @classmethod
     def from_directory(cls, directory, replacer_function=None, html_escape_function=None):
-        logging.debug("Initializing token replacer of class %s from directory %s",
-                      cls.__name__, directory)
+        LOGGER.debug("Initializing token replacer of class %s from directory %s", cls.__name__, directory)
 
         token_values = {}
         absolute_path = os.path.abspath(directory)
@@ -129,8 +131,7 @@ class TokenReplacer(object):
             def replacer_function(token, replacement):
                 return replacement
         else:
-            logging.debug("Using custom replacer_function %s",
-                          replacer_function.__name__)
+            LOGGER.debug("Using custom replacer_function %s", replacer_function.__name__)
 
         if not html_escape_function:
             def html_escape_function(filename, content):

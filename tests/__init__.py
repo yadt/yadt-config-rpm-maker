@@ -13,3 +13,49 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+    This module contains imports to ensure that the user gets useful feedback
+    when executing "python setup.py test" and some system dependencies are missing.
+"""
+
+at_least_one_import_failed = False
+
+
+try:
+    import pysvn  # nopep8
+except:
+    print 'Could not import "pysvn"! Please install it.'
+    at_least_one_import_failed = True
+
+
+try:
+    import rpm  # nopep8
+except:
+    print 'Could not import "rpm"! Please install it.'
+    at_least_one_import_failed = True
+
+
+try:
+    import yaml  # nopep8
+except:
+    print 'Could not import "yaml"! Please install it.'
+    at_least_one_import_failed = True
+
+
+try:
+    import mock  # nopep8
+except:
+    print 'Could not import "mock"! Please install it.'
+    at_least_one_import_failed = True
+
+
+try:
+    import docopt  # nopep8
+except:
+    print 'Could not import "docopt"! Please install it.'
+    at_least_one_import_failed = True
+
+
+if at_least_one_import_failed:
+    exit(1)

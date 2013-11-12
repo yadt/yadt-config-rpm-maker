@@ -19,16 +19,19 @@ import os
 import shutil
 import subprocess
 import tempfile
-import logging
+
 import traceback
 import config
 
+from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.segment import OVERLAY_ORDER
+
+LOGGER = getLogger(__name__)
 
 
 class BuildHostThread(Thread):
@@ -44,18 +47,29 @@ class BuildHostThread(Thread):
         self.error_logging_handler = error_logging_handler
 
     def run(self):
+        rpms = []
         while not self.host_queue.empty():
             host = self.host_queue.get()
             self.host_queue.task_done()
             try:
-                rpms = HostRpmBuilder(hostname=host, revision=self.revision, work_dir=self.work_dir, svn_service_queue=self.svn_service_queue, error_logging_handler=self.error_logging_handler).build()
+                rpms = HostRpmBuilder(hostname=host,
+                                      revision=self.revision,
+                                      work_dir=self.work_dir,
+                                      svn_service_queue=self.svn_service_queue,
+                                      error_logging_handler=self.error_logging_handler).build()
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
 
             except BaseConfigRpmMakerException as e:
                 self.failed_host_queue.put((host, str(e)))
+
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
+        count_of_rpms = len(rpms)
+        if count_of_rpms > 0:
+            LOGGER.debug('Thread "%s" finished and built %s rpms.', self.name, count_of_rpms)
+        else:
+            LOGGER.debug('Thread "%s" finished without building any rpm!', self.name)
 
 
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
@@ -72,37 +86,51 @@ class ConfigurationException(BaseConfigRpmMakerException):
 
 class ConfigRpmMaker(object):
 
-    ERROR_MSG = '\n\n\nYour commit has been accepted by the SVN server, but due to the\n' + \
-                'errors that it contains no RPMs have been created.\n\n%s' + \
-                'Please fix the issues and trigger the RPM creation with a dummy commit.\n\n'
+    ERROR_MSG = """
+------------------------------------------------------------------------
+Your commit has been accepted by the SVN server, but due to the errors
+that it contains no RPMs have been created.
+
+See %s/%s.txt for details.
+
+Please fix the issues and trigger the RPM creation with a dummy commit.
+------------------------------------------------------------------------
+"""
 
     def __init__(self, revision, svn_service):
+        LOGGER.debug("Initializing %s with revision=%s and svn_service=%s", ConfigRpmMaker.__name__, revision, svn_service)
         self.revision = revision
         self.svn_service = svn_service
-        self.temp_dir = config.get('temp_dir')
+        self.temp_dir = config.get_temporary_directory()
         self._assure_temp_dir_if_set()
         self._create_logger()
         self.work_dir = None
 
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get('error_log_url', '')
-        err_suffix = 'See %s/%s.txt for details.\n\n' % (err_url, revision)
-        error_msg = self.ERROR_MSG % err_suffix
-        self.error_logger.error(error_msg)
+        error_msg = self.ERROR_MSG % (err_url, revision)
+        for line in error_msg.split('\n'):
+            LOGGER.error(line)
         self._move_error_log_for_public_access()
         self._clean_up_work_dir()
         return error_msg
 
     def build(self):
+        LOGGER.info('Working on revision %s', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
             change_set = self.svn_service.get_change_set(self.revision)
             available_hosts = self.svn_service.get_hosts(self.revision)
 
-            affected_hosts = self._get_affected_hosts(change_set, available_hosts)
+            affected_hosts = list(self._get_affected_hosts(change_set, available_hosts))
             if not affected_hosts:
                 self.logger.info("We have nothing to do. No host affected by change set: %s", str(change_set))
                 return
+
+            affected_hosts.sort()
+            LOGGER.info('Found %s affected hosts', len(affected_hosts))
+            for i in range(len(affected_hosts)):
+                LOGGER.info('Affected host #%s "%s"', i, affected_hosts[i])
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
@@ -113,6 +141,7 @@ class ConfigRpmMaker(object):
             self.logger.error('Last error during build:\n%s' % str(e))
             self.__build_error_msg_and_move_to_public_access(self.revision)
             raise e
+
         except Exception, e:
             self.logger.exception('Last error during build:')
             error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
@@ -122,10 +151,12 @@ class ConfigRpmMaker(object):
         return rpms
 
     def _clean_up_work_dir(self):
+        LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
         if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
             shutil.rmtree(self.work_dir)
 
         if os.path.exists(self.error_log_file):
+            LOGGER.debug('Removing error log "%s"', self.error_log_file)
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
@@ -139,6 +170,7 @@ class ConfigRpmMaker(object):
             shutil.move(self.error_log_file, os.path.join(error_log_dir, self.revision + '.txt'))
 
     def _move_configviewer_dirs_to_final_destination(self, hosts):
+        LOGGER.info("Updating configviewer data.")
         for host in hosts:
             temp_path = HostRpmBuilder.get_config_viewer_host_dir(host, True)
             dest_path = HostRpmBuilder.get_config_viewer_host_dir(host)
@@ -148,6 +180,7 @@ class ConfigRpmMaker(object):
 
     def _build_hosts(self, hosts):
         if not hosts:
+            LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
             return
 
         host_queue = Queue()
@@ -160,7 +193,7 @@ class ConfigRpmMaker(object):
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(name='host_rpm_thread_%d' % i,
+        thread_pool = [BuildHostThread(name='thread_%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
@@ -170,6 +203,7 @@ class ConfigRpmMaker(object):
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
         for thread in thread_pool:
+            LOGGER.debug('Starting "%s"', thread.name)
             thread.start()
 
         for thread in thread_pool:
@@ -180,21 +214,35 @@ class ConfigRpmMaker(object):
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
-        return self._consume_queue(rpm_queue)
+        built_rpms = self._consume_queue(rpm_queue)
+        LOGGER.debug('Built %s rpm(s).', len(built_rpms))
+        for i in range(len(built_rpms)):
+            LOGGER.debug('Built rpm #%s "%s"', i, built_rpms[i])
+        return built_rpms
 
     def _upload_rpms(self, rpms):
         rpm_upload_cmd = config.get('rpm_upload_cmd')
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
+            LOGGER.info("Uploading %s rpm(s).", len(rpms))
+            LOGGER.debug('Uploading rpm(s) using command "%s" and chunk_size "%s"', rpm_upload_cmd, chunk_size)
+
             pos = 0
             while pos < len(rpms):
                 rpm_chunk = rpms[pos:pos + chunk_size]
                 cmd = '%s %s' % (rpm_upload_cmd, ' '.join(rpm_chunk))
-                returncode = subprocess.call(cmd, shell=True)
-                if returncode:
-                    raise CouldNotUploadRpmsException('Could not upload rpms. Called %s . Returned: %d' % (cmd, returncode))
+                process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = process.communicate()
+                if process.returncode:
+                    error_message = """Rpm upload failed. Executed command "%s"
+stdout: "%s"
+stderr: "%s"
+return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
+                    raise CouldNotUploadRpmsException(error_message)
                 pos += chunk_size
+        else:
+            LOGGER.info("Rpms will not be uploaded since no upload command has been configured.")
 
     def _get_affected_hosts(self, change_set, available_host):
         result = set()
@@ -226,6 +274,7 @@ class ConfigRpmMaker(object):
 
     def _consume_queue(self, queue):
         items = []
+
         while not queue.empty():
             item = queue.get()
             queue.task_done()
@@ -234,25 +283,30 @@ class ConfigRpmMaker(object):
         return items
 
     def _create_logger(self):
-        self.logger = logging.getLogger('Config-Rpm-Maker')
-        self.error_log_file = tempfile.mktemp(suffix='.error.log', prefix='yadt-config-rpm-maker', dir=config.get('temp_dir'))
-        self.error_handler = logging.FileHandler(self.error_log_file)
-        self.error_handler.setFormatter(logging.Formatter(HostRpmBuilder.LOG_FORMAT, HostRpmBuilder.DATE_FORMAT))
-        self.error_handler.setLevel(logging.ERROR)
+        self.error_log_file = tempfile.mktemp(dir=config.get_temporary_directory(),
+                                              prefix='yadt-config-rpm-maker',
+                                              suffix='.error.log')
+        self.error_handler = FileHandler(self.error_log_file)
+        formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
+        self.error_handler.setFormatter(formatter)
+        self.error_handler.setLevel(ERROR)
+
+        self.logger = getLogger('fileLogger')
         self.logger.addHandler(self.error_handler)
         self.logger.propagate = False
-
-        self.error_logger = logging.getLogger('Config-Rpm-Maker-Error')
-        self.error_logger.propagate = True
-        self.error_logger.setLevel(logging.ERROR)
 
     def _assure_temp_dir_if_set(self):
         if self.temp_dir and not os.path.exists(self.temp_dir):
             os.makedirs(self.temp_dir)
 
     def _prepare_work_dir(self):
-        self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.', suffix='.' + self.revision, dir=self.temp_dir)
+        LOGGER.debug('Preparing working directory "%s"', self.temp_dir)
+        self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.',
+                                         suffix='.' + self.revision,
+                                         dir=self.temp_dir)
+
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
+        LOGGER.debug('Creating directory structure for rpmbuild in "%s"', self.rpm_build_dir)
         for name in ['tmp', 'RPMS', 'RPMS/x86_64,RPMS/noarch', 'BUILD', 'SRPMS', 'SPECS', 'SOURCES']:
             path = os.path.join(self.rpm_build_dir, name)
             if not os.path.exists(path):

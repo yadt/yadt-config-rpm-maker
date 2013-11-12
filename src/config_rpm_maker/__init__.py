@@ -14,43 +14,142 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+"""yadt-config-rpm-maker
+
+Usage:
+  config-rpm-maker <repository> <revision> [--debug]
+  config-rpm-maker -h | --help
+  config-rpm-maker --version
+
+Arguments:
+  repository    absolute path to your subversion repository
+  revision      subversion revision for which the configuration rpms are going to be built
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --debug       Force DEBUG log level.
+"""
+
 import traceback
-import sys
 
-from config_rpm_maker.configRpmMaker import ConfigRpmMaker
-from config_rpm_maker.svn import SvnService
-from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from docopt import docopt
+from logging import DEBUG, Formatter, StreamHandler, getLogger
+from math import ceil
+from sys import exit, stderr
+from time import time
+
 from config_rpm_maker import config
+from config_rpm_maker.configRpmMaker import ConfigRpmMaker
+from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.svn import SvnService
+
+ARGUMENT_REVISION = '<revision>'
+ARGUMENT_REPOSITORY = '<repository>'
+
+OPTION_DEBUG = '--debug'
+
+LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
+ROOT_LOGGER_NAME = __name__
+
+MESSAGE_SUCCESS = "Success."
+
+LOGGER = None
 
 
-logging.basicConfig(
-    format="%(asctime)s %(levelname)5s [%(name)s] - %(message)s",
-    level=config.get('log_level', 'INFO'),
-)
+timestamp_at_start = 0
 
 
-class CliException(BaseConfigRpmMakerException):
-    error_info = "Command Line Error:\n"
+def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
+    """ Returnes a root_logger which logs to the console using the given log_level. """
+    formatter = Formatter(LOGGING_FORMAT)
+
+    console_handler = StreamHandler()
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(log_level)
+
+    root_logger = getLogger(ROOT_LOGGER_NAME)
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(console_handler)
+
+    return root_logger
 
 
-def mainMethod(args=sys.argv[1:]):
+def log_configuration():
+    LOGGER.debug('Loaded configuration file "%s"', config.configuration_file_path)
+
+    keys = sorted(config.configuration.keys())
+    max_length = len(max(keys, key=len))
+
+    for key in keys:
+        indentet_key = key.ljust(max_length)
+        LOGGER.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
+
+
+def start_measuring_time():
+    """ Start measuring the time. This is required to calculate the elapsed time. """
+    global timestamp_at_start
+    timestamp_at_start = time()
+
+
+def exit_program(message, return_code):
+    """ Logs the given message and exits with given return code. """
+
+    elapsed_time_in_seconds = time() - timestamp_at_start
+    elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
+    LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
+
+    if return_code == 0:
+        LOGGER.info(message)
+    else:
+        LOGGER.error(message)
+
+    exit(return_code)
+
+
+def main():
+    start_measuring_time()
+    arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
+
+    global LOGGER
     try:
-        if len(args) != 2:
-            raise CliException("You need to provide 2 parameters (repo dir, revision).\nArguments were %s " % str(args))
+        config.load_configuration_file()
 
-        if not (args[1].isdigit() and int(args[1]) >= 0):
-            raise CliException("Revision must be a positive integer.\nGiven revision was '%s'" % args[1])
+        if arguments[OPTION_DEBUG]:
+            LOGGER = create_root_logger(DEBUG)
+            LOGGER.debug("DEBUG logging is enabled")
+        else:
+            log_level = config.get_log_level()
+            LOGGER = create_root_logger(log_level)
 
-    # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
-        svn_service = SvnService(
-            base_url='file://' + args[0],
-            path_to_config=config.get('svn_path_to_config')
-        )
-        ConfigRpmMaker(revision=args[1], svn_service=svn_service).build()
+    except config.ConfigException as e:
+        stderr.write(str(e) + "\n")
+        exit(1)
+
+    LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
+    LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
+
+    log_configuration()
+
+    revision = arguments[ARGUMENT_REVISION]
+    if not revision.isdigit():
+        exit_program('Given revision "%s" is not a integer.' % revision, return_code=1)
+
+    repository = arguments[ARGUMENT_REPOSITORY]
+
+    try:
+        # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
+        svn_service = SvnService(base_url='file://{0}'.format(repository),
+                                 path_to_config=config.get('svn_path_to_config'))
+        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
+
     except BaseConfigRpmMakerException as e:
-        sys.stderr.write("{0}\n\nSee the error log for details.\n".format(str(e)))
-        sys.exit(1)
+        for line in str(e).split("\n"):
+            LOGGER.error(line)
+        exit_program('An exception occurred!', return_code=2)
+
     except Exception:
         traceback.print_exc(5)
-        sys.exit(2)
+        exit_program('An unknown exception occurred!', return_code=3)
+
+    exit_program(MESSAGE_SUCCESS, return_code=0)
