@@ -26,7 +26,7 @@ class HostnameSegment(object):
         pass
 
     def get_svn_paths(self, hostname):
-        return sorted([self.get_svn_prefix() + part for part in self.get(hostname)])
+        return [self.get_svn_prefix() + part for part in self.get(hostname)]
 
     def get_variable_name(self):
         return self.__class__.__name__.upper()
