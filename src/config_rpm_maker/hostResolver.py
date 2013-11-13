@@ -23,6 +23,7 @@ from config_rpm_maker import config
 class HostResolver(object):
     def resolve(self, hostname):
         dns_searchlist = config.get('custom_dns_searchlist')
+
         if dns_searchlist:
             for dns_entry in dns_searchlist:
                 try:
@@ -35,7 +36,13 @@ class HostResolver(object):
             except Exception:
                 pass
 
-        return None, None, None
+        if not config.get('allow_unknown_hosts'):
+            raise Exception("Could not lookup '%s' with 'getent hosts'" % hostname)
+
+        ip = "127.0.0.1"
+        fqdn = "localhost.localdomain"
+        aliases = ""
+        return ip, fqdn, aliases
 
     def _resolve(self, hostname):
         p = subprocess.Popen("getent hosts " + hostname, stdout=subprocess.PIPE, shell=True)

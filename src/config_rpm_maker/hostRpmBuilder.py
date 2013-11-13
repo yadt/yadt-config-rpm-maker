@@ -221,14 +221,6 @@ class HostRpmBuilder(object):
 
     def _save_network_variables(self):
         ip, fqdn, aliases = HostResolver().resolve(self.hostname)
-        if not ip:
-            if config.get('allow_unknown_hosts'):
-                ip = "127.0.0.1"
-                fqdn = "localhost.localdomain"
-                aliases = ""
-            else:
-                raise Exception("Could not lookup '%s' with 'getent hosts'" % self.hostname)
-
         self._write_file(os.path.join(self.variables_dir, 'IP'), ip)
         self._write_file(os.path.join(self.variables_dir, 'FQDN'), fqdn)
         self._write_file(os.path.join(self.variables_dir, 'ALIASES'), aliases)
