@@ -1,8 +1,5 @@
 # Configuration of committer
 # see: https://github.com/aelgru/committer
 
-[DEFAULT]
-execute_before = ./lint_sources
-
 [COMMIT]
 execute_before = ./setup.py test

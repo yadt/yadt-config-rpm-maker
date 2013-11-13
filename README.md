@@ -78,13 +78,6 @@ But of course you can set up a development environment on other platforms as wel
 ... or use a [vagrant box](http://www.vagrantup.com/) from [vagrantbox.es](http://vagrantbox.es/) to develop in your
 destination distribution.
 
-### Linting
-
-```bash
-./lint_sources
-```
-To lint the code we are using flake8.
-
 ### Run Tests
 
 ```bash
