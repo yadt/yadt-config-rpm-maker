@@ -22,7 +22,7 @@ yum install python-devel python-setuptools -y
 ```
 
 ```bash
-yum install subversion rpm-build install pysvn PyYAML -y
+yum install subversion rpm-build install pysvn python-yaml -y
 ```
 
 ```bash
