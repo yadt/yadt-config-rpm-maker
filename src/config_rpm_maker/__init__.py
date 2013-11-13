@@ -175,7 +175,7 @@ def build_configuration_rpms_from(repository, revision):
         base_url = 'file://{0}'.format(repository)
         path_to_config = config.get('svn_path_to_config')
         svn_service = SvnService(base_url=base_url, path_to_config=path_to_config)
-        ConfigRpmMaker(revision=revision, svn_service=svn_service).build() # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
+        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
