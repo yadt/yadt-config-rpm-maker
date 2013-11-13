@@ -17,10 +17,15 @@
 import re
 import subprocess
 
+from logging import getLogger
+
 from config_rpm_maker import config
+
+LOGGER = getLogger(__name__)
 
 
 class HostResolver(object):
+
     def resolve(self, hostname):
         dns_searchlist = config.get('custom_dns_searchlist')
 
