@@ -63,7 +63,7 @@ sudo yum install pysvn
 
 Additional build dependency
 ```
-sudo pip install PyYAML
+sudo yum install python-yaml
 ```
 
 ### Developing on other Platforms
@@ -77,13 +77,6 @@ But of course you can set up a development environment on other platforms as wel
 
 ... or use a [vagrant box](http://www.vagrantup.com/) from [vagrantbox.es](http://vagrantbox.es/) to develop in your
 destination distribution.
-
-### Linting
-
-```bash
-./lint_sources
-```
-To lint the code we are using flake8.
 
 ### Run Tests
 
@@ -119,6 +112,16 @@ The `config-rpm-maker` script allows you to execute config-rpm-maker in your wor
 ```bash
 python setup.py bdist_rpm
 ```
+
+Authors
+=======
+
+* [Sebastian Herold](https://github.com/heroldus)
+* [Schlomo Schapiro](https://github.com/schlomo)
+* [Ingmar Krusch](https://github.com/ingmarkrusch)
+* [Maximillien Riehl](https://github.com/mriehl)
+* [Michael Gruber](https://github.com/aelgru)
+* Konrad Hosemann
 
 License
 =======

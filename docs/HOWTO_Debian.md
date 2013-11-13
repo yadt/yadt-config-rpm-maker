@@ -21,7 +21,7 @@ sudo apt-get install python-svn rpm python-rpm python-yaml
 ```
 
 ```bash
-sudo pip install flake8 docopt mock
+sudo pip install docopt mock
 ```
 
 ## Running Tests

@@ -14,11 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-'''
-Created on Aug 12, 2011
-
-@author: Michael Gruber, Konrad Hosemann
-'''
 import unittest
 
 from config_rpm_maker.token.treenode import TreeNode, NameNotAcceptedException

@@ -15,8 +15,6 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-__author__ = "Schlomo Schapiro"
-
 from config_rpm_maker import main
 
 
