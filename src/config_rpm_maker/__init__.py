@@ -47,6 +47,7 @@ OPTION_VERSION_HELP = "show version"
 MESSAGE_SUCCESS = "Success."
 
 RETURN_CODE_SUCCESS = 0
+RETURN_CODE_VERSION = RETURN_CODE_SUCCESS
 RETURN_CODE_NOT_ENOUGH_ARGUMENTS = 1
 RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
 RETURN_CODE_CONFIGURATION_ERROR = 3
@@ -142,7 +143,7 @@ def parse_arguments(argv, version):
 
     if values.version:
         stdout.write(version + '\n')
-        return exit(RETURN_CODE_SUCCESS)
+        return exit(RETURN_CODE_VERSION)
 
     if len(args) < 2:
         parser.print_help()
