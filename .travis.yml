@@ -9,7 +9,7 @@ before_script:
   - ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/
   - sudo apt-get install python-yaml
   - ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/
-  - pip install docopt mock
+  - pip install mock
   - PYTHONPATH=src python tests/__init__.py
   - sudo rm /bin/sh
   - sudo ln -s /bin/bash /bin/sh

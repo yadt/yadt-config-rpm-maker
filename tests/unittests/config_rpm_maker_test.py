@@ -16,13 +16,81 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from mock import Mock, call, patch
 from unittest import TestCase
-from mock import call, patch
 
-from config_rpm_maker import exit_program
+from config_rpm_maker import USAGE_INFORMATION, parse_arguments, exit_program
 
 
-class ConfigRpmMakerTest(TestCase):
+class ParseArgumentsTests(TestCase):
+
+    @patch('config_rpm_maker.OptionParser')
+    def test_should_use_usage_information(self, mock_option_parser_class):
+
+        mock_option_parser = Mock()
+        mock_values = Mock()
+        mock_values.version = False
+        mock_values.debug = False
+        mock_arguments = ["foo", "bar"]
+        mock_option_parser.parse_args.return_value = (mock_values, mock_arguments)
+        mock_option_parser_class.return_value = mock_option_parser
+
+        parse_arguments([], version="")
+
+        mock_option_parser_class.assert_called_with(usage=USAGE_INFORMATION)
+
+    @patch('config_rpm_maker.exit')
+    @patch('config_rpm_maker.OptionParser')
+    def test_should_print_help_screen_and_exit_when_less_than_two_positional_arguments_are_given(self, mock_option_parser_class, mock_exit):
+
+        mock_option_parser = Mock()
+        mock_values = Mock()
+        mock_values.version = False
+        mock_values.debug = False
+        mock_arguments = [""]
+        mock_option_parser.parse_args.return_value = (mock_values, mock_arguments)
+        mock_option_parser_class.return_value = mock_option_parser
+
+        parse_arguments([], version="")
+
+        mock_option_parser.print_help.assert_called_with()
+        mock_exit.assert_called_with(1)
+
+    @patch('config_rpm_maker.exit')
+    @patch('config_rpm_maker.stdout')
+    def test_should_print_version_and_exit_with_return_code_zero_when_version_option_given(self, mock_stdout, mock_exit):
+
+        parse_arguments(["--version"], version="yadt-config-rpm-maker 2.0")
+
+        mock_stdout.write.assert_called_with("yadt-config-rpm-maker 2.0\n")
+        mock_exit.assert_called_with(0)
+
+    def test_should_return_debug_option_as_false_when_no_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertFalse(actual_arguments["--debug"])
+
+    def test_should_return_debug_option_as_true_when_debug_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--debug"], version="")
+
+        self.assertTrue(actual_arguments["--debug"])
+
+    def test_should_return_first_argument_as_repository(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertEqual(actual_arguments["<repository>"], "foo")
+
+    def test_should_return_second_argument_as_revision(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertEqual(actual_arguments["<revision>"], "123")
+
+
+class ExitProgramTests(TestCase):
 
     @patch('config_rpm_maker.LOGGER')
     @patch('config_rpm_maker.exit')

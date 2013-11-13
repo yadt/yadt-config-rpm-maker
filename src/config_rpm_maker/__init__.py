@@ -14,29 +14,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""yadt-config-rpm-maker
-
-Usage:
-  config-rpm-maker <repository> <revision> [--debug]
-  config-rpm-maker -h | --help
-  config-rpm-maker --version
-
-Arguments:
-  repository    absolute path to your subversion repository
-  revision      subversion revision for which the configuration rpms are going to be built
-
-Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  --debug       Force DEBUG log level.
-"""
 
 import traceback
 
-from docopt import docopt
 from logging import DEBUG, Formatter, StreamHandler, getLogger
 from math import ceil
-from sys import exit, stderr
+from optparse import OptionParser
+from sys import argv, exit, stderr, stdout
 from time import time
 
 from config_rpm_maker import config
@@ -44,10 +28,18 @@ from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
 
-ARGUMENT_REVISION = '<revision>'
 ARGUMENT_REPOSITORY = '<repository>'
+ARGUMENT_REVISION = '<revision>'
 
+USAGE_INFORMATION = """Usage: %prog repository revision [options]
+
+Arguments:
+  repository  absolute path to your subversion repository
+  revision    subversion revision for which the configuration rpms are going to be built"""
 OPTION_DEBUG = '--debug'
+OPTION_DEBUG_HELP = "force DEBUG log level"
+OPTION_VERSION = '--version'
+OPTION_VERSION_HELP = "show version"
 
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = __name__
@@ -107,9 +99,47 @@ def exit_program(message, return_code):
     exit(return_code)
 
 
+def parse_arguments(argv, version):
+    """
+        Parses the given command line arguments.
+
+        if -h or --help is given it will display the print the help screen and exit
+        if OPTION_VERSION is given it will display the version information and exit
+
+        Otherwise it will return a dictionary containing the keys and values for
+            OPTION_DEBUG: boolean, True if option --debug is given
+            ARGUMENT_REPOSITORY: string, the first argument
+            ARGUMENT_REVISION: string, the second argument
+    """
+
+    usage = USAGE_INFORMATION
+    parser = OptionParser(usage=usage)
+    parser.add_option("", OPTION_DEBUG,
+                      action="store_true", dest="debug", default=False,
+                      help=OPTION_DEBUG_HELP)
+    parser.add_option("", OPTION_VERSION,
+                      action="store_true", dest="version", default=False,
+                      help=OPTION_VERSION_HELP)
+    values, args = parser.parse_args(argv)
+
+    if values.version:
+        stdout.write(version + '\n')
+        return exit(0)
+
+    if len(args) < 2:
+        parser.print_help()
+        return exit(1)
+
+    arguments = {OPTION_DEBUG: values.debug or False,
+                 ARGUMENT_REPOSITORY: args[0],
+                 ARGUMENT_REVISION: args[1]}
+
+    return arguments
+
+
 def main():
     start_measuring_time()
-    arguments = docopt(__doc__, version='yadt-config-rpm-maker 2.0')
+    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
 
     global LOGGER
     try:

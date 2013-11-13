@@ -26,13 +26,13 @@ yum install subversion rpm-build install pysvn python-yaml -y
 ```
 
 ```bash
-easy_install docopt mock
+easy_install mock
 ```
 
 or if you have `pip` installed
 
 ```bash
-pip install docopt mock
+pip install mock
 ```
 
 ## Running Tests
