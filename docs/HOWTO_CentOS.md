@@ -26,13 +26,13 @@ yum install subversion rpm-build install pysvn PyYAML -y
 ```
 
 ```bash
-easy_install PyYAML docopt mock
+easy_install docopt mock
 ```
 
 or if you have `pip` installed
 
 ```bash
-pip install PyYAML docopt mock
+pip install docopt mock
 ```
 
 ## Running Tests

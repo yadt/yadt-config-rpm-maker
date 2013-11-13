@@ -63,7 +63,7 @@ sudo yum install pysvn
 
 Additional build dependency
 ```
-sudo pip install PyYAML
+sudo yum install python-yaml
 ```
 
 ### Developing on other Platforms
