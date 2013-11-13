@@ -64,6 +64,8 @@ def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
     root_logger.setLevel(log_level)
     root_logger.addHandler(console_handler)
 
+    if log_level == DEBUG:
+        root_logger.debug("DEBUG logging is enabled")
     return root_logger
 
 
@@ -76,15 +78,15 @@ def create_sys_log_handler(revision):
     return sys_log_handler
 
 
-def log_configuration():
-    LOGGER.debug('Loaded configuration file "%s"', config.configuration_file_path)
+def log_configuration_to_logger(logger):
+    logger.debug('Loaded configuration file "%s"', config.configuration_file_path)
 
     keys = sorted(config.configuration.keys())
     max_length = len(max(keys, key=len))
 
     for key in keys:
         indentet_key = key.ljust(max_length)
-        LOGGER.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
+        logger.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
 
 
 def start_measuring_time():
@@ -146,29 +148,32 @@ def parse_arguments(argv, version):
     return arguments
 
 
-def main():
-    start_measuring_time()
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
-
-    global LOGGER
+def determine_log_level(arguments):
+    """ Determines the log level based on arguments and configuration """
     try:
-        config.load_configuration_file()
-
         if arguments[OPTION_DEBUG]:
-            LOGGER = create_root_logger(DEBUG)
-            LOGGER.debug("DEBUG logging is enabled")
+            log_level = DEBUG
         else:
             log_level = config.get_log_level()
-            LOGGER = create_root_logger(log_level)
 
     except config.ConfigException as e:
         stderr.write(str(e) + "\n")
         exit(1)
 
+    return log_level
+
+
+def main():
+    start_measuring_time()
+    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
+    config.load_configuration_file()
+    log_level = determine_log_level(arguments)
+
+    global LOGGER
+    LOGGER = create_root_logger(log_level)
     LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
     LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
-
-    log_configuration()
+    log_configuration_to_logger(LOGGER)
 
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
