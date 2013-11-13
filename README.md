@@ -120,6 +120,16 @@ The `config-rpm-maker` script allows you to execute config-rpm-maker in your wor
 python setup.py bdist_rpm
 ```
 
+Authors
+=======
+
+* [Sebastian Herold](https://github.com/heroldus)
+* [Schlomo Schapiro](https://github.com/schlomo)
+* [Ingmar Krusch](https://github.com/ikrusch)
+* [Maximillien Riehl](https://github.com/mriehl)
+* [Michael Gruber](https://github.com/aelgru)
+* Konrad Hosemann
+
 License
 =======
 
