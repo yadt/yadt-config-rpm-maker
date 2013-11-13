@@ -23,12 +23,12 @@ from time import time
 LOGGER = getLogger(__name__)
 
 
-def measure_execution_time(fn):
-    @wraps(fn)
+def measure_execution_time(original_function):
+    @wraps(original_function)
     def wrapped_function(*args, **kwargs):
         start_time = time()
 
-        ret = fn(*args, **kwargs)
+        return_value_from_function = original_function(*args, **kwargs)
 
         elapsed_time_in_seconds = time() - start_time
         elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
@@ -41,12 +41,12 @@ def measure_execution_time(fn):
             key_word_arguments = ", " + str(kwargs)
         
         if len(args) > 0:
-            function_name = "%s.%s" % (args[0].__class__.__name__, fn.__name__)
+            function_name = "%s.%s" % (args[0].__class__.__name__, original_function.__name__)
         else:
-            function_name = fn.__name__
+            function_name = original_function.__name__
         function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
         LOGGER.info('Took %ss to perform %s', elapsed_time_in_seconds, function_call)
 
-        return ret
+        return return_value_from_function
 
     return wrapped_function
