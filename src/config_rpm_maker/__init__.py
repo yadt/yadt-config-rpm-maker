@@ -18,6 +18,7 @@
 import traceback
 
 from logging import DEBUG, Formatter, StreamHandler, getLogger
+from logging.handlers import SysLogHandler
 from math import ceil
 from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
@@ -41,6 +42,8 @@ OPTION_DEBUG_HELP = "force DEBUG log level"
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
+DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
+DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = __name__
 
@@ -65,6 +68,15 @@ def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     root_logger.addHandler(console_handler)
 
     return root_logger
+
+
+def create_sys_log_handler(revision):
+    """ Create a logger handler which logs to sys log and uses the given revision within the format """
+    sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
+    formatter = Formatter(DEFAULT_SYS_LOG_FORMAT.format(revision))
+    sys_log_handler.setFormatter(formatter)
+
+    return sys_log_handler
 
 
 def log_configuration():
@@ -164,6 +176,9 @@ def main():
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
         exit_program('Given revision "%s" is not a integer.' % revision, return_code=1)
+
+    sys_log_handler = create_sys_log_handler(revision)
+    LOGGER.addHandler(sys_log_handler)
 
     repository = arguments[ARGUMENT_REPOSITORY]
 
