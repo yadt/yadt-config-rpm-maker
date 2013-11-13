@@ -61,7 +61,7 @@ pysvn (a python library for SVN) is required, but not available by usual python 
 sudo yum install pysvn
 ```
 
-Additional build dependency
+Additional dependency
 ```
 sudo yum install python-yaml
 ```

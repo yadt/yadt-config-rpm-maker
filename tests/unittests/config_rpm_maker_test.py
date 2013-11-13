@@ -30,7 +30,7 @@ class ConfigRpmMakerTest(TestCase):
 
         exit_program('Some message.', 123)
 
-        self.assertEqual(call(123), mock_exit.call_args)
+        mock_exit.assert_called_once_with(123)
 
     @patch('config_rpm_maker.exit')
     @patch('config_rpm_maker.LOGGER')
@@ -38,8 +38,8 @@ class ConfigRpmMakerTest(TestCase):
 
         exit_program('Success.', 0)
 
-        self.assertEqual(call('Success.'), mock_logger.info.call_args)
-        self.assertEqual(None, mock_logger.error.call_args)
+        mock_logger.info.assert_called_with('Success.')
+        self.assertEqual(0, mock_logger.error.call_count)
 
     @patch('config_rpm_maker.exit')
     @patch('config_rpm_maker.LOGGER')
@@ -47,7 +47,7 @@ class ConfigRpmMakerTest(TestCase):
 
         exit_program('Failed.', 1)
 
-        self.assertEqual(call('Failed.'), mock_logger.error.call_args)
+        mock_logger.error.assert_called_with('Failed.')
 
     @patch('config_rpm_maker.time')
     @patch('config_rpm_maker.exit')
