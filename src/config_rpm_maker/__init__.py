@@ -29,6 +29,8 @@ from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
 
+ROOT_LOGGER_NAME = __name__
+
 ARGUMENT_REPOSITORY = '<repository>'
 ARGUMENT_REVISION = '<revision>'
 
@@ -42,9 +44,14 @@ OPTION_DEBUG_HELP = "force DEBUG log level"
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
-ROOT_LOGGER_NAME = __name__
-
 MESSAGE_SUCCESS = "Success."
+
+RETURN_CODE_SUCCESS = 0
+RETURN_CODE_NOT_ENOUGH_ARGUMENTS = 1
+RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
+RETURN_CODE_CONFIGURATION_ERROR = 3
+RETURN_CODE_EXCEPTION_OCCURRED = 4
+RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
 
 LOGGER = None
 
@@ -102,7 +109,7 @@ def exit_program(message, return_code):
     elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
     LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
 
-    if return_code == 0:
+    if return_code == RETURN_CODE_SUCCESS:
         LOGGER.info(message)
     else:
         LOGGER.error(message)
@@ -135,11 +142,11 @@ def parse_arguments(argv, version):
 
     if values.version:
         stdout.write(version + '\n')
-        return exit(0)
+        return exit(RETURN_CODE_SUCCESS)
 
     if len(args) < 2:
         parser.print_help()
-        return exit(1)
+        return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
 
     arguments = {OPTION_DEBUG: values.debug or False,
                  ARGUMENT_REPOSITORY: args[0],
@@ -158,7 +165,7 @@ def determine_log_level(arguments):
 
     except config.ConfigException as e:
         stderr.write(str(e) + "\n")
-        exit(1)
+        exit(RETURN_CODE_CONFIGURATION_ERROR)
 
     return log_level
 
@@ -177,7 +184,7 @@ def main():
 
     revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
-        exit_program('Given revision "%s" is not a integer.' % revision, return_code=1)
+        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
@@ -193,10 +200,10 @@ def main():
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
             LOGGER.error(line)
-        exit_program('An exception occurred!', return_code=2)
+        exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:
         traceback.print_exc(5)
-        exit_program('An unknown exception occurred!', return_code=3)
+        exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
 
-    exit_program(MESSAGE_SUCCESS, return_code=0)
+    exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
