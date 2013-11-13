@@ -1,5 +1,7 @@
 # Configuration of committer
 # see: https://github.com/aelgru/committer
+[DEFAULT]
+execute_before = flake8 src tests setup.py --ignore=E501
 
 [COMMIT]
 execute_before = ./setup.py test
