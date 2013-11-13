@@ -121,6 +121,7 @@ Authors
 * [Ingmar Krusch](https://github.com/ingmarkrusch)
 * [Maximillien Riehl](https://github.com/mriehl)
 * [Michael Gruber](https://github.com/aelgru)
+* [Hasan Hosgel](https://github.com/alosdev)
 * Konrad Hosemann
 
 License
