@@ -37,6 +37,7 @@ LOG_FILE_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
 
 configuration = None
+configuration_file_path = 'yadt-config-rpm-maker.yaml'
 
 
 class ConfigException(BaseConfigRpmMakerException):
@@ -66,7 +67,7 @@ def get_log_level():
 
 def load_configuration_file():
     global configuration, configuration_file_path
-    configuration_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', 'yadt-config-rpm-maker.yaml')
+    configuration_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', configuration_file_path)
     if os.path.exists(configuration_file_path):
         try:
             with open(configuration_file_path) as f:
