@@ -118,7 +118,7 @@ Authors
 
 * [Sebastian Herold](https://github.com/heroldus)
 * [Schlomo Schapiro](https://github.com/schlomo)
-* [Ingmar Krusch](https://github.com/ikrusch)
+* [Ingmar Krusch](https://github.com/ingmarkrusch)
 * [Maximillien Riehl](https://github.com/mriehl)
 * [Michael Gruber](https://github.com/aelgru)
 * Konrad Hosemann
