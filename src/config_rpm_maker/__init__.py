@@ -24,7 +24,7 @@ from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
 from time import time
 
-from config_rpm_maker import config
+from config_rpm_maker.config import DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_ADDRESS, DEFAULT_SYS_LOG_FORMAT
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
@@ -42,9 +42,6 @@ OPTION_DEBUG_HELP = "force DEBUG log level"
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
-DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
-DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
-LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
 ROOT_LOGGER_NAME = __name__
 
 MESSAGE_SUCCESS = "Success."
@@ -55,9 +52,9 @@ LOGGER = None
 timestamp_at_start = 0
 
 
-def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
+def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
     """ Returnes a root_logger which logs to the console using the given log_level. """
-    formatter = Formatter(LOGGING_FORMAT)
+    formatter = Formatter(DEFAULT_LOG_FORMAT)
 
     console_handler = StreamHandler()
     console_handler.setFormatter(formatter)

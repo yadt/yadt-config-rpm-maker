@@ -23,8 +23,10 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 LOGGER = getLogger(__name__)
 
-DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
+DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = INFO
+DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
+DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
