@@ -232,13 +232,10 @@ def main():
     LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
     log_configuration_to_logger(LOGGER)
 
-    revision = arguments[ARGUMENT_REVISION]
-    revision = ensure_valid_revision(revision)
+    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
+    repository = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
-
-    repository = arguments[ARGUMENT_REPOSITORY]
-    repository = ensure_valid_repository_url(repository)
 
     build_configuration_rpms_from(repository, revision)
