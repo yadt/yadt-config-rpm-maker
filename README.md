@@ -18,7 +18,6 @@ Options:
   -h, --help  show this help message and exit
   --debug     force DEBUG log level
   --version   show version
-
 ```
 
 ### Example
