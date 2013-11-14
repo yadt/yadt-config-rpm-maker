@@ -23,6 +23,7 @@ from math import ceil
 from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
 from time import time
+from urlparse import urlparse
 
 from config_rpm_maker import config
 from config_rpm_maker.config import DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_ADDRESS, DEFAULT_SYS_LOG_FORMAT
@@ -54,6 +55,10 @@ RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
 RETURN_CODE_CONFIGURATION_ERROR = 3
 RETURN_CODE_EXCEPTION_OCCURRED = 4
 RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
+RETURN_CODE_REPOSITORY_URL_INVALID = 6
+RETURN_CODE_REPOSITORY_FILE_URL_DOES_NOT_EXIST = 7
+
+VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
 
 LOGGER = None
 
@@ -197,6 +202,21 @@ def ensure_valid_revision(revision):
 
     return revision
 
+
+def ensure_valid_repository_url(repository_url):
+    """ Ensures that the given url is a valid repository url """
+    parsed_url = urlparse(repository_url)
+    scheme = parsed_url.scheme
+
+    if scheme in VALID_REPOSITORY_URL_SCHEMES:
+        return repository_url
+
+    if scheme is '':
+        return 'file://%s' % parsed_url.path
+
+    return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
+
+
 def main():
     start_measuring_time()
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
@@ -216,6 +236,6 @@ def main():
     LOGGER.addHandler(sys_log_handler)
 
     repository = arguments[ARGUMENT_REPOSITORY]
-    validate_repository_argument(repository)
+    repository = ensure_valid_repository_url(repository)
 
     build_configuration_rpms_from(repository, revision)
