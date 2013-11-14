@@ -31,8 +31,6 @@ from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
 
-ROOT_LOGGER_NAME = __name__
-
 ARGUMENT_REPOSITORY = '<repository-url>'
 ARGUMENT_REVISION = '<revision>'
 
@@ -73,7 +71,7 @@ def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
     console_handler.setFormatter(formatter)
     console_handler.setLevel(log_level)
 
-    root_logger = getLogger(ROOT_LOGGER_NAME)
+    root_logger = getLogger(__name__)
     root_logger.setLevel(log_level)
     root_logger.addHandler(console_handler)
 
