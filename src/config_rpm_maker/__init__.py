@@ -17,8 +17,7 @@
 
 import traceback
 
-from logging import DEBUG, Formatter, StreamHandler, getLogger
-from logging.handlers import SysLogHandler
+from logging import DEBUG, getLogger
 from math import ceil
 from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
@@ -26,13 +25,10 @@ from time import time, strftime
 from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import (DEFAULT_DATE_FORMAT,
-                                     DEFAULT_LOG_FORMAT,
-                                     DEFAULT_LOG_LEVEL,
-                                     DEFAULT_SYS_LOG_ADDRESS,
-                                     DEFAULT_SYS_LOG_FORMAT)
+from config_rpm_maker.config import DEFAULT_DATE_FORMAT
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler, log_configuration_to_logger
 from config_rpm_maker.svn import SvnService
 
 ARGUMENT_REPOSITORY = '<repository-url>'
@@ -67,38 +63,6 @@ LOGGER = getLogger(__name__)
 
 
 timestamp_at_start = 0
-
-
-def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
-    """ Returnes a root_logger which logs to the console using the given log_level. """
-    formatter = Formatter(DEFAULT_LOG_FORMAT)
-
-    console_handler = StreamHandler()
-    console_handler.setFormatter(formatter)
-    console_handler.setLevel(log_level)
-
-    return console_handler
-
-
-def create_sys_log_handler(revision):
-    """ Create a logger handler which logs to sys log and uses the given revision within the format """
-    sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
-    formatter = Formatter(DEFAULT_SYS_LOG_FORMAT.format(revision))
-    sys_log_handler.setFormatter(formatter)
-
-    return sys_log_handler
-
-
-def log_configuration_to_logger(logger):
-    logger.debug('Loaded configuration file "%s"', config.configuration_file_path)
-
-    keys = sorted(config.configuration.keys())
-    max_length = len(max(keys, key=len)) + 2  # two is for quotes on left and right side
-
-    for key in keys:
-        indentet_key = ('"%s"' % key).ljust(max_length)
-        value = config.configuration[key]
-        logger.debug('Configuraton property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
 
 
 def start_measuring_time():
@@ -241,7 +205,7 @@ def main():
     initialize_logger(LOGGER, log_level)
 
     start_measuring_time()
-    log_configuration_to_logger(LOGGER)
+    log_configuration_to_logger(LOGGER, config.configuration, config.configuration_file_path)
 
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])

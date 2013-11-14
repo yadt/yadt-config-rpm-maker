@@ -19,6 +19,7 @@ import os
 
 from logging import getLogger
 
+from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 LOGGER = getLogger(__name__)
@@ -51,16 +52,13 @@ class SvnService(object):
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
         except Exception as e:
-            LOGGER.error('Retrieving change set information of revision "%s" in repository "%s" failed.',
+            LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
                          revision, self.config_url)
             raise SvnServiceException(str(e))
 
         start_pos = len(self.path_to_config + '/')
         changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
-        changed_paths.sort()
-        LOGGER.debug('The commit change set (revision %s) contained %s changed paths.', revision, len(changed_paths))
-        for i in range(len(changed_paths)):
-            LOGGER.debug('Changed path #%s: %s', i, changed_paths[i])
+        log_elements_of_list('The commit change set contained %s changed path(s).', changed_paths)
         return changed_paths
 
     def get_hosts(self, revision):

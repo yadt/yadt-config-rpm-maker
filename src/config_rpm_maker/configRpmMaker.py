@@ -27,6 +27,7 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
+from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.profiler import measure_execution_time
@@ -125,13 +126,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
             affected_hosts = list(self._get_affected_hosts(change_set, available_hosts))
             if not affected_hosts:
-                self.logger.info("We have nothing to do. No host affected by change set: %s", str(change_set))
+                LOGGER.info("No rpm(s) built. No host affected by change set: %s", str(change_set))
                 return
 
-            affected_hosts.sort()
-            LOGGER.info('Found %s affected hosts', len(affected_hosts))
-            for i in range(len(affected_hosts)):
-                LOGGER.info('Affected host #%s "%s"', i, affected_hosts[i])
+            log_elements_of_list('Detected %s affected host(s).', affected_hosts)
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
@@ -217,9 +215,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         built_rpms = self._consume_queue(rpm_queue)
-        LOGGER.debug('Built %s rpm(s).', len(built_rpms))
-        for i in range(len(built_rpms)):
-            LOGGER.debug('Built rpm #%s "%s"', i, built_rpms[i])
+        log_elements_of_list('Built %s rpm(s).', built_rpms)
         return built_rpms
 
     @measure_execution_time
