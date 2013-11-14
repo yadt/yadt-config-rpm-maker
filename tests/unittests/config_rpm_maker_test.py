@@ -19,7 +19,11 @@
 from mock import Mock, call, patch
 from unittest import TestCase, main
 
-from config_rpm_maker import USAGE_INFORMATION, parse_arguments, exit_program, build_configuration_rpms_from
+from config_rpm_maker import (USAGE_INFORMATION,
+                              build_configuration_rpms_from,
+                              exit_program,
+                              parse_arguments,
+                              validate_revision_argument)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
@@ -193,6 +197,23 @@ class BuildConfigurationRpmsTests(TestCase):
         build_configuration_rpms_from('file:///path_to/testdata/repository', 1980)
 
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision=1980)
+
+
+class ArgumentValidationTests(TestCase):
+
+    @patch('config_rpm_maker.exit_program')
+    def test_should_exit_if_a_non_integer_string_is_given(self, mock_exit_program):
+
+        validate_revision_argument('abc')
+
+        mock_exit_program.assert_called_with('Given revision "abc" is not an integer.', return_code=2)
+
+    @patch('config_rpm_maker.exit_program')
+    def test_should_not_exit_if_a_integer_string_is_given(self, mock_exit_program):
+
+        validate_revision_argument('123')
+
+        self.assertEqual(None, mock_exit_program.call_args)
 
 
 class ExitProgramTests(TestCase):

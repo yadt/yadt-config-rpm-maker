@@ -190,6 +190,12 @@ def build_configuration_rpms_from(repository, revision):
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
 
 
+def validate_revision_argument(revision):
+    """ Ensures that the given argument is a valid revision and exits the program if not """
+    if not revision.isdigit():
+        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
+
+
 def main():
     start_measuring_time()
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
@@ -203,8 +209,7 @@ def main():
     log_configuration_to_logger(LOGGER)
 
     revision = arguments[ARGUMENT_REVISION]
-    if not revision.isdigit():
-        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
+    validate_revision_argument(revision)
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
