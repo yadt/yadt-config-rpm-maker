@@ -23,8 +23,11 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 LOGGER = getLogger(__name__)
 
-DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)5s [%(name)s] - %(message)s"
+DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
+DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = INFO
+DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
+DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
@@ -35,6 +38,7 @@ LOG_FILE_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
 
 configuration = None
+configuration_file_path = DEFAULT_CONFIGURATION_FILE_PATH
 
 
 class ConfigException(BaseConfigRpmMakerException):
@@ -64,7 +68,7 @@ def get_log_level():
 
 def load_configuration_file():
     global configuration, configuration_file_path
-    configuration_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', 'yadt-config-rpm-maker.yaml')
+    configuration_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', configuration_file_path)
     if os.path.exists(configuration_file_path):
         try:
             with open(configuration_file_path) as f:

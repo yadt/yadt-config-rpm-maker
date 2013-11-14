@@ -29,6 +29,7 @@ from threading import Thread
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
+from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
 
 LOGGER = getLogger(__name__)
@@ -106,6 +107,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self._create_logger()
         self.work_dir = None
 
+    @measure_execution_time
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get('error_log_url', '')
         error_msg = self.ERROR_MSG % (err_url, revision)
@@ -178,6 +180,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 shutil.rmtree(dest_path)
             shutil.move(temp_path, dest_path)
 
+    @measure_execution_time
     def _build_hosts(self, hosts):
         if not hosts:
             LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
@@ -220,6 +223,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.debug('Built rpm #%s "%s"', i, built_rpms[i])
         return built_rpms
 
+    @measure_execution_time
     def _upload_rpms(self, rpms):
         rpm_upload_cmd = config.get('rpm_upload_cmd')
         chunk_size = self._get_chunk_size(rpms)

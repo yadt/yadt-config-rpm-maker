@@ -18,15 +18,19 @@
 import traceback
 
 from logging import DEBUG, Formatter, StreamHandler, getLogger
+from logging.handlers import SysLogHandler
 from math import ceil
 from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
 from time import time
 
 from config_rpm_maker import config
+from config_rpm_maker.config import DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_ADDRESS, DEFAULT_SYS_LOG_FORMAT
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
+
+ROOT_LOGGER_NAME = __name__
 
 ARGUMENT_REPOSITORY = '<repository>'
 ARGUMENT_REVISION = '<revision>'
@@ -41,10 +45,15 @@ OPTION_DEBUG_HELP = "force DEBUG log level"
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
-LOGGING_FORMAT = "[%(levelname)5s] %(message)s"
-ROOT_LOGGER_NAME = __name__
-
 MESSAGE_SUCCESS = "Success."
+
+RETURN_CODE_SUCCESS = 0
+RETURN_CODE_VERSION = RETURN_CODE_SUCCESS
+RETURN_CODE_NOT_ENOUGH_ARGUMENTS = 1
+RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
+RETURN_CODE_CONFIGURATION_ERROR = 3
+RETURN_CODE_EXCEPTION_OCCURRED = 4
+RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
 
 LOGGER = None
 
@@ -52,9 +61,9 @@ LOGGER = None
 timestamp_at_start = 0
 
 
-def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
+def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
     """ Returnes a root_logger which logs to the console using the given log_level. """
-    formatter = Formatter(LOGGING_FORMAT)
+    formatter = Formatter(DEFAULT_LOG_FORMAT)
 
     console_handler = StreamHandler()
     console_handler.setFormatter(formatter)
@@ -64,18 +73,29 @@ def create_root_logger(log_level=config.DEFAULT_LOG_LEVEL):
     root_logger.setLevel(log_level)
     root_logger.addHandler(console_handler)
 
+    if log_level == DEBUG:
+        root_logger.debug("DEBUG logging is enabled")
     return root_logger
 
 
-def log_configuration():
-    LOGGER.debug('Loaded configuration file "%s"', config.configuration_file_path)
+def create_sys_log_handler(revision):
+    """ Create a logger handler which logs to sys log and uses the given revision within the format """
+    sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
+    formatter = Formatter(DEFAULT_SYS_LOG_FORMAT.format(revision))
+    sys_log_handler.setFormatter(formatter)
+
+    return sys_log_handler
+
+
+def log_configuration_to_logger(logger):
+    logger.debug('Loaded configuration file "%s"', config.configuration_file_path)
 
     keys = sorted(config.configuration.keys())
     max_length = len(max(keys, key=len))
 
     for key in keys:
         indentet_key = key.ljust(max_length)
-        LOGGER.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
+        logger.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
 
 
 def start_measuring_time():
@@ -91,7 +111,7 @@ def exit_program(message, return_code):
     elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
     LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
 
-    if return_code == 0:
+    if return_code == RETURN_CODE_SUCCESS:
         LOGGER.info(message)
     else:
         LOGGER.error(message)
@@ -124,11 +144,11 @@ def parse_arguments(argv, version):
 
     if values.version:
         stdout.write(version + '\n')
-        return exit(0)
+        return exit(RETURN_CODE_VERSION)
 
     if len(args) < 2:
         parser.print_help()
-        return exit(1)
+        return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
 
     arguments = {OPTION_DEBUG: values.debug or False,
                  ARGUMENT_REPOSITORY: args[0],
@@ -137,49 +157,59 @@ def parse_arguments(argv, version):
     return arguments
 
 
-def main():
-    start_measuring_time()
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
-
-    global LOGGER
+def determine_log_level(arguments):
+    """ Determines the log level based on arguments and configuration """
     try:
-        config.load_configuration_file()
-
         if arguments[OPTION_DEBUG]:
-            LOGGER = create_root_logger(DEBUG)
-            LOGGER.debug("DEBUG logging is enabled")
+            log_level = DEBUG
         else:
             log_level = config.get_log_level()
-            LOGGER = create_root_logger(log_level)
 
     except config.ConfigException as e:
         stderr.write(str(e) + "\n")
-        exit(1)
+        exit(RETURN_CODE_CONFIGURATION_ERROR)
 
-    LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
-    LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
+    return log_level
 
-    log_configuration()
 
-    revision = arguments[ARGUMENT_REVISION]
-    if not revision.isdigit():
-        exit_program('Given revision "%s" is not a integer.' % revision, return_code=1)
-
-    repository = arguments[ARGUMENT_REPOSITORY]
-
+def build_configuration_rpms_from(repository, revision):
     try:
-        # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
-        svn_service = SvnService(base_url='file://{0}'.format(repository),
-                                 path_to_config=config.get('svn_path_to_config'))
-        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
+        base_url = 'file://{0}'.format(repository)
+        path_to_config = config.get('svn_path_to_config')
+        svn_service = SvnService(base_url=base_url, path_to_config=path_to_config)
+        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
             LOGGER.error(line)
-        exit_program('An exception occurred!', return_code=2)
+        exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:
         traceback.print_exc(5)
-        exit_program('An unknown exception occurred!', return_code=3)
+        exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
 
-    exit_program(MESSAGE_SUCCESS, return_code=0)
+    exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
+
+
+def main():
+    start_measuring_time()
+    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
+    config.load_configuration_file()
+    log_level = determine_log_level(arguments)
+
+    global LOGGER
+    LOGGER = create_root_logger(log_level)
+    LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
+    LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
+    log_configuration_to_logger(LOGGER)
+
+    revision = arguments[ARGUMENT_REVISION]
+    if not revision.isdigit():
+        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
+
+    sys_log_handler = create_sys_log_handler(revision)
+    LOGGER.addHandler(sys_log_handler)
+
+    repository = arguments[ARGUMENT_REPOSITORY]
+
+    build_configuration_rpms_from(repository, revision)

@@ -8,19 +8,17 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
   * Uploads configuration RPMs to a YUM repository.
 
 ```
-Usage:
-  config-rpm-maker <repository> <revision> [--debug]
-  config-rpm-maker -h | --help
-  config-rpm-maker --version
+Usage: config_rpm_maker repository revision [options]
 
 Arguments:
-  repository    absolute path to your subversion repository
-  revision      subversion revision for which the configuration rpms are going to be built
+  repository  absolute path to your subversion repository
+  revision    subversion revision for which the configuration rpms are going to be built
 
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  --debug       Force DEBUG log level.
+  -h, --help  show this help message and exit
+  --debug     force DEBUG log level
+  --version   show version
+
 ```
 
 ### Example
@@ -121,6 +119,7 @@ Authors
 * [Ingmar Krusch](https://github.com/ingmarkrusch)
 * [Maximillien Riehl](https://github.com/mriehl)
 * [Michael Gruber](https://github.com/aelgru)
+* [Hasan Hosgel](https://github.com/alosdev)
 * Konrad Hosemann
 
 License
