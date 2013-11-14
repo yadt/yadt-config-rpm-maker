@@ -46,7 +46,7 @@ def measure_execution_time(original_function):
         else:
             function_name = original_function.__name__
         function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
-        LOGGER.info('Took %ss to perform %s', elapsed_time_in_seconds, function_call)
+        LOGGER.debug('Took %ss to perform %s', elapsed_time_in_seconds, function_call)
 
         return return_value_from_function
 
