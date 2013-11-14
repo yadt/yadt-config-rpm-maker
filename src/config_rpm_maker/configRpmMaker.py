@@ -99,7 +99,6 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 """
 
     def __init__(self, revision, svn_service):
-        LOGGER.debug("Initializing %s with revision=%s and svn_service=%s", ConfigRpmMaker.__name__, revision, svn_service)
         self.revision = revision
         self.svn_service = svn_service
         self.temp_dir = config.get_temporary_directory()

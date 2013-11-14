@@ -31,28 +31,23 @@ class SvnServiceException(BaseConfigRpmMakerException):
 class SvnService(object):
 
     def __init__(self, base_url, username=None, password=None, path_to_config='/config'):
-        LOGGER.debug('Initializing %s with base_url="%s" and path_to_config="%s"', SvnService.__name__, base_url, path_to_config)
-
         self.path_to_config = path_to_config
         self.base_url = base_url
         self.config_url = base_url + path_to_config
-        LOGGER.info('Configuration repository is "%s"', self.config_url)
+        LOGGER.info('Configuration repository is "%s".', self.config_url)
         self._initialize_pysvn_client(username, password)
 
     def _initialize_pysvn_client(self, username, password):
-        LOGGER.debug("Initializing pysvn client")
         self.client = pysvn.Client()
         self.client.set_auth_cache(True)
         if username:
-            LOGGER.debug('Setting default username for pysvn client to "%s"', username)
+            LOGGER.debug('Setting default username for subversion client to "%s".', username)
             self.client.set_default_username(username)
         if password:
-            LOGGER.debug('Setting default password for pysvn client')
+            LOGGER.debug('Setting default password for subversion client.')
             self.client.set_default_password(password)
 
     def get_change_set(self, revision):
-        LOGGER.debug('Retrieving change set information for revision "%s"', revision)
-
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
         except Exception as e:
@@ -63,7 +58,7 @@ class SvnService(object):
         start_pos = len(self.path_to_config + '/')
         changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
         changed_paths.sort()
-        LOGGER.debug('Found %s changed paths.', len(changed_paths))
+        LOGGER.debug('The commit change set (revision %s) contained %s changed paths.', revision, len(changed_paths))
         for i in range(len(changed_paths)):
             LOGGER.debug('Changed path #%s: %s', i, changed_paths[i])
         return changed_paths
