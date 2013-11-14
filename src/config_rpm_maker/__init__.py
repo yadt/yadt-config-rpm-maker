@@ -39,8 +39,10 @@ USAGE_INFORMATION = """Usage: %prog repo-url revision [options]
 Arguments:
   repo-url    URL to subversion repository or absolute path on localhost
   revision    subversion revision for which the configuration rpms are going to be built"""
+
 OPTION_DEBUG = '--debug'
 OPTION_DEBUG_HELP = "force DEBUG log level"
+
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
@@ -57,13 +59,13 @@ RETURN_CODE_REPOSITORY_URL_INVALID = 6
 
 VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
 
-LOGGER = None
+LOGGER = getLogger(__name__)
 
 
 timestamp_at_start = 0
 
 
-def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
+def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
     """ Returnes a root_logger which logs to the console using the given log_level. """
     formatter = Formatter(DEFAULT_LOG_FORMAT)
 
@@ -71,13 +73,7 @@ def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
     console_handler.setFormatter(formatter)
     console_handler.setLevel(log_level)
 
-    root_logger = getLogger(__name__)
-    root_logger.setLevel(log_level)
-    root_logger.addHandler(console_handler)
-
-    if log_level == DEBUG:
-        root_logger.debug("DEBUG logging is enabled")
-    return root_logger
+    return console_handler
 
 
 def create_sys_log_handler(revision):
@@ -214,14 +210,25 @@ def ensure_valid_repository_url(repository_url):
     return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
 
 
+def initialize_logger(arguments):
+    """ Sets log level of root logger and adds console handler """
+
+    log_level = determine_log_level(arguments)
+    LOGGER.setLevel(log_level)
+
+    if log_level == DEBUG:
+        LOGGER.debug("DEBUG logging is enabled")
+
+    console_handler = create_console_handler(log_level)
+    LOGGER.addHandler(console_handler)
+
+
 def main():
     start_measuring_time()
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
     config.load_configuration_file()
-    log_level = determine_log_level(arguments)
+    initialize_logger(arguments)
 
-    global LOGGER
-    LOGGER = create_root_logger(log_level)
     LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
     LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
     log_configuration_to_logger(LOGGER)
