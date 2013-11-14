@@ -20,14 +20,12 @@ import subprocess
 from logging import getLogger
 
 from config_rpm_maker import config
-from config_rpm_maker.profiler import measure_execution_time
 
 LOGGER = getLogger(__name__)
 
 
 class HostResolver(object):
 
-    @measure_execution_time
     def resolve(self, hostname):
         dns_searchlist = config.get('custom_dns_searchlist')
 

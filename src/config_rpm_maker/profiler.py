@@ -30,10 +30,11 @@ def measure_execution_time(original_function):
 
         return_value_from_function = original_function(*args, **kwargs)
 
-        elapsed_time_in_seconds = time() - start_time
+        end_time = time()
+        elapsed_time_in_seconds = end_time - start_time
         elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
 
-        arguments = ', '.join(map(lambda arg: '"%s"' % str(arg), args[1:]))
+        arguments = ', '.join(map(lambda arg: arg if type(arg) == str else str(arg), args[1:]))
 
         if len(kwargs.keys()) == 0:
             key_word_arguments = ""

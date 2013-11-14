@@ -28,6 +28,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostResolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
+from config_rpm_maker.profiler import measure_execution_time
 
 
 LOGGER = getLogger(__name__)
@@ -127,7 +128,7 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.variables'), patch_info)
 
         self._filter_tokens_in_rpm_sources()
-        self._build_rpm()
+        self._build_rpm_using_rpmbuild()
 
         LOGGER.debug('Writing configviewer data for host "%s"', self.hostname)
         self._filter_tokens_in_config_viewer()
@@ -153,6 +154,7 @@ class HostRpmBuilder(object):
     def _write_revision_file_for_config_viewer(self):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
 
+    @measure_execution_time
     def _find_rpms(self):
         result = []
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'RPMS')):
@@ -165,7 +167,8 @@ class HostRpmBuilder(object):
                     result.append(os.path.join(root, filename))
         return result
 
-    def _build_rpm(self):
+    @measure_execution_time
+    def _build_rpm_using_rpmbuild(self):
         tar_path = self._tar_sources()
 
         working_environment = os.environ.copy()
@@ -175,21 +178,22 @@ class HostRpmBuilder(object):
         LOGGER.debug('Building rpms by executing "%s"', rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
 
-        p = subprocess.Popen(rpmbuild_cmd,
-                             shell=True,
-                             env=working_environment,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+        process = subprocess.Popen(rpmbuild_cmd,
+                                   shell=True,
+                                   env=working_environment,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
 
-        stdout, stderr = p.communicate()
+        stdout, stderr = process.communicate()
 
         self.logger.info(stdout)
         if stderr:
             self.logger.error(stderr)
 
-        if p.returncode:
+        if process.returncode:
             raise CouldNotBuildRpmException('Could not build RPM for host "%s": stdout="%s", stderr="%s"' % (self.hostname, stdout.strip(), stderr.strip()))
 
+    @measure_execution_time
     def _tar_sources(self):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
@@ -203,9 +207,11 @@ class HostRpmBuilder(object):
             raise Exception('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
+    @measure_execution_time
     def _filter_tokens_in_rpm_sources(self):
         TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir)
 
+    @measure_execution_time
     def _copy_files_for_config_viewer(self):
         if os.path.exists(self.config_viewer_host_dir):
             shutil.rmtree(self.config_viewer_host_dir)
@@ -213,22 +219,26 @@ class HostRpmBuilder(object):
         shutil.copytree(self.host_config_dir, self.config_viewer_host_dir, symlinks=True)
         shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
 
+    @measure_execution_time
     def _generate_patch_info(self):
         variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
         variables = sorted(variables)
         variables = [var_name.rjust(40) + ' : ' + self._get_content(os.path.join(self.variables_dir, var_name)) for var_name in variables]
         return "\n".join(variables) + "\n"
 
+    @measure_execution_time
     def _save_network_variables(self):
         ip, fqdn, aliases = HostResolver().resolve(self.hostname)
         self._write_file(os.path.join(self.variables_dir, 'IP'), ip)
         self._write_file(os.path.join(self.variables_dir, 'FQDN'), fqdn)
         self._write_file(os.path.join(self.variables_dir, 'ALIASES'), aliases)
 
+    @measure_execution_time
     def _save_segment_variables(self):
         for segment in ALL_SEGEMENTS:
             self._write_file(os.path.join(self.variables_dir, segment.get_variable_name()), segment.get(self.hostname)[-1])
 
+    @measure_execution_time
     def _save_file_list(self):
         f = open(os.path.join(self.work_dir, 'filelist.' + self.hostname), 'w')
         try:
@@ -298,6 +308,7 @@ Change set:
          "\n   ".join([path['action'] + ' ' + path['path'] for path in log['changed_paths']]),
          log['message'])
 
+    @measure_execution_time
     def _export_spec_file(self):
         svn_service = self.svn_service_queue.get()
         try:
@@ -306,6 +317,7 @@ Change set:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
 
+    @measure_execution_time
     def _overlay_segment(self, segment):
         requires = []
         provides = []
