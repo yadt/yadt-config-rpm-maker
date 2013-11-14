@@ -174,19 +174,18 @@ def determine_log_level(arguments):
 
 def build_configuration_rpms_from(repository, revision):
     try:
-        base_url = 'file://{0}'.format(repository)
         path_to_config = config.get('svn_path_to_config')
-        svn_service = SvnService(base_url=base_url, path_to_config=path_to_config)
+        svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
         ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
             LOGGER.error(line)
-        exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
+        return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:
         traceback.print_exc(5)
-        exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
 
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
 

@@ -24,9 +24,9 @@ Options:
 ### Example
 
 ```bash
-config-rpm-maker /foo/bar/svn/test 123
+config-rpm-maker file:///path-to/your/svn/repository/ 123
 ```
-Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
+Builds all relevant configuration RPMs from the repository at `file:///path-to/your/svn/repository/` in revision `123`.
 
 ## Features
 
