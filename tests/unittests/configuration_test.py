@@ -18,7 +18,7 @@
 
 from logging import DEBUG, ERROR, INFO
 from mock import patch
-from unittest import TestCase
+from unittest import TestCase, main
 
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, ConfigException, get_log_level, get_temporary_directory
 
@@ -76,3 +76,6 @@ class ConfigurationTests(TestCase):
         mock_get.return_value = "FOO"
 
         self.assertRaises(ConfigException, get_log_level)
+
+if __name__ == "__main__":
+    main()
