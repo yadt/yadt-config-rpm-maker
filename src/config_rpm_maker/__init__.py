@@ -33,13 +33,13 @@ from config_rpm_maker.svn import SvnService
 
 ROOT_LOGGER_NAME = __name__
 
-ARGUMENT_REPOSITORY = '<repository>'
+ARGUMENT_REPOSITORY = '<repository-url>'
 ARGUMENT_REVISION = '<revision>'
 
-USAGE_INFORMATION = """Usage: %prog repository revision [options]
+USAGE_INFORMATION = """Usage: %prog repo-url revision [options]
 
 Arguments:
-  repository  absolute path to your subversion repository
+  repo-url    URL to subversion repository or absolute path on localhost
   revision    subversion revision for which the configuration rpms are going to be built"""
 OPTION_DEBUG = '--debug'
 OPTION_DEBUG_HELP = "force DEBUG log level"

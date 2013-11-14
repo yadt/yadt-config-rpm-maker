@@ -87,7 +87,7 @@ class ParseArgumentsTests(TestCase):
 
         actual_arguments = parse_arguments(["foo", "123"], version="")
 
-        self.assertEqual(actual_arguments["<repository>"], "foo")
+        self.assertEqual(actual_arguments["<repository-url>"], "foo")
 
     def test_should_return_second_argument_as_revision(self):
 
