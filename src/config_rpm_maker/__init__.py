@@ -210,24 +210,23 @@ def ensure_valid_repository_url(repository_url):
     return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
 
 
-def initialize_logger(arguments):
+def initialize_logger(logger, log_level):
     """ Sets log level of root logger and adds console handler """
-
-    log_level = determine_log_level(arguments)
-    LOGGER.setLevel(log_level)
-
-    if log_level == DEBUG:
-        LOGGER.debug("DEBUG logging is enabled")
+    logger.setLevel(log_level)
 
     console_handler = create_console_handler(log_level)
-    LOGGER.addHandler(console_handler)
+    logger.addHandler(console_handler)
+
+    if log_level == DEBUG:
+        logger.debug("DEBUG logging is enabled")
 
 
 def main():
     start_measuring_time()
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
     config.load_configuration_file()
-    initialize_logger(arguments)
+    log_level = determine_log_level(arguments)
+    initialize_logger(LOGGER, log_level)
 
     LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
     LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
