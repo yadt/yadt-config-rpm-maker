@@ -21,7 +21,8 @@ from logging.handlers import SysLogHandler
 from config_rpm_maker.config import (DEFAULT_LOG_FORMAT,
                                      DEFAULT_LOG_LEVEL,
                                      DEFAULT_SYS_LOG_ADDRESS,
-                                     DEFAULT_SYS_LOG_FORMAT)
+                                     DEFAULT_SYS_LOG_FORMAT,
+                                     DEFAULT_SYS_LOG_LEVEL)
 
 LOGGER = getLogger(__name__)
 
@@ -39,9 +40,12 @@ def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
 
 def create_sys_log_handler(revision):
     """ Create a logger handler which logs to sys log and uses the given revision within the format """
+    format = DEFAULT_SYS_LOG_FORMAT.format(revision)
+    formatter = Formatter(format)
+
     sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
-    formatter = Formatter(DEFAULT_SYS_LOG_FORMAT.format(revision))
     sys_log_handler.setFormatter(formatter)
+    sys_log_handler.setLevel(DEFAULT_SYS_LOG_LEVEL)
 
     return sys_log_handler
 

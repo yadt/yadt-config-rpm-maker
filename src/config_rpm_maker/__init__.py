@@ -189,7 +189,7 @@ def ensure_valid_repository_url(repository_url):
 
 def initialize_logger(logger, log_level):
     """ Sets log level of root logger and adds console handler """
-    logger.setLevel(log_level)
+    logger.setLevel(DEBUG)
 
     console_handler = create_console_handler(log_level)
     logger.addHandler(console_handler)
