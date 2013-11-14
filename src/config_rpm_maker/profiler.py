@@ -39,7 +39,7 @@ def measure_execution_time(original_function):
             key_word_arguments = ""
         else:
             key_word_arguments = ", " + str(kwargs)
-        
+
         if len(args) > 0:
             function_name = "%s.%s" % (args[0].__class__.__name__, original_function.__name__)
         else:

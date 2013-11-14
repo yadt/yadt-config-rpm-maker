@@ -24,6 +24,7 @@ from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
 from time import time
 
+from config_rpm_maker import config
 from config_rpm_maker.config import DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_ADDRESS, DEFAULT_SYS_LOG_FORMAT
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
