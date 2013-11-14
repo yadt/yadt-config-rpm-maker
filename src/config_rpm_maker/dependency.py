@@ -20,8 +20,10 @@ from types import ListType
 
 
 class Dependency:
-    """Consumes raw formatted RPM dependencies. Eighter accumulates them or collapses them so the first/gerneral
-    ones get overwritten by the later/specific ones"""
+    """
+        Consumes raw formatted RPM dependencies. Either accumulates them or collapses them
+        so the first/gerneral ones get overwritten by the later/specific ones
+    """
 
     def __init__(self, collapseDependencies=False, filterRegex=".*", positiveFilter=True):
         self.dependencies = dict([])
@@ -29,7 +31,7 @@ class Dependency:
         self.filterRegex = filterRegex
         self.positiveFilter = positiveFilter
 
-    def __filterDeps(self):
+    def _filterDeps(self):
         filteredDependencies = dict([])
         for package, dependency in self.dependencies.items():
             if re.match(self.filterRegex, package):
@@ -40,7 +42,7 @@ class Dependency:
                     filteredDependencies[package] = dependency
         self.dependencies = filteredDependencies
 
-    def __add(self, rawDependencyString):
+    def _add(self, rawDependencyString):
         dependency = re.sub("\s*([<>=]+)\s*", "\\1", rawDependencyString)  # remove spaces around <>=
         dependency = re.sub("\s*,\s*", "\n", dependency)         # change , spearator into newline
         dependency = re.sub("\s+", "\n", dependency)             # all spaces left are separators now, change into newline
@@ -63,11 +65,11 @@ class Dependency:
     def add(self, rawDependencies):
         if isinstance(rawDependencies, ListType):
             for item in rawDependencies:
-                self.__add(item)
+                self._add(item)
         else:
-            self.__add(rawDependencies)
-        self.__filterDeps()
+            self._add(rawDependencies)
+        self._filterDeps()
 
     def __repr__(self):
-        """nicely prints the previously <code>add()</code>ed RPM dependencies"""
+        """ nicely prints the previously added RPM dependencies """
         return ", ".join(self.dependencies.values())
