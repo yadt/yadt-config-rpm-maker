@@ -317,7 +317,6 @@ Change set:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
 
-    @measure_execution_time
     def _overlay_segment(self, segment):
         requires = []
         provides = []
