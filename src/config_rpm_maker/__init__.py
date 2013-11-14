@@ -190,11 +190,12 @@ def build_configuration_rpms_from(repository, revision):
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
 
 
-def validate_revision_argument(revision):
+def ensure_valid_revision(revision):
     """ Ensures that the given argument is a valid revision and exits the program if not """
     if not revision.isdigit():
         exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
 
+    return revision
 
 def main():
     start_measuring_time()
@@ -209,11 +210,12 @@ def main():
     log_configuration_to_logger(LOGGER)
 
     revision = arguments[ARGUMENT_REVISION]
-    validate_revision_argument(revision)
+    revision = ensure_valid_revision(revision)
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
 
     repository = arguments[ARGUMENT_REPOSITORY]
+    validate_repository_argument(repository)
 
     build_configuration_rpms_from(repository, revision)

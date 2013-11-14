@@ -23,7 +23,7 @@ from config_rpm_maker import (USAGE_INFORMATION,
                               build_configuration_rpms_from,
                               exit_program,
                               parse_arguments,
-                              validate_revision_argument)
+                              ensure_valid_revision)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
@@ -204,16 +204,23 @@ class ArgumentValidationTests(TestCase):
     @patch('config_rpm_maker.exit_program')
     def test_should_exit_if_a_non_integer_string_is_given(self, mock_exit_program):
 
-        validate_revision_argument('abc')
+        ensure_valid_revision('abc')
 
         mock_exit_program.assert_called_with('Given revision "abc" is not an integer.', return_code=2)
 
     @patch('config_rpm_maker.exit_program')
     def test_should_not_exit_if_a_integer_string_is_given(self, mock_exit_program):
 
-        validate_revision_argument('123')
+        ensure_valid_revision('123')
 
         self.assertEqual(None, mock_exit_program.call_args)
+
+    @patch('config_rpm_maker.exit_program')
+    def test_should_not_exit_if_a_integer_string_is_given(self, mock_exit_program):
+
+        actual_revision = ensure_valid_revision('123')
+
+        self.assertEqual('123', actual_revision)
 
 
 class ExitProgramTests(TestCase):
