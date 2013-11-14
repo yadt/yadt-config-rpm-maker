@@ -24,6 +24,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 LOGGER = getLogger(__name__)
 
 DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
+DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = INFO
 DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
@@ -34,7 +35,7 @@ KEY_LOG_LEVEL = "log_level"
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-LOG_FILE_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
+LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
 
 configuration = None

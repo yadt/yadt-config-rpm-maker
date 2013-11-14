@@ -22,11 +22,15 @@ from logging.handlers import SysLogHandler
 from math import ceil
 from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
-from time import time
+from time import time, strftime
 from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_ADDRESS, DEFAULT_SYS_LOG_FORMAT
+from config_rpm_maker.config import (DEFAULT_DATE_FORMAT,
+                                     DEFAULT_LOG_FORMAT,
+                                     DEFAULT_LOG_LEVEL,
+                                     DEFAULT_SYS_LOG_ADDRESS,
+                                     DEFAULT_SYS_LOG_FORMAT)
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.svn import SvnService
@@ -89,15 +93,18 @@ def log_configuration_to_logger(logger):
     logger.debug('Loaded configuration file "%s"', config.configuration_file_path)
 
     keys = sorted(config.configuration.keys())
-    max_length = len(max(keys, key=len))
+    max_length = len(max(keys, key=len)) + 2  # two is for quotes on left and right side
 
     for key in keys:
-        indentet_key = key.ljust(max_length)
-        logger.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
+        indentet_key = ('"%s"' % key).ljust(max_length)
+        value = config.configuration[key]
+        logger.debug('Configuraton property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
 
 
 def start_measuring_time():
     """ Start measuring the time. This is required to calculate the elapsed time. """
+    LOGGER.info("Starting to measure time at %s", strftime(DEFAULT_DATE_FORMAT))
+
     global timestamp_at_start
     timestamp_at_start = time()
 
@@ -190,22 +197,28 @@ def build_configuration_rpms_from(repository, revision):
 
 def ensure_valid_revision(revision):
     """ Ensures that the given argument is a valid revision and exits the program if not """
+
     if not revision.isdigit():
         exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
 
+    LOGGER.debug('Accepting "%s" as a valid subversion revision.', revision)
     return revision
 
 
 def ensure_valid_repository_url(repository_url):
     """ Ensures that the given url is a valid repository url """
+
     parsed_url = urlparse(repository_url)
     scheme = parsed_url.scheme
 
     if scheme in VALID_REPOSITORY_URL_SCHEMES:
+        LOGGER.debug('Accepting "%s" as a valid repository url.', repository_url)
         return repository_url
 
     if scheme is '':
-        return 'file://%s' % parsed_url.path
+        file_uri = 'file://%s' % parsed_url.path
+        LOGGER.debug('Accepting "%s" as a valid repository url.', file_uri)
+        return file_uri
 
     return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
 
@@ -222,20 +235,18 @@ def initialize_logger(logger, log_level):
 
 
 def main():
-    start_measuring_time()
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
     config.load_configuration_file()
     log_level = determine_log_level(arguments)
     initialize_logger(LOGGER, log_level)
 
-    LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
-    LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
+    start_measuring_time()
     log_configuration_to_logger(LOGGER)
 
+    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
-    repository = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
 
-    build_configuration_rpms_from(repository, revision)
+    build_configuration_rpms_from(repository_url, revision)
