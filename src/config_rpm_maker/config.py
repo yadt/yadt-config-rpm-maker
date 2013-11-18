@@ -34,6 +34,7 @@ DEFAULT_SYS_LOG_LEVEL = DEBUG
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
+KEY_THREAD_COUNT = 'thread_count'
 
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT

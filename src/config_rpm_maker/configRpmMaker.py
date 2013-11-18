@@ -27,6 +27,7 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
+from config_rpm_maker.config import KEY_THREAD_COUNT
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
@@ -262,13 +263,13 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
         return result
 
     def _get_thread_count(self, affected_hosts):
-        thread_count = int(config.get('thread_count', 1))
+        thread_count = int(config.get(KEY_THREAD_COUNT, 1))
         if thread_count < 0:
-            raise ConfigurationException('thread_count is %s, values <0 are not allowed)' % thread_count)
+            raise ConfigurationException('%s is %s, values <0 are not allowed)' % (KEY_THREAD_COUNT, thread_count))
 
-        # thread_count is zero means one thread for affected host
         if not thread_count or thread_count > len(affected_hosts):
             thread_count = len(affected_hosts)
+            LOGGER.info("Using one thread for each affected host.")
         return thread_count
 
     def _consume_queue(self, queue):
