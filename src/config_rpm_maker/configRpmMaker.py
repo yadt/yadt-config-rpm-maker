@@ -70,7 +70,7 @@ class BuildHostThread(Thread):
                 self.failed_host_queue.put((host, traceback.format_exc()))
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
-            LOGGER.debug('%s: finished and built %s rpms.', self.name, count_of_rpms)
+            LOGGER.debug('%s: finished and built %s rpm(s).', self.name, count_of_rpms)
         else:
             LOGGER.debug('%s: finished without building any rpm!', self.name)
 
@@ -215,8 +215,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
+        LOGGER.info("Finished building configuration rpm(s).")
         built_rpms = self._consume_queue(rpm_queue)
         log_elements_of_list(LOGGER.debug, 'Built %s rpm(s).', built_rpms)
+
         return built_rpms
 
     @measure_execution_time
