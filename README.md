@@ -12,11 +12,11 @@ Usage: config_rpm_maker repo-url revision [options]
 
 Arguments:
   repo-url    URL to subversion repository or absolute path on localhost
-  revision    subversion revision for which the configuration rpms are going to be built"""
+  revision    subversion revision for which the configuration rpms are going to be built
 
 Options:
   -h, --help  show this help message and exit
-  --debug     force DEBUG log level
+  --debug     force DEBUG log level on console
   --version   show version
 ```
 

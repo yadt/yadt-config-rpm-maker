@@ -41,7 +41,7 @@ Arguments:
   revision    subversion revision for which the configuration rpms are going to be built"""
 
 OPTION_DEBUG = '--debug'
-OPTION_DEBUG_HELP = "force DEBUG log level"
+OPTION_DEBUG_HELP = "force DEBUG log level on console"
 
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
