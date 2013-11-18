@@ -129,7 +129,7 @@ def parse_arguments(argv, version):
     return arguments
 
 
-def determine_log_level(arguments):
+def determine_console_log_level(arguments):
     """ Determines the log level based on arguments and configuration """
     try:
         if arguments[OPTION_DEBUG]:
@@ -190,22 +190,22 @@ def ensure_valid_repository_url(repository_url):
     return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
 
 
-def initialize_logger(logger, log_level):
-    """ Sets log level of root logger and adds console handler """
-    logger.setLevel(DEBUG)
-
-    console_handler = create_console_handler(log_level)
+def append_console_logger(logger, console_log_level):
+    """ Creates and appends a console log handler with the given log level """
+    console_handler = create_console_handler(console_log_level)
     logger.addHandler(console_handler)
 
-    if log_level == DEBUG:
+    if console_log_level == DEBUG:
         logger.debug("DEBUG logging is enabled")
 
 
 def main():
+    LOGGER.setLevel(DEBUG)
+
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
     config.load_configuration_file()
-    log_level = determine_log_level(arguments)
-    initialize_logger(LOGGER, log_level)
+    console_log_level = determine_console_log_level(arguments)
+    append_console_logger(LOGGER, console_log_level)
 
     start_measuring_time()
     log_process_id(LOGGER.info)
