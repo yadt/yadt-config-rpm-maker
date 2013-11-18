@@ -52,7 +52,8 @@ class HostRpmBuilder(object):
 
         return path
 
-    def __init__(self, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
+    def __init__(self, thread_name, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
+        self.thread_name = thread_name
         self.hostname = hostname
         self.revision = revision
         self.work_dir = work_dir
@@ -69,7 +70,7 @@ class HostRpmBuilder(object):
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
-        LOGGER.info('Building configuration rpm(s) for host "%s"', self.hostname)
+        LOGGER.info('%s: building configuration rpm(s) for host "%s"', self.thread_name, self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
@@ -130,7 +131,7 @@ class HostRpmBuilder(object):
         self._filter_tokens_in_rpm_sources()
         self._build_rpm_using_rpmbuild()
 
-        LOGGER.debug('Writing configviewer data for host "%s"', self.hostname)
+        LOGGER.debug('%s: writing configviewer data for host "%s"', self.thread_name, self.hostname)
         self._filter_tokens_in_config_viewer()
         self._write_revision_file_for_config_viewer()
         self._write_overlaying_for_config_viewer(overall_exported)
@@ -145,7 +146,11 @@ class HostRpmBuilder(object):
             filtered_replacement = replacement.rstrip()
             return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
 
-        token_replacer = TokenReplacer.filter_directory(self.config_viewer_host_dir, self.variables_dir, html_escape=True, replacer_function=configviewer_token_replacer)
+        token_replacer = TokenReplacer.filter_directory(self.config_viewer_host_dir,
+                                                        self.variables_dir,
+                                                        html_escape=True,
+                                                        replacer_function=configviewer_token_replacer,
+                                                        thread_name=self.thread_name)
         tokens_unused = set(token_replacer.token_values.keys()) - token_replacer.token_used
         path_to_unused_variables = os.path.join(self.config_viewer_host_dir, 'unused_variables.txt')
         self._write_file(path_to_unused_variables, '\n'.join(sorted(tokens_unused)))
@@ -175,7 +180,7 @@ class HostRpmBuilder(object):
         working_environment['HOME'] = os.path.abspath(self.work_dir)
         rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
 
-        LOGGER.debug('Building rpms by executing "%s"', rpmbuild_cmd)
+        LOGGER.debug('%s: building rpms by executing "%s"', self.thread_name, rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
 
         process = subprocess.Popen(rpmbuild_cmd,
@@ -209,7 +214,7 @@ class HostRpmBuilder(object):
 
     @measure_execution_time
     def _filter_tokens_in_rpm_sources(self):
-        TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir)
+        TokenReplacer.filter_directory(self.host_config_dir, self.variables_dir, thread_name=self.thread_name)
 
     @measure_execution_time
     def _copy_files_for_config_viewer(self):

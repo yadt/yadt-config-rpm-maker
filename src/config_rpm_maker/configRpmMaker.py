@@ -55,7 +55,8 @@ class BuildHostThread(Thread):
             host = self.host_queue.get()
             self.host_queue.task_done()
             try:
-                rpms = HostRpmBuilder(hostname=host,
+                rpms = HostRpmBuilder(thread_name=self.name,
+                                      hostname=host,
                                       revision=self.revision,
                                       work_dir=self.work_dir,
                                       svn_service_queue=self.svn_service_queue,
