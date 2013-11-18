@@ -28,7 +28,10 @@ from config_rpm_maker import config
 from config_rpm_maker.config import DEFAULT_DATE_FORMAT
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler, log_configuration_to_logger
+from config_rpm_maker.logutils import (create_console_handler,
+                                       create_sys_log_handler,
+                                       log_configuration_to_logger,
+                                       log_process_id)
 from config_rpm_maker.svn import SvnService
 
 ARGUMENT_REPOSITORY = '<repository-url>'
@@ -205,6 +208,7 @@ def main():
     initialize_logger(LOGGER, log_level)
 
     start_measuring_time()
+    log_process_id(LOGGER.info)
     log_configuration_to_logger(LOGGER, config.configuration, config.configuration_file_path)
 
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])

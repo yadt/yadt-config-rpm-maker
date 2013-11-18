@@ -14,9 +14,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from logging import Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
+from os import getpid
 
 from config_rpm_maker.config import (DEFAULT_LOG_FORMAT,
                                      DEFAULT_LOG_LEVEL,
@@ -71,3 +71,9 @@ def log_elements_of_list(summary_message, unsorted_list):
     LOGGER.debug(summary_message + ' Listing in sorted order:', count_of_elements)
     for i in range(count_of_elements):
         LOGGER.debug('    #%s: %s', i, sorted_list[i])
+
+
+def log_process_id(logging_function):
+    """ Calls the given logging function to log the current process id """
+    process_id = getpid()
+    logging_function("Process ID is %s", process_id)
