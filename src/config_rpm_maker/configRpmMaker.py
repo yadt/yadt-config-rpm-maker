@@ -69,9 +69,9 @@ class BuildHostThread(Thread):
                 self.failed_host_queue.put((host, traceback.format_exc()))
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
-            LOGGER.debug('Thread "%s" finished and built %s rpms.', self.name, count_of_rpms)
+            LOGGER.debug('%s: finished and built %s rpms.', self.name, count_of_rpms)
         else:
-            LOGGER.debug('Thread "%s" finished without building any rpm!', self.name)
+            LOGGER.debug('%s: finished without building any rpm!', self.name)
 
 
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
@@ -193,7 +193,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(name='thread_%d' % i,
+        thread_pool = [BuildHostThread(name='Thread-%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
@@ -203,7 +203,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
         for thread in thread_pool:
-            LOGGER.debug('Starting "%s"', thread.name)
+            LOGGER.debug('%s: starting ...', thread.name)
             thread.start()
 
         for thread in thread_pool:
