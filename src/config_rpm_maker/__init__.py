@@ -203,18 +203,19 @@ def main():
     LOGGER.setLevel(DEBUG)
 
     arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
+
     config.load_configuration_file()
     console_log_level = determine_console_log_level(arguments)
     append_console_logger(LOGGER, console_log_level)
-
-    start_measuring_time()
-    log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config.configuration, config.configuration_file_path)
 
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
+
+    start_measuring_time()
+    log_process_id(LOGGER.info)
+    log_configuration(LOGGER.debug, config.configuration, config.configuration_file_path)
 
     build_configuration_rpms_from(repository_url, revision)
