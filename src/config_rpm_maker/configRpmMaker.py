@@ -68,6 +68,7 @@ class BuildHostThread(Thread):
 
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
+
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
             LOGGER.debug('%s: finished and built %s rpm(s).', self.name, count_of_rpms)
