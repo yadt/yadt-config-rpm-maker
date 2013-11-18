@@ -50,10 +50,10 @@ def create_sys_log_handler(revision):
     return sys_log_handler
 
 
-def log_configuration_to_logger(logger, configuration, path):
+def log_configuration(logging_function, configuration, path):
     """ Logs the path to configuration file and the properties """
 
-    logger.debug('Loaded configuration file "%s"', path)
+    logging_function('Loaded configuration file "%s"', path)
 
     keys = sorted(configuration.keys())
     max_length = len(max(keys, key=len)) + 2  # two is for quotes on left and right side
@@ -61,16 +61,17 @@ def log_configuration_to_logger(logger, configuration, path):
     for key in keys:
         indentet_key = ('"%s"' % key).ljust(max_length)
         value = configuration[key]
-        logger.debug('Configuraton property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
+        logging_function('Configuraton property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
 
 
-def log_elements_of_list(summary_message, unsorted_list):
-    """ Logs all elements of a unsorted list in a sorted way. Each element to one line. """
+def log_elements_of_list(logging_function, summary_message, unsorted_list):
+    """ Uses the given logging function to log all elements of a unsorted list in
+        a sorted way. Each element to one line. """
     sorted_list = sorted(unsorted_list)
     count_of_elements = len(sorted_list)
-    LOGGER.debug(summary_message + ' Listing in sorted order:', count_of_elements)
+    logging_function(summary_message + ' Listing in sorted order:', count_of_elements)
     for i in range(count_of_elements):
-        LOGGER.debug('    #%s: %s', i, sorted_list[i])
+        logging_function('    #%s: %s', i, sorted_list[i])
 
 
 def log_process_id(logging_function):

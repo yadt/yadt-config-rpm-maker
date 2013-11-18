@@ -130,7 +130,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 LOGGER.info("No rpm(s) built. No host affected by change set: %s", str(change_set))
                 return
 
-            log_elements_of_list('Detected %s affected host(s).', affected_hosts)
+            log_elements_of_list(LOGGER.debug, 'Detected %s affected host(s).', affected_hosts)
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
@@ -216,7 +216,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         built_rpms = self._consume_queue(rpm_queue)
-        log_elements_of_list('Built %s rpm(s).', built_rpms)
+        log_elements_of_list(LOGGER.debug, 'Built %s rpm(s).', built_rpms)
         return built_rpms
 
     @measure_execution_time

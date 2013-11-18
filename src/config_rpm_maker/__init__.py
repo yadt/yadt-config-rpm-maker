@@ -30,7 +30,7 @@ from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.logutils import (create_console_handler,
                                        create_sys_log_handler,
-                                       log_configuration_to_logger,
+                                       log_configuration,
                                        log_process_id)
 from config_rpm_maker.svn import SvnService
 
@@ -209,7 +209,7 @@ def main():
 
     start_measuring_time()
     log_process_id(LOGGER.info)
-    log_configuration_to_logger(LOGGER, config.configuration, config.configuration_file_path)
+    log_configuration(LOGGER.debug, config.configuration, config.configuration_file_path)
 
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])

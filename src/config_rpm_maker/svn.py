@@ -58,7 +58,7 @@ class SvnService(object):
 
         start_pos = len(self.path_to_config + '/')
         changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
-        log_elements_of_list('The commit change set contained %s changed path(s).', changed_paths)
+        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s).', changed_paths)
         return changed_paths
 
     def get_hosts(self, revision):
