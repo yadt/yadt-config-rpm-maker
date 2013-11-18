@@ -12,7 +12,8 @@
 The configuration file is a [YAML](http://yaml.org/) file.
 Please have a look at the [example configuration file.](https://github.com/yadt/yadt-config-rpm-maker/blob/master/yadt-config-rpm-maker.yaml)
 
-| Property Name                     | Fallback Value             | Description                             |
-|-----------------------------------|----------------------------|-----------------------------------------|
-| log_level                         | INFO                       | Has to be one of DEBUG, ERROR or INFO
-| temp_dir                          |          | This directory is used as a working directory when building rpms. You will find the error log files here.
+| Property Name      | Fallback Value | Description                             |
+|--------------------|----------------|-----------------------------------------|
+| log_level          | INFO           | Has to be one of DEBUG, ERROR or INFO
+| svn_path_to_config |                | This path will be appended to the given repository url.
+| temp_dir           |                | This directory is used as a working directory when building rpms. You will find the error log files here.
