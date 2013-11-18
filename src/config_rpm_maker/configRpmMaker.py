@@ -268,8 +268,12 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
             raise ConfigurationException('%s is %s, values <0 are not allowed)' % (KEY_THREAD_COUNT, thread_count))
 
         if not thread_count or thread_count > len(affected_hosts):
+            if not thread_count:
+                reason = 'Configuration property "%s" is %s' % (KEY_THREAD_COUNT, thread_count)
+            elif thread_count > len(affected_hosts):
+                reason = "More threads available than affected hosts"
             thread_count = len(affected_hosts)
-            LOGGER.info("Using one thread for each affected host.")
+            LOGGER.info("%s: using one thread for each affected host." % (reason))
         return thread_count
 
     def _consume_queue(self, queue):
