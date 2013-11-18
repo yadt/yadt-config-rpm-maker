@@ -91,8 +91,11 @@ class TokenReplacer(object):
     def filter_directory(cls,
                          directory,
                          variables_definition_directory,
-                         replacer_function=None, html_escape=False, html_escape_function=None):
-        LOGGER.debug("Filtering files in %s", directory)
+                         replacer_function=None,
+                         html_escape=False,
+                         html_escape_function=None,
+                         thread_name="no thread name"):
+        LOGGER.debug('%s: filtering files in directory "%s"', thread_name, directory)
 
         token_replacer = cls.from_directory(os.path.abspath(variables_definition_directory),
                                             replacer_function=replacer_function, html_escape_function=html_escape_function)

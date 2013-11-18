@@ -8,25 +8,33 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
   * Uploads configuration RPMs to a YUM repository.
 
 ```
-Usage: config_rpm_maker repository revision [options]
+Usage: config_rpm_maker repo-url revision [options]
 
 Arguments:
-  repository  absolute path to your subversion repository
+  repo-url    URL to subversion repository or absolute path on localhost
   revision    subversion revision for which the configuration rpms are going to be built
 
 Options:
   -h, --help  show this help message and exit
-  --debug     force DEBUG log level
+  --debug     force DEBUG log level on console
   --version   show version
-
 ```
 
-### Example
+### Examples
 
 ```bash
-config-rpm-maker /foo/bar/svn/test 123
+config-rpm-maker /path-to/your/svn/repository/ 123
 ```
-Builds all relevant configuration RPMs from the repository at `/foo/bar/svn/test` in revision `123`.
+Builds all relevant configuration RPMs from the repository at `file:///path-to/your/svn/repository/` in revision `123`.
+
+```bash
+config-rpm-maker file://host/path-to/your/svn/repository/ 123
+```
+
+```bash
+config-rpm-maker svn://host/repository/ 123
+```
+
 
 ## Features
 

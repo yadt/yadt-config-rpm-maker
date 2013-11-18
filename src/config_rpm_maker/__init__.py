@@ -17,31 +17,35 @@
 
 import traceback
 
-from logging import DEBUG, Formatter, StreamHandler, getLogger
-from logging.handlers import SysLogHandler
+from logging import DEBUG, getLogger
 from math import ceil
 from optparse import OptionParser
 from sys import argv, exit, stderr, stdout
-from time import time
+from time import time, strftime
+from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_ADDRESS, DEFAULT_SYS_LOG_FORMAT
+from config_rpm_maker.config import DEFAULT_DATE_FORMAT
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.logutils import (create_console_handler,
+                                       create_sys_log_handler,
+                                       log_configuration,
+                                       log_process_id)
 from config_rpm_maker.svn import SvnService
 
-ROOT_LOGGER_NAME = __name__
-
-ARGUMENT_REPOSITORY = '<repository>'
+ARGUMENT_REPOSITORY = '<repository-url>'
 ARGUMENT_REVISION = '<revision>'
 
-USAGE_INFORMATION = """Usage: %prog repository revision [options]
+USAGE_INFORMATION = """Usage: %prog repo-url revision [options]
 
 Arguments:
-  repository  absolute path to your subversion repository
+  repo-url    URL to subversion repository or absolute path on localhost
   revision    subversion revision for which the configuration rpms are going to be built"""
+
 OPTION_DEBUG = '--debug'
-OPTION_DEBUG_HELP = "force DEBUG log level"
+OPTION_DEBUG_HELP = "force DEBUG log level on console"
+
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
@@ -54,52 +58,20 @@ RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
 RETURN_CODE_CONFIGURATION_ERROR = 3
 RETURN_CODE_EXCEPTION_OCCURRED = 4
 RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
+RETURN_CODE_REPOSITORY_URL_INVALID = 6
 
-LOGGER = None
+VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
+
+LOGGER = getLogger(__name__)
 
 
 timestamp_at_start = 0
 
 
-def create_root_logger(log_level=DEFAULT_LOG_LEVEL):
-    """ Returnes a root_logger which logs to the console using the given log_level. """
-    formatter = Formatter(DEFAULT_LOG_FORMAT)
-
-    console_handler = StreamHandler()
-    console_handler.setFormatter(formatter)
-    console_handler.setLevel(log_level)
-
-    root_logger = getLogger(ROOT_LOGGER_NAME)
-    root_logger.setLevel(log_level)
-    root_logger.addHandler(console_handler)
-
-    if log_level == DEBUG:
-        root_logger.debug("DEBUG logging is enabled")
-    return root_logger
-
-
-def create_sys_log_handler(revision):
-    """ Create a logger handler which logs to sys log and uses the given revision within the format """
-    sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
-    formatter = Formatter(DEFAULT_SYS_LOG_FORMAT.format(revision))
-    sys_log_handler.setFormatter(formatter)
-
-    return sys_log_handler
-
-
-def log_configuration_to_logger(logger):
-    logger.debug('Loaded configuration file "%s"', config.configuration_file_path)
-
-    keys = sorted(config.configuration.keys())
-    max_length = len(max(keys, key=len))
-
-    for key in keys:
-        indentet_key = key.ljust(max_length)
-        logger.debug('Configuraton property %s = "%s"', indentet_key, config.configuration[key])
-
-
 def start_measuring_time():
     """ Start measuring the time. This is required to calculate the elapsed time. """
+    LOGGER.info("Starting to measure time at %s", strftime(DEFAULT_DATE_FORMAT))
+
     global timestamp_at_start
     timestamp_at_start = time()
 
@@ -157,7 +129,7 @@ def parse_arguments(argv, version):
     return arguments
 
 
-def determine_log_level(arguments):
+def determine_console_log_level(arguments):
     """ Determines the log level based on arguments and configuration """
     try:
         if arguments[OPTION_DEBUG]:
@@ -174,42 +146,76 @@ def determine_log_level(arguments):
 
 def build_configuration_rpms_from(repository, revision):
     try:
-        base_url = 'file://{0}'.format(repository)
         path_to_config = config.get('svn_path_to_config')
-        svn_service = SvnService(base_url=base_url, path_to_config=path_to_config)
+        svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
         ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
     except BaseConfigRpmMakerException as e:
         for line in str(e).split("\n"):
             LOGGER.error(line)
-        exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
+        return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:
         traceback.print_exc(5)
-        exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
 
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
 
 
-def main():
-    start_measuring_time()
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
-    config.load_configuration_file()
-    log_level = determine_log_level(arguments)
+def ensure_valid_revision(revision):
+    """ Ensures that the given argument is a valid revision and exits the program if not """
 
-    global LOGGER
-    LOGGER = create_root_logger(log_level)
-    LOGGER.debug('Argument repository is "%s"', str(arguments[ARGUMENT_REPOSITORY]))
-    LOGGER.debug('Argument revision is "%s"', str(arguments[ARGUMENT_REVISION]))
-    log_configuration_to_logger(LOGGER)
-
-    revision = arguments[ARGUMENT_REVISION]
     if not revision.isdigit():
         exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
+
+    LOGGER.debug('Accepting "%s" as a valid subversion revision.', revision)
+    return revision
+
+
+def ensure_valid_repository_url(repository_url):
+    """ Ensures that the given url is a valid repository url """
+
+    parsed_url = urlparse(repository_url)
+    scheme = parsed_url.scheme
+
+    if scheme in VALID_REPOSITORY_URL_SCHEMES:
+        LOGGER.debug('Accepting "%s" as a valid repository url.', repository_url)
+        return repository_url
+
+    if scheme is '':
+        file_uri = 'file://%s' % parsed_url.path
+        LOGGER.debug('Accepting "%s" as a valid repository url.', file_uri)
+        return file_uri
+
+    return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
+
+
+def append_console_logger(logger, console_log_level):
+    """ Creates and appends a console log handler with the given log level """
+    console_handler = create_console_handler(console_log_level)
+    logger.addHandler(console_handler)
+
+    if console_log_level == DEBUG:
+        logger.debug("DEBUG logging is enabled")
+
+
+def main():
+    LOGGER.setLevel(DEBUG)
+
+    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
+
+    config.load_configuration_file()
+    console_log_level = determine_console_log_level(arguments)
+    append_console_logger(LOGGER, console_log_level)
+
+    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
+    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
 
     sys_log_handler = create_sys_log_handler(revision)
     LOGGER.addHandler(sys_log_handler)
 
-    repository = arguments[ARGUMENT_REPOSITORY]
+    start_measuring_time()
+    log_process_id(LOGGER.info)
+    log_configuration(LOGGER.debug, config.configuration, config.configuration_file_path)
 
-    build_configuration_rpms_from(repository, revision)
+    build_configuration_rpms_from(repository_url, revision)

@@ -27,6 +27,8 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
+from config_rpm_maker.config import KEY_THREAD_COUNT
+from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.profiler import measure_execution_time
@@ -53,7 +55,8 @@ class BuildHostThread(Thread):
             host = self.host_queue.get()
             self.host_queue.task_done()
             try:
-                rpms = HostRpmBuilder(hostname=host,
+                rpms = HostRpmBuilder(thread_name=self.name,
+                                      hostname=host,
                                       revision=self.revision,
                                       work_dir=self.work_dir,
                                       svn_service_queue=self.svn_service_queue,
@@ -66,11 +69,12 @@ class BuildHostThread(Thread):
 
             except Exception:
                 self.failed_host_queue.put((host, traceback.format_exc()))
+
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
-            LOGGER.debug('Thread "%s" finished and built %s rpms.', self.name, count_of_rpms)
+            LOGGER.debug('%s: finished and built %s rpm(s).', self.name, count_of_rpms)
         else:
-            LOGGER.debug('Thread "%s" finished without building any rpm!', self.name)
+            LOGGER.debug('%s: finished without building any rpm!', self.name)
 
 
 class CouldNotBuildSomeRpmsException(BaseConfigRpmMakerException):
@@ -99,7 +103,6 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 """
 
     def __init__(self, revision, svn_service):
-        LOGGER.debug("Initializing %s with revision=%s and svn_service=%s", ConfigRpmMaker.__name__, revision, svn_service)
         self.revision = revision
         self.svn_service = svn_service
         self.temp_dir = config.get_temporary_directory()
@@ -126,13 +129,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
             affected_hosts = list(self._get_affected_hosts(change_set, available_hosts))
             if not affected_hosts:
-                self.logger.info("We have nothing to do. No host affected by change set: %s", str(change_set))
+                LOGGER.info("No rpm(s) built. No host affected by change set: %s", str(change_set))
                 return
 
-            affected_hosts.sort()
-            LOGGER.info('Found %s affected hosts', len(affected_hosts))
-            for i in range(len(affected_hosts)):
-                LOGGER.info('Affected host #%s "%s"', i, affected_hosts[i])
+            log_elements_of_list(LOGGER.debug, 'Detected %s affected host(s).', affected_hosts)
 
             self._prepare_work_dir()
             rpms = self._build_hosts(affected_hosts)
@@ -196,7 +196,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
-        thread_pool = [BuildHostThread(name='thread_%d' % i,
+        thread_pool = [BuildHostThread(name='Thread-%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
@@ -206,7 +206,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
         for thread in thread_pool:
-            LOGGER.debug('Starting "%s"', thread.name)
+            LOGGER.debug('%s: starting ...', thread.name)
             thread.start()
 
         for thread in thread_pool:
@@ -217,10 +217,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
+        LOGGER.info("Finished building configuration rpm(s).")
         built_rpms = self._consume_queue(rpm_queue)
-        LOGGER.debug('Built %s rpm(s).', len(built_rpms))
-        for i in range(len(built_rpms)):
-            LOGGER.debug('Built rpm #%s "%s"', i, built_rpms[i])
+        log_elements_of_list(LOGGER.debug, 'Built %s rpm(s).', built_rpms)
+
         return built_rpms
 
     @measure_execution_time
@@ -267,13 +267,17 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
         return result
 
     def _get_thread_count(self, affected_hosts):
-        thread_count = int(config.get('thread_count', 1))
+        thread_count = int(config.get(KEY_THREAD_COUNT, 1))
         if thread_count < 0:
-            raise ConfigurationException('thread_count is %s, values <0 are not allowed)' % thread_count)
+            raise ConfigurationException('%s is %s, values <0 are not allowed)' % (KEY_THREAD_COUNT, thread_count))
 
-        # thread_count is zero means one thread for affected host
         if not thread_count or thread_count > len(affected_hosts):
+            if not thread_count:
+                reason = 'Configuration property "%s" is %s' % (KEY_THREAD_COUNT, thread_count)
+            elif thread_count > len(affected_hosts):
+                reason = "More threads available than affected hosts"
             thread_count = len(affected_hosts)
+            LOGGER.info("%s: using one thread for each affected host." % (reason))
         return thread_count
 
     def _consume_queue(self, queue):
