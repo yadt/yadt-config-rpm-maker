@@ -76,13 +76,13 @@ sudo yum install python-yaml
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
+We recommend to develop in a vagrant box. Read more in our [tutorial](https://github.com/aelgru/yadt-config-rpm-maker/develop-in-a-vagrant-box)
+
 But of course you can set up a development environment on other platforms as well:
 * [CentOS](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
 * [OpenSUSE](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
 * [Debian / Ubuntu](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
 
-... or use a [vagrant box](http://www.vagrantup.com/) from [vagrantbox.es](http://vagrantbox.es/) to develop in your
-destination distribution.
 
 ### Run Tests
 
