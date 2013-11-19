@@ -92,11 +92,11 @@ python setup.py test
 
 The feedback of the test loader is not helping if the imports fail.
 This is a known bug [issue7559](http://bugs.python.org/issue7559).
-But there are import checks in [`tests/__init__.py`](https://github.com/yadt/yadt-config-rpm-maker/blob/master/tests/__init__.py)
+But there are import checks in [`test/__init__.py`](https://github.com/yadt/yadt-config-rpm-maker/blob/master/test/__init__.py)
 
 Run the checks to see if you have import errors by executing:
 ```bash
-PYTHONPATH=src python tests/__init__.py
+PYTHONPATH=src python test/__init__.py
 ```
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
