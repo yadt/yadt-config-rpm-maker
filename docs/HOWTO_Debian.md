@@ -1,4 +1,4 @@
-# Developing on Debian 7 / Ubuntu 12
+# Developing on Debian 7 / Ubuntu 12 / Mint 15
 
 ## Get the sources
 

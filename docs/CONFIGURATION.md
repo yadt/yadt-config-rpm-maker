@@ -17,3 +17,4 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 | log_level          | INFO           | Has to be one of DEBUG, ERROR or INFO
 | svn_path_to_config |                | This path will be appended to the given repository url.
 | temp_dir           |                | This directory is used as a working directory when building rpms. You will find the error log files here.
+| thread_count       | 1              | Defines how many threads will be start to build your rpms. Use 0 if you want to start exactly one thread for each affected host.

@@ -5,7 +5,7 @@ yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rp
 * Run `config-rpm-maker` as post-commit hook of your configuration repository:
   * Builds RPMs containing the configuration for each host.
   * Builds only the configuration RPMs for the affected hosts.
-  * Uploads configuration RPMs to a YUM repository.
+  * Uploads configuration RPMs to a repository using a configurable command.
 
 ```
 Usage: config_rpm_maker repo-url revision [options]
@@ -38,7 +38,7 @@ config-rpm-maker svn://host/repository/ 123
 
 ## Features
 
-  * preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
+  * preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/yadt/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
 
 ## Getting Started
 
@@ -48,7 +48,7 @@ Some examples:
   * [Creating and Configuring Your Repository](http://svnbook.red-bean.com/en/1.7/svn.reposadmin.create.html)
 
 To set up `yadt-config-rpm-maker` please have a look at the
-[Configuration Documentation](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)
+[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)
 
 ### Example Content for Configuration Repository
 
@@ -59,30 +59,17 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ## Build
 
-### Dependencies
-
-pysvn (a python library for SVN) is required, but not available by usual python means (pip & easy_install).
-
-```bash
-sudo yum install pysvn
-```
-
-Additional dependency
-```
-sudo yum install python-yaml
-```
-
-### Developing on other Platforms
+### Setup a Devlopment Enviroment
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
-But of course you can set up a development environment on other platforms as well:
-* [CentOS](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
-* [OpenSUSE](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
-* [Debian / Ubuntu](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
+We recommend to develop in a vagrant box. Read more in our [tutorial](https://github.com/yadt/yadt-config-rpm-maker/develop-in-a-vagrant-box)
 
-... or use a [vagrant box](http://www.vagrantup.com/) from [vagrantbox.es](http://vagrantbox.es/) to develop in your
-destination distribution.
+But of course you can set up a development environment on other platforms as well:
+* [CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
+* [OpenSUSE](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
+* [Debian / Mint / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
+
 
 ### Run Tests
 
@@ -90,18 +77,13 @@ destination distribution.
 python setup.py test
 ```
 
-Running a single test file
-```bash
-PYTHONPATH=src python tests/unittests/configuration_test.py
-```
-
 The feedback of the test loader is not helping if the imports fail.
 This is a known bug [issue7559](http://bugs.python.org/issue7559).
-But there are import checks in [`tests/__init__.py`](https://github.com/aelgru/yadt-config-rpm-maker/blob/master/tests/__init__.py)
+But there are import checks in [`test/__init__.py`](https://github.com/yadt/yadt-config-rpm-maker/blob/master/test/__init__.py)
 
 Run the checks to see if you have import errors by executing:
 ```bash
-PYTHONPATH=src python tests/__init__.py
+PYTHONPATH=src python test/__init__.py
 ```
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
