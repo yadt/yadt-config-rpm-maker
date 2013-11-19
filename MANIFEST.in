@@ -1,4 +1,5 @@
 graft src
 graft tests
 graft testdata
+include yadt-config-rpm-maker.yaml
 include README.md
