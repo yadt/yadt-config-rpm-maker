@@ -1,4 +1,4 @@
 graft src
-graft test
+graft tests
 graft testdata
 include README.md
