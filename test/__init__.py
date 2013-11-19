@@ -24,28 +24,32 @@ at_least_one_import_failed = False
 
 try:
     import pysvn  # nopep8
-except:
+
+except ImportError:
     print 'Could not import "pysvn"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
     import rpm  # nopep8
-except:
+
+except ImportError:
     print 'Could not import "rpm"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
     import yaml  # nopep8
-except:
+
+except ImportError:
     print 'Could not import "yaml"! Please install it.'
     at_least_one_import_failed = True
 
 
 try:
     import mock  # nopep8
-except:
+
+except ImportError:
     print 'Could not import "mock"! Please install it.'
     at_least_one_import_failed = True
 
