@@ -17,5 +17,4 @@ cd $HOME/yadt-config-rpm-maker
 
 ./setup.py bdist_rpm --source-only
 cd dist
-rpmbuild --rebuild yadt-config-rpm-maker-2.0-1.src.rpm
-
+sudo mock yadt-config-rpm-maker-2.0-1.src.rpm
