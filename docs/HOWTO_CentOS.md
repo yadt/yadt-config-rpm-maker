@@ -22,17 +22,7 @@ yum install python-devel python-setuptools -y
 ```
 
 ```bash
-yum install subversion rpm-build install pysvn python-yaml -y
-```
-
-```bash
-easy_install mock
-```
-
-or if you have `pip` installed
-
-```bash
-pip install mock
+yum install subversion rpm-build install pysvn python-yaml python-mock -y
 ```
 
 ## Running Tests
