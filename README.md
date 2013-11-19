@@ -68,7 +68,7 @@ We recommend to develop in a vagrant box. Read more in our [tutorial](https://gi
 But of course you can set up a development environment on other platforms as well:
 * [CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
 * [OpenSUSE](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
-* [Debian / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
+* [Debian / Mint / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
 
 
 ### Run Tests
