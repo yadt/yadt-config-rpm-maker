@@ -59,20 +59,7 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ## Build
 
-### Dependencies
-
-pysvn (a python library for SVN) is required, but not available by usual python means (pip & easy_install).
-
-```bash
-sudo yum install pysvn
-```
-
-Additional dependency
-```
-sudo yum install python-yaml
-```
-
-### Developing on other Platforms
+### Setup a Devlopment Enviroment
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
