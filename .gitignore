@@ -2,7 +2,7 @@
 *.iml
 target/
 .idea/
-yadt_config_rpm_maker.egg-info/
+*.egg*
 .project
 .pydevproject
 .DS_Store
