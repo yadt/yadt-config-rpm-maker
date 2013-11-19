@@ -12,7 +12,7 @@ sudo yum install python-devel python-setuptools pysvn python-yaml python-mock -y
 # Install git and clone repository
 sudo yum install git -y
 
-git clone https://github.com/aelgru/yadt-config-rpm-maker $HOME/yadt-config-rpm-maker
+git clone https://github.com/yadt/yadt-config-rpm-maker $HOME/yadt-config-rpm-maker
 cd $HOME/yadt-config-rpm-maker
 
 ./setup.py bdist_rpm --source-only
