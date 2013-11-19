@@ -14,5 +14,5 @@ Start your vagrant box, login to it and execute the bootstrap script:
 vagrant up
 vagrant ssh
 cd /vagrant
-sudo bash bootstrap.sh
+bash bootstrap.sh
 ```
