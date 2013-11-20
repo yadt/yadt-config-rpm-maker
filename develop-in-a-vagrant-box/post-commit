@@ -23,4 +23,4 @@ REVISION="$2"
 
 export YADT_CONFIG_RPM_MAKER_CONFIG_FILE="/home/vagrant/yadt-config-rpm-maker/yadt-config-rpm-maker.yaml"
 
-config-rpm-maker $REPOSITORY $REVISION
+config-rpm-maker ${REPOSITORY} ${REVISION}
