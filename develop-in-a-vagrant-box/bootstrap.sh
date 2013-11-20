@@ -19,7 +19,7 @@
 set -e
 
 # Please modify this if you would like to check out your own fork.
-REPOSITORY_URL="https://github.com/yadt/yadt-config-rpm-maker"
+REPOSITORY_URL="https://github.com/aelgru/yadt-config-rpm-maker"
 SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
 WORKING_DIRECTORY="$HOME/yadt-config-rpm-maker"
@@ -35,22 +35,22 @@ sudo yum install python-devel python-setuptools pysvn python-yaml python-mock -y
 # Install git and clone repository
 sudo yum install git -y
 
-git clone $REPOSITORY_URL $WORKING_DIRECTORY
-cd $WORKING_DIRECTORY
+git clone ${REPOSITORY_URL} ${WORKING_DIRECTORY}
+cd ${WORKING_DIRECTORY}
 
 ./setup.py bdist_rpm --source-only
 cd dist
-sudo mock rebuild $SOURCE_RPM -v
+sudo mock rebuild ${SOURCE_RPM} -v
 cd /var/lib/mock/epel-6-*/result
-sudo rpm -ivH RESULT_RPM
+sudo rpm -ivH ${RESULT_RPM}
 
-svnadmin create configuration-repository
+svnadmin create $HOME/configuration-repository
 
-rm configuration-repository/conf/svnserve.conf
-cp /vagrant/svnserve.conf configuration-repository/conf/svnserve.conf
-cp /vagrant/post-commit configuration-repository/hooks
+rm $HOME/configuration-repository/conf/svnserve.conf
+cp /vagrant/svnserve.conf $HOME/configuration-repository/conf/svnserve.conf
+cp /vagrant/post-commit $HOME/configuration-repository/hooks
+cp $HOME/yadt-config-rpm-maker/yadt-config-rpm-maker.yaml $HOME/configuration-repository/conf
 
-svn import yadt-config-rpm-maker/testdata/svn_repo/ file:///home/vagrant/configuration-repository/ -m "Initial commit"
-svnserve -r configuration-repository -d
+svn import $HOME/yadt-config-rpm-maker/testdata/svn_repo/ file:///$HOME/configuration-repository/ -m "Initial commit"
+svnserve -r $HOME/configuration-repository -d
 
-export YADT_CONFIG_RPM_MAKER_CONFIG_FILE="/home/vagrant/yadt-config-rpm-maker/yadt-config-rpm-maker.yaml"
