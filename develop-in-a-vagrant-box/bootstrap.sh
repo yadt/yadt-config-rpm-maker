@@ -49,6 +49,7 @@ svnadmin create $HOME/configuration-repository
 rm $HOME/configuration-repository/conf/svnserve.conf
 cp /vagrant/svnserve.conf $HOME/configuration-repository/conf/svnserve.conf
 cp /vagrant/post-commit $HOME/configuration-repository/hooks
+chmod 755 $HOME/configuration-repository/hooks/post-commit
 cp $HOME/yadt-config-rpm-maker/yadt-config-rpm-maker.yaml $HOME/configuration-repository/conf
 
 svn import $HOME/yadt-config-rpm-maker/testdata/svn_repo/ file:///$HOME/configuration-repository/ -m "Initial commit"
