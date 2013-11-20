@@ -16,3 +16,5 @@ vagrant ssh
 cd /vagrant
 bash bootstrap.sh
 ```
+
+Now you should have a svnserve daemon running on your vagrant box.
