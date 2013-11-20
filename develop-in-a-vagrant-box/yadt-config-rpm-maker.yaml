@@ -1,5 +1,3 @@
-#!/bin/bash
-#
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
@@ -15,12 +13,20 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#   Please see docs/CONFIGURATION.md for details
 
-set -e
-
-REPOSITORY="$1"
-REVISION="$2"
-
-export YADT_CONFIG_RPM_MAKER_CONFIG_FILE="/home/vagrant/configuration-repository/hooks/yadt-config-rpm-maker.yaml"
-
-config-rpm-maker ${REPOSITORY} ${REVISION}
+allow_unknown_hosts: true
+config_rpm_prefix: 'yadt-config-'
+config_viewer_dir: '/home/vagrant/target/configviewer'
+custom_dns_searchlist: []
+error_log_dir: '/home/vagrant/target/configviewer/errors'
+error_log_url: 'http://localhost/errors'
+log_level: INFO
+path_to_spec_file: 'default.spec'
+repo_packages_regex: '^yadt-.*-repos?$'
+rpm_upload_chunk_size: 10
+rpm_upload_cmd: /bin/true
+svn_path_to_config: '/config'
+thread_count: 4
+temp_dir: /home/vagrant/target
