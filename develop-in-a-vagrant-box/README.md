@@ -14,6 +14,15 @@ Start your vagrant box, login to it and execute the bootstrap script:
 vagrant up
 vagrant ssh
 cd /vagrant
+```
+
+Now you are ready to run the `bootstrap.sh` script.
+This might take a while since we are using [mock](http://fedoraproject.org/wiki/Projects/Mock) to build the rpm.
+Mock will at a certain perform `yum --installroot ...`. Unfortunately this is quite time consuming.
+
+Please check the `boostrap.sh` and configure the git repository URL within the script if you want to clone your own fork.
+
+```bash
 bash bootstrap.sh
 ```
 
