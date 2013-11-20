@@ -27,3 +27,19 @@ bash bootstrap.sh
 ```
 
 Now you should have a svnserve daemon running on your vagrant box.
+
+Checkout the configuration repository.
+```bash
+svn checkout svn://localhost.localdomain/ working-copy
+```
+
+Change directory into the working copy and make some changes.
+```bash
+cd working-copy
+vi config/host/berweb01/VARIABLES/RPM_REQUIRES
+```
+
+Commit those changes.
+```bash
+svn commit -m "Made some changes."
+```
