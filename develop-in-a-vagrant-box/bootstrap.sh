@@ -22,7 +22,7 @@ set -e
 WORKING_DIRECTORY="$HOME"
 
 # Please modify this if you would like to clone your own fork.
-SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
+SOURCE_REPOSITORY="https://github.com/aelgru/yadt-config-rpm-maker"
 SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
 
 SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
@@ -73,13 +73,10 @@ function setup_svn_server_with_test_data_and_start_it() {
     cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
     cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
     chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
-    cp yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/conf
+    cp /vagrant/yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/hooks
 
     # Import the test data into the configuration repository
     svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
-
-    # start subversion server
-    svnserve -r ${CONFIGURATION_REPOSITORY} -d
 }
 
 
