@@ -65,5 +65,5 @@ export YADT_CONFIG_RPM_MAKER_CONFIG_FILE="/home/vagrant/configuration-repository
 
 and execute `config-rpm-maker`
 ```bash
-config-rpm-maker /configuration-repository 1
+config-rpm-maker /home/vagrant/configuration-repository 1
 ```
