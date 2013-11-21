@@ -50,6 +50,8 @@ Commit those changes.
 svn commit -m "We will need httpd since we are building a web application."
 ```
 
+## Manual execution of `config-rpm-maker`
+
 If you want to execute `config-rpm-maker` for a specific revision, please set the environment variable
 `YADT_CONFIG_RPM_MAKER_CONFIG_FILE` to the destination of the configuration file.
 
