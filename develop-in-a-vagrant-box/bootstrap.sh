@@ -21,7 +21,7 @@ set -e
 WORKING_DIRECTORY="$HOME"
 CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
 
-# Please modify this if you would like to check out your own fork.
+# Please modify this if you would like to clone your own fork.
 SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
 SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
 
@@ -34,8 +34,11 @@ function install_dependencies() {
     wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
     sudo rpm -ivH epel-release-6*.rpm
 
-    sudo yum install subversion rpm-build pysvn python-yaml -y  # required to run
-    sudo yum install python-devel python-setuptools python-mock mock -y # required to build
+    # install build dependencies
+    sudo yum install python-devel python-setuptools python-mock mock -y
+
+    # install dependencies
+    sudo yum install subversion rpm-build pysvn python-yaml -y
 
     # Install git because we need it to clone the repository
     sudo yum install git -y
@@ -61,6 +64,7 @@ function build_and_install_config_rpm_maker() {
 function setup_svn_server_with_test_data_and_start_it() {
     svnadmin create ${CONFIGURATION_REPOSITORY}
 
+    # configure svn server
     rm ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
     cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
     cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
@@ -77,4 +81,3 @@ function setup_svn_server_with_test_data_and_start_it() {
 install_dependencies
 build_and_install_config_rpm_maker
 setup_svn_server_with_test_data_and_start_it
-
