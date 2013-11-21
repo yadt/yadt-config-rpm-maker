@@ -19,19 +19,6 @@
 set -e
 
 
-WORKING_DIRECTORY="$HOME"
-
-# Please modify this if you would like to clone your own fork.
-SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
-SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
-
-SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
-RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
-
-CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
-HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
-SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"
-
 function install_dependencies() {
     # Enable EPEL repository
     wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -50,7 +37,12 @@ function install_dependencies() {
 
 function build_and_install_config_rpm_maker() {
     # clone repository
-    git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
+    if [ ! -d ${SOURCE_DIRECTORY} ]; then
+        git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
+    else
+        cd ${SOURCE_DIRECTORY}
+        git pull
+    fi
 
     # build source rpm
     cd ${SOURCE_DIRECTORY}
@@ -82,8 +74,3 @@ function setup_svn_server_with_test_data_and_start_it() {
     # start subversion server
     svnserve -r ${CONFIGURATION_REPOSITORY} -d
 }
-
-
-install_dependencies
-build_and_install_config_rpm_maker
-setup_svn_server_with_test_data_and_start_it

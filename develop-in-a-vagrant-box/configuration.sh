@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+#   yadt-config-rpm-maker
+#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+set -e
+
+WORKING_DIRECTORY="$HOME"
+
+# Please modify this if you would like to clone your own fork.
+SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
+SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
+
+SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
+RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
+
+CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
+HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
+SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"
