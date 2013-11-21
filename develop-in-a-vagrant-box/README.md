@@ -28,6 +28,11 @@ bash bootstrap.sh
 
 Now you should have a svnserve daemon running on your vagrant box.
 
+Change into the vagrant home directory.
+```bash
+cd ~
+```
+
 Checkout the configuration repository.
 ```bash
 svn checkout svn://localhost.localdomain/ working-copy
@@ -43,4 +48,16 @@ vi config/host/berweb01/VARIABLES/RPM_REQUIRES
 Commit those changes.
 ```bash
 svn commit -m "We will need httpd since we are building a web application."
+```
+
+If you want to execute `config-rpm-maker` for a specific revision, please set the environment variable
+`YADT_CONFIG_RPM_MAKER_CONFIG_FILE` to the destination of the configuration file.
+
+```bash
+export YADT_CONFIG_RPM_MAKER_CONFIG_FILE="/home/vagrant/configuration-repository/hooks/yadt-config-rpm-maker.yaml"
+```
+
+and execute `config-rpm-maker`
+```bash
+config-rpm-maker /configuration-repository 1
 ```
