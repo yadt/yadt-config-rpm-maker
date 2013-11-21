@@ -29,7 +29,8 @@ SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
 
 CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
-
+HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
+SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"
 
 function install_dependencies() {
     # Enable EPEL repository
@@ -69,11 +70,11 @@ function setup_svn_server_with_test_data_and_start_it() {
     svnadmin create ${CONFIGURATION_REPOSITORY}
 
     # configure svn server
-    rm ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
-    cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
-    cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
-    chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
-    cp /vagrant/yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/hooks
+    rm ${SUBVERSION_CONFIGURATION_FILE}
+    cp /vagrant/svnserve.conf ${SUBVERSION_CONFIGURATION_FILE}
+    cp /vagrant/post-commit ${HOOKS_DIRECTORY}
+    chmod 755 ${HOOKS_DIRECTORY}/post-commit
+    cp /vagrant/yadt-config-rpm-maker.yaml ${HOOKS_DIRECTORY}
 
     # Import the test data into the configuration repository
     svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
