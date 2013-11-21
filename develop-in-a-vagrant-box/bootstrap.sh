@@ -22,39 +22,59 @@ WORKING_DIRECTORY="$HOME"
 CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
 
 # Please modify this if you would like to check out your own fork.
-SOURCE_REPOSITORY="https://github.com/aelgru/yadt-config-rpm-maker"
+SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
 SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
 
 SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
 
-# Enable EPEL repository
-wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-sudo rpm -ivH epel-release-6*.rpm
 
-# Install dependencies
-sudo yum install subversion rpm-build mock -y
-sudo yum install python-devel python-setuptools pysvn python-yaml python-mock -y
+function install_dependencies() {
+    # Enable EPEL repository
+    wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+    sudo rpm -ivH epel-release-6*.rpm
 
-# Install git and clone repository
-sudo yum install git -y
+    sudo yum install subversion rpm-build pysvn python-yaml -y  # required to run
+    sudo yum install python-devel python-setuptools python-mock mock -y # required to build
 
-git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
-cd ${SOURCE_DIRECTORY}
+    # Install git because we need it to clone the repository
+    sudo yum install git -y
+}
 
-./setup.py bdist_rpm --source-only
-cd dist
-sudo mock rebuild ${SOURCE_RPM} -v
-cd /var/lib/mock/epel-6-*/result
-sudo rpm -ivH ${RESULT_RPM}
+function build_and_install_config_rpm_maker() {
+    # clone repository
+    git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
 
-svnadmin create $HOME/configuration-repository
+    # build source rpm
+    cd ${SOURCE_DIRECTORY}
+    ./setup.py bdist_rpm --source-only
 
-rm ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
-cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
-cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
-chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
-cp yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/conf
+    # build rpm from source rpm
+    cd dist
+    sudo mock rebuild ${SOURCE_RPM} -v
 
-svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
-svnserve -r ${CONFIGURATION_REPOSITORY} -d
+    # install built rpm
+    cd /var/lib/mock/epel-6-*/result
+    sudo rpm -ivH ${RESULT_RPM}
+}
+
+function setup_svn_server_with_test_data_and_start_it() {
+    svnadmin create ${CONFIGURATION_REPOSITORY}
+
+    rm ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
+    cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
+    cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
+    chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
+    cp yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/conf
+
+    # Import the test data into the configuration repository
+    svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
+
+    # start subversion server
+    svnserve -r ${CONFIGURATION_REPOSITORY} -d
+}
+
+install_dependencies
+build_and_install_config_rpm_maker
+setup_svn_server_with_test_data_and_start_it
+
