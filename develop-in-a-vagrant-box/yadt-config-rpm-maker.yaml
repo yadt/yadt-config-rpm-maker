@@ -13,12 +13,20 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#   Please see docs/CONFIGURATION.md for details
 
-[bdist_rpm]
-release = 1
-requires       = subversion, bash, rpm-build, python >= 2.6, rpm-python, pysvn, python-yaml, file-libs
-build_requires = subversion, bash, rpm-build, python >= 2.6, rpm-python, pysvn, python-yaml, file-libs, python-setuptools,  python-mock, python-unittest2
-
-packager = Schlomo Schapiro <schlomo.schapiro@immobilienscout24.de>
-doc_files = README.md
-build-script = rpm.build
+allow_unknown_hosts: true
+config_rpm_prefix: 'yadt-config-'
+config_viewer_dir: '/home/vagrant/target/configviewer'
+custom_dns_searchlist: []
+error_log_dir: '/home/vagrant/target/configviewer/errors'
+error_log_url: 'http://localhost/errors'
+log_level: INFO
+path_to_spec_file: 'default.spec'
+repo_packages_regex: '^yadt-.*-repos?$'
+rpm_upload_chunk_size: 10
+rpm_upload_cmd: /bin/true
+svn_path_to_config: '/config'
+thread_count: 4
+temp_dir: /home/vagrant/target

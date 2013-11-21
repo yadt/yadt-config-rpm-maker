@@ -1,7 +1,10 @@
 # Configuration of committer
 # see: https://github.com/aelgru/committer
+
 [DEFAULT]
-execute_before = flake8 src test setup.py --ignore=E501
+# Ensuring we get updates from upstream
+execute_before = git pull upstream master
 
 [COMMIT]
+# Executing tests before we commit
 execute_before = ./setup.py test
