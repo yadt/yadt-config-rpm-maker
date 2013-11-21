@@ -37,7 +37,7 @@ function install_dependencies() {
 
 function build_and_install_config_rpm_maker() {
     # clone repository
-    if [ ! -d ${SOURCE_DIRECTORY} ]; then
+    if [[ ! -d ${SOURCE_DIRECTORY} ]]; then
         git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
     else
         cd ${SOURCE_DIRECTORY}
