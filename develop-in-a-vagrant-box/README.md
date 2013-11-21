@@ -3,6 +3,8 @@
 In this tutorial we will use a [vagrant](http://www.vagrantup.com/) box from [vagrantbox.es](http://vagrantbox.es/) to
 develop on the destination distribution regardless of your developer machine.
 
+## Setup a vagrant box
+
 Add a CentOS6 box or a Scientific Linux Box and initialize it
 ```bash
 vagrant box add CentOS6 url-to-your-favourite-centos-box
@@ -15,6 +17,8 @@ vagrant up
 vagrant ssh
 cd /vagrant
 ```
+
+## Installation from source
 
 Now you are ready to run the `bootstrap.sh` script.
 This might take a while since we are using [mock](http://fedoraproject.org/wiki/Projects/Mock) to build the rpm.
