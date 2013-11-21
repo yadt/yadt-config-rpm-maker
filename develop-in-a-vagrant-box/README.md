@@ -33,7 +33,8 @@ Checkout the configuration repository.
 svn checkout svn://localhost.localdomain/ working-copy
 ```
 
-Change directory into the working copy and make some changes.
+As a first example step we could add a new requirement to the host `berweb01`.
+Change directory into `working-copy` and add ` httpd` to the variable file `RPM_REQUIRES`.
 ```bash
 cd working-copy
 vi config/host/berweb01/VARIABLES/RPM_REQUIRES
@@ -41,5 +42,5 @@ vi config/host/berweb01/VARIABLES/RPM_REQUIRES
 
 Commit those changes.
 ```bash
-svn commit -m "Made some changes."
+svn commit -m "We will need httpd since we are building a web application."
 ```
