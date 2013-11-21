@@ -54,6 +54,6 @@ cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
 chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
 cp yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/conf
 
-svn import $HOME/yadt-config-rpm-maker/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
+svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
 svnserve -r ${CONFIGURATION_REPOSITORY} -d
 
