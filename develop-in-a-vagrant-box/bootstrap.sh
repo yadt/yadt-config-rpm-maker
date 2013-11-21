@@ -22,7 +22,8 @@ set -e
 REPOSITORY_URL="https://github.com/aelgru/yadt-config-rpm-maker"
 SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
-WORKING_DIRECTORY="$HOME/yadt-config-rpm-maker"
+WORKING_DIRECTORY="$HOME"
+SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
 
 # Enable EPEL repository
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -35,8 +36,8 @@ sudo yum install python-devel python-setuptools pysvn python-yaml python-mock -y
 # Install git and clone repository
 sudo yum install git -y
 
-git clone ${REPOSITORY_URL} ${WORKING_DIRECTORY}
-cd ${WORKING_DIRECTORY}
+git clone ${REPOSITORY_URL} ${SOURCE_DIRECTORY}
+cd ${SOURCE_DIRECTORY}
 
 ./setup.py bdist_rpm --source-only
 cd dist
