@@ -219,8 +219,9 @@ def main():
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
 
-    sys_log_handler = create_sys_log_handler(revision)
-    LOGGER.addHandler(sys_log_handler)
+    if not arguments[OPTION_NO_SYSLOG]:
+        sys_log_handler = create_sys_log_handler(revision)
+        LOGGER.addHandler(sys_log_handler)
 
     start_measuring_time()
     log_process_id(LOGGER.info)
