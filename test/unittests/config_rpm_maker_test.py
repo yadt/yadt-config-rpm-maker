@@ -83,6 +83,12 @@ class ParseArgumentsTests(TestCase):
 
         self.assertTrue(actual_arguments["--debug"])
 
+    def test_should_return_no_syslog_option_as_true_when_no_syslog_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--no-syslog"], version="")
+
+        self.assertTrue(actual_arguments["--no-syslog"])
+
     def test_should_return_first_argument_as_repository(self):
 
         actual_arguments = parse_arguments(["foo", "123"], version="")

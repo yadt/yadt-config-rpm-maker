@@ -46,6 +46,9 @@ Arguments:
 OPTION_DEBUG = '--debug'
 OPTION_DEBUG_HELP = "force DEBUG log level on console"
 
+OPTION_NO_SYSLOG = '--no-syslog'
+OPTION_NO_SYSLOG_HELP = "switch logging of debug information to syslog off"
+
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
@@ -100,6 +103,7 @@ def parse_arguments(argv, version):
 
         Otherwise it will return a dictionary containing the keys and values for
             OPTION_DEBUG: boolean, True if option --debug is given
+            OPTION_NO_SYSLOG: boolean, True if option --no-syslog is given
             ARGUMENT_REPOSITORY: string, the first argument
             ARGUMENT_REVISION: string, the second argument
     """
@@ -109,6 +113,9 @@ def parse_arguments(argv, version):
     parser.add_option("", OPTION_DEBUG,
                       action="store_true", dest="debug", default=False,
                       help=OPTION_DEBUG_HELP)
+    parser.add_option("", OPTION_NO_SYSLOG,
+                      action="store_true", dest="no_syslog", default=False,
+                      help=OPTION_NO_SYSLOG_HELP)
     parser.add_option("", OPTION_VERSION,
                       action="store_true", dest="version", default=False,
                       help=OPTION_VERSION_HELP)
@@ -123,6 +130,7 @@ def parse_arguments(argv, version):
         return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
 
     arguments = {OPTION_DEBUG: values.debug or False,
+                 OPTION_NO_SYSLOG: values.no_syslog or False,
                  ARGUMENT_REPOSITORY: args[0],
                  ARGUMENT_REVISION: args[1]}
 
