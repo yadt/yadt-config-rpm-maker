@@ -54,7 +54,7 @@ function build_and_install_config_rpm_maker() {
 
     # install built rpm
     cd /var/lib/mock/epel-6-*/result
-    sudo rpm -ivH ${RESULT_RPM}
+    sudo rpm -ivH ${RESULT_RPM} --force
 }
 
 
