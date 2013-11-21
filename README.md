@@ -63,7 +63,7 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
-We recommend to develop in a vagrant box. Read our tutorial [How to develop in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box).
+We recommend to develop in a vagrant box. Read our tutorial "[How to develop in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
 
 But of course you can set up a development environment on other platforms as well:
 * [How to develop under CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
