@@ -24,6 +24,7 @@ SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
 WORKING_DIRECTORY="$HOME"
 SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
+CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
 
 # Enable EPEL repository
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -47,12 +48,12 @@ sudo rpm -ivH ${RESULT_RPM}
 
 svnadmin create $HOME/configuration-repository
 
-rm $HOME/configuration-repository/conf/svnserve.conf
-cp /vagrant/svnserve.conf $HOME/configuration-repository/conf/svnserve.conf
-cp /vagrant/post-commit $HOME/configuration-repository/hooks
-chmod 755 $HOME/configuration-repository/hooks/post-commit
-cp yadt-config-rpm-maker.yaml $HOME/configuration-repository/conf
+rm ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
+cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
+cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
+chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
+cp yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/conf
 
-svn import $HOME/yadt-config-rpm-maker/testdata/svn_repo/ file:///$HOME/configuration-repository/ -m "Initial commit"
-svnserve -r $HOME/configuration-repository -d
+svn import $HOME/yadt-config-rpm-maker/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
+svnserve -r ${CONFIGURATION_REPOSITORY} -d
 
