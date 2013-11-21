@@ -18,8 +18,8 @@
 
 set -e
 
+
 WORKING_DIRECTORY="$HOME"
-CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
 
 # Please modify this if you would like to clone your own fork.
 SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
@@ -27,6 +27,8 @@ SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
 
 SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
+
+CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
 
 
 function install_dependencies() {
@@ -43,6 +45,7 @@ function install_dependencies() {
     # Install git because we need it to clone the repository
     sudo yum install git -y
 }
+
 
 function build_and_install_config_rpm_maker() {
     # clone repository
@@ -61,6 +64,7 @@ function build_and_install_config_rpm_maker() {
     sudo rpm -ivH ${RESULT_RPM}
 }
 
+
 function setup_svn_server_with_test_data_and_start_it() {
     svnadmin create ${CONFIGURATION_REPOSITORY}
 
@@ -77,6 +81,7 @@ function setup_svn_server_with_test_data_and_start_it() {
     # start subversion server
     svnserve -r ${CONFIGURATION_REPOSITORY} -d
 }
+
 
 install_dependencies
 build_and_install_config_rpm_maker
