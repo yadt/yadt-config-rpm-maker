@@ -59,16 +59,6 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ## Build
 
-Please don't forget to add our repository as remote
-```bash
-git remote add upstream https://github.com/yadt/yadt-config-rpm-maker.git
-```
-
-... and pull from time to time ...
-```bash
-git pull upstream master
-```
-
 ### Setup a Devlopment Enviroment
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
@@ -110,6 +100,18 @@ The `config-rpm-maker` script allows you to execute config-rpm-maker in your wor
 ```bash
 python setup.py bdist_rpm
 ```
+
+### Contribute
+
+Please don't forget to add our repository as remote to your fork
+```bash
+git remote add upstream https://github.com/yadt/yadt-config-rpm-maker.git
+```
+... and pull from time to time via ...
+```bash
+git pull upstream master
+```
+... to omit merge problems.
 
 Authors
 =======
