@@ -18,15 +18,15 @@
 
 set -e
 
-readonly WORKING_DIRECTORY="$HOME"
+readonly WORKING_DIRECTORY="${HOME}"
 
 # Please modify this if you would like to clone your own fork.
 readonly SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
-readonly SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
+readonly SOURCE_DIRECTORY="${WORKING_DIRECTORY}/yadt-config-rpm-maker"
 
 readonly SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
 readonly RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
 
-readonly CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
+readonly CONFIGURATION_REPOSITORY="${WORKING_DIRECTORY}/configuration-repository"
 readonly HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
 readonly SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"
