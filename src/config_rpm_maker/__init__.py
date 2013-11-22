@@ -26,7 +26,7 @@ from urlparse import urlparse
 
 from config_rpm_maker import config
 from config_rpm_maker.config import DEFAULT_DATE_FORMAT
-from config_rpm_maker.configRpmMaker import ConfigRpmMaker
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.logutils import (create_console_handler,
                                        create_sys_log_handler,

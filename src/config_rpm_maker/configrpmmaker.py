@@ -30,7 +30,7 @@ from threading import Thread
 from config_rpm_maker.config import KEY_THREAD_COUNT
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
+from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
 
