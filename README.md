@@ -120,6 +120,12 @@ PYTHONPATH=src python test/__init__.py
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
 
+
+Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
+```bash
+coverage report --omit=test/*,/usr/*,setup.py
+```
+
 ### Execution in the working directory
 
 ```bash
