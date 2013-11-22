@@ -27,7 +27,7 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
-from config_rpm_maker.config import KEY_THREAD_COUNT
+from config_rpm_maker.config import KEY_THREAD_COUNT, KEY_RPM_UPLOAD_CMD
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
@@ -225,7 +225,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     @measure_execution_time
     def _upload_rpms(self, rpms):
-        rpm_upload_cmd = config.get('rpm_upload_cmd')
+        rpm_upload_cmd = config.get(KEY_RPM_UPLOAD_CMD)
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:

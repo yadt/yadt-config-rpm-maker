@@ -25,7 +25,11 @@ from time import time, strftime
 from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_DATE_FORMAT
+from config_rpm_maker.config import (DEFAULT_DATE_FORMAT,
+                                     DEFAULT_CONFIG_VIEWER_ONLY,
+                                     DEFAULT_RPM_UPLOAD_CMD,
+                                     KEY_RPM_UPLOAD_CMD,
+                                     KEY_CONFIG_VIEWER_ONLY)
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.logutils import (create_console_handler,
@@ -48,6 +52,12 @@ OPTION_DEBUG_HELP = "force DEBUG log level on console"
 
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
+
+OPTION_RPM_UPLOAD_CMD = '--rpm-upload-cmd'
+OPTION_RPM_UPLOAD_CMD_HELP = 'Overwrite rpm_upload_config in config file'
+
+OPTION_CONFIG_VIEWER_ONLY = '--config-viewer-only'
+OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generated files for config viewer. Skip RPM build and upload.'
 
 MESSAGE_SUCCESS = "Success."
 
@@ -112,6 +122,12 @@ def parse_arguments(argv, version):
     parser.add_option("", OPTION_VERSION,
                       action="store_true", dest="version", default=False,
                       help=OPTION_VERSION_HELP)
+    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
+                      dest=KEY_RPM_UPLOAD_CMD, default=config.get(KEY_RPM_UPLOAD_CMD, DEFAULT_RPM_UPLOAD_CMD),
+                      help=OPTION_RPM_UPLOAD_CMD_HELP)
+    parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
+                      action="store_true", dest=KEY_CONFIG_VIEWER_ONLY, default=config.get(KEY_CONFIG_VIEWER_ONLY, DEFAULT_CONFIG_VIEWER_ONLY),
+                      help=OPTION_CONFIG_VIEWER_ONLY_HELP)
     values, args = parser.parse_args(argv)
 
     if values.version:
@@ -123,6 +139,8 @@ def parse_arguments(argv, version):
         return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
 
     arguments = {OPTION_DEBUG: values.debug or False,
+                 KEY_RPM_UPLOAD_CMD: values[KEY_RPM_UPLOAD_CMD],
+                 KEY_CONFIG_VIEWER_ONLY: values[KEY_CONFIG_VIEWER_ONLY],
                  ARGUMENT_REPOSITORY: args[0],
                  ARGUMENT_REVISION: args[1]}
 
@@ -199,12 +217,19 @@ def append_console_logger(logger, console_log_level):
         logger.debug("DEBUG logging is enabled")
 
 
+def apply_arguments_to_config(arguments):
+    config.setvalue(KEY_RPM_UPLOAD_CMD, arguments[KEY_RPM_UPLOAD_CMD])
+    config.setvalue(KEY_CONFIG_VIEWER_ONLY, arguments[KEY_CONFIG_VIEWER_ONLY])
+
+
 def main():
     LOGGER.setLevel(DEBUG)
 
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
-
     config.load_configuration_file()
+
+    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
+    apply_arguments_to_config(arguments)
+
     console_log_level = determine_console_log_level(arguments)
     append_console_logger(LOGGER, console_log_level)
 

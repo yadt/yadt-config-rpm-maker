@@ -30,11 +30,15 @@ DEFAULT_LOG_LEVEL = INFO
 DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
 DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 DEFAULT_SYS_LOG_LEVEL = DEBUG
+DEFAULT_CONFIG_VIEWER_ONLY = False
+DEFAULT_RPM_UPLOAD_CMD = False
 
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 KEY_THREAD_COUNT = 'thread_count'
+KEY_RPM_UPLOAD_CMD = 'rpm_upload_cmd'
+KEY_CONFIG_VIEWER_ONLY = 'config_viewer_only'
 
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
