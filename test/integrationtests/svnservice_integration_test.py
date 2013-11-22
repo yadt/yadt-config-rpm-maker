@@ -14,14 +14,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from baseTestCase import SvnTestCase
+from integration_test_support import IntegrationTest
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.svn import SvnService
 
 
-class SvnServiceTest(SvnTestCase):
+class SvnServiceTest(IntegrationTest):
 
     def setUp(self):
         self.create_svn_repo()
