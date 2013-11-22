@@ -21,7 +21,7 @@ from mock import Mock, call, patch
 from unittest import TestCase
 
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
-from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler, log_configuration
+from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler, log_configuration, log_elements_of_list
 
 
 @patch('config_rpm_maker.logutils.StreamHandler')
@@ -150,4 +150,41 @@ class LogConfigurationTests(TestCase):
                           call('Configuraton property %s = "%s" (%s)', '"a_property"', 123, 'int'),
                           call('Configuraton property %s = "%s" (%s)', '"b_property"', False, 'bool'),
                           call('Configuraton property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')],
+                         self.mock_log.call_args_list)
+
+
+class LogElementsOfListTests(TestCase):
+
+    def setUp(self):
+        self.mock_log = Mock()
+
+    def test_should_only_log_summary_when_list_has_no_elements(self):
+
+        log_elements_of_list(self.mock_log, 'Created %s elements.', [])
+
+        self.mock_log.assert_called_with('Created %s elements.', 0)
+
+    def test_should_log_one_element_if_a_list_with_one_element_is_given(self):
+
+        log_elements_of_list(self.mock_log, 'Created %s elements.', ['element'])
+
+        self.mock_log.assert_any_call('Created %s elements. Listing in sorted order:', 1)
+        self.mock_log.assert_any_call('    #%s: %s', 0, 'element')
+
+    def test_should_log_two_elements_if_a_list_with_two_elements_is_given(self):
+
+        log_elements_of_list(self.mock_log, 'Created %s elements.', ['element0', 'element1'])
+
+        self.mock_log.assert_any_call('Created %s elements. Listing in sorted order:', 2)
+        self.mock_log.assert_any_call('    #%s: %s', 0, 'element0')
+        self.mock_log.assert_any_call('    #%s: %s', 1, 'element1')
+
+    def test_should_log_elements_in_sorted_order(self):
+
+        log_elements_of_list(self.mock_log, 'Created %s elements.', ['element0', 'element1', 'element2'])
+
+        self.assertEqual([call('Created %s elements. Listing in sorted order:', 3),
+                          call('    #%s: %s', 0, 'element0'),
+                          call('    #%s: %s', 1, 'element1'),
+                          call('    #%s: %s', 2, 'element2')],
                          self.mock_log.call_args_list)

@@ -71,8 +71,14 @@ def log_configuration(logging_function, configuration, path):
 def log_elements_of_list(logging_function, summary_message, unsorted_list):
     """ Uses the given logging function to log all elements of a unsorted list in
         a sorted way. Each element to one line. """
+
     sorted_list = sorted(unsorted_list)
+
     count_of_elements = len(sorted_list)
+    if count_of_elements == 0:
+        logging_function(summary_message, 0)
+        return
+
     logging_function(summary_message + ' Listing in sorted order:', count_of_elements)
     for i in range(count_of_elements):
         logging_function('    #%s: %s', i, sorted_list[i])
