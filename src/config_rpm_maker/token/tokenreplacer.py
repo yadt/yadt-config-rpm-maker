@@ -23,8 +23,10 @@ from logging import getLogger
 import config_rpm_maker.magic
 
 from config_rpm_maker import config
+from config_rpm_maker.config import DEFAULT_FILE_SIZE_MAXIMUM
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
 
 LOGGER = getLogger(__name__)
 
@@ -166,7 +168,7 @@ class TokenReplacer(object):
 
     def filter_file(self, filename, html_escape=False):
         try:
-            self.file_size_limit = config.get('max_file_size', 100 * 1024)
+            self.file_size_limit = config.get('max_file_size', DEFAULT_FILE_SIZE_MAXIMUM)
             if os.path.getsize(filename) > self.file_size_limit:
                 raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)" % (os.path.basename(filename), os.path.getsize(filename), self.file_size_limit))
 
