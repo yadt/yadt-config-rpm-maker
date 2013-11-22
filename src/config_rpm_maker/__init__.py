@@ -28,6 +28,7 @@ from config_rpm_maker import config
 from config_rpm_maker.config import (DEFAULT_DATE_FORMAT,
                                      DEFAULT_CONFIG_VIEWER_ONLY,
                                      DEFAULT_RPM_UPLOAD_CMD,
+                                     KEY_SVN_PATH_TO_CONFIG,
                                      KEY_RPM_UPLOAD_CMD,
                                      KEY_CONFIG_VIEWER_ONLY)
 from config_rpm_maker.configRpmMaker import ConfigRpmMaker
@@ -36,7 +37,8 @@ from config_rpm_maker.logutils import (create_console_handler,
                                        create_sys_log_handler,
                                        log_configuration,
                                        log_process_id)
-from config_rpm_maker.svn import SvnService
+from config_rpm_maker.svnservice import SvnService
+
 
 ARGUMENT_REPOSITORY = '<repository-url>'
 ARGUMENT_REVISION = '<revision>'
@@ -49,6 +51,9 @@ Arguments:
 
 OPTION_DEBUG = '--debug'
 OPTION_DEBUG_HELP = "force DEBUG log level on console"
+
+OPTION_NO_SYSLOG = '--no-syslog'
+OPTION_NO_SYSLOG_HELP = "switch logging of debug information to syslog off"
 
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
@@ -110,6 +115,9 @@ def parse_arguments(argv, version):
 
         Otherwise it will return a dictionary containing the keys and values for
             OPTION_DEBUG: boolean, True if option --debug is given
+            OPTION_NO_SYSLOG: boolean, True if option --no-syslog is given
+            KEY_RPM_UPLOAD_CMD: string, command executed for rpm uploads
+            KEY_CONFIG_VIEWER_ONLY, boolean, True to indicate rpm building and uploads are skipped
             ARGUMENT_REPOSITORY: string, the first argument
             ARGUMENT_REVISION: string, the second argument
     """
@@ -119,6 +127,9 @@ def parse_arguments(argv, version):
     parser.add_option("", OPTION_DEBUG,
                       action="store_true", dest="debug", default=False,
                       help=OPTION_DEBUG_HELP)
+    parser.add_option("", OPTION_NO_SYSLOG,
+                      action="store_true", dest="no_syslog", default=False,
+                      help=OPTION_NO_SYSLOG_HELP)
     parser.add_option("", OPTION_VERSION,
                       action="store_true", dest="version", default=False,
                       help=OPTION_VERSION_HELP)
@@ -139,6 +150,7 @@ def parse_arguments(argv, version):
         return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
 
     arguments = {OPTION_DEBUG: values.debug or False,
+                 OPTION_NO_SYSLOG: values.no_syslog or False,
                  KEY_RPM_UPLOAD_CMD: values[KEY_RPM_UPLOAD_CMD],
                  KEY_CONFIG_VIEWER_ONLY: values[KEY_CONFIG_VIEWER_ONLY],
                  ARGUMENT_REPOSITORY: args[0],
@@ -164,7 +176,7 @@ def determine_console_log_level(arguments):
 
 def build_configuration_rpms_from(repository, revision):
     try:
-        path_to_config = config.get('svn_path_to_config')
+        path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
         svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
         ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
@@ -236,8 +248,9 @@ def main():
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
 
-    sys_log_handler = create_sys_log_handler(revision)
-    LOGGER.addHandler(sys_log_handler)
+    if not arguments[OPTION_NO_SYSLOG]:
+        sys_log_handler = create_sys_log_handler(revision)
+        LOGGER.addHandler(sys_log_handler)
 
     start_measuring_time()
     log_process_id(LOGGER.info)

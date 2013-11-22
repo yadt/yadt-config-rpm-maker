@@ -1,3 +1,5 @@
+#!/bin/bash
+#
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
@@ -14,13 +16,17 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+set -e
 
-from config_rpm_maker.hostResolver import HostResolver
+readonly WORKING_DIRECTORY="${HOME}"
 
+# Please modify this if you would like to clone your own fork.
+readonly SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
+readonly SOURCE_DIRECTORY="${WORKING_DIRECTORY}/yadt-config-rpm-maker"
 
-class HostResolverTest(unittest.TestCase):
-    def test_resolve_localhost(self):
-        ip, fqdn, aliases = HostResolver().resolve('localhost')
-        self.assertTrue(ip == '127.0.0.1' or ip == '::1')
-        self.assertEqual(fqdn, 'localhost')
+readonly SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
+readonly RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
+
+readonly CONFIGURATION_REPOSITORY="${WORKING_DIRECTORY}/configuration-repository"
+readonly HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
+readonly SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"

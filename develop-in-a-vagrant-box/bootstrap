@@ -1,4 +1,4 @@
-# coding=utf-8
+#!/bin/bash
 #
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
@@ -16,23 +16,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase
-from mock import patch
+set -e
 
-from config_rpm_maker.profiler import measure_execution_time
+source "configuration.sh"
+source "library.sh"
 
-
-class ProfilerTests(TestCase):
-
-    @patch('config_rpm_maker.profiler.LOGGER')
-    def test_should_wrap_function(self, mock_LOGGER):
-
-        self.dummy_function_has_been_executed = False
-
-        def dummy_function():
-            self.dummy_function_has_been_executed = True
-
-        actual_function = measure_execution_time(dummy_function)
-        actual_function()
-
-        self.assertTrue(self.dummy_function_has_been_executed)
+install_dependencies
+build_and_install_config_rpm_maker
+setup_svn_server_with_test_data_and_start_it

@@ -16,8 +16,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mock import Mock, call, patch
-from unittest import TestCase, main
+from mock import Mock, patch
+from unittest import TestCase
 
 from config_rpm_maker import (USAGE_INFORMATION,
                               build_configuration_rpms_from,
@@ -82,6 +82,12 @@ class ParseArgumentsTests(TestCase):
         actual_arguments = parse_arguments(["foo", "123", "--debug"], version="")
 
         self.assertTrue(actual_arguments["--debug"])
+
+    def test_should_return_no_syslog_option_as_true_when_no_syslog_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--no-syslog"], version="")
+
+        self.assertTrue(actual_arguments["--no-syslog"])
 
     def test_should_return_first_argument_as_repository(self):
 
@@ -312,7 +318,7 @@ class ExitProgramTests(TestCase):
 
         exit_program('Success.', 0)
 
-        self.assertEqual(call('Elapsed time: 1.0s'), mock_logger.info.call_args_list[0])
+        mock_logger.info.assert_any_call('Elapsed time: 1.0s')
 
     @patch('config_rpm_maker.time')
     @patch('config_rpm_maker.exit')
@@ -323,7 +329,4 @@ class ExitProgramTests(TestCase):
 
         exit_program('Success.', 0)
 
-        self.assertEqual(call('Elapsed time: 0.56s'), mock_logger.info.call_args_list[0])
-
-if __name__ == "__main__":
-    main()
+        mock_logger.info.assert_any_call('Elapsed time: 0.56s')

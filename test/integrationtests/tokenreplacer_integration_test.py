@@ -23,53 +23,6 @@ import tempfile
 import unittest
 
 from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer
-from config_rpm_maker.token.cycle import ContainsCyclesException
-
-
-class TokenReplacerTest(unittest.TestCase):
-    def test_should_return_unmodified_content_when_content_does_not_contain_token(self):
-        self.assertEquals("spam", TokenReplacer().filter("spam"))
-
-    def test_should_raise_exception_when_token_to_filter_is_missing(self):
-        self.assertRaises(MissingTokenException, TokenReplacer().filter, "@@@NOT_FOUND@@@")
-
-    def _test_should_return_value_of_replaced_token_when_content_is_token_reference_and_token_contains_special_characters(self):
-        self.assertEquals("#\\/@$%&", TokenReplacer({"SPAM": "#\\/@$%&"}).filter("@@@SPAM@@@"))
-
-    def test_should_return_value_of_token_when_content_is_single_token(self):
-        self.assertEquals("spam", TokenReplacer({"SPAM": "spam"}).filter("@@@SPAM@@@"))
-
-    def test_should_not_replace_token_if_content_contains_invalid_token_reference(self):
-        self.assertEquals("@@@SPAM@@", TokenReplacer({"SPAM": "spam"}).filter("@@@SPAM@@"))
-
-    def test_should_return_value_of_token_when_content_has_surrounding_white_spaces(self):
-        self.assertEquals("spam", TokenReplacer({"SPAM": " spam\n"}).filter("@@@SPAM@@@"))
-
-    def test_should_return_value_of_two_tokens_when_content_is_double_token(self):
-        self.assertEquals("spameggs", TokenReplacer({"SPAM": "spam",
-                                                     "EGGS": "eggs"}).filter("@@@SPAM@@@@@@EGGS@@@"))
-
-    def test_should_return_value_of_content_with_replaced_tokens_when_content_is_a_mixture_of_static_text_and_tokens(self):
-        self.assertEquals("You should eat more spam and eggs.",
-                          TokenReplacer({"SPAM": "spam",
-                                         "EGGS": "eggs"}).filter("You should eat more @@@SPAM@@@ and @@@EGGS@@@."))
-
-    def test_should_use_custom_replacer_function(self):
-        def custom_replacer_function(token, value):
-            return "<%s:%s>" % (token, value)
-        self.assertEquals("<spam:eggs>",
-                          TokenReplacer({"spam": "eggs"},
-                                        custom_replacer_function).filter("@@@spam@@@"))
-
-    def test_should_replace_token_in_token(self):
-        self.assertEquals("foo", TokenReplacer({"FOO": "foo", "BAR": "@@@FOO@@@"}).filter("@@@BAR@@@"))
-
-    def test_should_replace_multiple_token_in_token(self):
-        self.assertEquals("fooIGNOREfoo", TokenReplacer({"FOO": "foo", "BAR": "@@@FOO@@@", "BAT": "@@@FOO@@@IGNORE@@@BAR@@@"}).filter("@@@BAT@@@"))
-
-    def test_should_determine_token_recursion(self):
-        self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
-        self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
 
 
 def file_mode(mode, binary):
