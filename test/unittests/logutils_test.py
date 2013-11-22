@@ -21,7 +21,11 @@ from mock import Mock, call, patch
 from unittest import TestCase
 
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
-from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler, log_configuration, log_elements_of_list
+from config_rpm_maker.logutils import (create_console_handler,
+                                       create_sys_log_handler,
+                                       log_configuration,
+                                       log_elements_of_list,
+                                       log_process_id)
 
 
 @patch('config_rpm_maker.logutils.StreamHandler')
@@ -188,3 +192,16 @@ class LogElementsOfListTests(TestCase):
                           call('    #%s: %s', 1, 'element1'),
                           call('    #%s: %s', 2, 'element2')],
                          self.mock_log.call_args_list)
+
+
+@patch('config_rpm_maker.logutils.getpid')
+class LogProcessId(TestCase):
+
+    def test_should_log_process_id(self, mock_getpid):
+
+        mock_logging_function = Mock()
+        mock_getpid.return_value = 1234
+
+        log_process_id(mock_logging_function)
+
+        mock_logging_function.assert_called_with('Process ID is %s', 1234)
