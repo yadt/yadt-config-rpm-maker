@@ -25,6 +25,7 @@ LOGGER = getLogger(__name__)
 
 DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
 DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
+DEFAULT_ERROR_LOG_URL = ''
 DEFAULT_FILE_SIZE_MAXIMUM = 100 * 1024
 DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"

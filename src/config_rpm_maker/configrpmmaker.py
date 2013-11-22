@@ -27,12 +27,14 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
-from config_rpm_maker.config import KEY_THREAD_COUNT
+from config_rpm_maker.config import KEY_THREAD_COUNT, DEFAULT_ERROR_LOG_URL
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
+
+
 
 LOGGER = getLogger(__name__)
 
@@ -112,7 +114,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     @measure_execution_time
     def __build_error_msg_and_move_to_public_access(self, revision):
-        err_url = config.get('error_log_url', '')
+        err_url = config.get('error_log_url', DEFAULT_ERROR_LOG_URL)
         error_msg = self.ERROR_MSG % (err_url, revision)
         for line in error_msg.split('\n'):
             LOGGER.error(line)
