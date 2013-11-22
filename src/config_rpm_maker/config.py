@@ -38,6 +38,7 @@ DEFAULT_UPLOAD_CHUNK_SIZE = 0
 
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
+KEY_SVN_PATH_TO_CONFIG = 'svn_path_to_config'
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 KEY_THREAD_COUNT = 'thread_count'
 

@@ -25,7 +25,7 @@ from time import time, strftime
 from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_DATE_FORMAT
+from config_rpm_maker.config import DEFAULT_DATE_FORMAT, KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.logutils import (create_console_handler,
@@ -33,6 +33,7 @@ from config_rpm_maker.logutils import (create_console_handler,
                                        log_configuration,
                                        log_process_id)
 from config_rpm_maker.svn import SvnService
+
 
 ARGUMENT_REPOSITORY = '<repository-url>'
 ARGUMENT_REVISION = '<revision>'
@@ -154,7 +155,7 @@ def determine_console_log_level(arguments):
 
 def build_configuration_rpms_from(repository, revision):
     try:
-        path_to_config = config.get('svn_path_to_config')
+        path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
         svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
         ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
