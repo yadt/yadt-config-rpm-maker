@@ -32,7 +32,7 @@ from config_rpm_maker.logutils import (create_console_handler,
                                        create_sys_log_handler,
                                        log_configuration,
                                        log_process_id)
-from config_rpm_maker.svn import SvnService
+from config_rpm_maker.svnservice import SvnService
 
 
 ARGUMENT_REPOSITORY = '<repository-url>'

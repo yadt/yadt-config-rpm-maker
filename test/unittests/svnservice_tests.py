@@ -19,7 +19,7 @@
 from unittest import TestCase
 from mock import Mock, patch
 
-from config_rpm_maker.svn import SvnService
+from config_rpm_maker.svnservice import SvnService
 
 
 class SvnServiceTests(TestCase):

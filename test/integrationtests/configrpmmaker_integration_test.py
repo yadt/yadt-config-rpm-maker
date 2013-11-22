@@ -24,7 +24,7 @@ from integration_test_support import IntegrationTest
 from config_rpm_maker import ConfigRpmMaker, config
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.segment import All, Typ
-from config_rpm_maker.svn import SvnService
+from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
 
 
