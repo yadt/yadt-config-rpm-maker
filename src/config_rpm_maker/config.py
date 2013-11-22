@@ -31,6 +31,8 @@ DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
 DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 DEFAULT_SYS_LOG_LEVEL = DEBUG
 
+DEFAULT_HOST_NAME_ENCODING = 'ascii'
+
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
