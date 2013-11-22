@@ -56,6 +56,10 @@ def log_configuration(logging_function, configuration, path):
     logging_function('Loaded configuration file "%s"', path)
 
     keys = sorted(configuration.keys())
+    if len(keys) == 0:
+        logging_function('Configuration file was empty!')
+        return
+
     max_length = len(max(keys, key=len)) + 2  # two is for quotes on left and right side
 
     for key in keys:

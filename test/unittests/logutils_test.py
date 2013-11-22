@@ -17,11 +17,11 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from logging import ERROR
-from mock import Mock, patch
+from mock import Mock, call, patch
 from unittest import TestCase
 
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
-from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler
+from config_rpm_maker.logutils import create_console_handler, create_sys_log_handler, log_configuration
 
 
 @patch('config_rpm_maker.logutils.StreamHandler')
@@ -101,3 +101,53 @@ class CreateSysLogHandlerTests(TestCase):
         actual_handler = create_sys_log_handler(123)
 
         self.assertEqual(mock_handler, actual_handler)
+
+
+class LogConfigurationTests(TestCase):
+
+    def setUp(self):
+        self.mock_log = Mock()
+
+    def test_should_log_given_path(self):
+
+        log_configuration(self.mock_log, {}, 'configuration_file.yaml')
+
+        self.assertEqual(call('Loaded configuration file "%s"', 'configuration_file.yaml'), self.mock_log.call_args_list[0])
+
+    def test_should_log_when_configuration_file_was_empty(self):
+
+        log_configuration(self.mock_log, {}, 'configuration_file.yaml')
+
+        self.assertEqual(call('Configuration file was empty!'), self.mock_log.call_args_list[1])
+
+    def test_should_log_given_string_configuration_property(self):
+
+        log_configuration(self.mock_log, {'property': '123'}, 'configuration_file.yaml')
+
+        self.assertEqual(call('Configuraton property %s = "%s" (%s)', '"property"', '123', 'str'), self.mock_log.call_args_list[1])
+
+    def test_should_log_given_boolean_configuration_property(self):
+
+        log_configuration(self.mock_log, {'property': True}, 'configuration_file.yaml')
+
+        self.assertEqual(call('Configuraton property %s = "%s" (%s)', '"property"', True, 'bool'), self.mock_log.call_args_list[1])
+
+    def test_should_log_given_integer_configuration_property(self):
+
+        log_configuration(self.mock_log, {'property': 123}, 'configuration_file.yaml')
+
+        self.assertEqual(call('Configuraton property %s = "%s" (%s)', '"property"', 123, 'int'), self.mock_log.call_args_list[1])
+
+    def test_should_log_given_configuration_properties_in_alphabetical_order(self):
+
+        configuration = {'a_property': 123,
+                         'b_property': False,
+                         'c_property': 'hello world'}
+
+        log_configuration(self.mock_log, configuration, 'configuration_file.yaml')
+
+        self.assertEqual([call('Loaded configuration file "%s"', 'configuration_file.yaml'),
+                          call('Configuraton property %s = "%s" (%s)', '"a_property"', 123, 'int'),
+                          call('Configuraton property %s = "%s" (%s)', '"b_property"', False, 'bool'),
+                          call('Configuraton property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')],
+                         self.mock_log.call_args_list)
