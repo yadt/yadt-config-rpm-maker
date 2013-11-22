@@ -41,9 +41,8 @@ class TokenCycleChecking(object):
             raise ContainsCyclesException(error_message)
 
 
+#Tarjan's partitioning algorithm for finding strongly connected components in a graph.
 def tarjan_scc(graph):
-    """ Tarjan's partitioning algorithm for finding strongly connected components in a graph. """
-
     index_counter = [0]
     stack = []
     lowlinks = {}

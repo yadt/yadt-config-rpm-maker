@@ -27,14 +27,10 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
-<<<<<<< HEAD:src/config_rpm_maker/configRpmMaker.py
 from config_rpm_maker.config import KEY_THREAD_COUNT, KEY_RPM_UPLOAD_CMD
-=======
-from config_rpm_maker.config import KEY_THREAD_COUNT, DEFAULT_ERROR_LOG_URL, DEFAULT_THREAD_COUNT, DEFAULT_UPLOAD_CHUNK_SIZE
->>>>>>> remotes/origin/master:src/config_rpm_maker/configrpmmaker.py
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
+from config_rpm_maker.hostRpmBuilder import HostRpmBuilder
 from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
 
@@ -116,7 +112,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     @measure_execution_time
     def __build_error_msg_and_move_to_public_access(self, revision):
-        err_url = config.get('error_log_url', DEFAULT_ERROR_LOG_URL)
+        err_url = config.get('error_log_url', '')
         error_msg = self.ERROR_MSG % (err_url, revision)
         for line in error_msg.split('\n'):
             LOGGER.error(line)
@@ -271,7 +267,7 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
         return result
 
     def _get_thread_count(self, affected_hosts):
-        thread_count = int(config.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT))
+        thread_count = int(config.get(KEY_THREAD_COUNT, 1))
         if thread_count < 0:
             raise ConfigurationException('%s is %s, values <0 are not allowed)' % (KEY_THREAD_COUNT, thread_count))
 
@@ -325,7 +321,7 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
                 os.makedirs(path)
 
     def _get_chunk_size(self, rpms):
-        chunk_size_raw = config.get('rpm_upload_chunk_size', DEFAULT_UPLOAD_CHUNK_SIZE)
+        chunk_size_raw = config.get('rpm_upload_chunk_size', 0)
         try:
             chunk_size = int(chunk_size_raw)
         except ValueError:

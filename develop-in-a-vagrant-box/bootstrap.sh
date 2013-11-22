@@ -19,6 +19,18 @@
 set -e
 
 
+WORKING_DIRECTORY="$HOME"
+
+# Please modify this if you would like to clone your own fork.
+SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
+SOURCE_DIRECTORY="$WORKING_DIRECTORY/yadt-config-rpm-maker"
+
+SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
+RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
+
+CONFIGURATION_REPOSITORY="$WORKING_DIRECTORY/configuration-repository"
+
+
 function install_dependencies() {
     # Enable EPEL repository
     wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -37,12 +49,7 @@ function install_dependencies() {
 
 function build_and_install_config_rpm_maker() {
     # clone repository
-    if [[ ! -d ${SOURCE_DIRECTORY} ]]; then
-        git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
-    else
-        cd ${SOURCE_DIRECTORY}
-        git pull
-    fi
+    git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
 
     # build source rpm
     cd ${SOURCE_DIRECTORY}
@@ -54,7 +61,7 @@ function build_and_install_config_rpm_maker() {
 
     # install built rpm
     cd /var/lib/mock/epel-6-*/result
-    sudo rpm -ivH ${RESULT_RPM} --force
+    sudo rpm -ivH ${RESULT_RPM}
 }
 
 
@@ -62,15 +69,17 @@ function setup_svn_server_with_test_data_and_start_it() {
     svnadmin create ${CONFIGURATION_REPOSITORY}
 
     # configure svn server
-    rm ${SUBVERSION_CONFIGURATION_FILE}
-    cp /vagrant/svnserve.conf ${SUBVERSION_CONFIGURATION_FILE}
-    cp /vagrant/post-commit ${HOOKS_DIRECTORY}
-    chmod 755 ${HOOKS_DIRECTORY}/post-commit
-    cp /vagrant/yadt-config-rpm-maker.yaml ${HOOKS_DIRECTORY}
+    rm ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
+    cp /vagrant/svnserve.conf ${CONFIGURATION_REPOSITORY}/conf/svnserve.conf
+    cp /vagrant/post-commit ${CONFIGURATION_REPOSITORY}/hooks
+    chmod 755 ${CONFIGURATION_REPOSITORY}/hooks/post-commit
+    cp /vagrant/yadt-config-rpm-maker.yaml ${CONFIGURATION_REPOSITORY}/hooks
 
     # Import the test data into the configuration repository
     svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
-
-    # start subversion server
-    svnserve -r ${CONFIGURATION_REPOSITORY} -d
 }
+
+
+install_dependencies
+build_and_install_config_rpm_maker
+setup_svn_server_with_test_data_and_start_it

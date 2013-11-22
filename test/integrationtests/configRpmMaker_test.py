@@ -19,16 +19,15 @@ import shutil
 import subprocess
 import rpm
 
-from integration_test_support import IntegrationTest
+from baseTestCase import SvnTestCase
 
 from config_rpm_maker import ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.segment import All, Typ
-from config_rpm_maker.svnservice import SvnService
+from config_rpm_maker.svn import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
 
 
-class ConfigRpmMakerTest(IntegrationTest):
+class ConfigRpmMakerTest(SvnTestCase):
 
     def test_find_matching_hosts(self):
         config_rpm_maker = ConfigRpmMaker(None, None)
@@ -104,7 +103,7 @@ class ConfigRpmMakerTest(IntegrationTest):
     def _given_config_rpm_maker(self, keep_work_dir=False):
         self._cleanup_temp_dir()
         self.create_svn_repo()
-        svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get('svn_path_to_config'))
 
         if keep_work_dir:
             os.environ['KEEPWORKDIR'] = '1'

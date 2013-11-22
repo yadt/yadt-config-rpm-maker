@@ -35,52 +35,20 @@ config-rpm-maker file://host/path-to/your/svn/repository/ 123
 config-rpm-maker svn://host/repository/ 123
 ```
 
+
 ## Features
 
-  * Templating for your configuration files.
-  * Preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/yadt/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
+  * preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/yadt/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
 
 ## Getting Started
-
-If you simply want to try and understand how `yadt-config-rpm-maker` works we recommend to "[setup a devlopment enviroment](https://github.com/yadt/yadt-config-rpm-maker#setup-a-devlopment-enviroment)".
-
-#### Step by Step Installation
-
-##### Step 1
-
-Install the build dependencies
-```bash
-sudo yum install python-devel python-setuptools python-mock mock -y
-```
-Install dependencies
-```bash
-sudo yum install subversion rpm-build pysvn python-yaml -y
-```
-
-##### Step 2
-
-Build the source rpm
-```bash
-./setup.py bdist_rpm --source-only
-```
-
-Build the rpm from the source rpm using mock.
-```bash
-sudo mock rebuild yadt-config-rpm-maker-2.0-1.src.rpm -v
-```
-
-##### Step 3
 
 Set up a subversion repository. There are several tutorials available in the web.
 Some examples:
   * [How To Set Up An SVN Repository In 7 Simple Steps](http://www.civicactions.com/blog/2010/may/25/how_set_svn_repository_7_simple_steps)
   * [Creating and Configuring Your Repository](http://svnbook.red-bean.com/en/1.7/svn.reposadmin.create.html)
 
-and run `config-rpm-maker` in a `post-commit` hook.
-
-#### Configuration
-
-`yadt-config-rpm-maker` is configured using a yaml file. Read more in our "[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)".
+To set up `yadt-config-rpm-maker` please have a look at the
+[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)
 
 ### Example Content for Configuration Repository
 
@@ -91,16 +59,26 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ## Build
 
+Please don't forget to add our repository as remote
+```bash
+git remote add upstream https://github.com/yadt/yadt-config-rpm-maker.git
+```
+
+... and pull from time to time ...
+```bash
+git pull upstream master
+```
+
 ### Setup a Devlopment Enviroment
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
-We recommend to develop in a vagrant box. Read our tutorial "[How to develop in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
+We recommend to develop in a vagrant box. Read more in our [tutorial](https://github.com/yadt/yadt-config-rpm-maker/develop-in-a-vagrant-box)
 
 But of course you can set up a development environment on other platforms as well:
-* [How to develop under CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
-* [How to develop under OpenSUSE](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
-* [How to develop under Debian / Mint / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
+* [CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
+* [OpenSUSE](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
+* [Debian / Mint / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
 
 
 ### Run Tests
@@ -120,12 +98,6 @@ PYTHONPATH=src python test/__init__.py
 
 When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
 
-
-Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
-```bash
-coverage report --omit=test/*,/usr/*,setup.py
-```
-
 ### Execution in the working directory
 
 ```bash
@@ -138,18 +110,6 @@ The `config-rpm-maker` script allows you to execute config-rpm-maker in your wor
 ```bash
 python setup.py bdist_rpm
 ```
-
-### Contribute
-
-Please don't forget to add our repository as remote to your fork
-```bash
-git remote add upstream https://github.com/yadt/yadt-config-rpm-maker.git
-```
-... and pull from time to time via ...
-```bash
-git pull upstream master
-```
-... to omit merge problems.
 
 Authors
 =======

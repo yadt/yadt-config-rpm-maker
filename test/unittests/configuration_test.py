@@ -18,30 +18,28 @@
 
 from logging import DEBUG, ERROR, INFO
 from mock import patch
-from unittest import TestCase
+from unittest import TestCase, main
 
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, ConfigException, get_log_level, get_temporary_directory
 
 
-@patch("config_rpm_maker.config.get")
-class GetTemporaryDirectoryTests(TestCase):
+class ConfigurationTests(TestCase):
 
+    @patch("config_rpm_maker.config.get")
     def test_get_temporary_directory_should_use_key_for_temporary_directory(self, mock_get):
         get_temporary_directory()
 
         mock_get.assert_called_once_with('temp_dir')
 
-    def test_get_temporary_directory_should_return_value_from_get(self, mock_get):
+    @patch("config_rpm_maker.config.get")
+    def test_get_temporary_directory_should_retur_value_from_get(self, mock_get):
         mock_get.return_value = "temporary directory"
 
         actual = get_temporary_directory()
 
         self.assertEqual("temporary directory", actual)
 
-
-@patch("config_rpm_maker.config.get")
-class GetLogLevelTests(TestCase):
-
+    @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_use_key_for_log_level(self, mock_get):
         mock_get.return_value = "DEBUG"
 
@@ -49,6 +47,7 @@ class GetLogLevelTests(TestCase):
 
         mock_get.assert_called_once_with('log_level', DEFAULT_LOG_LEVEL)
 
+    @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_return_debug_log_level(self, mock_get):
         mock_get.return_value = "DEBUG"
 
@@ -56,6 +55,7 @@ class GetLogLevelTests(TestCase):
 
         self.assertEqual(DEBUG, actual)
 
+    @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_return_error_log_level(self, mock_get):
         mock_get.return_value = "ERROR"
 
@@ -63,6 +63,7 @@ class GetLogLevelTests(TestCase):
 
         self.assertEqual(ERROR, actual)
 
+    @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_return_info_log_level(self, mock_get):
         mock_get.return_value = "INFO"
 
@@ -70,7 +71,11 @@ class GetLogLevelTests(TestCase):
 
         self.assertEqual(INFO, actual)
 
+    @patch("config_rpm_maker.config.get")
     def test_get_log_level_should_raise_exception_when_strange_log_level_given(self, mock_get):
         mock_get.return_value = "FOO"
 
         self.assertRaises(ConfigException, get_log_level)
+
+if __name__ == "__main__":
+    main()

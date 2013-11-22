@@ -22,7 +22,7 @@ import unittest
 from config_rpm_maker import config
 
 
-class IntegrationTest(unittest.TestCase):
+class SvnTestCase(unittest.TestCase):
 
     def create_svn_repo(self):
         self.repo_dir = os.path.abspath(os.path.join(config.get('temp_dir'), 'svn_repo'))
