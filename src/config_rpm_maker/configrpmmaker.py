@@ -27,13 +27,12 @@ from logging import ERROR, FileHandler, Formatter, getLogger
 from Queue import Queue
 from threading import Thread
 
-from config_rpm_maker.config import KEY_THREAD_COUNT, DEFAULT_ERROR_LOG_URL, DEFAULT_THREAD_COUNT
+from config_rpm_maker.config import KEY_THREAD_COUNT, DEFAULT_ERROR_LOG_URL, DEFAULT_THREAD_COUNT, DEFAULT_UPLOAD_CHUNK_SIZE
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
-
 
 LOGGER = getLogger(__name__)
 
@@ -322,7 +321,7 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
                 os.makedirs(path)
 
     def _get_chunk_size(self, rpms):
-        chunk_size_raw = config.get('rpm_upload_chunk_size', 0)
+        chunk_size_raw = config.get('rpm_upload_chunk_size', DEFAULT_UPLOAD_CHUNK_SIZE)
         try:
             chunk_size = int(chunk_size_raw)
         except ValueError:
