@@ -17,7 +17,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mock import Mock, patch
-from unittest import TestCase, main
+from unittest import TestCase
 
 from config_rpm_maker import (USAGE_INFORMATION,
                               build_configuration_rpms_from,
@@ -330,6 +330,3 @@ class ExitProgramTests(TestCase):
         exit_program('Success.', 0)
 
         mock_logger.info.assert_any_call('Elapsed time: 0.56s')
-
-if __name__ == "__main__":
-    main()

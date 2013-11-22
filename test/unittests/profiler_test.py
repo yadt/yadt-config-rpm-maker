@@ -16,7 +16,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase, main
+from unittest import TestCase
 from mock import patch
 
 from config_rpm_maker.profiler import measure_execution_time
@@ -36,6 +36,3 @@ class ProfilerTests(TestCase):
         actual_function()
 
         self.assertTrue(self.dummy_function_has_been_executed)
-
-if __name__ == "__main__":
-    main()
