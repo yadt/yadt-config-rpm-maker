@@ -68,7 +68,7 @@ class SvnService(object):
 
         # remove first item
         items = items[1:]
-        repos_paths = [item[0].repos_path for item in items]
+        repos_paths = [item[0].repos_path.encode('ascii') for item in items]
         return [os.path.basename(repos_path) for repos_path in repos_paths]
 
     def export(self, svn_path, target_dir, revision):
