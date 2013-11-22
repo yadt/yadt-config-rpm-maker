@@ -116,31 +116,31 @@ class LogConfigurationTests(TestCase):
 
         log_configuration(self.mock_log, {}, 'configuration_file.yaml')
 
-        self.assertEqual(call('Loaded configuration file "%s"', 'configuration_file.yaml'), self.mock_log.call_args_list[0])
+        self.mock_log.assert_any_call('Loaded configuration file "%s"', 'configuration_file.yaml')
 
     def test_should_log_when_configuration_file_was_empty(self):
 
         log_configuration(self.mock_log, {}, 'configuration_file.yaml')
 
-        self.assertEqual(call('Configuration file was empty!'), self.mock_log.call_args_list[1])
+        self.mock_log.assert_any_call('Configuration file was empty!')
 
     def test_should_log_given_string_configuration_property(self):
 
         log_configuration(self.mock_log, {'property': '123'}, 'configuration_file.yaml')
 
-        self.assertEqual(call('Configuraton property %s = "%s" (%s)', '"property"', '123', 'str'), self.mock_log.call_args_list[1])
+        self.mock_log.assert_any_call('Configuraton property %s = "%s" (%s)', '"property"', '123', 'str')
 
     def test_should_log_given_boolean_configuration_property(self):
 
         log_configuration(self.mock_log, {'property': True}, 'configuration_file.yaml')
 
-        self.assertEqual(call('Configuraton property %s = "%s" (%s)', '"property"', True, 'bool'), self.mock_log.call_args_list[1])
+        self.mock_log.assert_any_call('Configuraton property %s = "%s" (%s)', '"property"', True, 'bool')
 
     def test_should_log_given_integer_configuration_property(self):
 
         log_configuration(self.mock_log, {'property': 123}, 'configuration_file.yaml')
 
-        self.assertEqual(call('Configuraton property %s = "%s" (%s)', '"property"', 123, 'int'), self.mock_log.call_args_list[1])
+        self.mock_log.assert_any_call('Configuraton property %s = "%s" (%s)', '"property"', 123, 'int')
 
     def test_should_log_given_configuration_properties_in_alphabetical_order(self):
 
