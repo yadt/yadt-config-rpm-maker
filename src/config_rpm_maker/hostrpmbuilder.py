@@ -25,7 +25,7 @@ from logging import ERROR, Formatter, FileHandler, getLogger
 from config_rpm_maker import config
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.hostResolver import HostResolver
+from config_rpm_maker.hostresolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
 from config_rpm_maker.profiler import measure_execution_time

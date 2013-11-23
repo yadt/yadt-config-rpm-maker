@@ -16,7 +16,7 @@
 
 import unittest
 
-from config_rpm_maker.hostResolver import HostResolver
+from config_rpm_maker.hostresolver import HostResolver
 
 
 class HostResolverTest(unittest.TestCase):
