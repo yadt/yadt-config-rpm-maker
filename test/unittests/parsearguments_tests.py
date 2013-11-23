@@ -1,0 +1,140 @@
+# coding=utf-8
+#
+#   yadt-config-rpm-maker
+#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from mock import patch, Mock
+from unittest import TestCase
+
+from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_CMD
+from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD
+from config_rpm_maker.parsearguments import apply_arguments_to_config, parse_arguments
+
+
+class ParseArgumentsTests(TestCase):
+
+    @patch('config_rpm_maker.parsearguments.OptionParser')
+    def test_should_use_usage_information(self, mock_option_parser_class):
+
+        mock_option_parser = Mock()
+        mock_values = Mock()
+        mock_values.version = False
+        mock_values.debug = False
+        mock_arguments = ["foo", "bar"]
+        mock_option_parser.parse_args.return_value = (mock_values, mock_arguments)
+        mock_option_parser_class.return_value = mock_option_parser
+
+        parse_arguments([], version="")
+
+        mock_option_parser_class.assert_called_with(usage=USAGE_INFORMATION)
+
+    @patch('config_rpm_maker.parsearguments.exit')
+    @patch('config_rpm_maker.parsearguments.OptionParser')
+    def test_should_print_help_screen_and_exit_when_less_than_two_positional_arguments_are_given(self, mock_option_parser_class, mock_exit):
+
+        mock_option_parser = Mock()
+        mock_values = Mock()
+        mock_values.version = False
+        mock_values.debug = False
+        mock_arguments = [""]
+        mock_option_parser.parse_args.return_value = (mock_values, mock_arguments)
+        mock_option_parser_class.return_value = mock_option_parser
+
+        parse_arguments([], version="")
+
+        mock_option_parser.print_help.assert_called_with()
+        mock_exit.assert_called_with(1)
+
+    @patch('config_rpm_maker.parsearguments.exit')
+    @patch('config_rpm_maker.parsearguments.stdout')
+    def test_should_print_version_and_exit_with_return_code_zero_when_version_option_given(self, mock_stdout, mock_exit):
+
+        parse_arguments(["--version"], version="yadt-config-rpm-maker 2.0")
+
+        mock_stdout.write.assert_called_with("yadt-config-rpm-maker 2.0\n")
+        mock_exit.assert_called_with(0)
+
+    def test_should_return_debug_option_as_false_when_no_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertFalse(actual_arguments["--debug"])
+
+    def test_should_return_debug_option_as_true_when_debug_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--debug"], version="")
+
+        self.assertTrue(actual_arguments["--debug"])
+
+    def test_should_return_no_syslog_option_as_true_when_no_syslog_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--no-syslog"], version="")
+
+        self.assertTrue(actual_arguments["--no-syslog"])
+
+    def test_should_return_option_config_viewer_only_as_false_when_no_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertFalse(actual_arguments["--config-viewer-only"])
+
+    def test_should_return_option_config_viewer_only_as_true_when_option_is_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--config-viewer-only"], version="")
+
+        self.assertTrue(actual_arguments["--config-viewer-only"])
+
+    def test_should_return_first_argument_as_repository(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertEqual(actual_arguments["<repository-url>"], "foo")
+
+    def test_should_return_second_argument_as_revision(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertEqual(actual_arguments["<revision>"], "123")
+
+
+@patch('config_rpm_maker.parsearguments.setvalue')
+class ApplyArgumentsToConfiguration(TestCase):
+
+    def setUp(self):
+        self.arguments = {OPTION_RPM_UPLOAD_CMD: False,
+                          OPTION_CONFIG_VIEWER_ONLY: False}
+
+    def test_should_not_apply_anything_if_no_options_given(self, mock_setvalue):
+
+        apply_arguments_to_config(self.arguments)
+
+        self.assertEqual(0, len(mock_setvalue.call_args_list))
+
+    def test_should_set_rpm_upload_command_when_option_is_given(self, mock_setvalue):
+
+        self.arguments[OPTION_RPM_UPLOAD_CMD] = '/bin/true'
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_setvalue.assert_any_call(KEY_RPM_UPLOAD_CMD, '/bin/true')
+
+    def test_should_set_config_viewer_only_when_option_is_given(self, mock_setvalue):
+
+        self.arguments[OPTION_CONFIG_VIEWER_ONLY] = True
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_setvalue.assert_any_call(KEY_CONFIG_VIEWER_ONLY, True)

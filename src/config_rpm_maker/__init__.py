@@ -18,152 +18,31 @@
 import traceback
 
 from logging import DEBUG, getLogger
-from math import ceil
-from optparse import OptionParser
-from sys import argv, exit, stderr, stdout
-from time import time, strftime
+from sys import argv, exit, stderr
 from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import (DEFAULT_DATE_FORMAT,
-                                     DEFAULT_CONFIG_VIEWER_ONLY,
-                                     DEFAULT_RPM_UPLOAD_CMD,
-                                     KEY_RPM_UPLOAD_CMD,
-                                     KEY_CONFIG_VIEWER_ONLY,
-                                     KEY_SVN_PATH_TO_CONFIG)
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.logutils import (create_console_handler,
                                        create_sys_log_handler,
                                        log_configuration,
                                        log_process_id)
 from config_rpm_maker.svnservice import SvnService
-
-
-ARGUMENT_REPOSITORY = '<repository-url>'
-ARGUMENT_REVISION = '<revision>'
-
-USAGE_INFORMATION = """Usage: %prog repo-url revision [options]
-
-Arguments:
-  repo-url    URL to subversion repository or absolute path on localhost
-  revision    subversion revision for which the configuration rpms are going to be built"""
-
-OPTION_DEBUG = '--debug'
-OPTION_DEBUG_HELP = "force DEBUG log level on console"
-
-OPTION_NO_SYSLOG = '--no-syslog'
-OPTION_NO_SYSLOG_HELP = "switch logging of debug information to syslog off"
-
-OPTION_VERSION = '--version'
-OPTION_VERSION_HELP = "show version"
-
-OPTION_RPM_UPLOAD_CMD = '--rpm-upload-cmd'
-OPTION_RPM_UPLOAD_CMD_HELP = 'Overwrite rpm_upload_config in config file'
-
-OPTION_CONFIG_VIEWER_ONLY = '--config-viewer-only'
-OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generated files for config viewer. Skip RPM build and upload.'
+from config_rpm_maker.returncodes import RETURN_CODE_CONFIGURATION_ERROR, \
+    RETURN_CODE_REPOSITORY_URL_INVALID, RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED, RETURN_CODE_EXCEPTION_OCCURRED, \
+    RETURN_CODE_SUCCESS, RETURN_CODE_REVISION_IS_NOT_AN_INTEGER
+from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
+    parse_arguments
 
 MESSAGE_SUCCESS = "Success."
 
-RETURN_CODE_SUCCESS = 0
-RETURN_CODE_VERSION = RETURN_CODE_SUCCESS
-RETURN_CODE_NOT_ENOUGH_ARGUMENTS = 1
-RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
-RETURN_CODE_CONFIGURATION_ERROR = 3
-RETURN_CODE_EXCEPTION_OCCURRED = 4
-RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
-RETURN_CODE_REPOSITORY_URL_INVALID = 6
 
 VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
 
 LOGGER = getLogger(__name__)
-
-
-timestamp_at_start = 0
-
-
-def start_measuring_time():
-    """ Start measuring the time. This is required to calculate the elapsed time. """
-    LOGGER.info("Starting to measure time at %s", strftime(DEFAULT_DATE_FORMAT))
-
-    global timestamp_at_start
-    timestamp_at_start = time()
-
-
-def exit_program(message, return_code):
-    """ Logs the given message and exits with given return code. """
-
-    elapsed_time_in_seconds = time() - timestamp_at_start
-    elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
-    LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
-
-    if return_code == RETURN_CODE_SUCCESS:
-        LOGGER.info(message)
-    else:
-        LOGGER.error(message)
-
-    exit(return_code)
-
-
-def parse_arguments(argv, version):
-    """
-        Parses the given command line arguments.
-
-        if -h or --help is given it will display the print the help screen and exit
-        if OPTION_VERSION is given it will display the version information and exit
-
-        Otherwise it will return a dictionary containing the keys and values for
-            OPTION_DEBUG: boolean, True if option --debug is given
-            OPTION_NO_SYSLOG: boolean, True if option --no-syslog is given
-            ARGUMENT_REPOSITORY: string, the first argument
-            ARGUMENT_REVISION: string, the second argument
-    """
-
-    usage = USAGE_INFORMATION
-    parser = OptionParser(usage=usage)
-    parser.add_option("", OPTION_DEBUG,
-                      action="store_true", dest="debug", default=False,
-                      help=OPTION_DEBUG_HELP)
-    parser.add_option("", OPTION_NO_SYSLOG,
-                      action="store_true", dest="no_syslog", default=False,
-                      help=OPTION_NO_SYSLOG_HELP)
-    parser.add_option("", OPTION_VERSION,
-                      action="store_true", dest="version", default=False,
-                      help=OPTION_VERSION_HELP)
-    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
-                      dest='rpm_upload_command', default=False,
-                      help=OPTION_RPM_UPLOAD_CMD_HELP)
-    parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
-                      action="store_true", dest='config_viewer_only', default=False,
-                      help=OPTION_CONFIG_VIEWER_ONLY_HELP)
-    values, args = parser.parse_args(argv)
-
-    if values.version:
-        stdout.write(version + '\n')
-        return exit(RETURN_CODE_VERSION)
-
-    if len(args) < 2:
-        parser.print_help()
-        return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
-
-    arguments = {OPTION_DEBUG: values.debug or False,
-                 OPTION_NO_SYSLOG: values.no_syslog or False,
-                 OPTION_RPM_UPLOAD_CMD: values.rpm_upload_command,
-                 OPTION_CONFIG_VIEWER_ONLY: values.config_viewer_only,
-                 ARGUMENT_REPOSITORY: args[0],
-                 ARGUMENT_REVISION: args[1]}
-
-    return arguments
-
-
-def apply_arguments_to_config(arguments):
-    """ Overrides configuration properties if command line options are specified. """
-    if arguments[OPTION_RPM_UPLOAD_CMD]:
-        config.setvalue(KEY_RPM_UPLOAD_CMD, arguments[OPTION_RPM_UPLOAD_CMD])
-
-    if arguments[OPTION_CONFIG_VIEWER_ONLY]:
-        config.setvalue(KEY_CONFIG_VIEWER_ONLY, arguments[KEY_CONFIG_VIEWER_ONLY])
 
 
 def determine_console_log_level(arguments):

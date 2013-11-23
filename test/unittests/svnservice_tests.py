@@ -17,7 +17,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import TestCase
-from mock import Mock, patch
+from mock import Mock
 
 from config_rpm_maker.svnservice import SvnService
 
