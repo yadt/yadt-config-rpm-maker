@@ -1,4 +1,4 @@
-# coding=utf-8
+#!/bin/bash
 #
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
@@ -16,23 +16,17 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase
-from mock import patch
+set -e
 
-from config_rpm_maker.profiler import measure_execution_time
+readonly WORKING_DIRECTORY="${HOME}"
 
+# Please modify this if you would like to clone your own fork.
+readonly SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
+readonly SOURCE_DIRECTORY="${WORKING_DIRECTORY}/yadt-config-rpm-maker"
 
-class ProfilerTests(TestCase):
+readonly SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
+readonly RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
 
-    @patch('config_rpm_maker.profiler.LOGGER')
-    def test_should_wrap_function(self, mock_LOGGER):
-
-        self.dummy_function_has_been_executed = False
-
-        def dummy_function():
-            self.dummy_function_has_been_executed = True
-
-        actual_function = measure_execution_time(dummy_function)
-        actual_function()
-
-        self.assertTrue(self.dummy_function_has_been_executed)
+readonly CONFIGURATION_REPOSITORY="${WORKING_DIRECTORY}/configuration-repository"
+readonly HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
+readonly SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"
