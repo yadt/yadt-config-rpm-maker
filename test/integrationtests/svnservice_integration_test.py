@@ -18,7 +18,7 @@ from integration_test_support import IntegrationTest
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
-from config_rpm_maker.svnservice import SvnService
+from config_rpm_maker.svnservice import SvnServiceException, SvnService
 
 
 class SvnServiceTest(IntegrationTest):
@@ -42,3 +42,7 @@ class SvnServiceTest(IntegrationTest):
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
         logs = service.log('', 2, 5)
         self.assertEqual(1, len(logs))
+
+    def test_should_raise_SvnServiceException(self):
+        service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        self.assertRaises(SvnServiceException, service.get_change_set, 13)
