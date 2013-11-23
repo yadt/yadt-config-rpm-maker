@@ -21,8 +21,8 @@ import rpm
 
 from integration_test_support import IntegrationTest, IntegrationTestException
 
-from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
+from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, config
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_CMD
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
@@ -209,3 +209,11 @@ class ConfigRpmMakerTest(IntegrationTest):
 
     def test_should_raise_CouldNotBuildSomeRpmsException(self):
         self.assertRaises(CouldNotBuildSomeRpmsException, ConfigRpmMaker(None, None)._build_hosts, ['devabc123'])
+
+    def test_should_raise_CouldNotUploadRpmsException(self):
+        rpm_upload_command_before_test = config.get(KEY_RPM_UPLOAD_CMD)
+        config.setvalue(KEY_RPM_UPLOAD_CMD, "foobar")
+
+        self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
+
+        config.setvalue(KEY_RPM_UPLOAD_CMD, rpm_upload_command_before_test)
