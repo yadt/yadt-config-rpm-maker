@@ -19,12 +19,16 @@
 from mock import Mock, patch
 from unittest import TestCase
 
-from config_rpm_maker import (USAGE_INFORMATION,
+from config_rpm_maker import (OPTION_CONFIG_VIEWER_ONLY,
+                              OPTION_RPM_UPLOAD_CMD,
+                              USAGE_INFORMATION,
+                              apply_arguments_to_config,
                               build_configuration_rpms_from,
                               exit_program,
                               parse_arguments,
                               ensure_valid_revision,
                               ensure_valid_repository_url)
+from config_rpm_maker.config import KEY_RPM_UPLOAD_CMD
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
@@ -89,6 +93,18 @@ class ParseArgumentsTests(TestCase):
 
         self.assertTrue(actual_arguments["--no-syslog"])
 
+    def test_should_return_option_config_viewer_only_as_false_when_no_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertFalse(actual_arguments["--config-viewer-only"])
+
+    def test_should_return_option_config_viewer_only_as_true_when_option_is_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--config-viewer-only"], version="")
+
+        self.assertTrue(actual_arguments["--config-viewer-only"])
+
     def test_should_return_first_argument_as_repository(self):
 
         actual_arguments = parse_arguments(["foo", "123"], version="")
@@ -100,6 +116,37 @@ class ParseArgumentsTests(TestCase):
         actual_arguments = parse_arguments(["foo", "123"], version="")
 
         self.assertEqual(actual_arguments["<revision>"], "123")
+
+
+@patch('config_rpm_maker.config')
+class ApplyArgumentsToConfiguration(TestCase):
+
+    def setUp(self):
+        self.arguments = {OPTION_RPM_UPLOAD_CMD: False,
+                          OPTION_CONFIG_VIEWER_ONLY: False}
+
+    def test_should_not_apply_anything_if_no_options_given(self, mock_config):
+
+        apply_arguments_to_config(self.arguments)
+
+        self.assertEqual(0, len(mock_config.call_args_list))
+
+    def test_should_set_rpm_upload_command_when_option_is_given(self, mock_config):
+
+        self.arguments[OPTION_RPM_UPLOAD_CMD] = '/bin/true'
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_config.setvalue.assert_any_call(KEY_RPM_UPLOAD_CMD, '/bin/true')
+
+    def test_should_set_config_viewer_only_when_option_is_given(self, mock_config):
+
+        self.arguments[OPTION_RPM_UPLOAD_CMD] = True
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_config.setvalue.assert_any_call(KEY_RPM_UPLOAD_CMD, True)
+
 
 
 class BuildConfigurationRpmsTests(TestCase):

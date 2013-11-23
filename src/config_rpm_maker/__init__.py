@@ -25,7 +25,12 @@ from time import time, strftime
 from urlparse import urlparse
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_DATE_FORMAT, KEY_SVN_PATH_TO_CONFIG
+from config_rpm_maker.config import (DEFAULT_DATE_FORMAT,
+                                     DEFAULT_CONFIG_VIEWER_ONLY,
+                                     DEFAULT_RPM_UPLOAD_CMD,
+                                     KEY_RPM_UPLOAD_CMD,
+                                     KEY_CONFIG_VIEWER_ONLY,
+                                     KEY_SVN_PATH_TO_CONFIG)
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.logutils import (create_console_handler,
@@ -52,6 +57,12 @@ OPTION_NO_SYSLOG_HELP = "switch logging of debug information to syslog off"
 
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
+
+OPTION_RPM_UPLOAD_CMD = '--rpm-upload-cmd'
+OPTION_RPM_UPLOAD_CMD_HELP = 'Overwrite rpm_upload_config in config file'
+
+OPTION_CONFIG_VIEWER_ONLY = '--config-viewer-only'
+OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generated files for config viewer. Skip RPM build and upload.'
 
 MESSAGE_SUCCESS = "Success."
 
@@ -120,6 +131,12 @@ def parse_arguments(argv, version):
     parser.add_option("", OPTION_VERSION,
                       action="store_true", dest="version", default=False,
                       help=OPTION_VERSION_HELP)
+    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
+                      dest='rpm_upload_command', default=False,
+                      help=OPTION_RPM_UPLOAD_CMD_HELP)
+    parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
+                      action="store_true", dest='config_viewer_only', default=False,
+                      help=OPTION_CONFIG_VIEWER_ONLY_HELP)
     values, args = parser.parse_args(argv)
 
     if values.version:
@@ -132,10 +149,21 @@ def parse_arguments(argv, version):
 
     arguments = {OPTION_DEBUG: values.debug or False,
                  OPTION_NO_SYSLOG: values.no_syslog or False,
+                 OPTION_RPM_UPLOAD_CMD: values.rpm_upload_command,
+                 OPTION_CONFIG_VIEWER_ONLY: values.config_viewer_only,
                  ARGUMENT_REPOSITORY: args[0],
                  ARGUMENT_REVISION: args[1]}
 
     return arguments
+
+
+def apply_arguments_to_config(arguments):
+    """ Overrides configuration properties if command line options are specified. """
+    if arguments[OPTION_RPM_UPLOAD_CMD]:
+        config.setvalue(KEY_RPM_UPLOAD_CMD, arguments[OPTION_RPM_UPLOAD_CMD])
+
+    if arguments[OPTION_CONFIG_VIEWER_ONLY]:
+        config.setvalue(KEY_CONFIG_VIEWER_ONLY, arguments[KEY_CONFIG_VIEWER_ONLY])
 
 
 def determine_console_log_level(arguments):

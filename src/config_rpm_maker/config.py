@@ -23,6 +23,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 LOGGER = getLogger(__name__)
 
+DEFAULT_CONFIG_VIEWER_ONLY = False
 DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
 DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 DEFAULT_ERROR_LOG_URL = ''
@@ -30,14 +31,17 @@ DEFAULT_FILE_SIZE_MAXIMUM = 100 * 1024
 DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = INFO
+DEFAULT_RPM_UPLOAD_CMD = False
 DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
 DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 DEFAULT_SYS_LOG_LEVEL = DEBUG
 DEFAULT_THREAD_COUNT = 1
 DEFAULT_UPLOAD_CHUNK_SIZE = 0
 
+KEY_CONFIG_VIEWER_ONLY = 'config_viewer_only'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
+KEY_RPM_UPLOAD_CMD = 'rpm_upload_cmd'
 KEY_SVN_PATH_TO_CONFIG = 'svn_path_to_config'
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 KEY_THREAD_COUNT = 'thread_count'
