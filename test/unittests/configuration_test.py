@@ -20,7 +20,8 @@ from logging import DEBUG, ERROR, INFO
 from mock import patch
 from unittest import TestCase
 
-from config_rpm_maker.config import DEFAULT_LOG_LEVEL, ConfigException, get_log_level, get_temporary_directory
+from config_rpm_maker import config
+from config_rpm_maker.config import DEFAULT_LOG_LEVEL, ConfigException, get_log_level, get_temporary_directory, setvalue
 
 
 @patch("config_rpm_maker.config.get")
@@ -74,3 +75,28 @@ class GetLogLevelTests(TestCase):
         mock_get.return_value = "FOO"
 
         self.assertRaises(ConfigException, get_log_level)
+
+
+class SetValueTests(TestCase):
+
+    def test_should_raise_configuration_exception_when_trying_to_set_value_without_name(self):
+
+        self.assertRaises(ConfigException, setvalue, name=None, value='123')
+
+    @patch('config_rpm_maker.config.load_configuration_file')
+    def test_should_load_configuration_if_no_configuration_properties_are_empty(self, mock_load_configuration_file):
+
+        def set_configuration_properties():
+            config.configuration = {}
+        mock_load_configuration_file.side_effect = set_configuration_properties
+        config.configuration = None
+
+        setvalue('abc', '123')
+
+        mock_load_configuration_file.assert_called_with()
+
+    def test_should_set_value_of_configuration_properties(self):
+
+        setvalue('abc', '123')
+
+        self.assertEqual('123', config.configuration['abc'])
