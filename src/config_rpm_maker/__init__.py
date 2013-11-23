@@ -30,9 +30,10 @@ from config_rpm_maker.logutils import (create_console_handler,
                                        log_configuration,
                                        log_process_id)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.returncodes import RETURN_CODE_CONFIGURATION_ERROR, \
-    RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED, RETURN_CODE_EXCEPTION_OCCURRED, \
-    RETURN_CODE_SUCCESS
+from config_rpm_maker.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
+                                          RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
+                                          RETURN_CODE_EXCEPTION_OCCURRED,
+                                          RETURN_CODE_SUCCESS)
 from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
     parse_arguments
 
