@@ -19,13 +19,18 @@ import shutil
 import subprocess
 import rpm
 
-from integration_test_support import IntegrationTest
+from integration_test_support import IntegrationTest, IntegrationTestException
 
 from config_rpm_maker import ConfigRpmMaker, config
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
+
+EXECUTION_ERROR_MESSAGE = """Execution of "{command_with_arguments}" failed. Error code was {error_code}
+stdout was: "{stdout}"
+stderr was: "{stderr}"
+"""
 
 
 class ConfigRpmMakerTest(IntegrationTest):
@@ -56,7 +61,9 @@ class ConfigRpmMakerTest(IntegrationTest):
 
     def test_build_hosts(self):
         config_rpm_maker = self._given_config_rpm_maker(keep_work_dir=True)
+
         rpms = config_rpm_maker.build()
+
         self.assertEqual(9, len(rpms))
 
         hosts_to_check = {
@@ -73,6 +80,7 @@ class ConfigRpmMakerTest(IntegrationTest):
                           'vars/var_in_var': 'berwebberweb'}
             }
         }
+
         for host in hosts_to_check:
             host_to_check = hosts_to_check[host]
             requires = host_to_check.get('requires', None)
@@ -181,7 +189,20 @@ class ConfigRpmMakerTest(IntegrationTest):
         extract_path = os.path.join(config_dev.get('temp_dir'), hostname + '.extract')
         os.mkdir(extract_path)
 
-        p = subprocess.Popen('rpm2cpio ' + os.path.abspath(path) + ' | cpio  -idmv', shell=True, cwd=extract_path)
-        p.communicate()
+        command_with_arguments = 'rpm2cpio ' + os.path.abspath(path) + ' | cpio  -idmv'
+        process = subprocess.Popen(command_with_arguments,
+                                   shell=True,
+                                   cwd=extract_path,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            message = EXECUTION_ERROR_MESSAGE.format(command_with_arguments=command_with_arguments,
+           error_code=process.returncode,
+           stdout=stdout or "",
+           stderr=stderr or "")
+
+            raise IntegrationTestException(message)
 
         return extract_path
