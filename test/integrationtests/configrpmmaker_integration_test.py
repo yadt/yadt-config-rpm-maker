@@ -21,7 +21,7 @@ import rpm
 
 from integration_test_support import IntegrationTest, IntegrationTestException
 
-from config_rpm_maker import ConfigRpmMaker, config
+from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, ConfigRpmMaker, config
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
@@ -206,3 +206,6 @@ class ConfigRpmMakerTest(IntegrationTest):
             raise IntegrationTestException(message)
 
         return extract_path
+
+    def test_should_raise_CouldNotBuildSomeRpmsException(self):
+        self.assertRaises(CouldNotBuildSomeRpmsException, ConfigRpmMaker(None, None)._build_hosts, ['devabc123'])
