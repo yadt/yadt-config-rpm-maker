@@ -123,7 +123,7 @@ When you run the integration tests, the yadt-config-rpm-maker will build test RP
 
 Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
 ```bash
-coverage report --omit=test/*,/usr/*,setup.py
+coverage run setup.py test && coverage report --omit=test/*,/usr/*,setup.py
 ```
 
 ### Execution in the working directory
