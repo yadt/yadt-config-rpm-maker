@@ -14,6 +14,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+__version__ = '2.0'
+
 import traceback
 
 from logging import DEBUG, getLogger
@@ -87,7 +89,7 @@ def append_console_logger(logger, console_log_level):
 def main():
     LOGGER.setLevel(DEBUG)
 
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker 2.0')
+    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
 
     config.load_configuration_file()
     console_log_level = determine_console_log_level(arguments)
