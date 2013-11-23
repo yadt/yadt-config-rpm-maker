@@ -42,6 +42,10 @@ class CouldNotBuildRpmException(BaseConfigRpmMakerException):
     error_info = "Could not create rpm for host :"
 
 
+class ConfigDirAlreadyExistsException(BaseConfigRpmMakerException):
+    error_info = "Config dir already exists: "
+
+
 class HostRpmBuilder(object):
     @classmethod
     def get_config_viewer_host_dir(cls, hostname, temp=False):
@@ -74,7 +78,7 @@ class HostRpmBuilder(object):
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
-            raise Exception('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
+            raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
 
         try:
             os.mkdir(self.host_config_dir)
