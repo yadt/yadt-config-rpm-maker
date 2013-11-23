@@ -14,14 +14,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import traceback
 
 from logging import DEBUG, getLogger
 from sys import argv, exit, stderr
-from urlparse import urlparse
 
 from config_rpm_maker import config
+from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -32,17 +31,14 @@ from config_rpm_maker.logutils import (create_console_handler,
                                        log_process_id)
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker.returncodes import RETURN_CODE_CONFIGURATION_ERROR, \
-    RETURN_CODE_REPOSITORY_URL_INVALID, RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED, RETURN_CODE_EXCEPTION_OCCURRED, \
-    RETURN_CODE_SUCCESS, RETURN_CODE_REVISION_IS_NOT_AN_INTEGER
+    RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED, RETURN_CODE_EXCEPTION_OCCURRED, \
+    RETURN_CODE_SUCCESS
 from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
     parse_arguments
 
-MESSAGE_SUCCESS = "Success."
-
-
-VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
-
 LOGGER = getLogger(__name__)
+
+MESSAGE_SUCCESS = "Success."
 
 
 def determine_console_log_level(arguments):
@@ -76,34 +72,6 @@ def build_configuration_rpms_from(repository, revision):
         return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
 
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
-
-
-def ensure_valid_revision(revision):
-    """ Ensures that the given argument is a valid revision and exits the program if not """
-
-    if not revision.isdigit():
-        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
-
-    LOGGER.debug('Accepting "%s" as a valid subversion revision.', revision)
-    return revision
-
-
-def ensure_valid_repository_url(repository_url):
-    """ Ensures that the given url is a valid repository url """
-
-    parsed_url = urlparse(repository_url)
-    scheme = parsed_url.scheme
-
-    if scheme in VALID_REPOSITORY_URL_SCHEMES:
-        LOGGER.debug('Accepting "%s" as a valid repository url.', repository_url)
-        return repository_url
-
-    if scheme is '':
-        file_uri = 'file://%s' % parsed_url.path
-        LOGGER.debug('Accepting "%s" as a valid repository url.', file_uri)
-        return file_uri
-
-    return exit_program('Given repository url "%s" is invalid.' % repository_url, return_code=RETURN_CODE_REPOSITORY_URL_INVALID)
 
 
 def append_console_logger(logger, console_log_level):

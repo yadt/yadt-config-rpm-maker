@@ -20,7 +20,7 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from config_rpm_maker import build_configuration_rpms_from, ensure_valid_revision, ensure_valid_repository_url
+from config_rpm_maker import build_configuration_rpms_from
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 
@@ -126,79 +126,3 @@ class BuildConfigurationRpmsTests(TestCase):
         build_configuration_rpms_from('file:///path_to/testdata/repository', 1980)
 
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision=1980)
-
-
-class EnsureValidRevisionTests(TestCase):
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_exit_if_a_non_integer_string_is_given(self, mock_exit_program):
-
-        ensure_valid_revision('abc')
-
-        mock_exit_program.assert_called_with('Given revision "abc" is not an integer.', return_code=2)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_not_exit_if_a_integer_string_is_given(self, mock_exit_program):
-
-        ensure_valid_revision('123')
-
-        self.assertEqual(None, mock_exit_program.call_args)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_return_revision_if_a_integer_string_is_given(self, mock_exit_program):
-
-        actual_revision = ensure_valid_revision('123')
-
-        self.assertEqual('123', actual_revision)
-
-
-class EnsureValidRepositoryUrlTests(TestCase):
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_exit_program_when_strange_url_is_given(self, mock_exit_program):
-
-        ensure_valid_repository_url('foo://bar')
-
-        mock_exit_program.assert_called_with('Given repository url "foo://bar" is invalid.', return_code=6)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_return_url_when_a_valid_svn_url(self, mock_exit_program):
-
-        actual_url = ensure_valid_repository_url('svn://host/repository')
-
-        self.assertEqual('svn://host/repository', actual_url)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_return_url_when_a_valid_http_url(self, mock_exit_program):
-
-        actual_url = ensure_valid_repository_url('http://host/repository')
-
-        self.assertEqual('http://host/repository', actual_url)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_return_url_when_a_valid_https_url(self, mock_exit_program):
-
-        actual_url = ensure_valid_repository_url('https://host/repository')
-
-        self.assertEqual('https://host/repository', actual_url)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_return_url_when_a_valid_ssh_url(self, mock_exit_program):
-
-        actual_url = ensure_valid_repository_url('ssh://host/repository')
-
-        self.assertEqual('ssh://host/repository', actual_url)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_return_url_when_a_valid_file_url(self, mock_exit_program):
-
-        actual_url = ensure_valid_repository_url('file://directory/repository')
-
-        self.assertEqual('file://directory/repository', actual_url)
-
-    @patch('config_rpm_maker.exit_program')
-    def test_should_prepend_file_scheme_if_url_has_no_scheme(self, mock_exit_program):
-
-        actual_url = ensure_valid_repository_url('/directory/repository')
-
-        self.assertEqual('file:///directory/repository', actual_url)
