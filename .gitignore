@@ -27,3 +27,5 @@ develop-in-a-vagrant-box/Vagrantfile
 develop-in-a-vagrant-box/epel-release-6-8.noarch.rpm
 develop-in-a-vagrant-box/yadt-config-rpm-maker
 
+# coverage data file
+.coverage
