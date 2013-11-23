@@ -22,7 +22,10 @@ import struct
 import tempfile
 import unittest
 
-from config_rpm_maker.token.tokenreplacer import CannotFilterFileException, MissingTokenException, TokenReplacer
+from config_rpm_maker.token.tokenreplacer import (CannotFilterFileException,
+                                                  MissingTokenException,
+                                                  MissingOrRedundantTokenException,
+                                                  TokenReplacer)
 
 
 def file_mode(mode, binary):
@@ -149,6 +152,9 @@ class TokenReplacerFilterFileTest(IntegrationTestBase):
 
     def test_should_raise_CannotFilterFileException(self):
         self.assertRaises(CannotFilterFileException, TokenReplacer().filter_file, "this-file-does-not-exist.txt")
+
+    def test_should_raise_MissingOrRedundantTokenException(self):
+        self.assertRaises(MissingOrRedundantTokenException, TokenReplacer, token_values={'RPM_REQUIRES': '@@@RPM_REQUIRES@@@'})
 
 
 class TokenReplacerFilterDirectory(IntegrationTestBase):
