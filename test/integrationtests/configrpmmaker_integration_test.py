@@ -199,9 +199,9 @@ class ConfigRpmMakerTest(IntegrationTest):
 
         if process.returncode != 0:
             message = EXECUTION_ERROR_MESSAGE.format(command_with_arguments=command_with_arguments,
-           error_code=process.returncode,
-           stdout=stdout or "",
-           stderr=stderr or "")
+                                                     error_code=process.returncode,
+                                                     stdout=stdout or "",
+                                                     stderr=stderr or "")
 
             raise IntegrationTestException(message)
 
