@@ -85,8 +85,6 @@ def load_configuration_file():
         try:
             with open(configuration_file_path) as f:
                 configuration = yaml.load(f)
-                from pprint import pprint
-                pprint(configuration)
 
         except Exception as e:
             raise ConfigException('Could not load configuration file "%s".\nError: %s' % (configuration_file_path, str(e)))
