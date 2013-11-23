@@ -35,7 +35,7 @@ from config_rpm_maker.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
                                           RETURN_CODE_EXCEPTION_OCCURRED,
                                           RETURN_CODE_SUCCESS)
 from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
-    parse_arguments
+    parse_arguments, apply_arguments_to_config
 
 LOGGER = getLogger(__name__)
 
@@ -92,6 +92,7 @@ def main():
     config.load_configuration_file()
     console_log_level = determine_console_log_level(arguments)
     append_console_logger(LOGGER, console_log_level)
+    apply_arguments_to_config(arguments)
 
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
