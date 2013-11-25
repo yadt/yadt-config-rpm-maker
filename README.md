@@ -123,7 +123,7 @@ When you run the integration tests, the yadt-config-rpm-maker will build test RP
 
 Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
 ```bash
-coverage run setup.py test && coverage report --omit=test/*,/usr/*,setup.py
+coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setup.py,src/config_rpm_maker/magic.py
 ```
 
 ### Execution in the working directory
