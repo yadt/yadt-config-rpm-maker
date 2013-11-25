@@ -137,7 +137,9 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.variables'), patch_info)
 
         self._filter_tokens_in_rpm_sources()
-        self._build_rpm_using_rpmbuild()
+
+        if not config.get(config.KEY_CONFIG_VIEWER_ONLY, config.DEFAULT_CONFIG_VIEWER_ONLY):
+            self._build_rpm_using_rpmbuild()
 
         LOGGER.debug('%s: writing configviewer data for host "%s"', self.thread_name, self.hostname)
         self._filter_tokens_in_config_viewer()
