@@ -39,7 +39,7 @@ class HostRpmBuilderTest(IntegrationTest):
 
         fake_host_directory = os.path.join(current_working_directory, 'yadt-config-fakehost')
         if not os.path.exists(fake_host_directory):
-            os.mkdir(fake_host_directory)
+            os.makedirs(fake_host_directory)
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
                                           hostname="fakehost",
