@@ -46,8 +46,14 @@ class IntegrationTest(unittest.TestCase):
             raise IntegrationTestException('Could not import test data.')
 
     def _create_repository_directory(self):
+
+        print "Configuration is:"
+        from pprint import pprint
+        pprint(config.configuration)
+        print "Configuration path is %s " % config.configuration_file_path
+        print "Configuration path exists is %s" % str(exists(config.configuration_file_path))
+
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
-        print "Temporary_directory is %s " % str(temporary_directory)
         self.repo_dir = abspath(join(temporary_directory, 'svn_repo'))
 
         if exists(self.repo_dir):
