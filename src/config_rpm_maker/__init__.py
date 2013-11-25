@@ -105,6 +105,6 @@ def main():
 
     start_measuring_time()
     log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config._configuration, config.configuration_file_path)
+    log_configuration(LOGGER.debug, config.get_configuration(), config.configuration_file_path)
 
     build_configuration_rpms_from(repository_url, revision)
