@@ -68,4 +68,3 @@ class TokenReplacerTest(unittest.TestCase):
     def test_should_determine_token_recursion(self):
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
-

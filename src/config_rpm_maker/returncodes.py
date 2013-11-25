@@ -1,3 +1,5 @@
+# coding=utf-8
+#
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
@@ -14,13 +16,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
-from config_rpm_maker.hostResolver import HostResolver
-
-
-class HostResolverTest(unittest.TestCase):
-    def test_resolve_localhost(self):
-        ip, fqdn, aliases = HostResolver().resolve('localhost')
-        self.assertTrue(ip == '127.0.0.1' or ip == '::1')
-        self.assertEqual(fqdn, 'localhost')
+RETURN_CODE_SUCCESS = 0
+RETURN_CODE_VERSION = RETURN_CODE_SUCCESS
+RETURN_CODE_NOT_ENOUGH_ARGUMENTS = 1
+RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
+RETURN_CODE_CONFIGURATION_ERROR = 3
+RETURN_CODE_EXCEPTION_OCCURRED = 4
+RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
+RETURN_CODE_REPOSITORY_URL_INVALID = 6

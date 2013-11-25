@@ -23,6 +23,7 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 LOGGER = getLogger(__name__)
 
+DEFAULT_CONFIG_VIEWER_ONLY = False
 DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
 DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 DEFAULT_ERROR_LOG_URL = ''
@@ -36,8 +37,10 @@ DEFAULT_SYS_LOG_LEVEL = DEBUG
 DEFAULT_THREAD_COUNT = 1
 DEFAULT_UPLOAD_CHUNK_SIZE = 0
 
+KEY_CONFIG_VIEWER_ONLY = 'config_viewer_only'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
+KEY_RPM_UPLOAD_CMD = 'rpm_upload_cmd'
 KEY_SVN_PATH_TO_CONFIG = 'svn_path_to_config'
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 KEY_THREAD_COUNT = 'thread_count'
@@ -107,7 +110,7 @@ def get(name, default=None):
 
 def setvalue(name, value):
     if not name:
-        raise Exception("No name given")
+        raise ConfigException("No name given")
 
     if not configuration:
         load_configuration_file()

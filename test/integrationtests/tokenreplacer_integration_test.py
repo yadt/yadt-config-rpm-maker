@@ -22,7 +22,10 @@ import struct
 import tempfile
 import unittest
 
-from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer
+from config_rpm_maker.token.tokenreplacer import (CannotFilterFileException,
+                                                  MissingTokenException,
+                                                  MissingOrRedundantTokenException,
+                                                  TokenReplacer)
 
 
 def file_mode(mode, binary):
@@ -146,6 +149,12 @@ class TokenReplacerFilterFileTest(IntegrationTestBase):
         path = os.path.join(self.tmp_directory, 'file-with-special-character')
         shutil.copyfile('testdata/svn_repo/config/typ/web/data/file-with-special-character', path)
         TokenReplacer(token_values={'RPM_REQUIRES': 'äöß234'}).filter_file(path, html_escape=True)
+
+    def test_should_raise_CannotFilterFileException(self):
+        self.assertRaises(CannotFilterFileException, TokenReplacer().filter_file, "this-file-does-not-exist.txt")
+
+    def test_should_raise_MissingOrRedundantTokenException(self):
+        self.assertRaises(MissingOrRedundantTokenException, TokenReplacer, token_values={'RPM_REQUIRES': '@@@RPM_REQUIRES@@@'})
 
 
 class TokenReplacerFilterDirectory(IntegrationTestBase):

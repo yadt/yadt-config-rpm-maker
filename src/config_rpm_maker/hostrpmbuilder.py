@@ -25,7 +25,7 @@ from logging import ERROR, Formatter, FileHandler, getLogger
 from config_rpm_maker import config
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.hostResolver import HostResolver
+from config_rpm_maker.hostresolver import HostResolver
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
 from config_rpm_maker.profiler import measure_execution_time
@@ -40,6 +40,14 @@ class CouldNotCreateConfigDirException(BaseConfigRpmMakerException):
 
 class CouldNotBuildRpmException(BaseConfigRpmMakerException):
     error_info = "Could not create rpm for host :"
+
+
+class ConfigDirAlreadyExistsException(BaseConfigRpmMakerException):
+    error_info = "Config dir already exists: "
+
+
+class CouldNotTarConfigurationDirectoryException(BaseConfigRpmMakerException):
+    error_info = "Could not tar configuration directory: "
 
 
 class HostRpmBuilder(object):
@@ -74,7 +82,7 @@ class HostRpmBuilder(object):
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if os.path.exists(self.host_config_dir):
-            raise Exception('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
+            raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
 
         try:
             os.mkdir(self.host_config_dir)
@@ -209,7 +217,7 @@ class HostRpmBuilder(object):
                              stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         if p.returncode:
-            raise Exception('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
+            raise CouldNotTarConfigurationDirectoryException('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
     @measure_execution_time
