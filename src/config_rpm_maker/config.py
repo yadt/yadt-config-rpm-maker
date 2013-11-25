@@ -49,7 +49,7 @@ LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
 
-configuration = None
+_configuration = None
 configuration_file_path = DEFAULT_CONFIGURATION_FILE_PATH
 
 
@@ -79,12 +79,12 @@ def get_log_level():
 
 
 def load_configuration_file():
-    global configuration, configuration_file_path
+    global _configuration, configuration_file_path
     configuration_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', configuration_file_path)
     if os.path.exists(configuration_file_path):
         try:
             with open(configuration_file_path) as f:
-                configuration = yaml.load(f)
+                _configuration = yaml.load(f)
 
         except Exception as e:
             raise ConfigException('Could not load configuration file "%s".\nError: %s' % (configuration_file_path, str(e)))
@@ -93,7 +93,7 @@ def load_configuration_file():
 
 
 def get(name, default=None):
-    if not configuration:
+    if not _configuration:
         try:
             load_configuration_file()
         except Exception as e:
@@ -102,8 +102,8 @@ def get(name, default=None):
             else:
                 raise e
 
-    if name in configuration:
-        return configuration[name]
+    if name in _configuration:
+        return _configuration[name]
     else:
         return default
 
@@ -112,7 +112,14 @@ def setvalue(name, value):
     if not name:
         raise ConfigException("No name given")
 
+    configuration = get_configuration()
+
     if not configuration:
         load_configuration_file()
+        configuration = get_configuration()
 
     configuration[name] = value
+
+
+def get_configuration():
+    return _configuration

@@ -21,7 +21,12 @@ from mock import patch
 from unittest import TestCase
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_LOG_LEVEL, ConfigException, get_log_level, get_temporary_directory, setvalue
+from config_rpm_maker.config import (DEFAULT_LOG_LEVEL,
+                                     ConfigException,
+                                     get_configuration,
+                                     get_log_level,
+                                     get_temporary_directory,
+                                     setvalue)
 
 
 @patch("config_rpm_maker.config.get")
@@ -83,20 +88,32 @@ class SetValueTests(TestCase):
 
         self.assertRaises(ConfigException, setvalue, name=None, value='123')
 
-#     @patch('config_rpm_maker.config.load_configuration_file')
-#     def test_should_load_configuration_if_no_configuration_properties_are_empty(self, mock_load_configuration_file):
-#
-#         def set_configuration_properties():
-#             config.configuration = {}
-#         mock_load_configuration_file.side_effect = set_configuration_properties
-#         config.configuration = None
-#
-#         setvalue('abc', '123')
-#
-#         mock_load_configuration_file.assert_called_with()
+    @patch('config_rpm_maker.config.get_configuration')
+    @patch('config_rpm_maker.config.load_configuration_file')
+    def test_should_load_configuration_if_no_configuration_properties_are_empty(self, mock_load_configuration_file, mock_get_configuration):
+
+        def set_configuration_properties():
+            mock_get_configuration.return_value = {}
+        mock_load_configuration_file.side_effect = set_configuration_properties
+        mock_get_configuration.return_value = None
+
+        setvalue('abc', '123')
+
+        mock_load_configuration_file.assert_called_with()
 
     def test_should_set_value_of_configuration_properties(self):
 
         setvalue('abc', '123')
 
-        self.assertEqual('123', config.configuration['abc'])
+        self.assertEqual('123', config._configuration['abc'])
+
+
+class GetConfigurationAsDictionary(TestCase):
+
+    @patch('config_rpm_maker.config._configuration')
+    def test_should_return_configuration(self, mock_configuration):
+
+
+        actual_configuration = get_configuration()
+
+        self.assertEqual(mock_configuration, actual_configuration)

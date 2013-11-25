@@ -47,12 +47,6 @@ class IntegrationTest(unittest.TestCase):
 
     def _create_repository_directory(self):
 
-        print "Configuration is:"
-        from pprint import pprint
-        pprint(config.configuration)
-        print "Configuration path is %s " % config.configuration_file_path
-        print "Configuration path exists is %s" % str(exists(config.configuration_file_path))
-
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
         self.repo_dir = abspath(join(temporary_directory, 'svn_repo'))
 
