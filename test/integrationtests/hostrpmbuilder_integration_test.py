@@ -18,8 +18,9 @@
 
 import os
 import shutil
-from Queue import Queue
 
+from Queue import Queue
+from os import getcwd
 from integration_test_support import IntegrationTest
 
 from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryException,
@@ -34,7 +35,18 @@ from config_rpm_maker import config
 class HostRpmBuilderTest(IntegrationTest):
 
     def test_should_raise_ConfigDirAlreadyExistsException(self):
-        host_rpm_builder = HostRpmBuilder(thread_name="abc", hostname="def", revision=1, work_dir="", svn_service_queue={})
+        current_working_directory = os.path.join(getcwd(), 'target', 'tmp')
+
+        fake_host_directory = os.path.join(current_working_directory, 'yadt-config-fakehost')
+        if not os.path.exists(fake_host_directory):
+            os.mkdir(fake_host_directory)
+
+        host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
+                                          hostname="fakehost",
+                                          revision='123',
+                                          work_dir=current_working_directory,
+                                          svn_service_queue={})
+
         self.assertRaises(ConfigDirAlreadyExistsException, host_rpm_builder.build)
 
     def test_should_raise_CouldNotTarConfigurationDirectoryException(self):
