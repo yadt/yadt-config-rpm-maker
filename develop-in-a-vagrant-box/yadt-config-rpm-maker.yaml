@@ -18,7 +18,7 @@
 
 allow_unknown_hosts: true
 config_rpm_prefix: 'yadt-config-'
-config_viewer_dir: '/home/vagrant/target/configviewer'
+config_viewer_hosts_dir: '/home/vagrant/target/configviewer/hosts'
 custom_dns_searchlist: []
 error_log_dir: '/home/vagrant/target/configviewer/errors'
 error_log_url: 'http://localhost/errors'

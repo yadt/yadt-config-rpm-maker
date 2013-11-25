@@ -53,7 +53,7 @@ class CouldNotTarConfigurationDirectoryException(BaseConfigRpmMakerException):
 class HostRpmBuilder(object):
     @classmethod
     def get_config_viewer_host_dir(cls, hostname, temp=False):
-        path = os.path.join(config.get('config_viewer_dir'), 'hosts', hostname)
+        path = os.path.join(config.get('config_viewer_hosts_dir'), hostname)
 
         if temp:
             path += '.new'
