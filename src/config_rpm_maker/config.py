@@ -70,29 +70,29 @@ def get_file_path_of_loaded_configuration():
     return _file_path_of_loaded_configuration
 
 
-def set_file_path_of_loaded_configuration(new_file_path):
+def _set_file_path_of_loaded_configuration(new_file_path):
     global _file_path_of_loaded_configuration
     _file_path_of_loaded_configuration = new_file_path
 
 
-def determine_configuration_file_path():
+def _determine_configuration_file_path():
     global _file_path_of_loaded_configuration
     _file_path_of_loaded_configuration = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
 
     return _file_path_of_loaded_configuration
 
 
-def load_configuration_properties_from_yaml_file(configuration_file_path):
+def _load_configuration_properties_from_yaml_file(configuration_file_path):
     try:
         with open(configuration_file_path) as configuration_file:
             set_properties(yaml.load(configuration_file))
-            set_file_path_of_loaded_configuration(configuration_file_path)
+            _set_file_path_of_loaded_configuration(configuration_file_path)
     except Exception as e:
         raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_file_path_of_loaded_configuration, str(e)))
 
 
 def load_configuration_file():
-    configuration_file_path = determine_configuration_file_path()
+    configuration_file_path = _determine_configuration_file_path()
 
     if not exists(configuration_file_path):
         raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
@@ -101,7 +101,7 @@ def load_configuration_file():
                                abspath('.'),
                                ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
 
-    load_configuration_properties_from_yaml_file(configuration_file_path)
+    _load_configuration_properties_from_yaml_file(configuration_file_path)
 
 
 def get(name, default=None):
