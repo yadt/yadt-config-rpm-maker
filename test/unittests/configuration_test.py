@@ -40,7 +40,6 @@ class GetProperties(TestCase):
     @patch('config_rpm_maker.config._properties')
     def test_should_return_configuration(self, mock_configuration):
 
-
         actual_configuration = get_configuration()
 
         self.assertEqual(mock_configuration, actual_configuration)
@@ -62,7 +61,6 @@ class GetConfigurationFilePath(TestCase):
 
     @patch('config_rpm_maker.config._configuration_file_path')
     def test_should_return_configuration(self, mock_configuration_file_path):
-
 
         actual_configuration_file_path = get_configuration_file_path()
 
@@ -223,5 +221,3 @@ class GetLogLevelTests(TestCase):
         mock_get.return_value = "FOO"
 
         self.assertRaises(ConfigException, get_log_level)
-
-

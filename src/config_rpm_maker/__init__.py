@@ -19,11 +19,11 @@ __version__ = '2.0'
 import traceback
 
 from logging import DEBUG, INFO, getLogger
-from sys import argv, exit, stderr
+from sys import argv
 
 from config_rpm_maker import config
 from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.exitprogram import start_measuring_time, exit_program
@@ -96,10 +96,15 @@ def log_additional_information():
     log_configuration(LOGGER.debug, config.get_configuration(), config.get_configuration_file_path())
 
 
-def main():
-    try:
-        LOGGER.setLevel(DEBUG)
+def log_exception_message(e):
+    for line in str(e).split("\n"):
+        LOGGER.error(line)
 
+
+def main():
+    LOGGER.setLevel(DEBUG)
+
+    try:
         arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
 
         initialize_logging_to_console(arguments)
@@ -110,14 +115,15 @@ def main():
         initialize_logging_to_syslog(arguments, revision)
 
         start_measuring_time()
-
         log_additional_information()
-
         start_building_configuration_rpms(repository_url, revision)
 
+    except ConfigException as e:
+        log_exception_message(e)
+        return exit_program('A confuration exception occured!', return_code=RETURN_CODE_CONFIGURATION_ERROR)
+
     except BaseConfigRpmMakerException as e:
-        for line in str(e).split("\n"):
-            LOGGER.error(line)
+        log_exception_message(e)
         return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:

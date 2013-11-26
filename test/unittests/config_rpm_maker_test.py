@@ -22,6 +22,7 @@ from mock import Mock, patch
 
 from config_rpm_maker import main, start_building_configuration_rpms
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.config import ConfigException
 
 
 class MainTests(TestCase):
@@ -52,6 +53,16 @@ class MainTests(TestCase):
         main()
 
         mock_exit_program.assert_called_with('An exception occurred!', return_code=4)
+
+    @patch('config_rpm_maker.parse_arguments')
+    @patch('config_rpm_maker.exit_program')
+    def test_should_return_with_error_message_and_error_code_when_configuration_exception_occurrs(self, mock_exit_program, mock_parse_arguments):
+
+        mock_parse_arguments.side_effect = ConfigException("We knew this could happen!")
+
+        main()
+
+        mock_exit_program.assert_called_with('A confuration exception occured!', return_code=3)
 
     @patch('config_rpm_maker.parse_arguments')
     @patch('config_rpm_maker.exit_program')
