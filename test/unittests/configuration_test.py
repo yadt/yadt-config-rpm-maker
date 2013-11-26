@@ -22,8 +22,7 @@ from StringIO import StringIO
 from unittest import TestCase
 
 from config_rpm_maker import config
-from config_rpm_maker.config import (DEFAULT_LOG_LEVEL,
-                                     DEFAULT_CONFIGURATION_FILE_PATH,
+from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
                                      KEY_CONFIG_RPM_PREFIX,
                                      KEY_CONFIG_VIEWER_HOSTS_DIR,
@@ -387,7 +386,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(4, actual_properties[KEY_THREAD_COUNT])
+        self.assertEqual(1, actual_properties[KEY_THREAD_COUNT])
 
     def test_should_return_temp_dir(self):
 
@@ -397,7 +396,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('target/tmp', actual_properties[KEY_TEMP_DIR])
 
-    def test_should_return_default_for_thread_count_if_not_defined(self):
+    def test_should_return_default_for_temp_dir_if_not_defined(self):
 
         properties = {}
 
@@ -420,7 +419,6 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual('/tmp', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
-
 
 
 class LoadConfigurationFileTests(TestCase):
