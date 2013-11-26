@@ -23,6 +23,7 @@ from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
 
 from config_rpm_maker import config
+from config_rpm_maker.config import KEY_LOG_LEVEL
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -391,7 +392,7 @@ Change set:
         self.handler.close()
 
     def _create_logger(self):
-        log_level = config.get_log_level()
+        log_level = config.get(KEY_LOG_LEVEL)
         formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
 
         self.handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))

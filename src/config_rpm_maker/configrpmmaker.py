@@ -31,7 +31,8 @@ from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
                                      DEFAULT_THREAD_COUNT,
                                      DEFAULT_UPLOAD_CHUNK_SIZE,
                                      KEY_THREAD_COUNT,
-                                     KEY_RPM_UPLOAD_CMD)
+                                     KEY_RPM_UPLOAD_COMMAND,
+                                     KEY_TEMPORARY_DIRECTORY)
 
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -110,7 +111,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
     def __init__(self, revision, svn_service):
         self.revision = revision
         self.svn_service = svn_service
-        self.temp_dir = config.get_temporary_directory()
+        self.temp_dir = config.get(KEY_TEMPORARY_DIRECTORY)
         self._assure_temp_dir_if_set()
         self._create_logger()
         self.work_dir = None
@@ -230,7 +231,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     @measure_execution_time
     def _upload_rpms(self, rpms):
-        rpm_upload_cmd = config.get(KEY_RPM_UPLOAD_CMD)
+        rpm_upload_cmd = config.get(KEY_RPM_UPLOAD_COMMAND)
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
@@ -296,7 +297,7 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
         return items
 
     def _create_logger(self):
-        self.error_log_file = tempfile.mktemp(dir=config.get_temporary_directory(),
+        self.error_log_file = tempfile.mktemp(dir=config.get(KEY_TEMPORARY_DIRECTORY),
                                               prefix='yadt-config-rpm-maker',
                                               suffix='.error.log')
         self.error_handler = FileHandler(self.error_log_file)
