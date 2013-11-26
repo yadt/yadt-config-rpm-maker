@@ -62,7 +62,7 @@ class MainTests(TestCase):
 
         main()
 
-        mock_exit_program.assert_called_with('A confuration exception occured!', return_code=3)
+        mock_exit_program.assert_called_with('Configuration error!', return_code=3)
 
     @patch('config_rpm_maker.parse_arguments')
     @patch('config_rpm_maker.exit_program')

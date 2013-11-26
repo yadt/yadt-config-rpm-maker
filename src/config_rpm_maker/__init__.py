@@ -120,7 +120,7 @@ def main():
 
     except ConfigException as e:
         log_exception_message(e)
-        return exit_program('A confuration exception occured!', return_code=RETURN_CODE_CONFIGURATION_ERROR)
+        return exit_program('Configuration error!', return_code=RETURN_CODE_CONFIGURATION_ERROR)
 
     except BaseConfigRpmMakerException as e:
         log_exception_message(e)
