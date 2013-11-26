@@ -53,7 +53,7 @@ LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
 
-_configuration = None
+_properties = None
 configuration_file_path = DEFAULT_CONFIGURATION_FILE_PATH
 
 
@@ -62,29 +62,8 @@ class ConfigException(BaseConfigRpmMakerException):
 
 
 def set_properties(new_properties):
-    global _configuration
-    _configuration = new_properties
-
-
-def get_temporary_directory():
-    """ Returns the temporary directory """
-
-    return get(KEY_TEMPORARY_DIRECTORY)
-
-
-def get_log_level():
-    """ Returns configured log level or default log level """
-
-    log_level_name = get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
-
-    if log_level_name == 'DEBUG':
-        return DEBUG
-    elif log_level_name == 'INFO':
-        return INFO
-    elif log_level_name == 'ERROR':
-        return ERROR
-
-    raise ConfigException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
+    global _properties
+    _properties = new_properties
 
 
 def load_configuration_file():
@@ -103,7 +82,7 @@ def load_configuration_file():
 
 
 def get(name, default=None):
-    if not _configuration:
+    if not _properties:
         try:
             load_configuration_file()
         except Exception as e:
@@ -112,8 +91,8 @@ def get(name, default=None):
             else:
                 raise e
 
-    if name in _configuration:
-        return _configuration[name]
+    if name in _properties:
+        return _properties[name]
     else:
         return default
 
@@ -132,4 +111,25 @@ def setvalue(name, value):
 
 
 def get_configuration():
-    return _configuration
+    return _properties
+
+
+def get_log_level():
+    """ Returns configured log level or default log level """
+
+    log_level_name = get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
+
+    if log_level_name == 'DEBUG':
+        return DEBUG
+    elif log_level_name == 'INFO':
+        return INFO
+    elif log_level_name == 'ERROR':
+        return ERROR
+
+    raise ConfigException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
+
+
+def get_temporary_directory():
+    """ Returns the temporary directory """
+
+    return get(KEY_TEMPORARY_DIRECTORY)

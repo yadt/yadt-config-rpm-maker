@@ -34,16 +34,27 @@ from config_rpm_maker.config import (DEFAULT_LOG_LEVEL,
                                      set_properties)
 
 
+class GetProperties(TestCase):
+
+    @patch('config_rpm_maker.config._properties')
+    def test_should_return_configuration(self, mock_configuration):
+
+
+        actual_configuration = get_configuration()
+
+        self.assertEqual(mock_configuration, actual_configuration)
+
+
 class SetPropertiesTests(TestCase):
 
-    @patch('config_rpm_maker.config._configuration')
+    @patch('config_rpm_maker.config._properties')
     def test_should_set_configuration_properties(self, mock_properties):
 
         fake_properties = {}
 
         set_properties(fake_properties)
 
-        self.assertEqual(config._configuration, fake_properties)
+        self.assertEqual(config._properties, fake_properties)
 
 
 class LoadConfigurationTests(TestCase):
@@ -123,6 +134,32 @@ class LoadConfigurationTests(TestCase):
         return FakeFile()
 
 
+class SetValueTests(TestCase):
+
+    def test_should_raise_configuration_exception_when_trying_to_set_value_without_name(self):
+
+        self.assertRaises(ConfigException, setvalue, name=None, value='123')
+
+    @patch('config_rpm_maker.config.get_configuration')
+    @patch('config_rpm_maker.config.load_configuration_file')
+    def test_should_load_configuration_if_no_configuration_properties_are_empty(self, mock_load_configuration_file, mock_get_configuration):
+
+        def set_configuration_properties():
+            mock_get_configuration.return_value = {}
+        mock_load_configuration_file.side_effect = set_configuration_properties
+        mock_get_configuration.return_value = None
+
+        setvalue('abc', '123')
+
+        mock_load_configuration_file.assert_called_with()
+
+    def test_should_set_value_of_configuration_properties(self):
+
+        setvalue('abc', '123')
+
+        self.assertEqual('123', config._properties['abc'])
+
+
 @patch("config_rpm_maker.config.get")
 class GetTemporaryDirectoryTests(TestCase):
 
@@ -176,38 +213,3 @@ class GetLogLevelTests(TestCase):
         self.assertRaises(ConfigException, get_log_level)
 
 
-class SetValueTests(TestCase):
-
-    def test_should_raise_configuration_exception_when_trying_to_set_value_without_name(self):
-
-        self.assertRaises(ConfigException, setvalue, name=None, value='123')
-
-    @patch('config_rpm_maker.config.get_configuration')
-    @patch('config_rpm_maker.config.load_configuration_file')
-    def test_should_load_configuration_if_no_configuration_properties_are_empty(self, mock_load_configuration_file, mock_get_configuration):
-
-        def set_configuration_properties():
-            mock_get_configuration.return_value = {}
-        mock_load_configuration_file.side_effect = set_configuration_properties
-        mock_get_configuration.return_value = None
-
-        setvalue('abc', '123')
-
-        mock_load_configuration_file.assert_called_with()
-
-    def test_should_set_value_of_configuration_properties(self):
-
-        setvalue('abc', '123')
-
-        self.assertEqual('123', config._configuration['abc'])
-
-
-class GetConfigurationAsDictionary(TestCase):
-
-    @patch('config_rpm_maker.config._configuration')
-    def test_should_return_configuration(self, mock_configuration):
-
-
-        actual_configuration = get_configuration()
-
-        self.assertEqual(mock_configuration, actual_configuration)
