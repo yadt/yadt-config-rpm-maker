@@ -87,13 +87,13 @@ def load_configuration_properties_from_yaml_file():
 def load_configuration_file():
     determine_configuration_file_path()
 
-    if exists(_configuration_file_path):
-        load_configuration_properties_from_yaml_file()
-    else:
+    if not exists(_configuration_file_path):
         raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
                               (DEFAULT_CONFIGURATION_FILE_PATH,
                                _configuration_file_path, abspath('.'),
                                ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
+
+    load_configuration_properties_from_yaml_file()
 
 
 def get(name, default=None):
