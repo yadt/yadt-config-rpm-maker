@@ -66,6 +66,16 @@ class MainTests(TestCase):
 
     @patch('config_rpm_maker.parse_arguments')
     @patch('config_rpm_maker.exit_program')
+    def test_should_return_with_error_message_and_error_code_when_user_interrupts_execution(self, mock_exit_program, mock_parse_arguments):
+
+        mock_parse_arguments.side_effect = KeyboardInterrupt()
+
+        main()
+
+        mock_exit_program.assert_called_with('Execution interrupted by user!', return_code=7)
+
+    @patch('config_rpm_maker.parse_arguments')
+    @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.traceback')
     def test_should_print_traceback_when_completly_unexpected_exception_occurrs(self, mock_traceback, mock_exit_program, mock_parse_arguments):
 

@@ -35,7 +35,8 @@ from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
                                           RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
                                           RETURN_CODE_EXCEPTION_OCCURRED,
-                                          RETURN_CODE_SUCCESS)
+                                          RETURN_CODE_SUCCESS,
+                                          RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
 from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
     parse_arguments, apply_arguments_to_config
 
@@ -129,5 +130,8 @@ def main():
     except Exception:
         traceback.print_exc(5)
         return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+
+    except KeyboardInterrupt:
+        return exit_program('Execution interrupted by user!', return_code=RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
 
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
