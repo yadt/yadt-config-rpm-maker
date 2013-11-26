@@ -54,7 +54,7 @@ LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
 
 _properties = None
-configuration_file_path = DEFAULT_CONFIGURATION_FILE_PATH
+_configuration_file_path = None
 
 
 class ConfigException(BaseConfigRpmMakerException):
@@ -66,19 +66,27 @@ def set_properties(new_properties):
     _properties = new_properties
 
 
-def load_configuration_file():
-    global configuration_file_path
+def get_configuration_file_path():
+    return _configuration_file_path
 
-    configuration_file_path = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
-    if exists(configuration_file_path):
+
+def determine_configuration_file_path():
+    global _configuration_file_path
+    _configuration_file_path = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+
+
+def load_configuration_file():
+    determine_configuration_file_path()
+
+    if exists(_configuration_file_path):
         try:
-            with open(configuration_file_path) as configuration_file:
+            with open(_configuration_file_path) as configuration_file:
                 set_properties(yaml.load(configuration_file))
 
         except Exception as e:
-            raise ConfigException('Could not load configuration file "%s".\nError: %s' % (configuration_file_path, str(e)))
+            raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_configuration_file_path, str(e)))
     else:
-        raise ConfigException("Could not find configuration file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (configuration_file_path, abspath('.')))
+        raise ConfigException("Could not find configuration file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (_configuration_file_path, abspath('.')))
 
 
 def get(name, default=None):

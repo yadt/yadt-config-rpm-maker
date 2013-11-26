@@ -29,6 +29,7 @@ from config_rpm_maker.config import (DEFAULT_LOG_LEVEL,
                                      get_configuration,
                                      get_log_level,
                                      get_temporary_directory,
+                                     get_configuration_file_path,
                                      load_configuration_file,
                                      setvalue,
                                      set_properties)
@@ -57,6 +58,17 @@ class SetPropertiesTests(TestCase):
         self.assertEqual(config._properties, fake_properties)
 
 
+class GetConfigurationFilePath(TestCase):
+
+    @patch('config_rpm_maker.config._configuration_file_path')
+    def test_should_return_configuration(self, mock_configuration_file_path):
+
+
+        actual_configuration_file_path = get_configuration_file_path()
+
+        self.assertEqual(mock_configuration_file_path, actual_configuration_file_path)
+
+
 class LoadConfigurationTests(TestCase):
 
     @patch('config_rpm_maker.config.exists')
@@ -67,7 +79,7 @@ class LoadConfigurationTests(TestCase):
 
         self.assertRaises(ConfigException, load_configuration_file)
 
-    @patch('config_rpm_maker.config.configuration_file_path')
+    @patch('config_rpm_maker.config._configuration_file_path')
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config.environ')
     def test_should_use_default_configuration_file_path_if_no_environment_variable_is_set(self, mock_environ, mock_exists, mock_file_path):
