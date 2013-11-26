@@ -18,15 +18,109 @@
 
 from logging import DEBUG, ERROR, INFO
 from mock import patch
+from StringIO import StringIO
 from unittest import TestCase
 
 from config_rpm_maker import config
 from config_rpm_maker.config import (DEFAULT_LOG_LEVEL,
+                                     DEFAULT_CONFIGURATION_FILE_PATH,
+                                     ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      ConfigException,
                                      get_configuration,
                                      get_log_level,
                                      get_temporary_directory,
-                                     setvalue)
+                                     load_configuration_file,
+                                     setvalue,
+                                     set_properties)
+
+
+class SetPropertiesTests(TestCase):
+
+    @patch('config_rpm_maker.config._configuration')
+    def test_should_set_configuration_properties(self, mock_properties):
+
+        fake_properties = {}
+
+        set_properties(fake_properties)
+
+        self.assertEqual(config._configuration, fake_properties)
+
+
+class LoadConfigurationTests(TestCase):
+
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config.environ')
+    def test_should_raise_exception_if_configuration_file_does_not_exist(self, mock_environ, mock_exists):
+
+        mock_exists.return_value = False
+
+        self.assertRaises(ConfigException, load_configuration_file)
+
+    @patch('config_rpm_maker.config.configuration_file_path')
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config.environ')
+    def test_should_use_default_configuration_file_path_if_no_environment_variable_is_set(self, mock_environ, mock_exists, mock_file_path):
+
+        mock_exists.return_value = False
+
+        self.assertRaises(ConfigException, load_configuration_file)
+
+        mock_environ.get.assert_called_with(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+
+    @patch('config_rpm_maker.config.set_properties')
+    @patch('config_rpm_maker.config.yaml')
+    @patch('__builtin__.open')
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config.environ')
+    def test_load_configuration_file_if_it_exists(self, mock_environ, mock_exists, mock_open, mock_yaml, mock_set_properties):
+
+        mock_exists.return_value = True
+        fake_file = self._create_fake_file()
+        mock_open.return_value = fake_file
+
+        load_configuration_file()
+
+        mock_yaml.load.assert_called_with(fake_file)
+
+    @patch('config_rpm_maker.config.set_properties')
+    @patch('config_rpm_maker.config.yaml')
+    @patch('__builtin__.open')
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config.environ')
+    def test_should_use_loaded_configuration_as_properties(self, mock_environ, mock_exists, mock_open, mock_yaml, mock_set_properties):
+
+        mock_exists.return_value = True
+        fake_file = self._create_fake_file()
+        mock_open.return_value = fake_file
+        mock_properties = {}
+        mock_yaml.load.return_value = mock_properties
+
+        load_configuration_file()
+
+        mock_set_properties.assert_called_with(mock_properties)
+
+    @patch('config_rpm_maker.config.yaml')
+    @patch('__builtin__.open')
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config.environ')
+    def test_should_raise_ConfigException_when_loading_fails(self, mock_environ, mock_exists, mock_open, mock_yaml):
+
+        mock_exists.return_value = True
+        fake_file = self._create_fake_file()
+        mock_open.return_value = fake_file
+        mock_yaml.load.side_effect = Exception()
+
+        self.assertRaises(ConfigException, load_configuration_file)
+
+    def _create_fake_file(self):
+        class FakeFile(StringIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                pass
+
+        return FakeFile()
 
 
 @patch("config_rpm_maker.config.get")

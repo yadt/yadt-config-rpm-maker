@@ -14,8 +14,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import yaml
+
+from os import environ
+from os.path import abspath, exists
 
 from logging import DEBUG, ERROR, INFO, getLogger
 
@@ -37,6 +39,8 @@ DEFAULT_SYS_LOG_LEVEL = DEBUG
 DEFAULT_THREAD_COUNT = 1
 DEFAULT_UPLOAD_CHUNK_SIZE = 0
 
+ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE = 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'
+
 KEY_CONFIG_VIEWER_ONLY = 'config_viewer_only'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
@@ -55,6 +59,11 @@ configuration_file_path = DEFAULT_CONFIGURATION_FILE_PATH
 
 class ConfigException(BaseConfigRpmMakerException):
     error_info = "Configuration Error:\n"
+
+
+def set_properties(new_properties):
+    global _configuration
+    _configuration = new_properties
 
 
 def get_temporary_directory():
@@ -79,17 +88,18 @@ def get_log_level():
 
 
 def load_configuration_file():
-    global _configuration, configuration_file_path
-    configuration_file_path = os.environ.get('YADT_CONFIG_RPM_MAKER_CONFIG_FILE', configuration_file_path)
-    if os.path.exists(configuration_file_path):
+    global configuration_file_path
+
+    configuration_file_path = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+    if exists(configuration_file_path):
         try:
-            with open(configuration_file_path) as f:
-                _configuration = yaml.load(f)
+            with open(configuration_file_path) as configuration_file:
+                set_properties(yaml.load(configuration_file))
 
         except Exception as e:
             raise ConfigException('Could not load configuration file "%s".\nError: %s' % (configuration_file_path, str(e)))
     else:
-        raise ConfigException("Could not find configuration file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (configuration_file_path, os.path.abspath('.')))
+        raise ConfigException("Could not find configuration file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (configuration_file_path, abspath('.')))
 
 
 def get(name, default=None):
