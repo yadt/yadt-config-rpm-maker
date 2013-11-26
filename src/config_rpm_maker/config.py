@@ -90,7 +90,10 @@ def load_configuration_file():
     if exists(_configuration_file_path):
         load_configuration_properties_from_yaml_file()
     else:
-        raise ConfigException("Could not find configuration file '%s'. Please provide a 'yadt-config-rpm-maker.yaml' in the current working directory '%s' or set environment variable 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'." % (_configuration_file_path, abspath('.')))
+        raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
+                              (DEFAULT_CONFIGURATION_FILE_PATH,
+                               _configuration_file_path, abspath('.'),
+                               ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
 
 
 def get(name, default=None):
