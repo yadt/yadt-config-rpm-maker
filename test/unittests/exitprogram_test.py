@@ -19,7 +19,7 @@
 from unittest import TestCase
 from mock import patch
 
-from config_rpm_maker.exitprogram import exit_program
+from config_rpm_maker.exitprogram import exit_program, get_timestamp_from_start
 
 
 class ExitProgramTests(TestCase):
@@ -52,21 +52,46 @@ class ExitProgramTests(TestCase):
     @patch('config_rpm_maker.exitprogram.time')
     @patch('config_rpm_maker.exitprogram.exit')
     @patch('config_rpm_maker.exitprogram.LOGGER')
-    def test_should_log_elapsed_time(self, mock_logger, mock_exit, mock_time):
+    def test_should_not_log_elapsed_time_when_we_did_not_start_to_measure_the_time(self, mock_logger, mock_exit, mock_time):
 
+        mock_time.return_value = 1
+
+        exit_program('Success.', 0)
+
+        self.assertEqual(1, len(mock_logger.info.call_args_list))
+
+    @patch('config_rpm_maker.exitprogram.get_timestamp_from_start')
+    @patch('config_rpm_maker.exitprogram.time')
+    @patch('config_rpm_maker.exitprogram.exit')
+    @patch('config_rpm_maker.exitprogram.LOGGER')
+    def test_should_log_elapsed_time(self, mock_logger, mock_exit, mock_time, mock_get_timestamp_from_start):
+
+        mock_get_timestamp_from_start.return_value = 0
         mock_time.return_value = 1
 
         exit_program('Success.', 0)
 
         mock_logger.info.assert_any_call('Elapsed time: 1.0s')
 
+    @patch('config_rpm_maker.exitprogram.get_timestamp_from_start')
     @patch('config_rpm_maker.exitprogram.time')
     @patch('config_rpm_maker.exitprogram.exit')
     @patch('config_rpm_maker.exitprogram.LOGGER')
-    def test_should_round_elapsed_time_down_to_two_decimals_after_dot(self, mock_logger, mock_exit, mock_time):
+    def test_should_round_elapsed_time_down_to_two_decimals_after_dot(self, mock_logger, mock_exit, mock_time, mock_get_timestamp_from_start):
 
+        mock_get_timestamp_from_start.return_value = 0
         mock_time.return_value = 0.555555555555
 
         exit_program('Success.', 0)
 
         mock_logger.info.assert_any_call('Elapsed time: 0.56s')
+
+
+class GetTimeStampFromStart(TestCase):
+
+    @patch('config_rpm_maker.exitprogram._timestamp_at_start')
+    def test_should_return_time_stamp_from_start(self, mock_timestamp):
+
+        actual_time_stamp = get_timestamp_from_start()
+
+        self.assertEqual(mock_timestamp, actual_time_stamp)
