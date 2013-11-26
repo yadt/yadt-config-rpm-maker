@@ -54,7 +54,7 @@ LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
 
 _properties = None
-_configuration_file_path = None
+_file_path_of_loaded_configuration = None
 
 
 class ConfigException(BaseConfigRpmMakerException):
@@ -66,34 +66,42 @@ def set_properties(new_properties):
     _properties = new_properties
 
 
-def get_configuration_file_path():
-    return _configuration_file_path
+def get_file_path_of_loaded_configuration():
+    return _file_path_of_loaded_configuration
+
+
+def set_file_path_of_loaded_configuration(new_file_path):
+    global _file_path_of_loaded_configuration
+    _file_path_of_loaded_configuration = new_file_path
 
 
 def determine_configuration_file_path():
-    global _configuration_file_path
-    _configuration_file_path = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+    global _file_path_of_loaded_configuration
+    _file_path_of_loaded_configuration = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+
+    return _file_path_of_loaded_configuration
 
 
-def load_configuration_properties_from_yaml_file():
+def load_configuration_properties_from_yaml_file(configuration_file_path):
     try:
-        with open(_configuration_file_path) as configuration_file:
+        with open(configuration_file_path) as configuration_file:
             set_properties(yaml.load(configuration_file))
-
+            set_file_path_of_loaded_configuration(configuration_file_path)
     except Exception as e:
-        raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_configuration_file_path, str(e)))
+        raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_file_path_of_loaded_configuration, str(e)))
 
 
 def load_configuration_file():
-    determine_configuration_file_path()
+    configuration_file_path = determine_configuration_file_path()
 
-    if not exists(_configuration_file_path):
+    if not exists(configuration_file_path):
         raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
                               (DEFAULT_CONFIGURATION_FILE_PATH,
-                               _configuration_file_path, abspath('.'),
+                               configuration_file_path,
+                               abspath('.'),
                                ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
 
-    load_configuration_properties_from_yaml_file()
+    load_configuration_properties_from_yaml_file(configuration_file_path)
 
 
 def get(name, default=None):

@@ -30,10 +30,11 @@ from config_rpm_maker.config import (DEFAULT_LOG_LEVEL,
                                      get_configuration,
                                      get_log_level,
                                      get_temporary_directory,
-                                     get_configuration_file_path,
+                                     get_file_path_of_loaded_configuration,
                                      load_configuration_file,
                                      load_configuration_properties_from_yaml_file,
                                      setvalue,
+                                     set_file_path_of_loaded_configuration,
                                      set_properties)
 
 
@@ -59,25 +60,45 @@ class SetPropertiesTests(TestCase):
         self.assertEqual(config._properties, fake_properties)
 
 
-class GetConfigurationFilePath(TestCase):
+class GetFilePathOfLoadedConfiguration(TestCase):
 
-    @patch('config_rpm_maker.config._configuration_file_path')
+    @patch('config_rpm_maker.config._file_path_of_loaded_configuration')
     def test_should_return_configuration(self, mock_configuration_file_path):
 
-        actual_configuration_file_path = get_configuration_file_path()
+        actual_configuration_file_path = get_file_path_of_loaded_configuration()
 
         self.assertEqual(mock_configuration_file_path, actual_configuration_file_path)
 
 
+class SetFilePathOfLoadedConfigurationTests(TestCase):
+
+    @patch('config_rpm_maker.config._file_path_of_loaded_configuration')
+    def test_should_set_file_path_of_loaded_configuration(self, mock_file_path_of_loaded_configuration):
+
+        fake_file_path_to_configuration_file = 'path-to-configuration-file'
+
+        set_file_path_of_loaded_configuration(fake_file_path_to_configuration_file)
+
+        self.assertEqual(config._file_path_of_loaded_configuration, fake_file_path_to_configuration_file)
+
+
 class DetermineConfigurationFilePathTest(TestCase):
 
-    @patch('config_rpm_maker.config._configuration_file_path')
     @patch('config_rpm_maker.config.environ')
-    def test_should_use_default_configuration_file_path_if_no_environment_variable_is_set(self, mock_environ, mock_file_path):
+    def test_should_use_default_configuration_file_path_if_no_environment_variable_is_set(self, mock_environ):
 
         determine_configuration_file_path()
 
         mock_environ.get.assert_called_with(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+
+    @patch('config_rpm_maker.config.environ')
+    def test_should_return_actual_determined_file_path(self, mock_environ):
+
+        mock_environ.get.return_value = 'path-to-configuration-file'
+
+        actual_file_path = determine_configuration_file_path()
+
+        self.assertEqual('path-to-configuration-file', actual_file_path)
 
 
 class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
@@ -92,9 +113,38 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
         mock_properties = {}
         mock_yaml.load.return_value = mock_properties
 
-        load_configuration_properties_from_yaml_file()
+        load_configuration_properties_from_yaml_file('path-to-configuration-file')
 
         mock_set_properties.assert_called_with(mock_properties)
+
+    @patch('config_rpm_maker.config.set_properties')
+    @patch('config_rpm_maker.config.yaml')
+    @patch('__builtin__.open')
+    def test_should_open_file_as_specified_in_argument(self, mock_open, mock_yaml, mock_set_properties):
+
+        fake_file = self._create_fake_file()
+        mock_open.return_value = fake_file
+        mock_properties = {}
+        mock_yaml.load.return_value = mock_properties
+
+        load_configuration_properties_from_yaml_file('path-to-configuration-file')
+
+        mock_open.assert_called_with('path-to-configuration-file')
+
+    @patch('config_rpm_maker.config.set_file_path_of_loaded_configuration')
+    @patch('config_rpm_maker.config.set_properties')
+    @patch('config_rpm_maker.config.yaml')
+    @patch('__builtin__.open')
+    def test_should_set_file_path_of_loaded_configuration(self, mock_open, mock_yaml, mock_set_properties, mock_set_file_path_of_loaded_configuration):
+
+        fake_file = self._create_fake_file()
+        mock_open.return_value = fake_file
+        mock_properties = {}
+        mock_yaml.load.return_value = mock_properties
+
+        load_configuration_properties_from_yaml_file('path-to-configuration-file')
+
+        mock_set_file_path_of_loaded_configuration.assert_called_with('path-to-configuration-file')
 
     @patch('config_rpm_maker.config.yaml')
     @patch('__builtin__.open')
@@ -104,7 +154,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
         mock_open.return_value = fake_file
         mock_yaml.load.side_effect = Exception()
 
-        self.assertRaises(ConfigException, load_configuration_file)
+        self.assertRaises(ConfigException, load_configuration_properties_from_yaml_file, 'path-to-configuration-file')
 
     def _create_fake_file(self):
         class FakeFile(StringIO):
@@ -127,10 +177,9 @@ class LoadConfigurationTests(TestCase):
 
         self.assertRaises(ConfigException, load_configuration_file)
 
-    @patch('config_rpm_maker.config._configuration_file_path')
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config.determine_configuration_file_path')
-    def test_should_use_default_configuration_file_path_if_no_environment_variable_is_set(self, mock_determine_configuration_file_path, mock_exists, mock_file_path):
+    def test_should_determine_the_configuration_file_path(self, mock_determine_configuration_file_path, mock_exists):
 
         mock_exists.return_value = False
 
@@ -140,13 +189,27 @@ class LoadConfigurationTests(TestCase):
 
     @patch('config_rpm_maker.config.load_configuration_properties_from_yaml_file')
     @patch('config_rpm_maker.config.exists')
-    def test_load_configuration_file_if_it_exists(self, mock_exists, mock_load_configuration_properties_from_yaml_file):
+    @patch('config_rpm_maker.config.determine_configuration_file_path')
+    def test_check_if_the_determined_configuration_file_path_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file):
 
+        mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
         mock_exists.return_value = True
 
         load_configuration_file()
 
-        mock_load_configuration_properties_from_yaml_file.assert_called_with()
+        mock_exists.assert_called_with('path-to-configuration-file')
+
+    @patch('config_rpm_maker.config.load_configuration_properties_from_yaml_file')
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config.determine_configuration_file_path')
+    def test_load_configuration_file_if_it_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file):
+
+        mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
+        mock_exists.return_value = True
+
+        load_configuration_file()
+
+        mock_load_configuration_properties_from_yaml_file.assert_called_with('path-to-configuration-file')
 
 
 class SetValueTests(TestCase):

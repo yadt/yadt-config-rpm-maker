@@ -94,7 +94,7 @@ def extract_repository_url_and_revision_from_arguments(arguments):
 
 def log_additional_information():
     log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config.get_configuration(), config.get_configuration_file_path())
+    log_configuration(LOGGER.debug, config.get_configuration(), config.get_file_path_of_loaded_configuration())
 
 
 def log_exception_message(e):
