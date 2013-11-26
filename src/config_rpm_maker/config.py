@@ -61,6 +61,10 @@ class ConfigException(BaseConfigRpmMakerException):
     error_info = "Configuration Error:\n"
 
 
+class ConfigurationValidationException(ConfigException):
+    error_info = "Invalid configuration:\n"
+
+
 def set_properties(new_properties):
     global _properties
     _properties = new_properties
@@ -91,6 +95,13 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
         raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_file_path_of_loaded_configuration, str(e)))
 
 
+def _validate_loaded_configuration_properties():
+    properties = get_properties()
+
+    if properties is None:
+        raise ConfigurationValidationException("Loaded configuration properties are empty.")
+
+
 def load_configuration_file():
     configuration_file_path = _determine_configuration_file_path()
 
@@ -102,6 +113,7 @@ def load_configuration_file():
                                ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
 
     _load_configuration_properties_from_yaml_file(configuration_file_path)
+    _validate_loaded_configuration_properties()
 
 
 def get(name, default=None):
@@ -124,16 +136,16 @@ def setvalue(name, value):
     if not name:
         raise ConfigException("No name given")
 
-    configuration = get_configuration()
+    configuration = get_properties()
 
     if not configuration:
         load_configuration_file()
-        configuration = get_configuration()
+        configuration = get_properties()
 
     configuration[name] = value
 
 
-def get_configuration():
+def get_properties():
     return _properties
 
 
