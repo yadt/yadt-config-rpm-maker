@@ -20,8 +20,60 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from config_rpm_maker import build_configuration_rpms_from
+from config_rpm_maker import main, start_building_configuration_rpms
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
+
+class MainTests(TestCase):
+
+    @patch('config_rpm_maker.start_building_configuration_rpms')
+    @patch('config_rpm_maker.log_additional_information')
+    @patch('config_rpm_maker.start_measuring_time')
+    @patch('config_rpm_maker.initialize_logging_to_syslog')
+    @patch('config_rpm_maker.extract_repository_url_and_revision_from_arguments')
+    @patch('config_rpm_maker.initialize_logging_to_console')
+    @patch('config_rpm_maker.initialize_configuration')
+    @patch('config_rpm_maker.parse_arguments')
+    @patch('config_rpm_maker.exit_program')
+    def test_should_return_with_success_message_and_return_code_zero_when_everything_works_as_expected(self, mock_exit_program, mock_parse_arguments, mock_initialize_configuration, mock_initialize_logging_to_console, mock_extract_repository_url_and_revision_from_arguments, mock_initialize_logging_to_syslog, mock_start_measuring_time, mock_log_additional_information, mock_start_building_configuration_rpms):
+
+        mock_extract_repository_url_and_revision_from_arguments.return_value = ('repository-url', '123')
+
+        main()
+
+        mock_exit_program.assert_called_with("Success.", return_code=0)
+
+    @patch('config_rpm_maker.parse_arguments')
+    @patch('config_rpm_maker.exit_program')
+    def test_should_return_with_error_message_and_error_code_when_exception_occurrs(self, mock_exit_program, mock_parse_arguments):
+
+        mock_parse_arguments.side_effect = BaseConfigRpmMakerException("We knew this could happen!")
+
+        main()
+
+        mock_exit_program.assert_called_with('An exception occurred!', return_code=4)
+
+    @patch('config_rpm_maker.parse_arguments')
+    @patch('config_rpm_maker.exit_program')
+    @patch('config_rpm_maker.traceback')
+    def test_should_print_traceback_when_completly_unexpected_exception_occurrs(self, mock_traceback, mock_exit_program, mock_parse_arguments):
+
+        mock_parse_arguments.side_effect = Exception("WTF!")
+
+        main()
+
+        mock_traceback.print_exc.assert_called_with(5)
+
+    @patch('config_rpm_maker.parse_arguments')
+    @patch('config_rpm_maker.exit_program')
+    @patch('config_rpm_maker.traceback')
+    def test_should_return_with_error_message_and_error_code_when_completly_unexpected_exception_occurrs(self, mock_traceback, mock_exit_program, mock_parse_arguments):
+
+        mock_parse_arguments.side_effect = Exception("WTF!")
+
+        main()
+
+        mock_exit_program.assert_called_with('An unknown exception occurred!', return_code=5)
 
 
 class BuildConfigurationRpmsTests(TestCase):
@@ -30,57 +82,13 @@ class BuildConfigurationRpmsTests(TestCase):
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_return_with_success_message_and_return_code_zero_when_everything_works_as_expected(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config):
+    def test_should_pass_when_everything_works_as_expected(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config):
 
         mock_config.get.return_value = '/path-to-configuration'
         mock_svn_service_class.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1)
-
-        mock_exit_program.assert_called_with("Success.", return_code=0)
-
-    @patch('config_rpm_maker.LOGGER')
-    @patch('config_rpm_maker.config')
-    @patch('config_rpm_maker.exit_program')
-    @patch('config_rpm_maker.SvnService')
-    @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_return_with_error_message_and_error_code_when_exception_occurrs(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config, mock_logger):
-
-        mock_config.get.return_value = '/path-to-configuration'
-        mock_svn_service_class.side_effect = BaseConfigRpmMakerException("We knew this could happen!")
-
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1)
-
-        mock_exit_program.assert_called_with('An exception occurred!', return_code=4)
-
-    @patch('config_rpm_maker.traceback')
-    @patch('config_rpm_maker.config')
-    @patch('config_rpm_maker.exit_program')
-    @patch('config_rpm_maker.SvnService')
-    @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_print_traceback_when_completly_unexpected_exception_occurrs(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config, mock_traceback):
-
-        mock_config.get.return_value = '/path-to-configuration'
-        mock_svn_service_class.side_effect = Exception("WTF!")
-
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1)
-
-        mock_traceback.print_exc.assert_called_with(5)
-
-    @patch('config_rpm_maker.traceback')
-    @patch('config_rpm_maker.config')
-    @patch('config_rpm_maker.exit_program')
-    @patch('config_rpm_maker.SvnService')
-    @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_return_with_error_message_and_error_code_when_completly_unexpected_exception_occurrs(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config, mock_traceback):
-
-        mock_config.get.return_value = '/path-to-configuration'
-        mock_svn_service_class.side_effect = Exception("WTF!")
-
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1)
-
-        mock_exit_program.assert_called_with('An unknown exception occurred!', return_code=5)
+        start_building_configuration_rpms('file:///path_to/testdata/repository', 1)
 
     @patch('config_rpm_maker.config')
     @patch('config_rpm_maker.exit_program')
@@ -92,7 +100,7 @@ class BuildConfigurationRpmsTests(TestCase):
         mock_svn_service_constructor.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1)
+        start_building_configuration_rpms('file:///path_to/testdata/repository', 1)
 
         mock_svn_service_constructor.assert_called_with(path_to_config='/path-to-configuration',
                                                         base_url='file:///path_to/testdata/repository')
@@ -107,7 +115,7 @@ class BuildConfigurationRpmsTests(TestCase):
         mock_svn_service_constructor.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1)
+        start_building_configuration_rpms('file:///path_to/testdata/repository', 1)
 
         mock_svn_service_constructor.assert_called_with(path_to_config='/path-to-configuration',
                                                         base_url='file:///path_to/testdata/repository')
@@ -123,6 +131,6 @@ class BuildConfigurationRpmsTests(TestCase):
         mock_svn_service_constructor.return_value = mock_svn_service
         mock_config_rpm_maker_class.return_value = Mock()
 
-        build_configuration_rpms_from('file:///path_to/testdata/repository', 1980)
+        start_building_configuration_rpms('file:///path_to/testdata/repository', 1980)
 
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision=1980)

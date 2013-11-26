@@ -18,7 +18,7 @@ __version__ = '2.0'
 
 import traceback
 
-from logging import DEBUG, getLogger
+from logging import DEBUG, INFO, getLogger
 from sys import argv, exit, stderr
 
 from config_rpm_maker import config
@@ -46,35 +46,18 @@ MESSAGE_SUCCESS = "Success."
 
 def determine_console_log_level(arguments):
     """ Determines the log level based on arguments and configuration """
-    try:
-        if arguments[OPTION_DEBUG]:
-            log_level = DEBUG
-        else:
-            log_level = config.get_log_level()
-
-    except config.ConfigException as e:
-        stderr.write(str(e) + "\n")
-        exit(RETURN_CODE_CONFIGURATION_ERROR)
+    if arguments[OPTION_DEBUG]:
+        log_level = DEBUG
+    else:
+        log_level = INFO
 
     return log_level
 
 
-def build_configuration_rpms_from(repository, revision):
-    try:
-        path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
-        svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
-        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
-
-    except BaseConfigRpmMakerException as e:
-        for line in str(e).split("\n"):
-            LOGGER.error(line)
-        return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
-
-    except Exception:
-        traceback.print_exc(5)
-        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
-
-    exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
+def start_building_configuration_rpms(repository, revision):
+    path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
+    svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
+    ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
 
 def append_console_logger(logger, console_log_level):
@@ -86,25 +69,59 @@ def append_console_logger(logger, console_log_level):
         logger.debug("DEBUG logging is enabled")
 
 
-def main():
-    LOGGER.setLevel(DEBUG)
-
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
-
+def initialize_configuration(arguments):
     config.load_configuration_file()
-    console_log_level = determine_console_log_level(arguments)
-    append_console_logger(LOGGER, console_log_level)
     apply_arguments_to_config(arguments)
 
-    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
-    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
 
+def initialize_logging_to_console(arguments):
+    console_log_level = determine_console_log_level(arguments)
+    append_console_logger(LOGGER, console_log_level)
+
+
+def initialize_logging_to_syslog(arguments, revision):
     if not arguments[OPTION_NO_SYSLOG]:
         sys_log_handler = create_sys_log_handler(revision)
         LOGGER.addHandler(sys_log_handler)
 
-    start_measuring_time()
+
+def extract_repository_url_and_revision_from_arguments(arguments):
+    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
+    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
+    return repository_url, revision
+
+
+def log_additional_information():
     log_process_id(LOGGER.info)
     log_configuration(LOGGER.debug, config.get_configuration(), config.get_configuration_file_path())
 
-    build_configuration_rpms_from(repository_url, revision)
+
+def main():
+    try:
+        LOGGER.setLevel(DEBUG)
+
+        arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
+
+        initialize_logging_to_console(arguments)
+        initialize_configuration(arguments)
+
+        repository_url, revision = extract_repository_url_and_revision_from_arguments(arguments)
+
+        initialize_logging_to_syslog(arguments, revision)
+
+        start_measuring_time()
+
+        log_additional_information()
+
+        start_building_configuration_rpms(repository_url, revision)
+
+    except BaseConfigRpmMakerException as e:
+        for line in str(e).split("\n"):
+            LOGGER.error(line)
+        return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
+
+    except Exception:
+        traceback.print_exc(5)
+        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+
+    exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
