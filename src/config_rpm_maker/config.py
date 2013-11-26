@@ -102,10 +102,7 @@ def _set_file_path_of_loaded_configuration(new_file_path):
 
 
 def _determine_configuration_file_path():
-    global _file_path_of_loaded_configuration
-    _file_path_of_loaded_configuration = environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
-
-    return _file_path_of_loaded_configuration
+    return environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
 
 
 def _load_configuration_properties_from_yaml_file(configuration_file_path):
