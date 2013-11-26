@@ -89,17 +89,18 @@ def _determine_configuration_file_path():
 def _load_configuration_properties_from_yaml_file(configuration_file_path):
     try:
         with open(configuration_file_path) as configuration_file:
-            set_properties(yaml.load(configuration_file))
+            properties = yaml.load(configuration_file)
             _set_file_path_of_loaded_configuration(configuration_file_path)
+            return properties
     except Exception as e:
         raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_file_path_of_loaded_configuration, str(e)))
 
 
-def _validate_loaded_configuration_properties():
-    properties = get_properties()
-
+def _validate_loaded_configuration_properties(properties):
     if properties is None:
         raise ConfigurationValidationException("Loaded configuration properties are empty.")
+
+    return properties
 
 
 def load_configuration_file():
@@ -112,8 +113,9 @@ def load_configuration_file():
                                abspath('.'),
                                ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
 
-    _load_configuration_properties_from_yaml_file(configuration_file_path)
-    _validate_loaded_configuration_properties()
+    raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
+    valid_properties = _validate_loaded_configuration_properties(raw_properties)
+    set_properties(valid_properties)
 
 
 def get(name, default=None):

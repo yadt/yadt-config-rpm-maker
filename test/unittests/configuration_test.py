@@ -108,20 +108,6 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
     @patch('config_rpm_maker.config.set_properties')
     @patch('config_rpm_maker.config.yaml')
     @patch('__builtin__.open')
-    def test_should_use_loaded_configuration_as_properties(self, mock_open, mock_yaml, mock_set_properties):
-
-        fake_file = self._create_fake_file()
-        mock_open.return_value = fake_file
-        mock_properties = {}
-        mock_yaml.load.return_value = mock_properties
-
-        _load_configuration_properties_from_yaml_file('path-to-configuration-file')
-
-        mock_set_properties.assert_called_with(mock_properties)
-
-    @patch('config_rpm_maker.config.set_properties')
-    @patch('config_rpm_maker.config.yaml')
-    @patch('__builtin__.open')
     def test_should_open_file_as_specified_in_argument(self, mock_open, mock_yaml, mock_set_properties):
 
         fake_file = self._create_fake_file()
@@ -134,10 +120,9 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
         mock_open.assert_called_with('path-to-configuration-file')
 
     @patch('config_rpm_maker.config._set_file_path_of_loaded_configuration')
-    @patch('config_rpm_maker.config.set_properties')
     @patch('config_rpm_maker.config.yaml')
     @patch('__builtin__.open')
-    def test_should_set_file_path_of_loaded_configuration(self, mock_open, mock_yaml, mock_set_properties, mock_set_file_path_of_loaded_configuration):
+    def test_should_set_file_path_of_loaded_configuration(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
 
         fake_file = self._create_fake_file()
         mock_open.return_value = fake_file
@@ -158,6 +143,20 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
 
         self.assertRaises(ConfigException, _load_configuration_properties_from_yaml_file, 'path-to-configuration-file')
 
+    @patch('config_rpm_maker.config._set_file_path_of_loaded_configuration')
+    @patch('config_rpm_maker.config.yaml')
+    @patch('__builtin__.open')
+    def test_return_raw_loaded_properties(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
+
+        fake_file = self._create_fake_file()
+        mock_open.return_value = fake_file
+        mock_properties = {'foo': 'bar'}
+        mock_yaml.load.return_value = mock_properties
+
+        actual_properties = _load_configuration_properties_from_yaml_file('path-to-configuration-file')
+
+        self.assertEqual({'foo': 'bar'}, actual_properties)
+
     def _create_fake_file(self):
         class FakeFile(StringIO):
             def __enter__(self):
@@ -172,21 +171,26 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
 class ValidateLoadedConfigurationPropertiesTest(TestCase):
 
     @patch('config_rpm_maker.config.LOGGER')
-    @patch('config_rpm_maker.config.get_properties')
-    def test_should_log_that_configuration_properties_are_empty(self, mock_get_properties, mock_logger):
-        mock_get_properties.return_value = None
+    def test_should_log_that_configuration_properties_are_empty(self, mock_logger):
 
-        self.assertRaises(ConfigurationValidationException, _validate_loaded_configuration_properties)
+        self.assertRaises(ConfigurationValidationException, _validate_loaded_configuration_properties, None)
 
     @patch('config_rpm_maker.config.LOGGER')
-    @patch('config_rpm_maker.config.get_properties')
-    def test_should_pass_through_if_some_configuration_properties_are_given(self, mock_get_properties, mock_logger):
-        mock_get_properties.return_value = {'foo': 'bar'}
+    def test_should_pass_through_if_some_configuration_properties_are_given(self, mock_logger):
 
-        _validate_loaded_configuration_properties()
+        _validate_loaded_configuration_properties({'foo': 'bar'})
+
+    @patch('config_rpm_maker.config.LOGGER')
+    def test_should_return_valid_properties(self, mock_logger):
+
+        properties = {'foo': 'bar'}
+
+        actual_properties = _validate_loaded_configuration_properties(properties)
+
+        self.assertEqual(properties, actual_properties)
 
 
-class LoadConfigurationTests(TestCase):
+class LoadConfigurationFileTests(TestCase):
 
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config.environ')
@@ -236,14 +240,34 @@ class LoadConfigurationTests(TestCase):
     @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config._determine_configuration_file_path')
-    def test_validate_loaded_configuration_properties(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_validate_loaded_configuration_properties):
+    def test_should_validate_loaded_configuration_properties(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_validate_loaded_configuration_properties):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
         mock_exists.return_value = True
+        mock_properties = {'foo': 'bar'}
+        mock_load_configuration_properties_from_yaml_file.return_value = mock_properties
 
         load_configuration_file()
 
-        mock_validate_loaded_configuration_properties.assert_called_with()
+        mock_validate_loaded_configuration_properties.assert_called_with(mock_properties)
+
+    @patch('config_rpm_maker.config.set_properties')
+    @patch('config_rpm_maker.config._validate_loaded_configuration_properties')
+    @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
+    @patch('config_rpm_maker.config.exists')
+    @patch('config_rpm_maker.config._determine_configuration_file_path')
+    def test_should_set_properties_to_valid_values(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_validate_loaded_configuration_properties, mock_set_properties):
+
+        mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
+        mock_exists.return_value = True
+        fake_raw_properties = {'foo': 'bar'}
+        mock_load_configuration_properties_from_yaml_file.return_value = fake_raw_properties
+        fake_valid_properties = {'spam': 'eggs'}
+        mock_validate_loaded_configuration_properties.return_value = fake_valid_properties
+
+        load_configuration_file()
+
+        mock_set_properties.assert_called_with(fake_valid_properties)
 
 
 class SetValueTests(TestCase):
@@ -265,11 +289,14 @@ class SetValueTests(TestCase):
 
         mock_load_configuration_file.assert_called_with()
 
-    def test_should_set_value_of_configuration_properties(self):
+    @patch('config_rpm_maker.config.get_properties')
+    def test_should_set_value_of_configuration_properties(self, mock_get_properties):
+        fake_properties = {}
+        mock_get_properties.return_value = fake_properties
 
         setvalue('abc', '123')
 
-        self.assertEqual('123', config._properties['abc'])
+        self.assertEqual('123', fake_properties['abc'])
 
 
 @patch("config_rpm_maker.config.get")
