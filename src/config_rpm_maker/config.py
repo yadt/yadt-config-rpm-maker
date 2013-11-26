@@ -96,7 +96,7 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
         raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_file_path_of_loaded_configuration, str(e)))
 
 
-def _validate_loaded_configuration_properties(properties):
+def _ensure_properties_are_valid(properties):
     if properties is None:
         raise ConfigurationValidationException("Loaded configuration properties are empty.")
 
@@ -114,7 +114,7 @@ def load_configuration_file():
                                ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
 
     raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
-    valid_properties = _validate_loaded_configuration_properties(raw_properties)
+    valid_properties = _ensure_properties_are_valid(raw_properties)
     set_properties(valid_properties)
 
 
