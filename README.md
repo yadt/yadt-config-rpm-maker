@@ -15,9 +15,14 @@ Arguments:
   revision    subversion revision for which the configuration rpms are going to be built
 
 Options:
-  -h, --help  show this help message and exit
-  --debug     force DEBUG log level on console
-  --version   show version
+  -h, --help            show this help message and exit
+  --debug               force DEBUG log level on console
+  --no-syslog           switch logging of debug information to syslog off
+  --version             show version
+  --rpm-upload-cmd=RPM_UPLOAD_COMMAND
+                        Overwrite rpm_upload_config in config file
+  --config-viewer-only  Only generated files for config viewer. Skip RPM build
+                        and upload.
 ```
 
 ### Examples
@@ -123,7 +128,7 @@ When you run the integration tests, the yadt-config-rpm-maker will build test RP
 
 Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
 ```bash
-coverage run setup.py test && coverage report --omit=test/*,/usr/*,setup.py
+coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setup.py,src/config_rpm_maker/magic.py
 ```
 
 ### Execution in the working directory

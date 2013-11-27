@@ -26,7 +26,7 @@ from config_rpm_maker.returncodes import RETURN_CODE_SUCCESS
 
 LOGGER = getLogger(__name__)
 
-timestamp_at_start = 0
+_timestamp_at_start = None
 
 
 def start_measuring_time():
@@ -34,16 +34,23 @@ def start_measuring_time():
 
     LOGGER.info("Starting to measure time at %s", strftime(DEFAULT_DATE_FORMAT))
 
-    global timestamp_at_start
-    timestamp_at_start = time()
+    global _timestamp_at_start
+    _timestamp_at_start = time()
+
+
+def get_timestamp_from_start():
+    """ Returns the timestamp which has been set by start_measuring_time. """
+    return _timestamp_at_start
 
 
 def exit_program(message, return_code):
     """ Logs the given message and exits with given return code. """
 
-    elapsed_time_in_seconds = time() - timestamp_at_start
-    elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
-    LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
+    timestamp_from_start = get_timestamp_from_start()
+    if timestamp_from_start is not None:
+        elapsed_time_in_seconds = time() - timestamp_from_start
+        elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
+        LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
 
     if return_code == RETURN_CODE_SUCCESS:
         LOGGER.info(message)

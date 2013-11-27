@@ -18,12 +18,12 @@ __version__ = '2.0'
 
 import traceback
 
-from logging import DEBUG, getLogger
-from sys import argv, exit, stderr
+from logging import DEBUG, INFO, getLogger
+from sys import argv
 
 from config_rpm_maker import config
 from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.exitprogram import start_measuring_time, exit_program
@@ -35,7 +35,8 @@ from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
                                           RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
                                           RETURN_CODE_EXCEPTION_OCCURRED,
-                                          RETURN_CODE_SUCCESS)
+                                          RETURN_CODE_SUCCESS,
+                                          RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
 from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
     parse_arguments, apply_arguments_to_config
 
@@ -46,35 +47,18 @@ MESSAGE_SUCCESS = "Success."
 
 def determine_console_log_level(arguments):
     """ Determines the log level based on arguments and configuration """
-    try:
-        if arguments[OPTION_DEBUG]:
-            log_level = DEBUG
-        else:
-            log_level = config.get_log_level()
-
-    except config.ConfigException as e:
-        stderr.write(str(e) + "\n")
-        exit(RETURN_CODE_CONFIGURATION_ERROR)
+    if arguments[OPTION_DEBUG]:
+        log_level = DEBUG
+    else:
+        log_level = INFO
 
     return log_level
 
 
-def build_configuration_rpms_from(repository, revision):
-    try:
-        path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
-        svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
-        ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
-
-    except BaseConfigRpmMakerException as e:
-        for line in str(e).split("\n"):
-            LOGGER.error(line)
-        return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
-
-    except Exception:
-        traceback.print_exc(5)
-        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
-
-    exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
+def start_building_configuration_rpms(repository, revision):
+    path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
+    svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
+    ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
 
 
 def append_console_logger(logger, console_log_level):
@@ -86,25 +70,68 @@ def append_console_logger(logger, console_log_level):
         logger.debug("DEBUG logging is enabled")
 
 
-def main():
-    LOGGER.setLevel(DEBUG)
-
-    arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
-
+def initialize_configuration(arguments):
     config.load_configuration_file()
-    console_log_level = determine_console_log_level(arguments)
-    append_console_logger(LOGGER, console_log_level)
     apply_arguments_to_config(arguments)
 
-    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
-    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
 
+def initialize_logging_to_console(arguments):
+    console_log_level = determine_console_log_level(arguments)
+    append_console_logger(LOGGER, console_log_level)
+
+
+def initialize_logging_to_syslog(arguments, revision):
     if not arguments[OPTION_NO_SYSLOG]:
         sys_log_handler = create_sys_log_handler(revision)
         LOGGER.addHandler(sys_log_handler)
 
-    start_measuring_time()
-    log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config.configuration, config.configuration_file_path)
 
-    build_configuration_rpms_from(repository_url, revision)
+def extract_repository_url_and_revision_from_arguments(arguments):
+    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
+    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
+    return repository_url, revision
+
+
+def log_additional_information():
+    log_process_id(LOGGER.info)
+    log_configuration(LOGGER.debug, config.get_properties(), config.get_file_path_of_loaded_configuration())
+
+
+def log_exception_message(e):
+    for line in str(e).split("\n"):
+        LOGGER.error(line)
+
+
+def main():
+    LOGGER.setLevel(DEBUG)
+
+    try:
+        arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
+
+        initialize_logging_to_console(arguments)
+        initialize_configuration(arguments)
+
+        repository_url, revision = extract_repository_url_and_revision_from_arguments(arguments)
+
+        initialize_logging_to_syslog(arguments, revision)
+
+        start_measuring_time()
+        log_additional_information()
+        start_building_configuration_rpms(repository_url, revision)
+
+    except ConfigException as e:
+        log_exception_message(e)
+        return exit_program('Configuration error!', return_code=RETURN_CODE_CONFIGURATION_ERROR)
+
+    except BaseConfigRpmMakerException as e:
+        log_exception_message(e)
+        return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
+
+    except Exception:
+        traceback.print_exc(5)
+        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+
+    except KeyboardInterrupt:
+        return exit_program('Execution interrupted by user!', return_code=RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
+
+    exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)

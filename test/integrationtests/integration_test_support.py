@@ -14,10 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import shutil
 import subprocess
 import unittest
+
+from os import makedirs
+from os.path import abspath, exists, join
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY
@@ -44,7 +46,11 @@ class IntegrationTest(unittest.TestCase):
             raise IntegrationTestException('Could not import test data.')
 
     def _create_repository_directory(self):
-        self.repo_dir = os.path.abspath(os.path.join(config.get(KEY_TEMPORARY_DIRECTORY), 'svn_repo'))
-        if os.path.exists(self.repo_dir):
+
+        temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
+        self.repo_dir = abspath(join(temporary_directory, 'svn_repo'))
+
+        if exists(self.repo_dir):
             shutil.rmtree(self.repo_dir)
-        os.makedirs(self.repo_dir)
+
+        makedirs(self.repo_dir)

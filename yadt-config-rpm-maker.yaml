@@ -16,13 +16,12 @@
 #
 #   Please see docs/CONFIGURATION.md for details
 
-allow_unknown_hosts: true
 config_rpm_prefix: 'yadt-config-'
 config_viewer_hosts_dir: 'target/tmp/configviewer/hosts'
 custom_dns_searchlist: []
 error_log_dir: 'target/tmp/configviewer/errors'
 error_log_url: 'http://localhost/errors'
-log_level: INFO
+log_level: DEBUG
 path_to_spec_file: 'default.spec'
 repo_packages_regex: '^yadt-.*-repos?$'
 rpm_upload_chunk_size: 10

@@ -19,7 +19,7 @@
 from mock import patch, Mock
 from unittest import TestCase
 
-from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_CMD
+from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND
 from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD
 from config_rpm_maker.parsearguments import apply_arguments_to_config, parse_arguments
 
@@ -129,7 +129,7 @@ class ApplyArgumentsToConfiguration(TestCase):
 
         apply_arguments_to_config(self.arguments)
 
-        mock_setvalue.assert_any_call(KEY_RPM_UPLOAD_CMD, '/bin/true')
+        mock_setvalue.assert_any_call(KEY_RPM_UPLOAD_COMMAND, '/bin/true')
 
     def test_should_set_config_viewer_only_when_option_is_given(self, mock_setvalue):
 
