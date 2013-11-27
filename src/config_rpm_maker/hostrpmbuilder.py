@@ -25,7 +25,7 @@ from os import mkdir
 from os.path import exists
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL
+from config_rpm_maker.config import KEY_LOG_LEVEL, get_config_viewer_host_dir
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -54,15 +54,6 @@ class CouldNotTarConfigurationDirectoryException(BaseConfigRpmMakerException):
 
 
 class HostRpmBuilder(object):
-    @classmethod
-    def get_config_viewer_host_dir(cls, hostname, temp=False):
-        path = os.path.join(config.get('config_viewer_hosts_dir'), hostname)
-
-        if temp:
-            path += '.new'
-
-        return path
-
     def __init__(self, thread_name, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
         self.thread_name = thread_name
         self.hostname = hostname
@@ -77,7 +68,7 @@ class HostRpmBuilder(object):
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
-        self.config_viewer_host_dir = HostRpmBuilder.get_config_viewer_host_dir(hostname, True)
+        self.config_viewer_host_dir = get_config_viewer_host_dir(hostname, True)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):

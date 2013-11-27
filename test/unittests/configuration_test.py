@@ -40,13 +40,14 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      ConfigException,
                                      ConfigurationValidationException,
-                                     _determine_configuration_file_path,
-                                     get_properties,
                                      ensure_valid_log_level,
+                                     get_config_viewer_host_dir,
                                      get_file_path_of_loaded_configuration,
+                                     get_properties,
                                      load_configuration_file,
                                      setvalue,
                                      set_properties,
+                                     _determine_configuration_file_path,
                                      _load_configuration_properties_from_yaml_file,
                                      _set_file_path_of_loaded_configuration,
                                      _ensure_properties_are_valid)
@@ -555,3 +556,26 @@ class EnsureValidLogLevelTests(TestCase):
     def test_get_log_level_should_raise_exception_when_strange_log_level_given(self):
 
         self.assertRaises(ConfigException, ensure_valid_log_level, "FOO")
+
+
+class GetConfigViewerHostDirTests(TestCase):
+
+    @patch('config_rpm_maker.config.get')
+    def test_should_return_path_to_host_directory(self, mock_get):
+
+        mock_get.return_value = 'path-to-config-viewer-host-directory'
+
+        actual_path = get_config_viewer_host_dir('devweb01')
+
+        mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
+        self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
+
+    @patch('config_rpm_maker.config.get')
+    def test_should_return_path_to_temporary_host_directory(self, mock_get):
+
+        mock_get.return_value = 'path-to-config-viewer-host-directory'
+
+        actual_path = get_config_viewer_host_dir('devweb01', temp=True)
+
+        mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
+        self.assertEqual('path-to-config-viewer-host-directory/devweb01.new', actual_path)

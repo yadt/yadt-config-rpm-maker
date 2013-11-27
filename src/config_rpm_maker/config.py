@@ -17,7 +17,7 @@
 import yaml
 
 from os import environ
-from os.path import abspath, exists
+from os.path import abspath, exists, join
 
 from logging import DEBUG, ERROR, INFO, getLogger
 
@@ -200,3 +200,13 @@ def ensure_valid_log_level(log_level_name):
         return ERROR
 
     raise ConfigException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
+
+
+def get_config_viewer_host_dir(hostname, temp=False):
+    config_viewer_hosts_directory = get(KEY_CONFIG_VIEWER_HOSTS_DIR)
+    path = join(config_viewer_hosts_directory, hostname)
+
+    if temp:
+        path += '.new'
+
+    return path

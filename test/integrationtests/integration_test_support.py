@@ -22,8 +22,7 @@ from os import makedirs
 from os.path import abspath, exists, join
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY
-from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
+from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, get_config_viewer_host_dir
 
 
 class IntegrationTestException(Exception):
@@ -56,9 +55,20 @@ class IntegrationTest(unittest.TestCase):
 
         makedirs(self.repo_dir)
 
+    def write_revision_file_for_hostname(self, hostname, revision):
+
+        config_viewer_host_directory = get_config_viewer_host_dir(hostname)
+
+        if not exists(config_viewer_host_directory):
+            makedirs(config_viewer_host_directory)
+
+        revision_file_path = join(config_viewer_host_directory, '%s.rev' % hostname)
+        with open(revision_file_path, "w") as revision_file:
+            revision_file.write(revision)
+
     def assert_revision_file_contains_revision(self, hostname, revision):
 
-        config_viewer_host_data = HostRpmBuilder.get_config_viewer_host_dir(hostname)
+        config_viewer_host_data = get_config_viewer_host_dir(hostname)
         error_message = 'Directory "%s" does not exist.' % config_viewer_host_data
         self.assertTrue(exists(config_viewer_host_data), error_message)
 

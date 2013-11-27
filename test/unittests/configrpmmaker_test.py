@@ -24,7 +24,9 @@ from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
     def setUp(self):
-        self.mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker.revision = '54'
+        self.mock_config_rpm_maker = mock_config_rpm_maker
 
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
@@ -58,16 +60,37 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         self.assert_mock_not_called(mock_rmtree)
 
+    @patch('__builtin__.open')
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    def test_should_remove_directory_if_it_does_already_exist(self, mock_exists, mock_move, mock_rmtree):
+    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
+    def test_should_remove_directory_if_it_does_already_exist(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+
+        mock_get_config_viewer_host_dir.return_value = 'target/tmp/configviewer/hosts/devweb01'
+        mock_open.return_value = self.create_fake_file("53")
 
         mock_exists.return_value = True
 
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01'])
 
         mock_rmtree.assert_called_with('target/tmp/configviewer/hosts/devweb01')
+
+    @patch('__builtin__.open')
+    @patch('config_rpm_maker.configrpmmaker.rmtree')
+    @patch('config_rpm_maker.configrpmmaker.move')
+    @patch('config_rpm_maker.configrpmmaker.exists')
+    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
+    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+
+        mock_get_config_viewer_host_dir.return_value = 'target/tmp/configviewer/hosts/devweb01'
+        mock_open.return_value = self.create_fake_file("99")
+
+        mock_exists.return_value = True
+
+        ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01'])
+
+        self.assertTrue(call('target/tmp/configviewer/hosts/devweb01') not in mock_rmtree.call_args_list)
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
@@ -93,10 +116,29 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb01')
 
+    @patch('__builtin__.open')
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_exists, mock_move, mock_rmtree):
+    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
+    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+
+        def get_config_viewer_host_dir_side_effect(hostname, temp=False):
+            return "config-viewer-directory-%s/%s" % ("temp" if temp else "destination", hostname)
+
+        mock_get_config_viewer_host_dir.side_effect = get_config_viewer_host_dir_side_effect
+
+        def mock_open_side_effect(path):
+            if path.endswith('devweb01.rev'):
+                return self.create_fake_file("42")
+            elif path.endswith('tuvweb01.rev'):
+                raise Exception('This should not happen since the exists side effect returns False')
+            elif path.endswith('berweb01.rev'):
+                return self.create_fake_file("42")
+            else:
+                raise Exception("Unknown path %s" % path)
+
+        mock_open.side_effect = mock_open_side_effect
 
         def exists_side_effect(path):
             if path.endswith('devweb01'):
@@ -110,13 +152,64 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         mock_exists.side_effect = exists_side_effect
 
+
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01', 'tuvweb01', 'berweb01'])
 
-        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
-        mock_move.assert_any_call('target/tmp/configviewer/hosts/devweb01.new', 'target/tmp/configviewer/hosts/devweb01')
 
-        self.assertTrue(call('target/tmp/configviewer/hosts/tuvweb01') not in mock_rmtree.call_args_list)
-        mock_move.assert_any_call('target/tmp/configviewer/hosts/tuvweb01.new', 'target/tmp/configviewer/hosts/tuvweb01')
+        mock_rmtree.assert_any_call('config-viewer-directory-destination/devweb01')
+        mock_move.assert_any_call('config-viewer-directory-temp/devweb01', 'config-viewer-directory-destination/devweb01')
 
-        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/berweb01')
-        mock_move.assert_any_call('target/tmp/configviewer/hosts/berweb01.new', 'target/tmp/configviewer/hosts/berweb01')
+        self.assertTrue(call('config-viewer-directory-destination/tuvweb01') not in mock_rmtree.call_args_list)
+        mock_move.assert_any_call('config-viewer-directory-temp/tuvweb01', 'config-viewer-directory-destination/tuvweb01')
+
+        mock_rmtree.assert_any_call('config-viewer-directory-destination/berweb01')
+        mock_move.assert_any_call('config-viewer-directory-temp/berweb01', 'config-viewer-directory-destination/berweb01')
+
+    @patch('__builtin__.open')
+    @patch('config_rpm_maker.configrpmmaker.rmtree')
+    @patch('config_rpm_maker.configrpmmaker.move')
+    @patch('config_rpm_maker.configrpmmaker.exists')
+    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
+    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+
+        def get_config_viewer_host_dir_side_effect(hostname, temp=False):
+            return "config-viewer-directory-%s/%s" % ("temp" if temp else "destination", hostname)
+
+        mock_get_config_viewer_host_dir.side_effect = get_config_viewer_host_dir_side_effect
+
+        def mock_open_side_effect(path):
+            if path.endswith('devweb01.rev'):
+                return self.create_fake_file("99")
+            elif path.endswith('tuvweb01.rev'):
+                raise Exception('This should not happen since the exists side effect returns False')
+            elif path.endswith('berweb01.rev'):
+                return self.create_fake_file("42")
+            else:
+                raise Exception("Unknown path %s" % path)
+
+        mock_open.side_effect = mock_open_side_effect
+
+        def exists_side_effect(path):
+            if path.endswith('devweb01'):
+                return True
+            elif path.endswith('tuvweb01'):
+                return False
+            elif path.endswith('berweb01'):
+                return True
+            else:
+                raise Exception("Unknown path %s" % path)
+
+        mock_exists.side_effect = exists_side_effect
+
+
+        ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01', 'tuvweb01', 'berweb01'])
+
+
+        self.assertTrue(call('config-viewer-directory-destination/devweb01') not in mock_rmtree.call_args_list)
+        self.assertTrue(call('config-viewer-directory-temp/devweb01', 'config-viewer-directory-destination/devweb01') not in mock_move.call_args_list)
+
+        self.assertTrue(call('config-viewer-directory-destination/tuvweb01') not in mock_rmtree.call_args_list)
+        mock_move.assert_any_call('config-viewer-directory-temp/tuvweb01', 'config-viewer-directory-destination/tuvweb01')
+
+        mock_rmtree.assert_any_call('config-viewer-directory-destination/berweb01')
+        mock_move.assert_any_call('config-viewer-directory-temp/berweb01', 'config-viewer-directory-destination/berweb01')

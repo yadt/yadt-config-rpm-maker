@@ -33,6 +33,9 @@ class UnitTests(TestCase):
 
         """
         class FakeFile(StringIO):
+            def __init__(self, content):
+                StringIO.__init__(self, content)
+
             def __enter__(self):
                 return self
 

@@ -29,11 +29,11 @@ from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryEx
                                              ConfigDirAlreadyExistsException,
                                              HostRpmBuilder)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY, get_config_viewer_host_dir
 from config_rpm_maker import config
 
 
-class HostRpmBuilderTest(IntegrationTest):
+class HostRpmBuilderIntegrationTest(IntegrationTest):
 
     def test_should_write_revision_file(self):
         working_directory = self.refresh_temporary_directory()
@@ -49,7 +49,7 @@ class HostRpmBuilderTest(IntegrationTest):
 
         host_rpm_builder.build()
 
-        temporary_path_of_revision_file = join(HostRpmBuilder.get_config_viewer_host_dir(hostname, temp=True), hostname + '.rev')
+        temporary_path_of_revision_file = join(get_config_viewer_host_dir(hostname, temp=True), hostname + '.rev')
         self.assert_path_exists(temporary_path_of_revision_file)
         self.assert_content_of_file(temporary_path_of_revision_file, revision)
 

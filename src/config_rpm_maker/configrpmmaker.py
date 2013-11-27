@@ -24,7 +24,7 @@ import traceback
 import config
 
 from logging import ERROR, FileHandler, Formatter, getLogger
-from os.path import exists
+from os.path import exists, join
 from Queue import Queue
 from shutil import rmtree, move
 from threading import Thread
@@ -34,7 +34,8 @@ from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
                                      DEFAULT_UPLOAD_CHUNK_SIZE,
                                      KEY_THREAD_COUNT,
                                      KEY_RPM_UPLOAD_COMMAND,
-                                     KEY_TEMPORARY_DIRECTORY)
+                                     KEY_TEMPORARY_DIRECTORY,
+                                     get_config_viewer_host_dir)
 
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -183,10 +184,15 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.info("Updating configviewer data.")
 
         for host in hosts:
-            temp_path = HostRpmBuilder.get_config_viewer_host_dir(host, True)
-            dest_path = HostRpmBuilder.get_config_viewer_host_dir(host)
+            temp_path = get_config_viewer_host_dir(host, True)
+            dest_path = get_config_viewer_host_dir(host)
 
             if exists(dest_path):
+                path_to_revision_file = join(dest_path, "%s.rev" % host)
+                with open(path_to_revision_file) as revision_file_content:
+                    revision_from_file = int(revision_file_content.read())
+                    if revision_from_file > int(self.revision):
+                        continue
                 rmtree(dest_path)
 
             move(temp_path, dest_path)

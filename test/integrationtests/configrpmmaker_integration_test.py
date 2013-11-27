@@ -33,7 +33,7 @@ stderr was: "{stderr}"
 """
 
 
-class ConfigRpmMakerTest(IntegrationTest):
+class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
     def test_find_matching_hosts(self):
         config_rpm_maker = ConfigRpmMaker(None, None)
@@ -227,4 +227,17 @@ class ConfigRpmMakerTest(IntegrationTest):
         self.assert_revision_file_contains_revision('devweb01', '2')
         self.assert_revision_file_contains_revision('tuvweb01', '2')
         self.assert_revision_file_contains_revision('berweb01', '2')
+
+    def test_should_move_config_viewer_data_to_destination(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        self.write_revision_file_for_hostname('tuvweb01', revision='3')
+        self.write_revision_file_for_hostname('berweb01', revision='4')
+
+        config_rpm_maker.build()
+
+        self.assert_revision_file_contains_revision('devweb01', revision='2')
+        self.assert_revision_file_contains_revision('tuvweb01', revision='3')
+        self.assert_revision_file_contains_revision('berweb01', revision='4')
 
