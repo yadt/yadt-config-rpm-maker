@@ -29,7 +29,7 @@ from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryEx
                                              ConfigDirAlreadyExistsException,
                                              HostRpmBuilder)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY, KEY_CONFIG_VIEWER_HOSTS_DIR
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY
 from config_rpm_maker import config
 
 
