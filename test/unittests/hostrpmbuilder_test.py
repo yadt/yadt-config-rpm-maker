@@ -360,3 +360,18 @@ class BuildTests(TestCase):
         actual_built_rpms = HostRpmBuilder.build(self.mock_host_rpm_builder)
 
         self.assertEqual(found_rpms, actual_built_rpms)
+
+
+class WriteRevisionFileForConfigViewerTests(TestCase):
+
+    def test_should_write_revision_file_using_host_name(self):
+
+        mock_host_rpm_builder = Mock(HostRpmBuilder)
+        mock_host_rpm_builder.config_viewer_host_dir = 'config-viewer-host-dir'
+        mock_host_rpm_builder.hostname = 'hostname'
+        mock_host_rpm_builder.revision = '1234'
+
+        HostRpmBuilder._write_revision_file_for_config_viewer(mock_host_rpm_builder)
+
+        mock_host_rpm_builder._write_file.assert_called_with('config-viewer-host-dir/hostname.rev', '1234')
+

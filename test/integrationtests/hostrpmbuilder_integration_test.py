@@ -21,6 +21,7 @@ import shutil
 
 from Queue import Queue
 from os import getcwd
+from os.path import join, exists
 from integration_test_support import IntegrationTest
 
 from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryException,
@@ -28,11 +29,29 @@ from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryEx
                                              ConfigDirAlreadyExistsException,
                                              HostRpmBuilder)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY, KEY_CONFIG_VIEWER_HOSTS_DIR
 from config_rpm_maker import config
 
 
 class HostRpmBuilderTest(IntegrationTest):
+
+    def test_should_write_revision_file(self):
+        working_directory = self.refresh_temporary_directory()
+        self.create_svn_repo()
+        svn_service_queue = self.create_svn_service_queue()
+        hostname = "berweb01"
+        revision = '1'
+        host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
+                                          hostname=hostname,
+                                          revision=revision,
+                                          work_dir=working_directory,
+                                          svn_service_queue=svn_service_queue)
+
+        host_rpm_builder.build()
+
+        temporary_path_of_revision_file = join(HostRpmBuilder.get_config_viewer_host_dir(hostname, temp=True), hostname + '.rev')
+        self.assert_path_exists(temporary_path_of_revision_file)
+        self.assert_content_of_file(temporary_path_of_revision_file, revision)
 
     def test_should_raise_ConfigDirAlreadyExistsException(self):
         current_working_directory = os.path.join(getcwd(), 'target', 'tmp')
@@ -88,3 +107,15 @@ class HostRpmBuilderTest(IntegrationTest):
             shutil.rmtree(working_directory)
         os.makedirs(working_directory)
         return working_directory
+
+    def assert_path_exists(self, path):
+        self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
+
+    def assert_content_of_file(self, path, expected_content):
+
+        with open(path) as file_to_read:
+            actual_content = file_to_read.read()
+            error_message = """File {path} does not have expected content.
+Expected content: {expected_content}
+  Actual content: {actual_content}""".format(path=path, expected_content=expected_content, actual_content=actual_content)
+            self.assertEqual(expected_content, actual_content, error_message)

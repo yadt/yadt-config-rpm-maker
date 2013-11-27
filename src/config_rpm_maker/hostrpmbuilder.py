@@ -170,7 +170,8 @@ class HostRpmBuilder(object):
         token_replacer.filter_file(path_to_unused_variables, html_escape=True)
 
     def _write_revision_file_for_config_viewer(self):
-        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
+        revision_file_path = os.path.join(self.config_viewer_host_dir, self.hostname + '.rev')
+        self._write_file(revision_file_path, self.revision)
 
     @measure_execution_time
     def _find_rpms(self):
