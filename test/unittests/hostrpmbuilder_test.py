@@ -23,6 +23,7 @@ from mock import Mock, patch
 
 import config_rpm_maker
 
+from config_rpm_maker.config import DEFAULT_CONFIG_VIEWER_ONLY, KEY_CONFIG_VIEWER_ONLY
 from config_rpm_maker.hostrpmbuilder import ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 
@@ -38,7 +39,7 @@ class BuildTests(TestCase):
         return mock_overlay_segment
 
     def setUp(self):
-        self.VARIABLES_DIRECTORY =  'variables-directory'
+        self.VARIABLES_DIRECTORY = 'variables-directory'
         self.RPM_REQUIRES_PATH = 'rpm-requires-path'
 
         mock_host_rpm_builder = Mock(HostRpmBuilder)
@@ -259,7 +260,6 @@ class BuildTests(TestCase):
 
         self.mock_host_rpm_builder._copy_files_for_config_viewer.assert_called_with()
 
-
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
     def test_should_write_patch_info_into_variables_and_configviewer(self, mock_exists, mock_mkdir):
@@ -292,16 +292,17 @@ class BuildTests(TestCase):
 
         self.mock_host_rpm_builder._build_rpm_using_rpmbuild.assert_called_with()
 
-    @patch('config_rpm_maker.hostrpmbuilder.config')
+    @patch('config_rpm_maker.hostrpmbuilder.config.get')
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
-    def test_should_build_rpm_using_rpmbuild(self, mock_exists, mock_mkdir, mock_config):
+    def test_should_not_build_rpm_using_rpmbuild(self, mock_exists, mock_mkdir, mock_get):
 
-        mock_config.get.return_value = True
+        mock_get.return_value = True
         mock_exists.return_value = False
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
+        mock_get.assert_any_call(KEY_CONFIG_VIEWER_ONLY, DEFAULT_CONFIG_VIEWER_ONLY)
         self.assertEqual(0, len(self.mock_host_rpm_builder._build_rpm_using_rpmbuild.call_args_list))
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
@@ -323,7 +324,6 @@ class BuildTests(TestCase):
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
         self.mock_host_rpm_builder._write_revision_file_for_config_viewer.assert_called_with()
-
 
     @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
