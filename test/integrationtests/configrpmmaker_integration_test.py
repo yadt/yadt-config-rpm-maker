@@ -217,3 +217,14 @@ class ConfigRpmMakerTest(IntegrationTest):
         self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
 
         config.setvalue(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
+
+    def test_should_move_config_viewer_data_to_destination(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        config_rpm_maker.build()
+
+        self.assert_revision_file_contains_revision('devweb01', '2')
+        self.assert_revision_file_contains_revision('tuvweb01', '2')
+        self.assert_revision_file_contains_revision('berweb01', '2')
+

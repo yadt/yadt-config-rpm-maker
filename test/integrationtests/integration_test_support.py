@@ -23,6 +23,7 @@ from os.path import abspath, exists, join
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY
+from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 
 
 class IntegrationTestException(Exception):
@@ -54,3 +55,26 @@ class IntegrationTest(unittest.TestCase):
             shutil.rmtree(self.repo_dir)
 
         makedirs(self.repo_dir)
+
+    def assert_revision_file_contains_revision(self, hostname, revision):
+
+        config_viewer_host_data = HostRpmBuilder.get_config_viewer_host_dir(hostname)
+        error_message = 'Directory "%s" does not exist.' % config_viewer_host_data
+        self.assertTrue(exists(config_viewer_host_data), error_message)
+
+        revision_file_path = join(config_viewer_host_data, '%s.rev' % hostname)
+        self.assert_file_content(revision_file_path, revision)
+
+    def assert_file_content(self, path_to_file, expected_content):
+
+        self.assertTrue(exists(path_to_file))
+
+        with open(path_to_file) as revision_file:
+            actual_content = revision_file.read()
+            error_message = """File "{path_to_file}" did not have expected content.
+Expected content: {expected_content}
+  Actual content: {actual_content}
+""".format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
+            self.assertEqual(expected_content, actual_content, error_message)
+
+
