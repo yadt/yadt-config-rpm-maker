@@ -28,6 +28,15 @@ from config_rpm_maker.hostrpmbuilder import ConfigDirAlreadyExistsException, Cou
 
 class BuildTests(TestCase):
 
+    def _create_mock_overlay_segment_method(self):
+        def fake_overlay_segment(segment):
+            return ['%s-svn-paths' % segment], ['%s-exported-paths' % segment], ['%s-requires' % segment], [
+                '%s-provides' % segment]
+
+        mock_overlay_segment = Mock()
+        mock_overlay_segment.side_effect = fake_overlay_segment
+        return mock_overlay_segment
+
     def setUp(self):
         self.VARIABLES_DIRECTORY =  'variables-directory'
         self.RPM_REQUIRES_PATH = 'rpm-requires-path'
@@ -43,13 +52,7 @@ class BuildTests(TestCase):
         mock_host_rpm_builder.rpm_provides_path = 'rpm-provides-path'
         mock_host_rpm_builder.config_viewer_host_dir = 'config_viewer_host_dir'
 
-        def fake_overlay_segment(segment):
-            return ['%s-svn-paths' % segment], ['%s-exported-paths' % segment], ['%s-requires' % segment], ['%s-provides' % segment]
-
-        mock_overlay_segment = Mock()
-        mock_overlay_segment.side_effect = fake_overlay_segment
-
-        mock_host_rpm_builder._overlay_segment = mock_overlay_segment
+        mock_host_rpm_builder._overlay_segment = self._create_mock_overlay_segment_method()
 
         self.mock_host_rpm_builder = mock_host_rpm_builder
 
@@ -168,3 +171,192 @@ class BuildTests(TestCase):
         self.mock_host_rpm_builder._write_dependency_file.assert_any_called(['segment1-requires', 'segment2-requires', 'segment3-requires'], 'rpm-requires-path', collapse_duplicates=True)
         self.mock_host_rpm_builder._write_dependency_file.assert_any_called(['segment1-requires', 'segment2-requires', 'segment3-requires'], 'variables-directory/RPM_REQUIRES_REPOS', filter_regex='^yadt-.*-repos?$')
 
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_export_spec_file(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._export_spec_file.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_save_log_entries_to_variable(self, mock_exists, mock_mkdir, mock_overlay_order):
+
+        config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER = ['segment1', 'segment2', 'segment3']
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._save_log_entries_to_variable.assert_called_with(['segment1-svn-paths', 'segment2-svn-paths', 'segment3-svn-paths'])
+
+    @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_save_overlaying_to_variable(self, mock_exists, mock_mkdir, mock_overlay_order):
+
+        config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER = ['segment1', 'segment2', 'segment3']
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._save_overlaying_to_variable.assert_called_with({'segment1': ['segment1-exported-paths'],
+                                                                                    'segment3': ['segment3-exported-paths'],
+                                                                                    'segment2': ['segment2-exported-paths']})
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_move_variables_out_of_rpm_dir(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._move_variables_out_of_rpm_dir.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_save_file_list(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._save_file_list.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_save_segment_variables(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._save_segment_variables.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_save_network_variables(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._save_network_variables.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_copy_files_for_config_viewer(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._copy_files_for_config_viewer.assert_called_with()
+
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_write_patch_info_into_variables_and_configviewer(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+        self.mock_host_rpm_builder._generate_patch_info.return_value = "patchinfo1\npatchinfo2\npatchinfo3\n"
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._write_file.assert_any_call('variables-directory/VARIABLES', 'patchinfo1\npatchinfo2\npatchinfo3\n')
+        self.mock_host_rpm_builder._write_file.assert_any_call('config_viewer_host_dir/devweb01.variables', 'patchinfo1\npatchinfo2\npatchinfo3\n')
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_filter_tokens_in_rpm_sources(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._filter_tokens_in_rpm_sources.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_build_rpm_using_rpmbuild(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._build_rpm_using_rpmbuild.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.config')
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_build_rpm_using_rpmbuild(self, mock_exists, mock_mkdir, mock_config):
+
+        mock_config.get.return_value = True
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.assertEqual(0, len(self.mock_host_rpm_builder._build_rpm_using_rpmbuild.call_args_list))
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_filter_tokens_in_config_viewer(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._filter_tokens_in_config_viewer.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_write_revision_file_for_config_viewer(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._write_revision_file_for_config_viewer.assert_called_with()
+
+
+    @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_write_overlaying_for_config_viewer(self, mock_exists, mock_mkdir, mock_overlay_order):
+
+        config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER = ['segment1', 'segment2', 'segment3']
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._write_overlaying_for_config_viewer.assert_called_with({'segment1': ['segment1-exported-paths'],
+                                                                                           'segment3': ['segment3-exported-paths'],
+                                                                                           'segment2': ['segment2-exported-paths']})
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_remove_logger_handlers(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._remove_logger_handlers.assert_called_with()
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_return_rpms(self, mock_exists, mock_mkdir):
+        found_rpms = ['rpm1', 'rpm2', 'rpm3']
+
+        self.mock_host_rpm_builder._find_rpms.return_value = found_rpms
+        mock_exists.return_value = False
+
+        actual_built_rpms = HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.assertEqual(found_rpms, actual_built_rpms)
