@@ -21,6 +21,8 @@ import subprocess
 from pysvn import ClientError
 from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
+from os import mkdir
+from os.path import exists
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_LOG_LEVEL
@@ -82,13 +84,13 @@ class HostRpmBuilder(object):
         LOGGER.info('%s: building configuration rpm(s) for host "%s"', self.thread_name, self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
-        if os.path.exists(self.host_config_dir):
+        if exists(self.host_config_dir):
             raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
 
         try:
-            os.mkdir(self.host_config_dir)
-        except Exception as e:
-            raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
+            mkdir(self.host_config_dir)
+        except Exception as exception:
+            raise CouldNotCreateConfigDirException('Could not create host config directory "%s".' % self.host_config_dir, exception)
 
         overall_requires = []
         overall_provides = []
@@ -107,8 +109,8 @@ class HostRpmBuilder(object):
         self.logger.info("Overall_provides: %s", str(overall_provides))
         self.logger.debug("Overall_svn_paths: %s", str(overall_svn_paths))
 
-        if not os.path.exists(self.variables_dir):
-            os.mkdir(self.variables_dir)
+        if not exists(self.variables_dir):
+            mkdir(self.variables_dir)
 
         self._write_dependency_file(overall_requires, self.rpm_requires_path, collapse_duplicates=True)
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
