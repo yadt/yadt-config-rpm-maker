@@ -18,9 +18,9 @@
 
 from logging import DEBUG, ERROR, INFO
 from mock import patch
-from StringIO import StringIO
 from unittest import TestCase
 
+from unittest_support import UnitTests
 from config_rpm_maker import config
 from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
@@ -115,14 +115,14 @@ class DetermineConfigurationFilePathTest(TestCase):
         self.assertEqual('path-to-configuration-file', actual_file_path)
 
 
-class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
+class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
     @patch('config_rpm_maker.config.set_properties')
     @patch('config_rpm_maker.config.yaml')
     @patch('__builtin__.open')
     def test_should_open_file_as_specified_in_argument(self, mock_open, mock_yaml, mock_set_properties):
 
-        fake_file = self._create_fake_file()
+        fake_file = self.create_fake_file()
         mock_open.return_value = fake_file
         mock_properties = {}
         mock_yaml.load.return_value = mock_properties
@@ -136,7 +136,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
     @patch('__builtin__.open')
     def test_should_set_file_path_of_loaded_configuration(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
 
-        fake_file = self._create_fake_file()
+        fake_file = self.create_fake_file()
         mock_open.return_value = fake_file
         mock_properties = {}
         mock_yaml.load.return_value = mock_properties
@@ -149,7 +149,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
     @patch('__builtin__.open')
     def test_should_raise_ConfigException_when_loading_fails(self, mock_open, mock_yaml):
 
-        fake_file = self._create_fake_file()
+        fake_file = self.create_fake_file()
         mock_open.return_value = fake_file
         mock_yaml.load.side_effect = Exception()
 
@@ -160,7 +160,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
     @patch('__builtin__.open')
     def test_return_raw_loaded_properties(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
 
-        fake_file = self._create_fake_file()
+        fake_file = self.create_fake_file()
         mock_open.return_value = fake_file
         mock_properties = {'foo': 'bar'}
         mock_yaml.load.return_value = mock_properties
@@ -168,16 +168,6 @@ class LoadConfigurationPropertiesFromYamlFileTests(TestCase):
         actual_properties = _load_configuration_properties_from_yaml_file('path-to-configuration-file')
 
         self.assertEqual({'foo': 'bar'}, actual_properties)
-
-    def _create_fake_file(self):
-        class FakeFile(StringIO):
-            def __enter__(self):
-                return self
-
-            def __exit__(self, exc_type, exc_val, exc_tb):
-                pass
-
-        return FakeFile()
 
 
 class EnsurePropertiesAreValidTest(TestCase):
