@@ -24,7 +24,9 @@ import traceback
 import config
 
 from logging import ERROR, FileHandler, Formatter, getLogger
+from os.path import exists
 from Queue import Queue
+from shutil import rmtree, move
 from threading import Thread
 
 from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
@@ -179,12 +181,15 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     def _move_configviewer_dirs_to_final_destination(self, hosts):
         LOGGER.info("Updating configviewer data.")
+
         for host in hosts:
             temp_path = HostRpmBuilder.get_config_viewer_host_dir(host, True)
             dest_path = HostRpmBuilder.get_config_viewer_host_dir(host)
-            if os.path.exists(dest_path):
-                shutil.rmtree(dest_path)
-            shutil.move(temp_path, dest_path)
+
+            if exists(dest_path):
+                rmtree(dest_path)
+
+            move(temp_path, dest_path)
 
     @measure_execution_time
     def _build_hosts(self, hosts):
