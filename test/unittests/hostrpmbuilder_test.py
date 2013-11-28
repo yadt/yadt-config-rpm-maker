@@ -27,6 +27,121 @@ from config_rpm_maker.config import DEFAULT_CONFIG_VIEWER_ONLY, KEY_CONFIG_VIEWE
 from config_rpm_maker.hostrpmbuilder import ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 
+class ConstructorTests(TestCase):
+
+    def setUp(self):
+
+        self.mock_svn_service_queue = Mock()
+        self.mock_host_rpm_builder = Mock(HostRpmBuilder)
+
+    def call_constructor(self):
+
+        HostRpmBuilder.__init__(self.mock_host_rpm_builder,
+                                thread_name='thread-name',
+                                hostname='hostname',
+                                revision='3485',
+                                work_dir='/tmp',
+                                svn_service_queue=self.mock_svn_service_queue)
+
+    def test_should_use_given_thread_name(self):
+
+        self.call_constructor()
+
+        self.assertEqual('thread-name', self.mock_host_rpm_builder.thread_name)
+
+    def test_should_use_given_host_name(self):
+
+        self.call_constructor()
+
+        self.assertEqual('hostname', self.mock_host_rpm_builder.hostname)
+
+    def test_should_use_given_revision(self):
+
+        self.call_constructor()
+
+        self.assertEqual('3485', self.mock_host_rpm_builder.revision)
+
+    def test_should_use_given_working_directory(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp', self.mock_host_rpm_builder.work_dir)
+
+    def test_should_use_no_error_logging_handler_as_default(self):
+
+        self.call_constructor()
+
+
+        self.assertEqual(None, self.mock_host_rpm_builder.error_logging_handler)
+
+    def test_should_create_logger(self):
+
+        self.call_constructor()
+
+        self.mock_host_rpm_builder._create_logger.assert_called_with()
+
+    def test_should_use_given_svn_service_queue(self):
+
+        self.call_constructor()
+
+        self.assertEqual(self.mock_svn_service_queue, self.mock_host_rpm_builder.svn_service_queue)
+
+    @patch('config_rpm_maker.hostrpmbuilder.config')
+    def test_should_read_config_rpm_prefix_from_configuration(self, mock_config):
+
+        mock_config.get.return_value = 'config-rpm-prefix'
+
+        self.call_constructor()
+
+        self.assertEqual('config-rpm-prefix', self.mock_host_rpm_builder.config_rpm_prefix)
+
+    def test_should_build_host_configuration_directory_using_working_directory_and_config_rpm_prefix_and_hostname(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/yadt-config-hostname', self.mock_host_rpm_builder.host_config_dir)
+
+    def test_should_build_variables_directory_using_host_configuration_directory(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/yadt-config-hostname/VARIABLES', self.mock_host_rpm_builder.variables_dir)
+
+    def test_should_build_path_to_rpm_requires_file_using_variables_directory(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/yadt-config-hostname/VARIABLES/RPM_REQUIRES', self.mock_host_rpm_builder.rpm_requires_path)
+
+    def test_should_build_path_to_rpm_provides_file_using_variables_directory(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/yadt-config-hostname/VARIABLES/RPM_PROVIDES', self.mock_host_rpm_builder.rpm_provides_path)
+
+    def test_should_build_path_to_spec_file_using_host_configuration_directory_and_config_rpm_prefix_and_hostname(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/yadt-config-hostname/yadt-config-hostname.spec', self.mock_host_rpm_builder.spec_file_path)
+
+    @patch('config_rpm_maker.hostrpmbuilder.build_config_viewer_host_directory_by_hostname')
+    def test_should_use_hostname_and_revision_to_build_config_viewer_hosts_directory(self, mock_build_config_viewer_host_directory_by_hostname):
+
+        mock_build_config_viewer_host_directory_by_hostname.return_value = 'config-viewer-host-directory'
+
+        self.call_constructor()
+
+        mock_build_config_viewer_host_directory_by_hostname.assert_called_with('hostname', postfix='.new-revision-3485')
+        self.assertEqual('config-viewer-host-directory', self.mock_host_rpm_builder.config_viewer_host_dir)
+
+    def test_should_build_rpm_build_directory_using_working_directory(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/rpmbuild', self.mock_host_rpm_builder.rpm_build_dir)
+
+
 class BuildTests(TestCase):
 
     def _create_mock_overlay_segment_method(self):

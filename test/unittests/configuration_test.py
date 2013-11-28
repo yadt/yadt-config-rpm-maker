@@ -571,11 +571,11 @@ class GetConfigViewerHostDirTests(TestCase):
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
 
     @patch('config_rpm_maker.config.get')
-    def test_should_return_path_to_temporary_host_directory(self, mock_get):
+    def test_should_return_path_and_append_a_postfix(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
-        actual_path = build_config_viewer_host_directory_by_hostname('devweb01', temp=True)
+        actual_path = build_config_viewer_host_directory_by_hostname('devweb01', postfix='.new-revision-123')
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
-        self.assertEqual('path-to-config-viewer-host-directory/devweb01.new', actual_path)
+        self.assertEqual('path-to-config-viewer-host-directory/devweb01.new-revision-123', actual_path)

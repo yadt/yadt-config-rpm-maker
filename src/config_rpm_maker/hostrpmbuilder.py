@@ -25,7 +25,7 @@ from os import mkdir
 from os.path import exists
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL, build_config_viewer_host_directory_by_hostname
+from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory_by_hostname
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -62,13 +62,13 @@ class HostRpmBuilder(object):
         self.error_logging_handler = error_logging_handler
         self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
-        self.config_rpm_prefix = config.get('config_rpm_prefix')
+        self.config_rpm_prefix = config.get(KEY_CONFIG_RPM_PREFIX)
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
-        self.config_viewer_host_dir = build_config_viewer_host_directory_by_hostname(hostname, True)
+        self.config_viewer_host_dir = build_config_viewer_host_directory_by_hostname(hostname, postfix='.new-revision-%s' % self.revision)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):

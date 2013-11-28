@@ -185,7 +185,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.info("Updating configviewer data.")
 
         for host in hosts:
-            temp_path = build_config_viewer_host_directory_by_hostname(host, True)
+            temp_path = build_config_viewer_host_directory_by_hostname(host, postfix='.new-revision-%s' % self.revision)
             dest_path = build_config_viewer_host_directory_by_hostname(host)
 
             if exists(dest_path):
@@ -193,9 +193,12 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 with open(path_to_revision_file) as revision_file_content:
                     revision_from_file = int(revision_file_content.read())
                     if revision_from_file > int(self.revision):
+                        LOGGER.debug('Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s', host, revision_from_file, self.revision)
                         continue
+
                 rmtree(dest_path)
 
+            LOGGER.debug('Updating configviewer data for host "%s"', host)
             move(temp_path, dest_path)
 
     @measure_execution_time

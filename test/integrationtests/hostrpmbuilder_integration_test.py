@@ -49,7 +49,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         host_rpm_builder.build()
 
-        temporary_path_of_revision_file = join(build_config_viewer_host_directory_by_hostname(hostname, temp=True), hostname + '.rev')
+        temporary_path_of_revision_file = join(build_config_viewer_host_directory_by_hostname(hostname, postfix='.new-revision-%s' % revision), hostname + '.rev')
         self.assert_path_exists(temporary_path_of_revision_file)
         self.assert_content_of_file(temporary_path_of_revision_file, revision)
 

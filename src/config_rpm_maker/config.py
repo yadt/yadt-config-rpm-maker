@@ -124,13 +124,13 @@ def get(name, default=None):
         return default
 
 
-def build_config_viewer_host_directory_by_hostname(hostname, temp=False):
+def build_config_viewer_host_directory_by_hostname(hostname, postfix=False):
     """ Returns a path to the config viewer host directory"""
     config_viewer_hosts_directory = get(KEY_CONFIG_VIEWER_HOSTS_DIR)
     path = join(config_viewer_hosts_directory, hostname)
 
-    if temp:
-        path += '.new'
+    if postfix:
+        path += postfix
 
     return path
 
@@ -178,7 +178,7 @@ def _set_file_path_of_loaded_configuration(new_file_path):
 
 def _determine_configuration_file_path():
     """
-        Decides which configuration file to load.
+        Decides which configuration file to load and returns the path to the file.
 
         It will try to read the environment variable and
         if this is not available it will fall back to the default file path.
