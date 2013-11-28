@@ -23,9 +23,6 @@ from config_rpm_maker.svnservice import SvnServiceException, SvnService
 
 class SvnServiceTest(IntegrationTest):
 
-    def setUp(self):
-        self.create_svn_repo()
-
     def test_get_change_set(self):
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
         self.assertEqual(['typ/web/data/index.html'], service.get_change_set(2))

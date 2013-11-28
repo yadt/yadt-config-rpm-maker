@@ -20,6 +20,7 @@ import unittest
 
 from os import makedirs
 from os.path import abspath, exists, join
+from shutil import rmtree
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, build_config_viewer_host_directory
@@ -30,6 +31,16 @@ class IntegrationTestException(Exception):
 
 
 class IntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
+
+        if exists(temporary_directory):
+            rmtree(temporary_directory)
+
+        self.temporary_directory = temporary_directory
+
+        self.create_svn_repo()
 
     def create_svn_repo(self):
         self._create_repository_directory()
@@ -47,8 +58,7 @@ class IntegrationTest(unittest.TestCase):
 
     def _create_repository_directory(self):
 
-        temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
-        self.repo_dir = abspath(join(temporary_directory, 'svn_repo'))
+        self.repo_dir = abspath(join(self.temporary_directory, 'svn_repo'))
 
         if exists(self.repo_dir):
             shutil.rmtree(self.repo_dir)

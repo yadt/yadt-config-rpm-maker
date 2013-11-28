@@ -110,8 +110,6 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             self.assertEqual(f.read(), '10 a a a a a a a a a a\n10 a a a a a a a a a a\n5 a a a a a\n')
 
     def _given_config_rpm_maker(self, keep_work_dir=False):
-        self._cleanup_temp_dir()
-        self.create_svn_repo()
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
 
         if keep_work_dir:
@@ -120,13 +118,6 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             del os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
         return ConfigRpmMaker('2', svn_service)
-
-    def _cleanup_temp_dir(self):
-        temp_dir = config_dev.get('temp_dir')
-        if temp_dir:
-            if os.path.exists(temp_dir):
-                shutil.rmtree(temp_dir)
-            os.makedirs(temp_dir)
 
     def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None):
         path = None
