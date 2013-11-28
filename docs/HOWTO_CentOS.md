@@ -16,13 +16,13 @@ git clone https://github.com/yadt/yadt-config-rpm-maker
 
 Install python development dependencies.
 ```bash
-yum install python-devel python-setuptools python-mock
+sudo yum install python-devel python-setuptools python-mock
 ```
 
 Install `yadt-config-rpm-maker` runtime dependencies.
 To install pysvn we need to [enable the RHEL EPEL repository](http://www.rackspace.com/knowledge_center/article/installing-rhel-epel-repo-on-centos-5x-or-6x).
 ```bash
-yum install subversion rpm-build install pysvn python-yaml
+sudo yum install subversion rpm-build install pysvn python-yaml
 ```
 
 ## Running Tests
