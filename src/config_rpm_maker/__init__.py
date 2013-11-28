@@ -111,10 +111,8 @@ def initialize_logging_to_syslog(arguments, revision):
 
 
 def start_building_configuration_rpms(repository, revision):
-    """
-        This function will start the process of building configuration rpms
-        for the given configuration repository and the revision.
-    """
+    """ This function will start the process of building configuration rpms
+        for the given configuration repository and the revision. """
     path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
     svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
     ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL

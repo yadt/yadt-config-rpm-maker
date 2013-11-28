@@ -110,31 +110,31 @@ class ParseArgumentsTests(TestCase):
         self.assertEqual(actual_arguments["<revision>"], "123")
 
 
-@patch('config_rpm_maker.parsearguments.setvalue')
+@patch('config_rpm_maker.parsearguments.set_property')
 class ApplyArgumentsToConfiguration(TestCase):
 
     def setUp(self):
         self.arguments = {OPTION_RPM_UPLOAD_CMD: False,
                           OPTION_CONFIG_VIEWER_ONLY: False}
 
-    def test_should_not_apply_anything_if_no_options_given(self, mock_setvalue):
+    def test_should_not_apply_anything_if_no_options_given(self, mock_set_property):
 
         apply_arguments_to_config(self.arguments)
 
-        self.assertEqual(0, len(mock_setvalue.call_args_list))
+        self.assertEqual(0, len(mock_set_property.call_args_list))
 
-    def test_should_set_rpm_upload_command_when_option_is_given(self, mock_setvalue):
+    def test_should_set_rpm_upload_command_when_option_is_given(self, mock_set_property):
 
         self.arguments[OPTION_RPM_UPLOAD_CMD] = '/bin/true'
 
         apply_arguments_to_config(self.arguments)
 
-        mock_setvalue.assert_any_call(KEY_RPM_UPLOAD_COMMAND, '/bin/true')
+        mock_set_property.assert_any_call(KEY_RPM_UPLOAD_COMMAND, '/bin/true')
 
-    def test_should_set_config_viewer_only_when_option_is_given(self, mock_setvalue):
+    def test_should_set_config_viewer_only_when_option_is_given(self, mock_set_property):
 
         self.arguments[OPTION_CONFIG_VIEWER_ONLY] = True
 
         apply_arguments_to_config(self.arguments)
 
-        mock_setvalue.assert_any_call(KEY_CONFIG_VIEWER_ONLY, True)
+        mock_set_property.assert_any_call(KEY_CONFIG_VIEWER_ONLY, True)

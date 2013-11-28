@@ -20,7 +20,7 @@ from optparse import OptionParser
 from sys import stdout, exit
 
 from config_rpm_maker.returncodes import RETURN_CODE_NOT_ENOUGH_ARGUMENTS, RETURN_CODE_VERSION
-from config_rpm_maker.config import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, setvalue
+from config_rpm_maker.config import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, set_property
 
 
 ARGUMENT_REPOSITORY = '<repository-url>'
@@ -103,7 +103,7 @@ def apply_arguments_to_config(arguments):
     """ Overrides configuration properties if command line options are specified. """
 
     if arguments[OPTION_RPM_UPLOAD_CMD]:
-        setvalue(KEY_RPM_UPLOAD_COMMAND, arguments[OPTION_RPM_UPLOAD_CMD])
+        set_property(KEY_RPM_UPLOAD_COMMAND, arguments[OPTION_RPM_UPLOAD_CMD])
 
     if arguments[OPTION_CONFIG_VIEWER_ONLY]:
-        setvalue(KEY_CONFIG_VIEWER_ONLY, arguments[OPTION_CONFIG_VIEWER_ONLY])
+        set_property(KEY_CONFIG_VIEWER_ONLY, arguments[OPTION_CONFIG_VIEWER_ONLY])

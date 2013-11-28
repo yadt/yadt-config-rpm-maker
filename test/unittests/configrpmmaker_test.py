@@ -64,10 +64,10 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
-    def test_should_remove_directory_if_it_does_already_exist(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory_by_hostname')
+    def test_should_remove_directory_if_it_does_already_exist(self, mock_build_config_viewer_host_directory_by_hostname, mock_exists, mock_move, mock_rmtree, mock_open):
 
-        mock_get_config_viewer_host_dir.return_value = 'target/tmp/configviewer/hosts/devweb01'
+        mock_build_config_viewer_host_directory_by_hostname.return_value = 'target/tmp/configviewer/hosts/devweb01'
         mock_open.return_value = self.create_fake_file("53")
 
         mock_exists.return_value = True
@@ -80,10 +80,10 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
-    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory_by_hostname')
+    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_build_config_viewer_host_directory_by_hostname, mock_exists, mock_move, mock_rmtree, mock_open):
 
-        mock_get_config_viewer_host_dir.return_value = 'target/tmp/configviewer/hosts/devweb01'
+        mock_build_config_viewer_host_directory_by_hostname.return_value = 'target/tmp/configviewer/hosts/devweb01'
         mock_open.return_value = self.create_fake_file("99")
 
         mock_exists.return_value = True
@@ -120,13 +120,13 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
-    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory_by_hostname')
+    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_build_config_viewer_host_directory_by_hostname, mock_exists, mock_move, mock_rmtree, mock_open):
 
-        def get_config_viewer_host_dir_side_effect(hostname, temp=False):
+        def build_config_viewer_host_directory_by_hostname_side_effect(hostname, temp=False):
             return "config-viewer-directory-%s/%s" % ("temp" if temp else "destination", hostname)
 
-        mock_get_config_viewer_host_dir.side_effect = get_config_viewer_host_dir_side_effect
+        mock_build_config_viewer_host_directory_by_hostname.side_effect = build_config_viewer_host_directory_by_hostname_side_effect
 
         def mock_open_side_effect(path):
             if path.endswith('devweb01.rev'):
@@ -169,13 +169,13 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.get_config_viewer_host_dir')
-    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_get_config_viewer_host_dir, mock_exists, mock_move, mock_rmtree, mock_open):
+    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory_by_hostname')
+    def test_should_remove_directories_of_hosts_if_they_already_exist(self, mock_build_config_viewer_host_directory_by_hostname, mock_exists, mock_move, mock_rmtree, mock_open):
 
-        def get_config_viewer_host_dir_side_effect(hostname, temp=False):
+        def build_config_viewer_host_directory_by_hostname_side_effect(hostname, temp=False):
             return "config-viewer-directory-%s/%s" % ("temp" if temp else "destination", hostname)
 
-        mock_get_config_viewer_host_dir.side_effect = get_config_viewer_host_dir_side_effect
+        mock_build_config_viewer_host_directory_by_hostname.side_effect = build_config_viewer_host_directory_by_hostname_side_effect
 
         def mock_open_side_effect(path):
             if path.endswith('devweb01.rev'):

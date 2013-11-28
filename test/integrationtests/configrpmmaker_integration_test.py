@@ -99,11 +99,11 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         os.chmod(cmd_file, 0755)
         cmd = '%s %s' % (cmd_file, target_file)
-        config.setvalue('rpm_upload_cmd', cmd)
+        config.set_property('rpm_upload_cmd', cmd)
         try:
             ConfigRpmMaker(None, None)._upload_rpms(['a' for x in range(25)])
         finally:
-            config.setvalue('rpm_upload_cmd', old_config)
+            config.set_property('rpm_upload_cmd', old_config)
 
         self.assertTrue(os.path.exists(target_file))
         with open(target_file) as f:
@@ -212,11 +212,11 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
     def test_should_raise_CouldNotUploadRpmsException(self):
         rpm_upload_command_before_test = config.get(KEY_RPM_UPLOAD_COMMAND)
-        config.setvalue(KEY_RPM_UPLOAD_COMMAND, "foobar")
+        config.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
 
         self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
 
-        config.setvalue(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
+        config.set_property(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
 
     def test_should_move_config_viewer_data_to_destination(self):
 

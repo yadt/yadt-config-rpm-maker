@@ -40,12 +40,12 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      ConfigException,
                                      ConfigurationValidationException,
-                                     ensure_valid_log_level,
-                                     get_config_viewer_host_dir,
+                                     _ensure_valid_log_level,
+                                     build_config_viewer_host_directory_by_hostname,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
                                      load_configuration_file,
-                                     setvalue,
+                                     set_property,
                                      set_properties,
                                      _determine_configuration_file_path,
                                      _load_configuration_properties_from_yaml_file,
@@ -183,7 +183,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         _ensure_properties_are_valid({'foo': 'bar'})
 
-    @patch('config_rpm_maker.config.ensure_valid_log_level')
+    @patch('config_rpm_maker.config._ensure_valid_log_level')
     def test_should_return_log_level_valid_properties(self, mock_ensure_valid_log_level):
 
         mock_ensure_valid_log_level.return_value = 'valid_log_level'
@@ -193,7 +193,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('valid_log_level', actual_properties[KEY_LOG_LEVEL])
 
-    @patch('config_rpm_maker.config.ensure_valid_log_level')
+    @patch('config_rpm_maker.config._ensure_valid_log_level')
     def test_should_return_default_log_level_when_no_log_level_defined(self, mock_ensure_valid_log_level):
 
         mock_ensure_valid_log_level.return_value = 'valid_log_level'
@@ -496,7 +496,7 @@ class SetValueTests(TestCase):
 
     def test_should_raise_configuration_exception_when_trying_to_set_value_without_name(self):
 
-        self.assertRaises(ConfigException, setvalue, name=None, value='123')
+        self.assertRaises(ConfigException, set_property, name=None, value='123')
 
     @patch('config_rpm_maker.config.get_properties')
     @patch('config_rpm_maker.config.load_configuration_file')
@@ -507,7 +507,7 @@ class SetValueTests(TestCase):
         mock_load_configuration_file.side_effect = set_configuration_properties
         mock_get_configuration.return_value = None
 
-        setvalue('abc', '123')
+        set_property('abc', '123')
 
         mock_load_configuration_file.assert_called_with()
 
@@ -516,7 +516,7 @@ class SetValueTests(TestCase):
         fake_properties = {}
         mock_get_properties.return_value = fake_properties
 
-        setvalue('abc', '123')
+        set_property('abc', '123')
 
         self.assertEqual('123', fake_properties['abc'])
 
@@ -525,37 +525,37 @@ class EnsureValidLogLevelTests(TestCase):
 
     def test_get_log_level_should_return_debug_log_level_if_lower_debug_is_given(self):
 
-        actual = ensure_valid_log_level("debug")
+        actual = _ensure_valid_log_level("debug")
 
         self.assertEqual(DEBUG, actual)
 
     def test_get_log_level_should_return_debug_log_level_if_name_contains_whitespace(self):
 
-        actual = ensure_valid_log_level("\tdeBug    ")
+        actual = _ensure_valid_log_level("\tdeBug    ")
 
         self.assertEqual(DEBUG, actual)
 
     def test_get_log_level_should_return_debug_log_level(self):
 
-        actual = ensure_valid_log_level("DEBUG")
+        actual = _ensure_valid_log_level("DEBUG")
 
         self.assertEqual(DEBUG, actual)
 
     def test_get_log_level_should_return_error_log_level(self):
 
-        actual = ensure_valid_log_level("ERROR")
+        actual = _ensure_valid_log_level("ERROR")
 
         self.assertEqual(ERROR, actual)
 
     def test_get_log_level_should_return_info_log_level(self):
 
-        actual = ensure_valid_log_level("INFO")
+        actual = _ensure_valid_log_level("INFO")
 
         self.assertEqual(INFO, actual)
 
     def test_get_log_level_should_raise_exception_when_strange_log_level_given(self):
 
-        self.assertRaises(ConfigException, ensure_valid_log_level, "FOO")
+        self.assertRaises(ConfigException, _ensure_valid_log_level, "FOO")
 
 
 class GetConfigViewerHostDirTests(TestCase):
@@ -565,7 +565,7 @@ class GetConfigViewerHostDirTests(TestCase):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
-        actual_path = get_config_viewer_host_dir('devweb01')
+        actual_path = build_config_viewer_host_directory_by_hostname('devweb01')
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
@@ -575,7 +575,7 @@ class GetConfigViewerHostDirTests(TestCase):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
-        actual_path = get_config_viewer_host_dir('devweb01', temp=True)
+        actual_path = build_config_viewer_host_directory_by_hostname('devweb01', temp=True)
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01.new', actual_path)
