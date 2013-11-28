@@ -125,14 +125,14 @@ class ConstructorTests(TestCase):
 
         self.assertEqual('/tmp/yadt-config-hostname/yadt-config-hostname.spec', self.mock_host_rpm_builder.spec_file_path)
 
-    @patch('config_rpm_maker.hostrpmbuilder.build_config_viewer_host_directory_by_hostname')
-    def test_should_use_hostname_and_revision_to_build_config_viewer_hosts_directory(self, mock_build_config_viewer_host_directory_by_hostname):
+    @patch('config_rpm_maker.hostrpmbuilder.build_config_viewer_host_directory')
+    def test_should_use_hostname_and_revision_to_build_config_viewer_hosts_directory(self, mock_build_config_viewer_host_directory):
 
-        mock_build_config_viewer_host_directory_by_hostname.return_value = 'config-viewer-host-directory'
+        mock_build_config_viewer_host_directory.return_value = 'config-viewer-host-directory'
 
         self.call_constructor()
 
-        mock_build_config_viewer_host_directory_by_hostname.assert_called_with('hostname', revision='3485')
+        mock_build_config_viewer_host_directory.assert_called_with('hostname', revision='3485')
         self.assertEqual('config-viewer-host-directory', self.mock_host_rpm_builder.config_viewer_host_dir)
 
     def test_should_build_rpm_build_directory_using_working_directory(self):

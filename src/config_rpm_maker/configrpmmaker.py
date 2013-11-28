@@ -36,7 +36,7 @@ from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
                                      KEY_THREAD_COUNT,
                                      KEY_RPM_UPLOAD_COMMAND,
                                      KEY_TEMPORARY_DIRECTORY,
-                                     build_config_viewer_host_directory_by_hostname)
+                                     build_config_viewer_host_directory)
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
@@ -192,8 +192,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.info("Updating configviewer data.")
 
         for host in hosts:
-            temp_path = build_config_viewer_host_directory_by_hostname(host, revision=self.revision)
-            dest_path = build_config_viewer_host_directory_by_hostname(host)
+            temp_path = build_config_viewer_host_directory(host, revision=self.revision)
+            dest_path = build_config_viewer_host_directory(host)
 
             if exists(dest_path):
                 path_to_revision_file = join(dest_path, "%s.rev" % host)

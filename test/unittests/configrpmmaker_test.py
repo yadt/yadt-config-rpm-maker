@@ -63,10 +63,10 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory_by_hostname')
-    def test_should_remove_directory_if_it_does_already_exist(self, mock_build_config_viewer_host_directory_by_hostname, mock_exists, mock_move, mock_rmtree):
+    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory')
+    def test_should_remove_directory_if_it_does_already_exist(self, mock_build_config_viewer_host_directory, mock_exists, mock_move, mock_rmtree):
 
-        mock_build_config_viewer_host_directory_by_hostname.return_value = 'target/tmp/configviewer/hosts/devweb01'
+        mock_build_config_viewer_host_directory.return_value = 'target/tmp/configviewer/hosts/devweb01'
         self.mock_config_rpm_maker._read_integer_from_file.return_value = 53
 
         mock_exists.return_value = True
@@ -78,10 +78,10 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory_by_hostname')
-    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_build_config_viewer_host_directory_by_hostname, mock_exists, mock_move, mock_rmtree):
+    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory')
+    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_build_config_viewer_host_directory, mock_exists, mock_move, mock_rmtree):
 
-        mock_build_config_viewer_host_directory_by_hostname.return_value = 'target/tmp/configviewer/hosts/devweb01'
+        mock_build_config_viewer_host_directory.return_value = 'target/tmp/configviewer/hosts/devweb01'
         self.mock_config_rpm_maker._read_integer_from_file.return_value = 99
 
         mock_exists.return_value = True

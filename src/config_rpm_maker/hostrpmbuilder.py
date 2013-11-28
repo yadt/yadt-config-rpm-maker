@@ -25,7 +25,7 @@ from os import mkdir
 from os.path import exists
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory_by_hostname
+from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -68,7 +68,7 @@ class HostRpmBuilder(object):
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
-        self.config_viewer_host_dir = build_config_viewer_host_directory_by_hostname(hostname, revision=self.revision)
+        self.config_viewer_host_dir = build_config_viewer_host_directory(hostname, revision=self.revision)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):

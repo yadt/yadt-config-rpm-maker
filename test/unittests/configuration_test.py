@@ -41,7 +41,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ConfigException,
                                      ConfigurationValidationException,
                                      _ensure_valid_log_level,
-                                     build_config_viewer_host_directory_by_hostname,
+                                     build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
                                      load_configuration_file,
@@ -565,7 +565,7 @@ class GetConfigViewerHostDirTests(TestCase):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
-        actual_path = build_config_viewer_host_directory_by_hostname('devweb01')
+        actual_path = build_config_viewer_host_directory('devweb01')
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
@@ -575,7 +575,7 @@ class GetConfigViewerHostDirTests(TestCase):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
-        actual_path = build_config_viewer_host_directory_by_hostname('devweb01', revision='123')
+        actual_path = build_config_viewer_host_directory('devweb01', revision='123')
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01.new-revision-123', actual_path)
