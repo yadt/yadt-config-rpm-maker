@@ -22,7 +22,7 @@ import rpm
 from integration_test_support import IntegrationTest, IntegrationTestException
 
 from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
@@ -115,9 +115,9 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
 
         if keep_work_dir:
-            os.environ['KEEPWORKDIR'] = '1'
-        elif 'KEEPWORKDIR' in os.environ:
-            del os.environ['KEEPWORKDIR']
+            os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
+        elif ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ:
+            del os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
         return ConfigRpmMaker('2', svn_service)
 

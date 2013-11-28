@@ -32,14 +32,15 @@ from threading import Thread
 from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
                                      DEFAULT_THREAD_COUNT,
                                      DEFAULT_UPLOAD_CHUNK_SIZE,
+                                     ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
                                      KEY_THREAD_COUNT,
                                      KEY_RPM_UPLOAD_COMMAND,
                                      KEY_TEMPORARY_DIRECTORY,
                                      get_config_viewer_host_dir)
 
-from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
+from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
 
@@ -171,7 +172,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return 'KEEPWORKDIR' in os.environ and os.environ['KEEPWORKDIR']
+        return ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ and os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
     def _move_error_log_for_public_access(self):
         error_log_dir = os.path.join(config.get('error_log_dir'))
