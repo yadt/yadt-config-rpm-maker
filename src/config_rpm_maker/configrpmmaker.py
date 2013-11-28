@@ -24,19 +24,23 @@ import traceback
 import config
 
 from logging import ERROR, FileHandler, Formatter, getLogger
+from os.path import exists, join
 from Queue import Queue
+from shutil import rmtree, move
 from threading import Thread
 
 from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
                                      DEFAULT_THREAD_COUNT,
                                      DEFAULT_UPLOAD_CHUNK_SIZE,
+                                     ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
                                      KEY_THREAD_COUNT,
                                      KEY_RPM_UPLOAD_COMMAND,
-                                     KEY_TEMPORARY_DIRECTORY)
+                                     KEY_TEMPORARY_DIRECTORY,
+                                     build_config_viewer_host_directory)
 
-from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
+from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.profiler import measure_execution_time
 from config_rpm_maker.segment import OVERLAY_ORDER
 
@@ -168,7 +172,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return 'KEEPWORKDIR' in os.environ and os.environ['KEEPWORKDIR']
+        return ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ and os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
     def _move_error_log_for_public_access(self):
         error_log_dir = os.path.join(config.get('error_log_dir'))
@@ -177,14 +181,32 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 os.makedirs(error_log_dir)
             shutil.move(self.error_log_file, os.path.join(error_log_dir, self.revision + '.txt'))
 
+    def _read_integer_from_file(self, path):
+
+        with open(path) as file_which_contains_integer:
+            integer_from_file = int(file_which_contains_integer.read())
+
+        return integer_from_file
+
     def _move_configviewer_dirs_to_final_destination(self, hosts):
         LOGGER.info("Updating configviewer data.")
+
         for host in hosts:
-            temp_path = HostRpmBuilder.get_config_viewer_host_dir(host, True)
-            dest_path = HostRpmBuilder.get_config_viewer_host_dir(host)
-            if os.path.exists(dest_path):
-                shutil.rmtree(dest_path)
-            shutil.move(temp_path, dest_path)
+            temp_path = build_config_viewer_host_directory(host, revision=self.revision)
+            dest_path = build_config_viewer_host_directory(host)
+
+            if exists(dest_path):
+                path_to_revision_file = join(dest_path, "%s.rev" % host)
+                revision_from_file = self._read_integer_from_file(path_to_revision_file)
+
+                if revision_from_file > int(self.revision):
+                    LOGGER.debug('Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s', host, revision_from_file, self.revision)
+                    continue
+
+                rmtree(dest_path)
+
+            LOGGER.debug('Updating configviewer data for host "%s"', host)
+            move(temp_path, dest_path)
 
     @measure_execution_time
     def _build_hosts(self, hosts):

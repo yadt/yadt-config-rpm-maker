@@ -20,9 +20,10 @@ import unittest
 
 from os import makedirs
 from os.path import abspath, exists, join
+from shutil import rmtree
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY
+from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, build_config_viewer_host_directory
 
 
 class IntegrationTestException(Exception):
@@ -30,6 +31,16 @@ class IntegrationTestException(Exception):
 
 
 class IntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
+
+        if exists(temporary_directory):
+            rmtree(temporary_directory)
+
+        self.temporary_directory = temporary_directory
+
+        self.create_svn_repo()
 
     def create_svn_repo(self):
         self._create_repository_directory()
@@ -47,10 +58,43 @@ class IntegrationTest(unittest.TestCase):
 
     def _create_repository_directory(self):
 
-        temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
-        self.repo_dir = abspath(join(temporary_directory, 'svn_repo'))
+        self.repo_dir = abspath(join(self.temporary_directory, 'svn_repo'))
 
         if exists(self.repo_dir):
             shutil.rmtree(self.repo_dir)
 
         makedirs(self.repo_dir)
+
+    def write_revision_file_for_hostname(self, hostname, revision):
+
+        config_viewer_host_directory = build_config_viewer_host_directory(hostname)
+
+        if not exists(config_viewer_host_directory):
+            makedirs(config_viewer_host_directory)
+
+        revision_file_path = join(config_viewer_host_directory, '%s.rev' % hostname)
+        with open(revision_file_path, "w") as revision_file:
+            revision_file.write(revision)
+
+    def assert_revision_file_contains_revision(self, hostname, revision):
+
+        config_viewer_host_data = build_config_viewer_host_directory(hostname)
+        error_message = 'Directory "%s" does not exist.' % config_viewer_host_data
+        self.assertTrue(exists(config_viewer_host_data), error_message)
+
+        revision_file_path = join(config_viewer_host_data, '%s.rev' % hostname)
+        self.assert_file_content(revision_file_path, revision)
+
+    def assert_file_content(self, path_to_file, expected_content):
+
+        self.assertTrue(exists(path_to_file))
+
+        with open(path_to_file) as revision_file:
+            actual_content = revision_file.read()
+            error_message = """File "{path_to_file}" did not have expected content.
+Expected content: {expected_content}
+  Actual content: {actual_content}
+""".format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
+            self.assertEqual(expected_content, actual_content, error_message)
+
+

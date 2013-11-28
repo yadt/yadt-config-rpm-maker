@@ -22,7 +22,7 @@ import rpm
 from integration_test_support import IntegrationTest, IntegrationTestException
 
 from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
@@ -33,7 +33,7 @@ stderr was: "{stderr}"
 """
 
 
-class ConfigRpmMakerTest(IntegrationTest):
+class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
     def test_find_matching_hosts(self):
         config_rpm_maker = ConfigRpmMaker(None, None)
@@ -99,34 +99,25 @@ class ConfigRpmMakerTest(IntegrationTest):
 
         os.chmod(cmd_file, 0755)
         cmd = '%s %s' % (cmd_file, target_file)
-        config.setvalue('rpm_upload_cmd', cmd)
+        config.set_property('rpm_upload_cmd', cmd)
         try:
             ConfigRpmMaker(None, None)._upload_rpms(['a' for x in range(25)])
         finally:
-            config.setvalue('rpm_upload_cmd', old_config)
+            config.set_property('rpm_upload_cmd', old_config)
 
         self.assertTrue(os.path.exists(target_file))
         with open(target_file) as f:
             self.assertEqual(f.read(), '10 a a a a a a a a a a\n10 a a a a a a a a a a\n5 a a a a a\n')
 
     def _given_config_rpm_maker(self, keep_work_dir=False):
-        self._cleanup_temp_dir()
-        self.create_svn_repo()
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
 
         if keep_work_dir:
-            os.environ['KEEPWORKDIR'] = '1'
-        elif 'KEEPWORKDIR' in os.environ:
-            del os.environ['KEEPWORKDIR']
+            os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
+        elif ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ:
+            del os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
         return ConfigRpmMaker('2', svn_service)
-
-    def _cleanup_temp_dir(self):
-        temp_dir = config_dev.get('temp_dir')
-        if temp_dir:
-            if os.path.exists(temp_dir):
-                shutil.rmtree(temp_dir)
-            os.makedirs(temp_dir)
 
     def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None):
         path = None
@@ -212,8 +203,32 @@ class ConfigRpmMakerTest(IntegrationTest):
 
     def test_should_raise_CouldNotUploadRpmsException(self):
         rpm_upload_command_before_test = config.get(KEY_RPM_UPLOAD_COMMAND)
-        config.setvalue(KEY_RPM_UPLOAD_COMMAND, "foobar")
+        config.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
 
         self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
 
-        config.setvalue(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
+        config.set_property(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
+
+    def test_should_move_config_viewer_data_to_destination(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        config_rpm_maker.build()
+
+        self.assert_revision_file_contains_revision('devweb01', '2')
+        self.assert_revision_file_contains_revision('tuvweb01', '2')
+        self.assert_revision_file_contains_revision('berweb01', '2')
+
+    def test_should_only_move_config_viewer_data_to_destination_when_revision_is_higher(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        self.write_revision_file_for_hostname('tuvweb01', revision='3')
+        self.write_revision_file_for_hostname('berweb01', revision='4')
+
+        config_rpm_maker.build()
+
+        self.assert_revision_file_contains_revision('devweb01', revision='2')
+        self.assert_revision_file_contains_revision('tuvweb01', revision='3')
+        self.assert_revision_file_contains_revision('berweb01', revision='4')
+

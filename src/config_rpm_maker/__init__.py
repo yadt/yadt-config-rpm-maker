@@ -45,64 +45,10 @@ LOGGER = getLogger(__name__)
 MESSAGE_SUCCESS = "Success."
 
 
-def determine_console_log_level(arguments):
-    """ Determines the log level based on arguments and configuration """
-    if arguments[OPTION_DEBUG]:
-        log_level = DEBUG
-    else:
-        log_level = INFO
-
-    return log_level
-
-
-def start_building_configuration_rpms(repository, revision):
-    path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
-    svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
-    ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
-
-
-def append_console_logger(logger, console_log_level):
-    """ Creates and appends a console log handler with the given log level """
-    console_handler = create_console_handler(console_log_level)
-    logger.addHandler(console_handler)
-
-    if console_log_level == DEBUG:
-        logger.debug("DEBUG logging is enabled")
-
-
-def initialize_configuration(arguments):
-    config.load_configuration_file()
-    apply_arguments_to_config(arguments)
-
-
-def initialize_logging_to_console(arguments):
-    console_log_level = determine_console_log_level(arguments)
-    append_console_logger(LOGGER, console_log_level)
-
-
-def initialize_logging_to_syslog(arguments, revision):
-    if not arguments[OPTION_NO_SYSLOG]:
-        sys_log_handler = create_sys_log_handler(revision)
-        LOGGER.addHandler(sys_log_handler)
-
-
-def extract_repository_url_and_revision_from_arguments(arguments):
-    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
-    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
-    return repository_url, revision
-
-
-def log_additional_information():
-    log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config.get_properties(), config.get_file_path_of_loaded_configuration())
-
-
-def log_exception_message(e):
-    for line in str(e).split("\n"):
-        LOGGER.error(line)
-
-
 def main():
+    """
+        This function will be called by the command line interface.
+    """
     LOGGER.setLevel(DEBUG)
 
     try:
@@ -135,3 +81,71 @@ def main():
         return exit_program('Execution interrupted by user!', return_code=RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
 
     exit_program(MESSAGE_SUCCESS, return_code=RETURN_CODE_SUCCESS)
+
+
+def initialize_logging_to_console(arguments):
+    """ Initializes the logging to console and
+        appends the console handler to the root logger """
+    console_log_level = determine_console_log_level(arguments)
+    append_console_logger(LOGGER, console_log_level)
+
+
+def initialize_configuration(arguments):
+    """ Load the configuration file and applies the given arguments to the configuration. """
+    config.load_configuration_file()
+    apply_arguments_to_config(arguments)
+
+
+def extract_repository_url_and_revision_from_arguments(arguments):
+    """ Extracts the repository url and the revision from the given
+        arguments ensuring that they have valid values. """
+    repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
+    revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
+    return repository_url, revision
+
+
+def initialize_logging_to_syslog(arguments, revision):
+    """ Initializes the logging to syslog and
+        appends the syslog handler to the root logger if not omitted by the --no-syslog option """
+    if not arguments[OPTION_NO_SYSLOG]:
+        sys_log_handler = create_sys_log_handler(revision)
+        LOGGER.addHandler(sys_log_handler)
+
+
+def start_building_configuration_rpms(repository, revision):
+    """ This function will start the process of building configuration rpms
+        for the given configuration repository and the revision. """
+    path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
+    svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
+    ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
+
+
+def determine_console_log_level(arguments):
+    """ Determines the log level based on arguments and configuration """
+    if arguments[OPTION_DEBUG]:
+        log_level = DEBUG
+    else:
+        log_level = INFO
+
+    return log_level
+
+
+def append_console_logger(logger, console_log_level):
+    """ Creates and appends a console log handler with the given log level """
+    console_handler = create_console_handler(console_log_level)
+    logger.addHandler(console_handler)
+
+    if console_log_level == DEBUG:
+        logger.debug("DEBUG logging is enabled")
+
+
+def log_additional_information():
+    """ Logs additional information as the process id and the configuration. """
+    log_process_id(LOGGER.info)
+    log_configuration(LOGGER.debug, config.get_properties(), config.get_file_path_of_loaded_configuration())
+
+
+def log_exception_message(message):
+    """ Logs the given multiline message line by line. """
+    for line in str(message).split("\n"):
+        LOGGER.error(line)

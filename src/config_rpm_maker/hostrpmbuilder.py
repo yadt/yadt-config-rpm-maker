@@ -21,9 +21,11 @@ import subprocess
 from pysvn import ClientError
 from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
+from os import mkdir
+from os.path import exists
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL
+from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -52,15 +54,6 @@ class CouldNotTarConfigurationDirectoryException(BaseConfigRpmMakerException):
 
 
 class HostRpmBuilder(object):
-    @classmethod
-    def get_config_viewer_host_dir(cls, hostname, temp=False):
-        path = os.path.join(config.get('config_viewer_hosts_dir'), hostname)
-
-        if temp:
-            path += '.new'
-
-        return path
-
     def __init__(self, thread_name, hostname, revision, work_dir, svn_service_queue, error_logging_handler=None):
         self.thread_name = thread_name
         self.hostname = hostname
@@ -69,26 +62,26 @@ class HostRpmBuilder(object):
         self.error_logging_handler = error_logging_handler
         self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
-        self.config_rpm_prefix = config.get('config_rpm_prefix')
+        self.config_rpm_prefix = config.get(KEY_CONFIG_RPM_PREFIX)
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
-        self.config_viewer_host_dir = HostRpmBuilder.get_config_viewer_host_dir(hostname, True)
+        self.config_viewer_host_dir = build_config_viewer_host_directory(hostname, revision=self.revision)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):
         LOGGER.info('%s: building configuration rpm(s) for host "%s"', self.thread_name, self.hostname)
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
-        if os.path.exists(self.host_config_dir):
+        if exists(self.host_config_dir):
             raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
 
         try:
-            os.mkdir(self.host_config_dir)
-        except Exception as e:
-            raise CouldNotCreateConfigDirException("Could not create host config directory '%s' : %s" % self.host_config_dir, e)
+            mkdir(self.host_config_dir)
+        except Exception as exception:
+            raise CouldNotCreateConfigDirException('Could not create host config directory "%s".' % self.host_config_dir, exception)
 
         overall_requires = []
         overall_provides = []
@@ -107,8 +100,8 @@ class HostRpmBuilder(object):
         self.logger.info("Overall_provides: %s", str(overall_provides))
         self.logger.debug("Overall_svn_paths: %s", str(overall_svn_paths))
 
-        if not os.path.exists(self.variables_dir):
-            os.mkdir(self.variables_dir)
+        if not exists(self.variables_dir):
+            mkdir(self.variables_dir)
 
         self._write_dependency_file(overall_requires, self.rpm_requires_path, collapse_duplicates=True)
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
@@ -168,7 +161,8 @@ class HostRpmBuilder(object):
         token_replacer.filter_file(path_to_unused_variables, html_escape=True)
 
     def _write_revision_file_for_config_viewer(self):
-        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.rev'), self.revision)
+        revision_file_path = os.path.join(self.config_viewer_host_dir, self.hostname + '.rev')
+        self._write_file(revision_file_path, self.revision)
 
     @measure_execution_time
     def _find_rpms(self):

@@ -20,57 +20,57 @@ set -e
 
 
 function install_dependencies() {
-    # Enable EPEL repository
-    wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-    sudo rpm -ivH epel-release-6*.rpm
+  # Enable EPEL repository
+  wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+  sudo rpm -ivH epel-release-6*.rpm
 
-    # install build dependencies
-    sudo yum install python-devel python-setuptools python-mock mock -y
+  # Install build dependencies
+  sudo yum install python-devel python-setuptools python-mock mock -y
 
-    # install dependencies
-    sudo yum install subversion rpm-build pysvn python-yaml -y
+  # Install dependencies
+  sudo yum install subversion rpm-build pysvn python-yaml -y
 
-    # Install git because we need it to clone the repository
-    sudo yum install git -y
+  # Install git because we need it to clone the repository
+  sudo yum install git -y
 }
 
 
 function build_and_install_config_rpm_maker() {
-    # clone repository
-    if [[ ! -d ${SOURCE_DIRECTORY} ]]; then
-        git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
-    else
-        cd ${SOURCE_DIRECTORY}
-        git pull
-    fi
-
-    # build source rpm
+  # Clone repository
+  if [[ ! -d ${SOURCE_DIRECTORY} ]]; then
+    git clone ${SOURCE_REPOSITORY} ${SOURCE_DIRECTORY}
+  else
     cd ${SOURCE_DIRECTORY}
-    ./setup.py bdist_rpm --source-only
+    git pull
+  fi
 
-    # build rpm from source rpm
-    cd dist
-    sudo mock rebuild ${SOURCE_RPM} -v
+  # Build source rpm
+  cd ${SOURCE_DIRECTORY}
+  ./setup.py bdist_rpm --source-only
 
-    # install built rpm
-    cd /var/lib/mock/epel-6-*/result
-    sudo rpm -ivH ${RESULT_RPM} --force
+  # Build rpm from source rpm
+  cd dist
+  sudo mock rebuild ${SOURCE_RPM} -v
+
+  # Install built rpm
+  cd /var/lib/mock/epel-6-*/result
+  sudo rpm -ivH ${RESULT_RPM} --force
 }
 
 
 function setup_svn_server_with_test_data_and_start_it() {
-    svnadmin create ${CONFIGURATION_REPOSITORY}
+  svnadmin create ${CONFIGURATION_REPOSITORY}
 
-    # configure svn server
-    rm ${SUBVERSION_CONFIGURATION_FILE}
-    cp /vagrant/svnserve.conf ${SUBVERSION_CONFIGURATION_FILE}
-    cp /vagrant/post-commit ${HOOKS_DIRECTORY}
-    chmod 755 ${HOOKS_DIRECTORY}/post-commit
-    cp /vagrant/yadt-config-rpm-maker.yaml ${HOOKS_DIRECTORY}
+  # Configure svn server
+  rm ${SUBVERSION_CONFIGURATION_FILE}
+  cp /vagrant/svnserve.conf ${SUBVERSION_CONFIGURATION_FILE}
+  cp /vagrant/post-commit ${HOOKS_DIRECTORY}
+  chmod 755 ${HOOKS_DIRECTORY}/post-commit
+  cp /vagrant/yadt-config-rpm-maker.yaml ${HOOKS_DIRECTORY}
 
-    # Import the test data into the configuration repository
-    svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
+  # Import the test data into the configuration repository
+  svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"
 
-    # start subversion server
-    svnserve -r ${CONFIGURATION_REPOSITORY} -d
+  # Start subversion server
+  svnserve -r ${CONFIGURATION_REPOSITORY} -d
 }

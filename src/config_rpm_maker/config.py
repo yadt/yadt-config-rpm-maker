@@ -16,8 +16,8 @@
 
 import yaml
 
-from os import environ
-from os.path import abspath, exists
+from os import environ, getcwd
+from os.path import abspath, exists, join
 
 from logging import DEBUG, ERROR, INFO, getLogger
 
@@ -39,7 +39,7 @@ DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = 'DEBUG'
 DEFAULT_PATH_TO_SPEC_FILE = 'default.spec'
-DEFAULT_REPO_PACKAGES_REGEX = '^yadt-.*-repos?$'
+DEFAULT_REPO_PACKAGES_REGEX = '.*-repo.*'
 DEFAULT_RPM_UPLOAD_CHUNK_SIZE = 10
 DEFAULT_RPM_UPLOAD_COMMAND = None
 DEFAULT_SVN_PATH_TO_CONFIG = '/config'
@@ -51,6 +51,7 @@ DEFAULT_TEMP_DIR = '/tmp'
 DEFAULT_UPLOAD_CHUNK_SIZE = 0
 
 ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE = 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'
+ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY = 'KEEPWORKDIR'
 
 KEY_ALLOW_UNKNOWN_HOSTS = 'allow_unknown_hosts'
 KEY_CONFIG_VIEWER_ONLY = 'config_viewer_only'
@@ -87,40 +88,130 @@ class ConfigurationValidationException(ConfigException):
     error_info = "Invalid configuration:\n"
 
 
+def load_configuration_file():
+    """
+        Determines where the configuration file to load might be,
+        loads it and ensures the loaded properties are valid.
+    """
+    configuration_file_path = _determine_configuration_file_path()
+
+    if not exists(configuration_file_path):
+        raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
+                              (DEFAULT_CONFIGURATION_FILE_PATH,
+                               configuration_file_path,
+                               abspath('.'),
+                               ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
+
+    raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
+    valid_properties = _ensure_properties_are_valid(raw_properties)
+    set_properties(valid_properties)
+
+
+def get(name, default=None):
+    """ Get the configuration property """
+    if not _properties:
+        try:
+            load_configuration_file()
+        except Exception as e:
+            if default:
+                return default
+            else:
+                raise e
+
+    if name in _properties:
+        return _properties[name]
+    else:
+        return default
+
+
+def build_config_viewer_host_directory(hostname, revision=False):
+    """ Returns a path to the config viewer host directory"""
+    config_viewer_hosts_directory = get(KEY_CONFIG_VIEWER_HOSTS_DIR)
+    path = join(config_viewer_hosts_directory, hostname)
+
+    if revision:
+        path += ".new-revision-" + revision
+
+    return path
+
+
+def set_property(name, value):
+    """
+        set the configuration property identied by the given name to the given value.
+
+        Before setting the property it will check if the configuration file has already been loaded.
+        If this is not the case it will load the configuration file.
+    """
+    if not name:
+        raise ConfigException("No configuration property name given")
+
+    configuration = get_properties()
+
+    if not configuration:
+        load_configuration_file()
+        configuration = get_properties()
+
+    configuration[name] = value
+
+
+def get_properties():
+    """ Returns the application configuration properties if they have already been loaded"""
+    return _properties
+
+
 def set_properties(new_properties):
+    """ Sets the application configuration properties (a dictionary) """
     global _properties
     _properties = new_properties
 
 
 def get_file_path_of_loaded_configuration():
+    """ Returns the path to the loaded configuration file (if it has been loaded) """
     return _file_path_of_loaded_configuration
 
 
 def _set_file_path_of_loaded_configuration(new_file_path):
+    """ Use this function after load a configuration file to declare which file has been loaded """
     global _file_path_of_loaded_configuration
     _file_path_of_loaded_configuration = new_file_path
 
 
 def _determine_configuration_file_path():
+    """
+        Decides which configuration file to load and returns the path to the file.
+
+        It will try to read the environment variable and
+        if this is not available it will fall back to the default file path.
+    """
     return environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
 
 
 def _load_configuration_properties_from_yaml_file(configuration_file_path):
+    """ Load the configuration properties from the given path to a yaml file. """
     try:
         with open(configuration_file_path) as configuration_file:
             properties = yaml.load(configuration_file)
             _set_file_path_of_loaded_configuration(configuration_file_path)
             return properties
     except Exception as e:
-        raise ConfigException('Could not load configuration file "%s".\nError: %s' % (_file_path_of_loaded_configuration, str(e)))
+
+        error_message = 'Could not load configuration file "%s".\nCurrent working directory is "%s"\nError: %s' % (configuration_file_path, getcwd(), str(e))
+        raise ConfigException(error_message)
 
 
 def _ensure_properties_are_valid(raw_properties):
+    """
+        Ensures that the configuration properties are valid by parsing them.
+        If there is a default defined for a property it will return the default value.
+
+        Returns a dictionary containing valid application configuration properties.
+        Throws a exception if some parameters are invalid.
+    """
     if raw_properties is None:
         raise ConfigurationValidationException("Loaded configuration properties are empty.")
 
     valid_properties = {
-        KEY_LOG_LEVEL: ensure_valid_log_level(raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)),
+        KEY_LOG_LEVEL: _ensure_valid_log_level(raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)),
         KEY_ALLOW_UNKNOWN_HOSTS: raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS),
         KEY_CONFIG_RPM_PREFIX: raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX),
         KEY_CONFIG_VIEWER_HOSTS_DIR: raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR),
@@ -139,55 +230,7 @@ def _ensure_properties_are_valid(raw_properties):
     return valid_properties
 
 
-def load_configuration_file():
-    configuration_file_path = _determine_configuration_file_path()
-
-    if not exists(configuration_file_path):
-        raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
-                              (DEFAULT_CONFIGURATION_FILE_PATH,
-                               configuration_file_path,
-                               abspath('.'),
-                               ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
-
-    raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
-    valid_properties = _ensure_properties_are_valid(raw_properties)
-    set_properties(valid_properties)
-
-
-def get(name, default=None):
-    if not _properties:
-        try:
-            load_configuration_file()
-        except Exception as e:
-            if default:
-                return default
-            else:
-                raise e
-
-    if name in _properties:
-        return _properties[name]
-    else:
-        return default
-
-
-def setvalue(name, value):
-    if not name:
-        raise ConfigException("No name given")
-
-    configuration = get_properties()
-
-    if not configuration:
-        load_configuration_file()
-        configuration = get_properties()
-
-    configuration[name] = value
-
-
-def get_properties():
-    return _properties
-
-
-def ensure_valid_log_level(log_level_name):
+def _ensure_valid_log_level(log_level_name):
     """ Returns a valid log level """
 
     log_level_name = log_level_name.upper().strip()
