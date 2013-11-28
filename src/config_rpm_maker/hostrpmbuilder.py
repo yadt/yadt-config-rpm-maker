@@ -68,7 +68,7 @@ class HostRpmBuilder(object):
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
         self.rpm_provides_path = os.path.join(self.variables_dir, 'RPM_PROVIDES')
         self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.hostname + '.spec')
-        self.config_viewer_host_dir = build_config_viewer_host_directory_by_hostname(hostname, postfix='.new-revision-%s' % self.revision)
+        self.config_viewer_host_dir = build_config_viewer_host_directory_by_hostname(hostname, revision=self.revision)
         self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
 
     def build(self):

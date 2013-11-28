@@ -181,20 +181,27 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 os.makedirs(error_log_dir)
             shutil.move(self.error_log_file, os.path.join(error_log_dir, self.revision + '.txt'))
 
+    def _read_integer_from_file(self, path):
+
+        with open(path) as file_which_contains_integer:
+            integer_from_file = int(file_which_contains_integer.read())
+
+        return integer_from_file
+
     def _move_configviewer_dirs_to_final_destination(self, hosts):
         LOGGER.info("Updating configviewer data.")
 
         for host in hosts:
-            temp_path = build_config_viewer_host_directory_by_hostname(host, postfix='.new-revision-%s' % self.revision)
+            temp_path = build_config_viewer_host_directory_by_hostname(host, revision=self.revision)
             dest_path = build_config_viewer_host_directory_by_hostname(host)
 
             if exists(dest_path):
                 path_to_revision_file = join(dest_path, "%s.rev" % host)
-                with open(path_to_revision_file) as revision_file_content:
-                    revision_from_file = int(revision_file_content.read())
-                    if revision_from_file > int(self.revision):
-                        LOGGER.debug('Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s', host, revision_from_file, self.revision)
-                        continue
+                revision_from_file = self._read_integer_from_file(path_to_revision_file)
+
+                if revision_from_file > int(self.revision):
+                    LOGGER.debug('Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s', host, revision_from_file, self.revision)
+                    continue
 
                 rmtree(dest_path)
 

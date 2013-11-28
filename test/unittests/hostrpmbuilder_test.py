@@ -132,7 +132,7 @@ class ConstructorTests(TestCase):
 
         self.call_constructor()
 
-        mock_build_config_viewer_host_directory_by_hostname.assert_called_with('hostname', postfix='.new-revision-3485')
+        mock_build_config_viewer_host_directory_by_hostname.assert_called_with('hostname', revision='3485')
         self.assertEqual('config-viewer-host-directory', self.mock_host_rpm_builder.config_viewer_host_dir)
 
     def test_should_build_rpm_build_directory_using_working_directory(self):

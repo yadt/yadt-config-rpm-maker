@@ -575,7 +575,7 @@ class GetConfigViewerHostDirTests(TestCase):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
-        actual_path = build_config_viewer_host_directory_by_hostname('devweb01', postfix='.new-revision-123')
+        actual_path = build_config_viewer_host_directory_by_hostname('devweb01', revision='123')
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01.new-revision-123', actual_path)
