@@ -313,7 +313,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('^yadt-.*-repos?$', actual_properties[KEY_REPO_PACKAGES_REGEX])
+        self.assertEqual('.*-repo.*', actual_properties[KEY_REPO_PACKAGES_REGEX])
 
     def test_should_return_rpm_upload_chunk_size_regex(self):
 
