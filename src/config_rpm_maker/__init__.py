@@ -84,7 +84,8 @@ def main():
 
 
 def initialize_logging_to_console(arguments):
-    """ Initializes the logging to console """
+    """ Initializes the logging to console and
+        appends the console handler to the root logger """
     console_log_level = determine_console_log_level(arguments)
     append_console_logger(LOGGER, console_log_level)
 
@@ -104,7 +105,8 @@ def extract_repository_url_and_revision_from_arguments(arguments):
 
 
 def initialize_logging_to_syslog(arguments, revision):
-    """ Initializes the logging to syslog """
+    """ Initializes the logging to syslog and
+        appends the syslog handler to the root logger if not omitted by the --no-syslog option """
     if not arguments[OPTION_NO_SYSLOG]:
         sys_log_handler = create_sys_log_handler(revision)
         LOGGER.addHandler(sys_log_handler)
