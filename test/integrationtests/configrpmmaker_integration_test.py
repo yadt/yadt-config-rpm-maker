@@ -219,7 +219,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_revision_file_contains_revision('tuvweb01', '2')
         self.assert_revision_file_contains_revision('berweb01', '2')
 
-    def test_should_move_config_viewer_data_to_destination(self):
+    def test_should_only_move_config_viewer_data_to_destination_when_revision_is_higher(self):
 
         config_rpm_maker = self._given_config_rpm_maker()
 
