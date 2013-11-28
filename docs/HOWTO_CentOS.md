@@ -16,7 +16,7 @@ git clone https://github.com/yadt/yadt-config-rpm-maker
 
 Install python development dependencies.
 ```bash
-yum install python-devel python-setuptools -y python-mock
+yum install python-devel python-setuptools python-mock
 ```
 
 Install `yadt-config-rpm-maker` runtime dependencies.
