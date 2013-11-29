@@ -164,7 +164,6 @@ class HostRpmBuilder(object):
         revision_file_path = os.path.join(self.config_viewer_host_dir, self.hostname + '.rev')
         self._write_file(revision_file_path, self.revision)
 
-    @measure_execution_time
     def _find_rpms(self):
         result = []
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'RPMS')):
@@ -229,7 +228,6 @@ class HostRpmBuilder(object):
         shutil.copytree(self.host_config_dir, self.config_viewer_host_dir, symlinks=True)
         shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
 
-    @measure_execution_time
     def _generate_patch_info(self):
         variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
         variables = sorted(variables)
@@ -243,12 +241,10 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.variables_dir, 'FQDN'), fqdn)
         self._write_file(os.path.join(self.variables_dir, 'ALIASES'), aliases)
 
-    @measure_execution_time
     def _save_segment_variables(self):
         for segment in ALL_SEGEMENTS:
             self._write_file(os.path.join(self.variables_dir, segment.get_variable_name()), segment.get(self.hostname)[-1])
 
-    @measure_execution_time
     def _save_file_list(self):
         f = open(os.path.join(self.work_dir, 'filelist.' + self.hostname), 'w')
         try:
@@ -318,7 +314,6 @@ Change set:
          "\n   ".join([path['action'] + ' ' + path['path'] for path in log['changed_paths']]),
          log['message'])
 
-    @measure_execution_time
     def _export_spec_file(self):
         svn_service = self.svn_service_queue.get()
         try:
