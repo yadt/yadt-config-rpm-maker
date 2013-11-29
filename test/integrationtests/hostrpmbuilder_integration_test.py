@@ -33,19 +33,19 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
     def test_should_write_revision_file(self):
 
         svn_service_queue = self.create_svn_service_queue()
-        hostname = "berweb01"
-        revision = '1'
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
-                                          hostname=hostname,
-                                          revision=revision,
+                                          hostname="berweb01",
+                                          revision='1',
                                           work_dir=self.temporary_directory,
                                           svn_service_queue=svn_service_queue)
 
         host_rpm_builder.build()
 
-        temporary_path_of_revision_file = join(build_config_viewer_host_directory(hostname, revision=revision), hostname + '.rev')
-        self.assert_path_exists(temporary_path_of_revision_file)
-        self.assert_file_content(temporary_path_of_revision_file, revision)
+        host_directory = build_config_viewer_host_directory("berweb01", revision='1')
+        revision_file_path = join(host_directory, 'berweb01.rev')
+
+        self.assert_path_exists(revision_file_path)
+        self.assert_file_content(revision_file_path, '1')
 
     def test_should_raise_ConfigDirAlreadyExistsException(self):
 
