@@ -47,10 +47,10 @@ class IntegrationTest(unittest.TestCase):
     def create_svn_repo(self):
         self._create_repository_directory()
 
-        if subprocess.call('svnadmin create %s' % self.repo_dir, shell=True):
+        if subprocess.call('svnadmin create %s' % self.repository_directory, shell=True):
             raise IntegrationTestException('Could not create svn repo.')
 
-        self.repo_url = 'file://%s' % self.repo_dir
+        self.repo_url = 'file://%s' % self.repository_directory
 
         if subprocess.call('svn import -q -m import testdata/svn_repo %s' % self.repo_url, shell=True):
             raise IntegrationTestException('Could not import test data.')
@@ -60,12 +60,12 @@ class IntegrationTest(unittest.TestCase):
 
     def _create_repository_directory(self):
 
-        self.repo_dir = abspath(join(self.temporary_directory, 'svn_repo'))
+        self.repository_directory = abspath(join(self.temporary_directory, 'svn_repo'))
 
-        if exists(self.repo_dir):
-            shutil.rmtree(self.repo_dir)
+        if exists(self.repository_directory):
+            shutil.rmtree(self.repository_directory)
 
-        makedirs(self.repo_dir)
+        makedirs(self.repository_directory)
 
     def write_revision_file_for_hostname(self, hostname, revision):
 
