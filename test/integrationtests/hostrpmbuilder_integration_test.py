@@ -16,16 +16,17 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 
-from os.path import join
+from os import makedirs
+from os.path import join, exists
+
 from integration_test_support import IntegrationTest
 
+from config_rpm_maker.config import build_config_viewer_host_directory
 from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryException,
                                              CouldNotBuildRpmException,
                                              ConfigDirAlreadyExistsException,
                                              HostRpmBuilder)
-from config_rpm_maker.config import build_config_viewer_host_directory
 
 
 class HostRpmBuilderIntegrationTest(IntegrationTest):
@@ -49,9 +50,9 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
     def test_should_raise_ConfigDirAlreadyExistsException(self):
 
-        fake_host_directory = os.path.join(self.temporary_directory, 'yadt-config-fakehost')
-        if not os.path.exists(fake_host_directory):
-            os.makedirs(fake_host_directory)
+        fake_host_directory = join(self.temporary_directory, 'yadt-config-fakehost')
+        if not exists(fake_host_directory):
+            makedirs(fake_host_directory)
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
                                           hostname="fakehost",
