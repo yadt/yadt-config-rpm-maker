@@ -28,7 +28,6 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
         mock_config_rpm_maker.revision = '54'
         self.mock_config_rpm_maker = mock_config_rpm_maker
 
-
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     def test_should_not_do_anything_if_no_hosts_are_given(self, mock_move, mock_rmtree):
@@ -152,9 +151,7 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         mock_exists.side_effect = exists_side_effect
 
-
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01', 'tuvweb01', 'berweb01'])
-
 
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
         mock_move.assert_any_call('target/tmp/configviewer/hosts/devweb01.new-revision-54', 'target/tmp/configviewer/hosts/devweb01')
@@ -194,9 +191,7 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         mock_exists.side_effect = exists_side_effect
 
-
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01', 'tuvweb01', 'berweb01'])
-
 
         self.assertTrue(call('target/tmp/configviewer/hosts/devweb01') not in mock_rmtree.call_args_list)
         self.assertTrue(call('target/tmp/configviewer/hosts/devweb01.new-revision-54', 'target/tmp/configviewer/hosts/devweb01') not in mock_move.call_args_list)

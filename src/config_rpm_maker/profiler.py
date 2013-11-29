@@ -80,5 +80,5 @@ def log_execution_time_summaries(logging_function):
     logging_function('Execution times summary (keep in mind thread_count was set to %s):', get(KEY_THREAD_COUNT))
     for function_name in sorted(_summary.keys()):
         rounded_elapsed_time = round_to_two_decimals_after_dot(_summary[function_name][0])
-        average_time = round_to_two_decimals_after_dot(_summary[function_name][0]/_summary[function_name][1])
+        average_time = round_to_two_decimals_after_dot(_summary[function_name][0] / _summary[function_name][1])
         logging_function('    %3s times with average %5ss = sum %5ss : %s', _summary[function_name][1], average_time, rounded_elapsed_time, function_name)

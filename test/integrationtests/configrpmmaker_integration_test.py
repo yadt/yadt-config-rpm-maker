@@ -15,7 +15,6 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import shutil
 import subprocess
 import rpm
 
@@ -231,4 +230,3 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_revision_file_contains_revision('devweb01', revision='2')
         self.assert_revision_file_contains_revision('tuvweb01', revision='3')
         self.assert_revision_file_contains_revision('berweb01', revision='4')
-

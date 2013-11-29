@@ -96,5 +96,3 @@ Expected content: {expected_content}
   Actual content: {actual_content}
 """.format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
             self.assertEqual(expected_content, actual_content, error_message)
-
-

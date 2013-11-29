@@ -71,7 +71,6 @@ class ConstructorTests(TestCase):
 
         self.call_constructor()
 
-
         self.assertEqual(None, self.mock_host_rpm_builder.error_logging_handler)
 
     def test_should_create_logger(self):
