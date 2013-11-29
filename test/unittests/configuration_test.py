@@ -523,37 +523,41 @@ class SetValueTests(TestCase):
 
 class EnsureValidLogLevelTests(TestCase):
 
-    def test_get_log_level_should_return_debug_log_level_if_lower_debug_is_given(self):
+    def test_should_raise_exception_if_given_value_is_not_a_string(self):
+
+        self.assertRaises(ConfigException, _ensure_valid_log_level, 1)
+
+    def test_should_return_debug_log_level_if_lower_debug_is_given(self):
 
         actual = _ensure_valid_log_level("debug")
 
         self.assertEqual(DEBUG, actual)
 
-    def test_get_log_level_should_return_debug_log_level_if_name_contains_whitespace(self):
+    def test_should_return_debug_log_level_if_name_contains_whitespace(self):
 
         actual = _ensure_valid_log_level("\tdeBug    ")
 
         self.assertEqual(DEBUG, actual)
 
-    def test_get_log_level_should_return_debug_log_level(self):
+    def test_should_return_debug_log_level(self):
 
         actual = _ensure_valid_log_level("DEBUG")
 
         self.assertEqual(DEBUG, actual)
 
-    def test_get_log_level_should_return_error_log_level(self):
+    def test_should_return_error_log_level(self):
 
         actual = _ensure_valid_log_level("ERROR")
 
         self.assertEqual(ERROR, actual)
 
-    def test_get_log_level_should_return_info_log_level(self):
+    def test_should_return_info_log_level(self):
 
         actual = _ensure_valid_log_level("INFO")
 
         self.assertEqual(INFO, actual)
 
-    def test_get_log_level_should_raise_exception_when_strange_log_level_given(self):
+    def test_should_raise_exception_when_strange_log_level_given(self):
 
         self.assertRaises(ConfigException, _ensure_valid_log_level, "FOO")
 
