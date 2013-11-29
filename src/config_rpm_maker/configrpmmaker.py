@@ -120,7 +120,6 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self._create_logger()
         self.work_dir = None
 
-    @measure_execution_time
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get('error_log_url', DEFAULT_ERROR_LOG_URL)
         error_msg = self.ERROR_MSG % (err_url, revision)
@@ -208,7 +207,6 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.debug('Updating configviewer data for host "%s"', host)
             move(temp_path, dest_path)
 
-    @measure_execution_time
     def _build_hosts(self, hosts):
         if not hosts:
             LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')

@@ -20,20 +20,22 @@ from logging import getLogger
 from math import ceil
 from time import time
 
+from config_rpm_maker.config import KEY_THREAD_COUNT, get
+
 LOGGER = getLogger(__name__)
+
+LOG_EACH_MEASUREMENT = False
+
+_summary = {}
+
+
+def round_to_two_decimals_after_dot(elapsed_time_in_seconds):
+    return ceil(elapsed_time_in_seconds * 100) / 100
 
 
 def measure_execution_time(original_function):
-    @wraps(original_function)
-    def wrapped_function(*args, **kwargs):
-        start_time = time()
 
-        return_value_from_function = original_function(*args, **kwargs)
-
-        end_time = time()
-        elapsed_time_in_seconds = end_time - start_time
-        elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
-
+    def process_measurement(elapsed_time_in_seconds, args, kwargs):
         arguments = ', '.join(map(lambda arg: arg if type(arg) == str else str(arg), args[1:]))
 
         if len(kwargs.keys()) == 0:
@@ -45,9 +47,38 @@ def measure_execution_time(original_function):
             function_name = "%s.%s" % (args[0].__class__.__name__, original_function.__name__)
         else:
             function_name = original_function.__name__
-        function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
-        LOGGER.debug('Took %ss to perform %s', elapsed_time_in_seconds, function_call)
+
+        if function_name not in _summary.keys():
+            _summary[function_name] = [elapsed_time_in_seconds, 1]
+        else:
+            _summary[function_name][0] += elapsed_time_in_seconds
+            _summary[function_name][1] += 1
+
+        if LOG_EACH_MEASUREMENT:
+            function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
+            rounded_elapsed_time_in_seconds = round_to_two_decimals_after_dot(elapsed_time_in_seconds)
+            LOGGER.debug('Took %ss to perform %s', rounded_elapsed_time_in_seconds, function_call)
+
+    @wraps(original_function)
+    def wrapped_function(*args, **kwargs):
+        start_time = time()
+
+        return_value_from_function = original_function(*args, **kwargs)
+
+        end_time = time()
+
+        elapsed_time_in_seconds = end_time - start_time
+
+        process_measurement(elapsed_time_in_seconds, args, kwargs)
 
         return return_value_from_function
 
     return wrapped_function
+
+
+def log_execution_time_summaries(logging_function):
+    logging_function('Execution times summary (keep in mind thread_count was set to %s):', get(KEY_THREAD_COUNT))
+    for function_name in sorted(_summary.keys()):
+        rounded_elapsed_time = round_to_two_decimals_after_dot(_summary[function_name][0])
+        average_time = round_to_two_decimals_after_dot(_summary[function_name][0]/_summary[function_name][1])
+        logging_function('    %3s times with average %5ss = sum %5ss : %s', _summary[function_name][1], average_time, rounded_elapsed_time, function_name)

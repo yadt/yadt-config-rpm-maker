@@ -23,6 +23,7 @@ from time import time, strftime
 
 from config_rpm_maker.config import DEFAULT_DATE_FORMAT
 from config_rpm_maker.returncodes import RETURN_CODE_SUCCESS
+from config_rpm_maker.profiler import log_execution_time_summaries
 
 LOGGER = getLogger(__name__)
 
@@ -45,6 +46,8 @@ def get_timestamp_from_start():
 
 def exit_program(message, return_code):
     """ Logs the given message and exits with given return code. """
+
+    log_execution_time_summaries(LOGGER.debug)
 
     timestamp_from_start = get_timestamp_from_start()
     if timestamp_from_start is not None:

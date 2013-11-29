@@ -22,6 +22,7 @@ from logging import getLogger
 from config_rpm_maker.config import DEFAULT_HOST_NAME_ENCODING
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+from config_rpm_maker.profiler import measure_execution_time
 
 LOGGER = getLogger(__name__)
 
@@ -49,6 +50,7 @@ class SvnService(object):
             LOGGER.debug('Setting default password for subversion client.')
             self.client.set_default_password(password)
 
+    @measure_execution_time
     def get_change_set(self, revision):
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
@@ -62,6 +64,7 @@ class SvnService(object):
         log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s).', changed_paths)
         return changed_paths
 
+    @measure_execution_time
     def get_hosts(self, revision):
         url = self.config_url + '/host'
 
@@ -73,6 +76,7 @@ class SvnService(object):
         repos_paths = [item[0].repos_path.encode(DEFAULT_HOST_NAME_ENCODING) for item in items]
         return [os.path.basename(repos_path) for repos_path in repos_paths]
 
+    @measure_execution_time
     def export(self, svn_path, target_dir, revision):
         url = self._get_url(svn_path)
 
@@ -86,6 +90,7 @@ class SvnService(object):
         normalized_paths = filter(lambda path: path != '', normalized_paths)
         return [(svn_path, path) for path in normalized_paths]
 
+    @measure_execution_time
     def log(self, svn_path, revision, limit=0):
         url = self._get_url(svn_path)
         return self.client.log(url, pysvn.Revision(pysvn.opt_revision_kind.head), self._rev(revision), discover_changed_paths=True, limit=limit)
