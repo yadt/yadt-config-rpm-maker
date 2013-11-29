@@ -5,11 +5,11 @@ python:
 
 before_script:
   - sudo apt-get install python-svn 
-  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/site-packages/; else ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/; fi
+  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then echo "ok."; else ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/; fi
   - sudo apt-get install rpm python-rpm
-  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/site-packages/; else ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/; fi
+  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then echo "ok."; else ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/; fi
   - sudo apt-get install python-yaml
-  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/site-packages/; else ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/; fi  
+  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then echo "ok."; else ln -s /usr/lib/python2.7/dist-packages/yaml $VIRTUAL_ENV/lib/python2.7/site-packages/; fi  
   - PYTHONPATH=src python test/__init__.py
   - sudo rm /bin/sh
   - sudo ln -s /bin/bash /bin/sh
