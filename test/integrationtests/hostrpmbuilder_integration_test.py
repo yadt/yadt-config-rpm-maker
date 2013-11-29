@@ -18,24 +18,20 @@
 
 import os
 
-from Queue import Queue
-from os import getcwd
-from os.path import join, exists
+from os.path import join
 from integration_test_support import IntegrationTest
 
 from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryException,
                                              CouldNotBuildRpmException,
                                              ConfigDirAlreadyExistsException,
                                              HostRpmBuilder)
-from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
-from config_rpm_maker import config
+from config_rpm_maker.config import build_config_viewer_host_directory
 
 
 class HostRpmBuilderIntegrationTest(IntegrationTest):
 
     def test_should_write_revision_file(self):
-        self.create_svn_repo()
+
         svn_service_queue = self.create_svn_service_queue()
         hostname = "berweb01"
         revision = '1'
@@ -49,7 +45,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         temporary_path_of_revision_file = join(build_config_viewer_host_directory(hostname, revision=revision), hostname + '.rev')
         self.assert_path_exists(temporary_path_of_revision_file)
-        self.assert_content_of_file(temporary_path_of_revision_file, revision)
+        self.assert_file_content(temporary_path_of_revision_file, revision)
 
     def test_should_raise_ConfigDirAlreadyExistsException(self):
 
@@ -66,7 +62,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         self.assertRaises(ConfigDirAlreadyExistsException, host_rpm_builder.build)
 
     def test_should_raise_CouldNotTarConfigurationDirectoryException(self):
-        self.create_svn_repo()
+
         svn_service_queue = self.create_svn_service_queue()
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
@@ -78,7 +74,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         self.assertRaises(CouldNotTarConfigurationDirectoryException, host_rpm_builder.build)
 
     def test_should_raise_CouldNotBuildRpmException(self):
-        self.create_svn_repo()
+
         svn_service_queue = self.create_svn_service_queue()
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
@@ -88,22 +84,3 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
                                           svn_service_queue=svn_service_queue)
 
         self.assertRaises(CouldNotBuildRpmException, host_rpm_builder.build)
-
-    def create_svn_service_queue(self):
-        svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
-                                 path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
-        svn_service_queue = Queue()
-        svn_service_queue.put(svn_service)
-        return svn_service_queue
-
-    def assert_path_exists(self, path):
-        self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
-
-    def assert_content_of_file(self, path, expected_content):
-
-        with open(path) as file_to_read:
-            actual_content = file_to_read.read()
-            error_message = """File {path} does not have expected content.
-Expected content: {expected_content}
-  Actual content: {actual_content}""".format(path=path, expected_content=expected_content, actual_content=actual_content)
-            self.assertEqual(expected_content, actual_content, error_message)

@@ -18,12 +18,14 @@ import shutil
 import subprocess
 import unittest
 
+from Queue import Queue
 from os import makedirs
 from os.path import abspath, exists, join
 from shutil import rmtree
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
+from config_rpm_maker.svnservice import SvnService
 
 
 class IntegrationTestException(Exception):
@@ -96,3 +98,13 @@ Expected content: {expected_content}
   Actual content: {actual_content}
 """.format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
             self.assertEqual(expected_content, actual_content, error_message)
+
+    def create_svn_service_queue(self):
+        svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
+                                 path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service_queue = Queue()
+        svn_service_queue.put(svn_service)
+        return svn_service_queue
+
+    def assert_path_exists(self, path):
+        self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
