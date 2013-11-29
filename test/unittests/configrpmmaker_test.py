@@ -90,7 +90,7 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    def test_should_not_remove_temporary_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_exists, mock_move, mock_rmtree):
+    def test_should_remove_temporary_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_exists, mock_move, mock_rmtree):
 
         self.mock_config_rpm_maker._read_integer_from_file.return_value = 99
 
