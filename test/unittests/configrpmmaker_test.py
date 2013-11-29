@@ -77,10 +77,8 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
     @patch('config_rpm_maker.configrpmmaker.exists')
-    @patch('config_rpm_maker.configrpmmaker.build_config_viewer_host_directory')
-    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_build_config_viewer_host_directory, mock_exists, mock_move, mock_rmtree):
+    def test_should_not_remove_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_exists, mock_move, mock_rmtree):
 
-        mock_build_config_viewer_host_directory.return_value = 'target/tmp/configviewer/hosts/devweb01'
         self.mock_config_rpm_maker._read_integer_from_file.return_value = 99
 
         mock_exists.return_value = True
@@ -88,6 +86,19 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01'])
 
         self.assertTrue(call('target/tmp/configviewer/hosts/devweb01') not in mock_rmtree.call_args_list)
+
+    @patch('config_rpm_maker.configrpmmaker.rmtree')
+    @patch('config_rpm_maker.configrpmmaker.move')
+    @patch('config_rpm_maker.configrpmmaker.exists')
+    def test_should_not_remove_temporary_directory_if_the_revision_of_the_file_in_the_directory_is_higher(self, mock_exists, mock_move, mock_rmtree):
+
+        self.mock_config_rpm_maker._read_integer_from_file.return_value = 99
+
+        mock_exists.return_value = True
+
+        ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01'])
+
+        mock_rmtree.assert_called_with('target/tmp/configviewer/hosts/devweb01.new-revision-54')
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
@@ -193,7 +204,7 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01', 'tuvweb01', 'berweb01'])
 
-        self.assertTrue(call('target/tmp/configviewer/hosts/devweb01') not in mock_rmtree.call_args_list)
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01.new-revision-54')
         self.assertTrue(call('target/tmp/configviewer/hosts/devweb01.new-revision-54', 'target/tmp/configviewer/hosts/devweb01') not in mock_move.call_args_list)
 
         self.assertTrue(call('target/tmp/configviewer/hosts/tuvweb01') not in mock_rmtree.call_args_list)
