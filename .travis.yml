@@ -5,6 +5,7 @@ python:
 
 before_script:
   - sudo apt-get install python-svn 
+  - ls $VIRTUAL_ENV/lib/
   - ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/
   - sudo apt-get install rpm python-rpm
   - ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/
