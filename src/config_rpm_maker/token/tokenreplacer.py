@@ -19,6 +19,7 @@ import re
 import os
 
 from logging import getLogger
+from os.path import getsize
 
 import config_rpm_maker.magic
 
@@ -166,26 +167,44 @@ class TokenReplacer(object):
             content = content.replace("@@@%s@@@" % token_name, replacement)
             self.token_used.add(token_name)
 
+    def _read_content_from_file(self, filename):
+
+        with open(filename, "r") as input_file:
+            file_content = input_file.read()
+
+        return file_content
+
+    def _perform_filtering_on_file(self, filename, file_content, file_encoding, html_escape):
+        file_content = file_content.decode(file_encoding)
+
+        if html_escape:
+            file_content = self.html_escape_function(os.path.basename(filename), file_content)
+
+        file_content_filtered = self.filter(file_content)
+
+        with open(filename, "w") as output_file:
+            output_file.write(file_content_filtered.encode(file_encoding))
+
     def filter_file(self, filename, html_escape=False):
         try:
             self.file_size_limit = config.get('max_file_size', DEFAULT_FILE_SIZE_MAXIMUM)
-            if os.path.getsize(filename) > self.file_size_limit:
-                raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)" % (os.path.basename(filename), os.path.getsize(filename), self.file_size_limit))
 
-            with open(filename, "r") as input_file:
-                file_content = input_file.read()
+            file_size = getsize(filename)
+            if file_size > self.file_size_limit:
+                raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)" % (os.path.basename(filename), file_size, self.file_size_limit))
+
+            file_content = self._read_content_from_file(filename)
 
             file_encoding = self._get_file_encoding(file_content)
-            if file_encoding and file_encoding != 'binary':
-                file_content = file_content.decode(file_encoding)
-                if html_escape:
-                    file_content = self.html_escape_function(os.path.basename(filename), file_content)
+            if file_encoding:
+                if file_encoding != 'binary' and file_encoding != 'unknown-8bit':
+                    self._perform_filtering_on_file(filename, file_content, file_encoding, html_escape)
+                else:
+                    LOGGER.warn('Not filtering file "%s" since it has encoding "%s".', filename, file_encoding)
 
-                file_content_filtered = self.filter(file_content)
-                with open(filename, "w") as output_file:
-                    output_file.write(file_content_filtered.encode(file_encoding))
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)
+
         except Exception as e:
             raise CannotFilterFileException('Cannot filter file %s.\n%s' % (os.path.basename(filename), str(e)))
 
