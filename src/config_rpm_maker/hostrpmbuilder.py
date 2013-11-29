@@ -261,7 +261,7 @@ class HostRpmBuilder(object):
         self.variables_dir = new_var_dir
 
     def _save_log_entries_to_variable(self, svn_paths):
-        svn_service = self.svn_service_queue.get()
+        svn_service = self._get_next_svn_service_from_queue()
         logs = []
         try:
             for svn_path in svn_paths:
@@ -315,12 +315,17 @@ Change set:
          log['message'])
 
     def _export_spec_file(self):
-        svn_service = self.svn_service_queue.get()
+        svn_service = self._get_next_svn_service_from_queue()
         try:
             svn_service.export(config.get('path_to_spec_file'), self.spec_file_path, self.revision)
         finally:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
+
+    @measure_execution_time
+    def _get_next_svn_service_from_queue(self):
+        svn_service = self.svn_service_queue.get()
+        return svn_service
 
     def _overlay_segment(self, segment):
         requires = []
@@ -328,7 +333,7 @@ Change set:
         svn_base_paths = []
         exported_paths = []
         for svn_path in segment.get_svn_paths(self.hostname):
-            svn_service = self.svn_service_queue.get()
+            svn_service = self._get_next_svn_service_from_queue()
             try:
                 new_exported_paths = svn_service.export(svn_path, self.host_config_dir, self.revision)
                 exported_paths += new_exported_paths
