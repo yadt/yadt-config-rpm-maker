@@ -120,14 +120,6 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
         mock_exists.return_value = True
         self.mock_config_rpm_maker._read_integer_from_file.return_value = 42
 
-        def mock_open_side_effect(path):
-            if path.endswith('devweb01.rev'):
-                return self.create_fake_file("42")
-            elif path.endswith('tuvweb01.rev'):
-                return self.create_fake_file("42")
-            else:
-                raise Exception("Unknown path %s" % path)
-
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01', 'tuvweb01'])
 
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
