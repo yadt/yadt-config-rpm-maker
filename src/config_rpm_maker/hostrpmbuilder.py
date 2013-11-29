@@ -324,8 +324,7 @@ Change set:
 
     @measure_execution_time
     def _get_next_svn_service_from_queue(self):
-        svn_service = self.svn_service_queue.get()
-        return svn_service
+        return self.svn_service_queue.get()
 
     def _overlay_segment(self, segment):
         requires = []
