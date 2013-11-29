@@ -17,7 +17,6 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import shutil
 
 from Queue import Queue
 from os import getcwd
@@ -29,7 +28,7 @@ from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryEx
                                              ConfigDirAlreadyExistsException,
                                              HostRpmBuilder)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_TEMPORARY_DIRECTORY, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
 from config_rpm_maker import config
 
 
