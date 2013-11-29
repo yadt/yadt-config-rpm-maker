@@ -159,7 +159,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
     @patch('config_rpm_maker.config._set_file_path_of_loaded_configuration')
     @patch('config_rpm_maker.config.yaml')
     @patch('__builtin__.open')
-    def test_return_raw_loaded_properties(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
+    def test_should_return_raw_loaded_properties(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
 
         fake_file = self.create_fake_file()
         mock_open.return_value = fake_file
@@ -436,7 +436,7 @@ class LoadConfigurationFileTests(TestCase):
     @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config._determine_configuration_file_path')
-    def test_check_if_the_determined_configuration_file_path_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
+    def test_should_check_if_the_determined_configuration_file_path_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
         mock_exists.return_value = True
@@ -449,7 +449,7 @@ class LoadConfigurationFileTests(TestCase):
     @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config._determine_configuration_file_path')
-    def test_load_configuration_file_if_it_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
+    def test_should_load_configuration_file_if_it_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
         mock_exists.return_value = True
