@@ -36,7 +36,6 @@ from config_rpm_maker import config
 class HostRpmBuilderIntegrationTest(IntegrationTest):
 
     def test_should_write_revision_file(self):
-        working_directory = self.refresh_temporary_directory()
         self.create_svn_repo()
         svn_service_queue = self.create_svn_service_queue()
         hostname = "berweb01"
@@ -44,7 +43,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
                                           hostname=hostname,
                                           revision=revision,
-                                          work_dir=working_directory,
+                                          work_dir=self.temporary_directory,
                                           svn_service_queue=svn_service_queue)
 
         host_rpm_builder.build()
@@ -69,27 +68,25 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         self.assertRaises(ConfigDirAlreadyExistsException, host_rpm_builder.build)
 
     def test_should_raise_CouldNotTarConfigurationDirectoryException(self):
-        working_directory = self.refresh_temporary_directory()
         self.create_svn_repo()
         svn_service_queue = self.create_svn_service_queue()
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
                                           hostname="--help berweb",
                                           revision='1',
-                                          work_dir=working_directory,
+                                          work_dir=self.temporary_directory,
                                           svn_service_queue=svn_service_queue)
 
         self.assertRaises(CouldNotTarConfigurationDirectoryException, host_rpm_builder.build)
 
     def test_should_raise_CouldNotBuildRpmException(self):
-        working_directory = self.refresh_temporary_directory()
         self.create_svn_repo()
         svn_service_queue = self.create_svn_service_queue()
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
                                           hostname=" --help",
                                           revision='1',
-                                          work_dir=working_directory,
+                                          work_dir=self.temporary_directory,
                                           svn_service_queue=svn_service_queue)
 
         self.assertRaises(CouldNotBuildRpmException, host_rpm_builder.build)
@@ -100,13 +97,6 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         svn_service_queue = Queue()
         svn_service_queue.put(svn_service)
         return svn_service_queue
-
-    def refresh_temporary_directory(self):
-        working_directory = config.get(KEY_TEMPORARY_DIRECTORY)
-        if os.path.exists(working_directory):
-            shutil.rmtree(working_directory)
-        os.makedirs(working_directory)
-        return working_directory
 
     def assert_path_exists(self, path):
         self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
