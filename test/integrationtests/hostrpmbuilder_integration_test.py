@@ -52,16 +52,15 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         self.assert_content_of_file(temporary_path_of_revision_file, revision)
 
     def test_should_raise_ConfigDirAlreadyExistsException(self):
-        current_working_directory = os.path.join(getcwd(), 'target', 'tmp')
 
-        fake_host_directory = os.path.join(current_working_directory, 'yadt-config-fakehost')
+        fake_host_directory = os.path.join(self.temporary_directory, 'yadt-config-fakehost')
         if not os.path.exists(fake_host_directory):
             os.makedirs(fake_host_directory)
 
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
                                           hostname="fakehost",
                                           revision='123',
-                                          work_dir=current_working_directory,
+                                          work_dir=self.temporary_directory,
                                           svn_service_queue={})
 
         self.assertRaises(ConfigDirAlreadyExistsException, host_rpm_builder.build)
