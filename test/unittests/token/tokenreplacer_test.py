@@ -18,6 +18,7 @@
 
 import unittest
 
+from mock import Mock, patch
 
 from config_rpm_maker.token.cycle import ContainsCyclesException
 from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer
@@ -68,3 +69,18 @@ class TokenReplacerTest(unittest.TestCase):
     def test_should_determine_token_recursion(self):
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
+
+    @patch('config_rpm_maker.token.tokenreplacer.config')
+    @patch('config_rpm_maker.token.tokenreplacer.getsize')
+    def test_should_not_filter_file_with_encoding_unknown_8bit(self, mock_get_size, mock_config):
+
+        mock_get_size.return_value = 10
+        mock_config.get.return_value = 20
+
+        mock_token_replacer = Mock(TokenReplacer)
+        mock_token_replacer._read_content_from_file.return_value = 'fake binary file content'
+        mock_token_replacer._get_file_encoding.return_value = 'unknown-8bit'
+
+        TokenReplacer.filter_file(mock_token_replacer, "binary.file")
+
+        self.assertEqual(0, mock_token_replacer._perform_filtering_on_file.call_count)
