@@ -5,9 +5,7 @@ python:
 
 before_script:
   - sudo apt-get install python-svn 
-  - echo "Travis python version is ${TRAVIS_PYTHON_VERSION}"
-  - ls $VIRTUAL_ENV
-  - ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/
+  - if [[ "${TRAVIS_PYTHON_VERSION}" == "pypy" ]]; then ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/site-packages/; else ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/; fi
   - sudo apt-get install rpm python-rpm
   - ln -s /usr/lib/python2.7/dist-packages/rpm $VIRTUAL_ENV/lib/python2.7/site-packages/
   - sudo apt-get install python-yaml
