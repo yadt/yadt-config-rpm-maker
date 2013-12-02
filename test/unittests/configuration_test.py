@@ -267,13 +267,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual([], actual_properties[KEY_CUSTOM_DNS_SEARCHLIST])
 
-    def test_should_return_property_error_log_dir(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_property_error_log_dir(self, mock_ensure_is_a_string):
 
-        properties = {'error_log_dir': 'spam-eggs'}
+        mock_ensure_is_a_string.return_value = 'the valid error log'
+        properties = {'error_log_dir': 'error-spam-eggs/logs'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('spam-eggs', actual_properties[KEY_ERROR_LOG_DIRECTORY])
+        self.assertEqual('the valid error log', actual_properties[KEY_ERROR_LOG_DIRECTORY])
+        mock_ensure_is_a_string.assert_any_call(KEY_ERROR_LOG_DIRECTORY, 'error-spam-eggs/logs')
 
     def test_should_return_default_for_error_log_dir_if_not_defined(self):
 
@@ -420,7 +423,7 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual('a valid string', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
-        mock_ensure_is_a_string.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR, 'target/tmp/configviewer')
+        mock_ensure_is_a_string.assert_any_call(KEY_CONFIG_VIEWER_HOSTS_DIR, 'target/tmp/configviewer')
 
     def test_should_return_default_for_config_viewer_hosts_dir_if_not_defined(self):
 
