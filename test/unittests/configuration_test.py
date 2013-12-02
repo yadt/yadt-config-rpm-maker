@@ -241,7 +241,7 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual('valid string', actual_properties[KEY_CONFIG_RPM_PREFIX])
-        mock_ensure_is_a_string.assert_called_with(KEY_CONFIG_RPM_PREFIX, 'spam-eggs')
+        mock_ensure_is_a_string.assert_any_call(KEY_CONFIG_RPM_PREFIX, 'spam-eggs')
 
     def test_should_return_default_for_config_rpm_prefix_if_not_defined(self):
 
@@ -411,13 +411,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/tmp', actual_properties[KEY_TEMP_DIR])
 
-    def test_should_return_config_viewer_hosts_dir(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_config_viewer_hosts_dir(self, mock_ensure_is_a_string):
 
+        mock_ensure_is_a_string.return_value = 'a valid string'
         properties = {'config_viewer_hosts_dir': 'target/tmp/configviewer'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('target/tmp/configviewer', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
+        self.assertEqual('a valid string', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
+        mock_ensure_is_a_string.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR, 'target/tmp/configviewer')
 
     def test_should_return_default_for_config_viewer_hosts_dir_if_not_defined(self):
 

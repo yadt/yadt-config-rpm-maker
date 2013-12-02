@@ -210,15 +210,16 @@ def _ensure_properties_are_valid(raw_properties):
     if raw_properties is None:
         raise ConfigurationValidationException("Loaded configuration properties are empty.")
 
-    log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
     allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)
     config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX)
+    config_viewer_hosts_dir = raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR)
+    log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
 
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
         KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
-        KEY_CONFIG_VIEWER_HOSTS_DIR: raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR),
+        KEY_CONFIG_VIEWER_HOSTS_DIR:  _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
         KEY_ERROR_LOG_DIRECTORY: raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY),
         KEY_ERROR_URL_DIRECTORY: raw_properties.get(KEY_ERROR_URL_DIRECTORY, DEFAULT_ERROR_LOG_URL),
