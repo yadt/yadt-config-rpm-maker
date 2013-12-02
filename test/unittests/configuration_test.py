@@ -41,6 +41,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ConfigException,
                                      ConfigurationValidationException,
                                      _ensure_valid_log_level,
+                                     _ensure_valid_allow_unknown_hosts,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
@@ -203,9 +204,19 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('valid_log_level', actual_properties[KEY_LOG_LEVEL])
 
-    def test_should_return_property_allow_unkown_hosts(self):
+    @patch('config_rpm_maker.config._ensure_valid_allow_unknown_hosts')
+    def test_should_return_property_allow_unkown_hosts(self, mock_ensure_valid_allow_unknown_hosts):
 
-        properties = {'allow_unkown_hosts': True}
+        mock_ensure_valid_allow_unknown_hosts.return_value = False
+        properties = {'allow_unknown_hosts': False}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertFalse(actual_properties[KEY_ALLOW_UNKNOWN_HOSTS])
+
+    def test_should_return_default_property_for_allow_unkown_hosts(self):
+
+        properties = {}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
@@ -583,3 +594,22 @@ class GetConfigViewerHostDirTests(TestCase):
 
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01.new-revision-123', actual_path)
+
+
+class EnsureValidAllowUnkownHosts(TestCase):
+
+    def test_should_raise_exception_if_type_is_not_boolean(self):
+
+        self.assertRaises(ConfigException, _ensure_valid_allow_unknown_hosts, 'foo')
+
+    def test_should_return_valid_value_when_given_value_is_true(self):
+
+        actual = _ensure_valid_allow_unknown_hosts(True)
+
+        self.assertTrue(actual)
+
+    def test_should_return_valid_value_when_given_value_is_false(self):
+
+        actual = _ensure_valid_allow_unknown_hosts(False)
+
+        self.assertFalse(actual)

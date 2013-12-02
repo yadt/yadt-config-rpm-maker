@@ -16,6 +16,7 @@
 #
 #   Please see docs/CONFIGURATION.md for details
 
+allow_unknown_hosts: yes
 config_rpm_prefix: 'yadt-config-'
 config_viewer_hosts_dir: 'target/tmp/configviewer/hosts'
 custom_dns_searchlist: []

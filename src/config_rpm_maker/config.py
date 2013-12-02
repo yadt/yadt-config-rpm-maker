@@ -212,7 +212,7 @@ def _ensure_properties_are_valid(raw_properties):
 
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)),
-        KEY_ALLOW_UNKNOWN_HOSTS: raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS),
+        KEY_ALLOW_UNKNOWN_HOSTS: _ensure_valid_allow_unknown_hosts(raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)),
         KEY_CONFIG_RPM_PREFIX: raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX),
         KEY_CONFIG_VIEWER_HOSTS_DIR: raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR),
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
@@ -228,6 +228,14 @@ def _ensure_properties_are_valid(raw_properties):
     }
 
     return valid_properties
+
+
+def _ensure_valid_allow_unknown_hosts(allow_unknown_hosts):
+    """ Returns a valid value for allow unknown hosts """
+    if type(allow_unknown_hosts) is not bool:
+        raise ConfigException('Invalid value "%s" for "%s" has to be a boolean.' % (allow_unknown_hosts, KEY_ALLOW_UNKNOWN_HOSTS))
+
+    return allow_unknown_hosts
 
 
 def _ensure_valid_log_level(log_level_name):
