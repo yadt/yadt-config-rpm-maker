@@ -59,9 +59,11 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertFalse(os.path.exists(config_rpm_maker.error_log_file))
 
     def test_build_hosts(self):
-        config_rpm_maker = self._given_config_rpm_maker(keep_work_dir=True)
 
+        os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
+        config_rpm_maker = self._given_config_rpm_maker()
         rpms = config_rpm_maker.build()
+        del os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
         self.assertEqual(9, len(rpms))
 
@@ -108,13 +110,8 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         with open(target_file) as f:
             self.assertEqual(f.read(), '10 a a a a a a a a a a\n10 a a a a a a a a a a\n5 a a a a a\n')
 
-    def _given_config_rpm_maker(self, keep_work_dir=False):
+    def _given_config_rpm_maker(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
-
-        if keep_work_dir:
-            os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
-        elif ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ:
-            del os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
         return ConfigRpmMaker('2', svn_service)
 
