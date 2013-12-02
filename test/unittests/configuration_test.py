@@ -42,6 +42,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ConfigurationValidationException,
                                      _ensure_valid_log_level,
                                      _ensure_is_a_boolean_value,
+                                     _ensure_is_a_integer,
                                      _ensure_is_a_string,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
@@ -391,13 +392,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/config', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
 
-    def test_should_return_thread_count(self):
+    @patch('config_rpm_maker.config._ensure_is_a_integer')
+    def test_should_return_thread_count(self, mock_ensure_is_a_integer):
 
+        mock_ensure_is_a_integer.return_value = 123
         properties = {'thread_count': 10}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(10, actual_properties[KEY_THREAD_COUNT])
+        self.assertEqual(123, actual_properties[KEY_THREAD_COUNT])
+        mock_ensure_is_a_integer.assert_any_call(KEY_THREAD_COUNT, 10)
 
     def test_should_return_default_for_thread_count_if_not_defined(self):
 
@@ -640,7 +644,7 @@ class EnsureIsABooleanValueTests(TestCase):
 
 class EnsureIsAString(TestCase):
 
-    def test_should_raise_exception_if_type_is_not_a_string(self):
+    def test_should_raise_exception_if_type_is_not_string(self):
 
         self.assertRaises(ConfigException, _ensure_is_a_string, 'key', True)
 
@@ -649,3 +653,17 @@ class EnsureIsAString(TestCase):
         actual = _ensure_is_a_string('key', 'value')
 
         self.assertEqual('value', actual)
+
+
+class EnsureIsAInteger(TestCase):
+
+    def test_should_raise_exception_if_type_is_not_integer(self):
+
+        self.assertRaises(ConfigException, _ensure_is_a_integer, 'key', 'hello')
+
+    def test_should_return_given_integer(self):
+
+        actual = _ensure_is_a_integer('abc', 123)
+
+        self.assertEqual(123, actual)
+

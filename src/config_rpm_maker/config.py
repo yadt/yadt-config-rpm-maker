@@ -62,16 +62,16 @@ KEY_ERROR_LOG_DIRECTORY = 'error_log_dir'
 KEY_ERROR_LOG_URL = 'error_log_url'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
+KEY_PATH_TO_SPEC_FILE = 'path_to_spec_file'
+KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
 KEY_RPM_UPLOAD_COMMAND = 'rpm_upload_cmd'
+KEY_REPO_PACKAGES_REGEX = 'repo_packages_regex'
 KEY_SVN_PATH_TO_CONFIG = 'svn_path_to_config'
+KEY_SVN_PATH_TO_CONFIGURATION = 'svn_path_to_config'
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 KEY_THREAD_COUNT = 'thread_count'
-KEY_PATH_TO_SPEC_FILE = 'path_to_spec_file'
-KEY_REPO_PACKAGES_REGEX = 'repo_packages_regex'
-KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
-KEY_SVN_PATH_TO_CONFIGURATION = 'svn_path_to_config'
-KEY_THREAD_COUNT = 'thread_count'
 KEY_TEMP_DIR = 'temp_dir'
+
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
@@ -219,6 +219,7 @@ def _ensure_properties_are_valid(raw_properties):
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
     svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG)
     temporary_directory = raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
+    thread_count = raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT)
 
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
@@ -233,7 +234,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_RPM_UPLOAD_CHUNK_SIZE: raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE),
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
         KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
-        KEY_THREAD_COUNT: raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT),
+        KEY_THREAD_COUNT: _ensure_is_a_integer(KEY_THREAD_COUNT, thread_count),
         KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory)
     }
 
@@ -273,5 +274,15 @@ def _ensure_is_a_string(key, value):
     value_type = type(value)
     if value_type is not str:
         raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.' % (key, str(value), value_type.__name__))
+
+    return value
+
+
+def _ensure_is_a_integer(key, value):
+    """ Returns the given int """
+
+    value_type = type(value)
+    if value_type is not int:
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.' % (key, str(value), value_type.__name__))
 
     return value
