@@ -372,13 +372,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(None, actual_properties[KEY_RPM_UPLOAD_COMMAND])
 
-    def test_should_return_svn_path_to_config(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_svn_path_to_config(self, mock_ensure_is_a_string):
 
+        mock_ensure_is_a_string.return_value = 'a valid svn path'
         properties = {'svn_path_to_config': '/configuration'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/configuration', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
+        self.assertEqual('a valid svn path', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
+        mock_ensure_is_a_string.assert_any_call(KEY_SVN_PATH_TO_CONFIGURATION, '/configuration')
 
     def test_should_return_default_for_svn_path_to_config_if_not_defined(self):
 

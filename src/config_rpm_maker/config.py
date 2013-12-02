@@ -216,8 +216,9 @@ def _ensure_properties_are_valid(raw_properties):
     error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY)
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
-
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
+    svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG)
+
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
@@ -230,7 +231,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_REPO_PACKAGES_REGEX: raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX),
         KEY_RPM_UPLOAD_CHUNK_SIZE: raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE),
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
-        KEY_SVN_PATH_TO_CONFIG: raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG),
+        KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
         KEY_THREAD_COUNT: raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT),
         KEY_TEMP_DIR: raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
     }
