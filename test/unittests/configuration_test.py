@@ -44,6 +44,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      _ensure_is_a_boolean_value,
                                      _ensure_is_an_integer,
                                      _ensure_is_a_string,
+                                     _ensure_repo_packages_regex_is_valid_or_none,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
@@ -325,13 +326,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('default.spec', actual_properties[KEY_PATH_TO_SPEC_FILE])
 
-    def test_should_return_repo_packages_regex(self):
+    @patch('config_rpm_maker.config._ensure_repo_packages_regex_is_valid_or_none')
+    def test_should_return_repo_packages_regex(self, mock_ensure_repo_packages_regex_is_valid_or_none):
 
-        properties = {'repo_packages_regex': 'spam-eggs.speck'}
+        mock_ensure_repo_packages_regex_is_valid_or_none.return_value = 'a valid regex'
+        properties = {'repo_packages_regex': '.*-spam-.*'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('spam-eggs.speck', actual_properties[KEY_REPO_PACKAGES_REGEX])
+        self.assertEqual('a valid regex', actual_properties[KEY_REPO_PACKAGES_REGEX])
+        mock_ensure_repo_packages_regex_is_valid_or_none.assert_any_call('.*-spam-.*')
 
     def test_should_return_default_for_repo_packages_regex_if_not_defined(self):
 
@@ -339,7 +343,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('.*-repo.*', actual_properties[KEY_REPO_PACKAGES_REGEX])
+        self.assertEqual(None, actual_properties[KEY_REPO_PACKAGES_REGEX])
 
     @patch('config_rpm_maker.config._ensure_is_an_integer')
     def test_should_return_rpm_upload_chunk_size(self, mock_ensure_is_an_integer):
@@ -669,3 +673,26 @@ class EnsureIsAInteger(TestCase):
         actual = _ensure_is_an_integer('abc', 123)
 
         self.assertEqual(123, actual)
+
+
+class EnsureRepoPackageRegexIsValidOrNone(TestCase):
+
+    def test_should_raise_an_exception_if_given_value_is_not_of_type_string(self):
+
+        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_valid_or_none, 123)
+
+    def test_should_raise_an_exception_when_a_invalid_regex_is_given(self):
+
+        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_valid_or_none, '[')
+
+    def test_should_return_none_if_none_is_given(self):
+
+        actual = _ensure_repo_packages_regex_is_valid_or_none(None)
+
+        self.assertEqual(None, actual)
+
+    def test_should_return_given_value_if_it_is_a_valid_regex(self):
+
+        actual = _ensure_repo_packages_regex_is_valid_or_none(".*")
+
+        self.assertEqual(".*", actual)

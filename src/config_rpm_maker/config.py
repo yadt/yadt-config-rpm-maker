@@ -18,8 +18,8 @@ import yaml
 
 from os import environ, getcwd
 from os.path import abspath, exists, join
-
 from logging import DEBUG, ERROR, INFO, getLogger
+from re import compile
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
@@ -39,7 +39,7 @@ DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = 'DEBUG'
 DEFAULT_PATH_TO_SPEC_FILE = 'default.spec'
-DEFAULT_REPO_PACKAGES_REGEX = '.*-repo.*'
+DEFAULT_REPO_PACKAGES_REGEX = None
 DEFAULT_RPM_UPLOAD_CHUNK_SIZE = 10
 DEFAULT_RPM_UPLOAD_COMMAND = None
 DEFAULT_SVN_PATH_TO_CONFIG = '/config'
@@ -217,6 +217,7 @@ def _ensure_properties_are_valid(raw_properties):
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
+    repo_packages_regex = raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX)
     rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE)
     svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG)
     temporary_directory = raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
@@ -231,7 +232,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
-        KEY_REPO_PACKAGES_REGEX: raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX),
+        KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_valid_or_none(repo_packages_regex),
         KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
         KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
@@ -274,7 +275,8 @@ def _ensure_is_a_string(key, value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.' % (key, str(value), value_type.__name__))
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
+                              % (key, str(value), value_type.__name__))
 
     return value
 
@@ -284,6 +286,25 @@ def _ensure_is_an_integer(key, value):
 
     value_type = type(value)
     if value_type is not int:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.' % (key, str(value), value_type.__name__))
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
+                              % (key, str(value), value_type.__name__))
+
+    return value
+
+
+def _ensure_repo_packages_regex_is_valid_or_none(value):
+
+    if value is None:
+        return None
+
+    value_type = type(value)
+    if value_type is not str:
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string which is a valid regex or do not provide the parameter.'
+                              % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
+
+    try:
+        compile(value)
+    except Exception as e:
+        raise ConfigException('The given string "%s" is not a valid regular expression. Error was "%s".' % (value, str(e)))
 
     return value
