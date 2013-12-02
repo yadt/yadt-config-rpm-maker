@@ -305,13 +305,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('', actual_properties[KEY_ERROR_LOG_URL])
 
-    def test_should_return_path_to_spec_file(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_path_to_spec_file(self, mock_ensure_is_a_string):
 
+        mock_ensure_is_a_string.return_value = 'a valid spec file'
         properties = {'path_to_spec_file': 'spam-eggs.speck'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('spam-eggs.speck', actual_properties[KEY_PATH_TO_SPEC_FILE])
+        self.assertEqual('a valid spec file', actual_properties[KEY_PATH_TO_SPEC_FILE])
+        mock_ensure_is_a_string.assert_any_call(KEY_PATH_TO_SPEC_FILE, 'spam-eggs.speck')
 
     def test_should_return_default_for_path_to_spec_file_if_not_defined(self):
 

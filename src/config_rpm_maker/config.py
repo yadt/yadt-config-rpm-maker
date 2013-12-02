@@ -217,6 +217,7 @@ def _ensure_properties_are_valid(raw_properties):
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
 
+    path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
@@ -225,7 +226,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
-        KEY_PATH_TO_SPEC_FILE: raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE),
+        KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
         KEY_REPO_PACKAGES_REGEX: raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX),
         KEY_RPM_UPLOAD_CHUNK_SIZE: raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE),
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
