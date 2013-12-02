@@ -63,7 +63,6 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
         config_rpm_maker = self._given_config_rpm_maker()
         rpms = config_rpm_maker.build()
-        del os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
 
         self.assertEqual(9, len(rpms))
 

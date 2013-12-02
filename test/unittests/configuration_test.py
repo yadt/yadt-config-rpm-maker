@@ -666,4 +666,3 @@ class EnsureIsAInteger(TestCase):
         actual = _ensure_is_a_integer('abc', 123)
 
         self.assertEqual(123, actual)
-

@@ -225,7 +225,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
         KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
-        KEY_CONFIG_VIEWER_HOSTS_DIR:  _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
+        KEY_CONFIG_VIEWER_HOSTS_DIR: _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
