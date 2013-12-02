@@ -217,6 +217,7 @@ def _ensure_properties_are_valid(raw_properties):
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
+    rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE)
     svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG)
     temporary_directory = raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
     thread_count = raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT)
@@ -231,10 +232,10 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
         KEY_REPO_PACKAGES_REGEX: raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX),
-        KEY_RPM_UPLOAD_CHUNK_SIZE: raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE),
+        KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
         KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
-        KEY_THREAD_COUNT: _ensure_is_a_integer(KEY_THREAD_COUNT, thread_count),
+        KEY_THREAD_COUNT: _ensure_is_an_integer(KEY_THREAD_COUNT, thread_count),
         KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory)
     }
 
@@ -278,7 +279,7 @@ def _ensure_is_a_string(key, value):
     return value
 
 
-def _ensure_is_a_integer(key, value):
+def _ensure_is_an_integer(key, value):
     """ Returns the given int """
 
     value_type = type(value)

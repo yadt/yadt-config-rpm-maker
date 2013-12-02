@@ -42,7 +42,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ConfigurationValidationException,
                                      _ensure_valid_log_level,
                                      _ensure_is_a_boolean_value,
-                                     _ensure_is_a_integer,
+                                     _ensure_is_an_integer,
                                      _ensure_is_a_string,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
@@ -341,13 +341,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('.*-repo.*', actual_properties[KEY_REPO_PACKAGES_REGEX])
 
-    def test_should_return_rpm_upload_chunk_size_regex(self):
+    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    def test_should_return_rpm_upload_chunk_size(self, mock_ensure_is_an_integer):
 
+        mock_ensure_is_an_integer.return_value = 123
         properties = {'rpm_upload_chunk_size': 5}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(5, actual_properties[KEY_RPM_UPLOAD_CHUNK_SIZE])
+        self.assertEqual(123, actual_properties[KEY_RPM_UPLOAD_CHUNK_SIZE])
+        mock_ensure_is_an_integer.assert_any_call(KEY_RPM_UPLOAD_CHUNK_SIZE, 5)
 
     def test_should_return_default_for_rpm_upload_chunk_size_if_not_defined(self):
 
@@ -392,16 +395,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/config', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
 
-    @patch('config_rpm_maker.config._ensure_is_a_integer')
-    def test_should_return_thread_count(self, mock_ensure_is_a_integer):
+    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    def test_should_return_thread_count(self, mock_ensure_is_an_integer):
 
-        mock_ensure_is_a_integer.return_value = 123
+        mock_ensure_is_an_integer.return_value = 123
         properties = {'thread_count': 10}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual(123, actual_properties[KEY_THREAD_COUNT])
-        mock_ensure_is_a_integer.assert_any_call(KEY_THREAD_COUNT, 10)
+        mock_ensure_is_an_integer.assert_any_call(KEY_THREAD_COUNT, 10)
 
     def test_should_return_default_for_thread_count_if_not_defined(self):
 
@@ -659,10 +662,10 @@ class EnsureIsAInteger(TestCase):
 
     def test_should_raise_exception_if_type_is_not_integer(self):
 
-        self.assertRaises(ConfigException, _ensure_is_a_integer, 'key', 'hello')
+        self.assertRaises(ConfigException, _ensure_is_an_integer, 'key', 'hello')
 
     def test_should_return_given_integer(self):
 
-        actual = _ensure_is_a_integer('abc', 123)
+        actual = _ensure_is_an_integer('abc', 123)
 
         self.assertEqual(123, actual)
