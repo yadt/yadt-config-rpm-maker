@@ -212,11 +212,12 @@ def _ensure_properties_are_valid(raw_properties):
 
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
     allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)
+    config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX)
 
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
-        KEY_CONFIG_RPM_PREFIX: raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX),
+        KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
         KEY_CONFIG_VIEWER_HOSTS_DIR: raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR),
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
         KEY_ERROR_LOG_DIRECTORY: raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY),
@@ -258,3 +259,13 @@ def _ensure_valid_log_level(log_level_name):
         return ERROR
 
     raise ConfigException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
+
+
+def _ensure_is_a_string(key, value):
+    """ Retuns the given string """
+
+    value_type = type(value)
+    if value_type is not str:
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.' % (key, str(value), value_type.__name__))
+
+    return value

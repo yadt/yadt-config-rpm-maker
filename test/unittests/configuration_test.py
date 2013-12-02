@@ -42,6 +42,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      ConfigurationValidationException,
                                      _ensure_valid_log_level,
                                      _ensure_is_a_boolean_value,
+                                     _ensure_is_a_string,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
@@ -231,13 +232,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertTrue(actual_properties[KEY_ALLOW_UNKNOWN_HOSTS])
 
-    def test_should_return_property_config_rpm_prefix(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_property_config_rpm_prefix(self, mock_ensure_is_a_string):
 
+        mock_ensure_is_a_string.return_value = 'valid string'
         properties = {'config_rpm_prefix': 'spam-eggs'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertTrue(actual_properties[KEY_CONFIG_RPM_PREFIX])
+        self.assertEqual('valid string', actual_properties[KEY_CONFIG_RPM_PREFIX])
+        mock_ensure_is_a_string.assert_called_with(KEY_CONFIG_RPM_PREFIX, 'spam-eggs')
 
     def test_should_return_default_for_config_rpm_prefix_if_not_defined(self):
 
@@ -614,3 +618,16 @@ class EnsureIsABooleanValueTests(TestCase):
         actual = _ensure_is_a_boolean_value('key', False)
 
         self.assertFalse(actual)
+
+
+class EnsureIsAString(TestCase):
+
+    def test_should_raise_exception_if_type_is_not_a_string(self):
+
+        self.assertRaises(ConfigException, _ensure_is_a_string, 'key', True)
+
+    def test_should_return_given_string(self):
+
+        actual = _ensure_is_a_string('key', 'value')
+
+        self.assertEqual('value', actual)
