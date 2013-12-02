@@ -21,7 +21,7 @@ Options:
   --version             show version
   --rpm-upload-cmd=RPM_UPLOAD_COMMAND
                         Overwrite rpm_upload_config in config file
-  --config-viewer-only  Only generated files for config viewer. Skip RPM build
+  --config-viewer-only  Only generate files for config viewer. Skip RPM build
                         and upload.
 ```
 

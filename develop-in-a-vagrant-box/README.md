@@ -5,32 +5,22 @@ develop on the destination distribution regardless of your developer machine.
 
 ## Setup a vagrant box
 
-Add a CentOS6 box or a Scientific Linux Box and initialize it
-```bash
-vagrant box add CentOS6 url-to-your-favourite-centos-box
-vagrant init CentOS6
-```
-
 Start your vagrant box, login to it and execute the bootstrap script:
 ```bash
+cd develop-in-a-vagrant-box
 vagrant up
-vagrant ssh
-cd /vagrant
 ```
-
-## Installation from source
-
-Now you are ready to run the `bootstrap` script.
 This might take a while since we are using [mock](http://fedoraproject.org/wiki/Projects/Mock) to build the rpm.
 Mock will at a certain perform `yum --installroot ...`. Unfortunately this is quite time consuming.
 
-Please check the `configuration.sh` and configure the git repository URL within the script if you want to clone your own fork.
 
-```bash
-./bootstrap
-```
+## Installation from source
 
 Now you should have a svnserve daemon running on your vagrant box.
+
+```bash
+vagrant ssh
+```
 
 Change into the vagrant home directory.
 ```bash
@@ -53,6 +43,7 @@ Commit those changes.
 ```bash
 svn commit -m "We will need httpd since we are building a web application."
 ```
+
 ## Reinstalling
 
 After you made code changes and committed them to your fork you will want to reinstall `yadt-config-rpm-maker` to your vagrant box.

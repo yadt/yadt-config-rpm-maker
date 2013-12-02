@@ -233,6 +233,9 @@ def _ensure_properties_are_valid(raw_properties):
 def _ensure_valid_log_level(log_level_name):
     """ Returns a valid log level """
 
+    if type(log_level_name) is not str:
+        raise ConfigException('Invalid log level "%s". Log level has to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
+
     log_level_name = log_level_name.upper().strip()
 
     if log_level_name == 'DEBUG':

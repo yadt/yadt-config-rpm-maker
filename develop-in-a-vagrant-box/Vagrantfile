@@ -1,0 +1,11 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant::Config.run do |config|
+  config.vm.box = "yadt-config-rpm-maker-CentOS6"
+  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box"
+
+  Vagrant::Config.run do |config|
+    config.vm.provision :shell, :inline => "cd /vagrant; ./provision.sh"
+  end
+end

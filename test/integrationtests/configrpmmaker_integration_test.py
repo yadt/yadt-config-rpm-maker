@@ -15,14 +15,13 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import shutil
 import subprocess
 import rpm
 
 from integration_test_support import IntegrationTest, IntegrationTestException
 
 from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, build_config_viewer_host_directory
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
@@ -232,3 +231,15 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_revision_file_contains_revision('tuvweb01', revision='3')
         self.assert_revision_file_contains_revision('berweb01', revision='4')
 
+    def test_should_move_or_remove_temporary_directories(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        self.write_revision_file_for_hostname('tuvweb01', revision='3')
+        self.write_revision_file_for_hostname('berweb01', revision='4')
+
+        config_rpm_maker.build()
+
+        self.assert_path_does_not_exists(build_config_viewer_host_directory('devweb01', revision='2'))
+        self.assert_path_does_not_exists(build_config_viewer_host_directory('tuvweb01', revision='2'))
+        self.assert_path_does_not_exists(build_config_viewer_host_directory('berweb01', revision='2'))

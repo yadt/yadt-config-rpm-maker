@@ -59,6 +59,7 @@ function build_and_install_config_rpm_maker() {
 
 
 function setup_svn_server_with_test_data_and_start_it() {
+  cd ${WORKING_DIRECTORY}
   svnadmin create ${CONFIGURATION_REPOSITORY}
 
   # Configure svn server

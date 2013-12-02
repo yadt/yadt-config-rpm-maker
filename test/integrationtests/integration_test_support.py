@@ -18,12 +18,14 @@ import shutil
 import subprocess
 import unittest
 
+from Queue import Queue
 from os import makedirs
 from os.path import abspath, exists, join
 from shutil import rmtree
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
+from config_rpm_maker.svnservice import SvnService
 
 
 class IntegrationTestException(Exception):
@@ -45,10 +47,10 @@ class IntegrationTest(unittest.TestCase):
     def create_svn_repo(self):
         self._create_repository_directory()
 
-        if subprocess.call('svnadmin create %s' % self.repo_dir, shell=True):
+        if subprocess.call('svnadmin create %s' % self.repository_directory, shell=True):
             raise IntegrationTestException('Could not create svn repo.')
 
-        self.repo_url = 'file://%s' % self.repo_dir
+        self.repo_url = 'file://%s' % self.repository_directory
 
         if subprocess.call('svn import -q -m import testdata/svn_repo %s' % self.repo_url, shell=True):
             raise IntegrationTestException('Could not import test data.')
@@ -58,12 +60,12 @@ class IntegrationTest(unittest.TestCase):
 
     def _create_repository_directory(self):
 
-        self.repo_dir = abspath(join(self.temporary_directory, 'svn_repo'))
+        self.repository_directory = abspath(join(self.temporary_directory, 'svn_repo'))
 
-        if exists(self.repo_dir):
-            shutil.rmtree(self.repo_dir)
+        if exists(self.repository_directory):
+            shutil.rmtree(self.repository_directory)
 
-        makedirs(self.repo_dir)
+        makedirs(self.repository_directory)
 
     def write_revision_file_for_hostname(self, hostname, revision):
 
@@ -97,4 +99,15 @@ Expected content: {expected_content}
 """.format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
             self.assertEqual(expected_content, actual_content, error_message)
 
+    def create_svn_service_queue(self):
+        svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
+                                 path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service_queue = Queue()
+        svn_service_queue.put(svn_service)
+        return svn_service_queue
 
+    def assert_path_exists(self, path):
+        self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
+
+    def assert_path_does_not_exists(self, path):
+        self.assertFalse(exists(path), 'Path "%s" should not exist!' % path)

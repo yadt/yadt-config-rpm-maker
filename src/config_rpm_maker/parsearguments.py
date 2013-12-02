@@ -45,7 +45,7 @@ OPTION_RPM_UPLOAD_CMD = '--rpm-upload-cmd'
 OPTION_RPM_UPLOAD_CMD_HELP = 'Overwrite rpm_upload_config in config file'
 
 OPTION_CONFIG_VIEWER_ONLY = '--config-viewer-only'
-OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generated files for config viewer. Skip RPM build and upload.'
+OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generate files for config viewer. Skip RPM build and upload.'
 
 
 def parse_arguments(argv, version):

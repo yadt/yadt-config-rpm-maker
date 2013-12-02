@@ -47,13 +47,13 @@ def get_timestamp_from_start():
 def exit_program(message, return_code):
     """ Logs the given message and exits with given return code. """
 
-    log_execution_time_summaries(LOGGER.debug)
-
     timestamp_from_start = get_timestamp_from_start()
     if timestamp_from_start is not None:
         elapsed_time_in_seconds = time() - timestamp_from_start
         elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
         LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
+
+        log_execution_time_summaries(LOGGER.debug)
 
     if return_code == RETURN_CODE_SUCCESS:
         LOGGER.info(message)

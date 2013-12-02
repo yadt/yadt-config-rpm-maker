@@ -200,6 +200,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
                 if revision_from_file > int(self.revision):
                     LOGGER.debug('Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s', host, revision_from_file, self.revision)
+                    rmtree(temp_path)
                     continue
 
                 rmtree(dest_path)
