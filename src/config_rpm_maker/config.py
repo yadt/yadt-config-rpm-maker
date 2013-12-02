@@ -210,9 +210,12 @@ def _ensure_properties_are_valid(raw_properties):
     if raw_properties is None:
         raise ConfigurationValidationException("Loaded configuration properties are empty.")
 
+    log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
+    allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)
+
     valid_properties = {
-        KEY_LOG_LEVEL: _ensure_valid_log_level(raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)),
-        KEY_ALLOW_UNKNOWN_HOSTS: _ensure_valid_allow_unknown_hosts(raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)),
+        KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
+        KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
         KEY_CONFIG_RPM_PREFIX: raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX),
         KEY_CONFIG_VIEWER_HOSTS_DIR: raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR),
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
@@ -230,12 +233,13 @@ def _ensure_properties_are_valid(raw_properties):
     return valid_properties
 
 
-def _ensure_valid_allow_unknown_hosts(allow_unknown_hosts):
-    """ Returns a valid value for allow unknown hosts """
-    if type(allow_unknown_hosts) is not bool:
-        raise ConfigException('Invalid value "%s" for "%s" has to be a boolean.' % (allow_unknown_hosts, KEY_ALLOW_UNKNOWN_HOSTS))
+def _ensure_is_a_boolean_value(key, value):
+    """ Returns a boolean value or raises a exception if the given value is not a boolean """
 
-    return allow_unknown_hosts
+    if type(value) is not bool:
+        raise ConfigException('Invalid value "%s" for "%s" has to be a boolean.' % (value, key))
+
+    return value
 
 
 def _ensure_valid_log_level(log_level_name):
