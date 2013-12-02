@@ -59,7 +59,7 @@ KEY_CONFIG_VIEWER_HOSTS_DIR = 'config_viewer_hosts_dir'
 KEY_CONFIG_RPM_PREFIX = 'config_rpm_prefix'
 KEY_CUSTOM_DNS_SEARCHLIST = 'custom_dns_searchlist'
 KEY_ERROR_LOG_DIRECTORY = 'error_log_dir'
-KEY_ERROR_URL_DIRECTORY = 'error_log_url'
+KEY_ERROR_LOG_URL = 'error_log_url'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_RPM_UPLOAD_COMMAND = 'rpm_upload_cmd'
@@ -214,6 +214,7 @@ def _ensure_properties_are_valid(raw_properties):
     config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX)
     config_viewer_hosts_dir = raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR)
     error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY)
+    error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
 
     valid_properties = {
@@ -223,7 +224,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_CONFIG_VIEWER_HOSTS_DIR:  _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
         KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
-        KEY_ERROR_URL_DIRECTORY: raw_properties.get(KEY_ERROR_URL_DIRECTORY, DEFAULT_ERROR_LOG_URL),
+        KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_PATH_TO_SPEC_FILE: raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE),
         KEY_REPO_PACKAGES_REGEX: raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX),
         KEY_RPM_UPLOAD_CHUNK_SIZE: raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE),

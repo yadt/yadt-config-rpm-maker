@@ -28,7 +28,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      KEY_CONFIG_VIEWER_HOSTS_DIR,
                                      KEY_CUSTOM_DNS_SEARCHLIST,
                                      KEY_ERROR_LOG_DIRECTORY,
-                                     KEY_ERROR_URL_DIRECTORY,
+                                     KEY_ERROR_LOG_URL,
                                      KEY_LOG_LEVEL,
                                      KEY_PATH_TO_SPEC_FILE,
                                      KEY_REPO_PACKAGES_REGEX,
@@ -286,13 +286,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('', actual_properties[KEY_ERROR_LOG_DIRECTORY])
 
-    def test_should_return_property_error_url_dir(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_property_error_url_dir(self, mock_ensure_is_string):
 
-        properties = {'error_log_url': 'spam-eggs'}
+        mock_ensure_is_string.return_value = 'a valid error log url'
+        properties = {'error_log_url': 'error-spam-eggs-url'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('spam-eggs', actual_properties[KEY_ERROR_URL_DIRECTORY])
+        self.assertEqual('a valid error log url', actual_properties[KEY_ERROR_LOG_URL])
+        mock_ensure_is_string.assert_any_call(KEY_ERROR_LOG_URL, 'error-spam-eggs-url')
 
     def test_should_return_default_for_error_log_url_if_not_defined(self):
 
@@ -300,7 +303,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('', actual_properties[KEY_ERROR_URL_DIRECTORY])
+        self.assertEqual('', actual_properties[KEY_ERROR_LOG_URL])
 
     def test_should_return_path_to_spec_file(self):
 
