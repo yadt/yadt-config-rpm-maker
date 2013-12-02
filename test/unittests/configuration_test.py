@@ -407,13 +407,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(1, actual_properties[KEY_THREAD_COUNT])
 
-    def test_should_return_temp_dir(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string')
+    def test_should_return_temp_dir(self, mock_ensure_is_a_string):
 
+        mock_ensure_is_a_string.return_value = 'a valid temporary directory'
         properties = {'temp_dir': 'target/tmp'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('target/tmp', actual_properties[KEY_TEMP_DIR])
+        self.assertEqual('a valid temporary directory', actual_properties[KEY_TEMP_DIR])
+        mock_ensure_is_a_string.assert_any_call(KEY_TEMP_DIR, 'target/tmp')
 
     def test_should_return_default_for_temp_dir_if_not_defined(self):
 

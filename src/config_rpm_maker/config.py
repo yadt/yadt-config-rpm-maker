@@ -218,6 +218,7 @@ def _ensure_properties_are_valid(raw_properties):
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
     svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG)
+    temporary_directory = raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
 
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
@@ -233,7 +234,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
         KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
         KEY_THREAD_COUNT: raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT),
-        KEY_TEMP_DIR: raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
+        KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory)
     }
 
     return valid_properties
