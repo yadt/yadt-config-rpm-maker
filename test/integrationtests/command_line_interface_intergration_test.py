@@ -121,4 +121,12 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
         self.assertTrue(self.stdout.endswith(expected_postfix + "\n"), error_message)
 
     def assert_exit_code(self, expected_exit_code):
-        self.assertEqual(self.exit_code, expected_exit_code)
+        error_message = "Expected error code was %s but got %s.\n" % (expected_exit_code, self.exit_code)
+
+        if self.stdout:
+            error_message += "stdout: %s\n" % self.stdout
+
+        if self.stderr:
+            error_message += "stderr: %s\n" % self.stderr
+
+        self.assertEqual(self.exit_code, expected_exit_code, error_message)
