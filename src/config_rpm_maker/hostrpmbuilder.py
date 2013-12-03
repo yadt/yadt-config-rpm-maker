@@ -132,7 +132,7 @@ class HostRpmBuilder(object):
 
         self._filter_tokens_in_rpm_sources()
 
-        if not config.get(config.KEY_CONFIG_VIEWER_ONLY, config.DEFAULT_CONFIG_VIEWER_ONLY):
+        if not config.get(config.KEY_CONFIG_VIEWER_ONLY):
             self._build_rpm_using_rpmbuild()
 
         LOGGER.debug('%s: writing configviewer data for host "%s"', self.thread_name, self.hostname)

@@ -107,21 +107,18 @@ def load_configuration_file():
     set_properties(valid_properties)
 
 
-def get(name, default=None):
+def get(name):
     """ Get the configuration property """
     if not _properties:
         try:
             load_configuration_file()
         except Exception as e:
-            if default:
-                return default
-            else:
-                raise e
+            raise e
 
-    if name in _properties:
-        return _properties[name]
-    else:
-        return default
+    if name not in _properties:
+        raise ConfigException('Requested unknown configuration property "%s"' % name)
+
+    return _properties[name]
 
 
 def build_config_viewer_host_directory(hostname, revision=False):
@@ -230,6 +227,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
         KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
+        KEY_CONFIG_VIEWER_ONLY: DEFAULT_CONFIG_VIEWER_ONLY,
         KEY_CONFIG_VIEWER_HOSTS_DIR: _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
         KEY_CUSTOM_DNS_SEARCHLIST: _ensure_is_a_list_of_strings(KEY_CUSTOM_DNS_SEARCHLIST, custom_dns_searchlist),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),

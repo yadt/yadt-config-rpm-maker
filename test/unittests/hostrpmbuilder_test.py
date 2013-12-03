@@ -416,7 +416,7 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        mock_get.assert_any_call(KEY_CONFIG_VIEWER_ONLY, DEFAULT_CONFIG_VIEWER_ONLY)
+        mock_get.assert_any_call(KEY_CONFIG_VIEWER_ONLY)
         self.assertEqual(0, len(self.mock_host_rpm_builder._build_rpm_using_rpmbuild.call_args_list))
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')

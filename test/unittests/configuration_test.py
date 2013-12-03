@@ -28,6 +28,7 @@ from config_rpm_maker.config import (ConfigException,
                                      ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
                                      KEY_CONFIG_RPM_PREFIX,
+                                     KEY_CONFIG_VIEWER_ONLY,
                                      KEY_CONFIG_VIEWER_HOSTS_DIR,
                                      KEY_CUSTOM_DNS_SEARCHLIST,
                                      KEY_ERROR_LOG_DIRECTORY,
@@ -489,6 +490,14 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual(102400, actual_properties[KEY_MAX_FILE_SIZE])
+
+    def test_should_return_default_config_viewer_only(self):
+
+        properties = {}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertFalse(actual_properties[KEY_CONFIG_VIEWER_ONLY])
 
 
 class LoadConfigurationFileTests(TestCase):
