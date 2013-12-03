@@ -22,7 +22,10 @@ from unittest import TestCase
 
 from unittest_support import UnitTests
 from config_rpm_maker import config
-from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
+from config_rpm_maker.config import (ConfigException,
+                                     ConfigurationValidationException,
+                                     DEFAULT_CONFIGURATION_FILE_PATH,
+                                     ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
                                      KEY_CONFIG_RPM_PREFIX,
                                      KEY_CONFIG_VIEWER_HOSTS_DIR,
@@ -37,15 +40,6 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      KEY_SVN_PATH_TO_CONFIGURATION,
                                      KEY_THREAD_COUNT,
                                      KEY_TEMP_DIR,
-                                     ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
-                                     ConfigException,
-                                     ConfigurationValidationException,
-                                     _ensure_valid_log_level,
-                                     _ensure_is_a_boolean_value,
-                                     _ensure_is_an_integer,
-                                     _ensure_is_a_string,
-                                     _ensure_is_a_string_or_none,
-                                     _ensure_repo_packages_regex_is_valid_or_none,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
@@ -53,9 +47,16 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      set_property,
                                      set_properties,
                                      _determine_configuration_file_path,
+                                     _ensure_valid_log_level,
+                                     _ensure_is_a_boolean_value,
+                                     _ensure_is_an_integer,
+                                     _ensure_is_a_string,
+                                     _ensure_is_a_string_or_none,
+                                     _ensure_is_a_list_of_strings,
+                                     _ensure_repo_packages_regex_is_valid_or_none,
+                                     _ensure_properties_are_valid,
                                      _load_configuration_properties_from_yaml_file,
-                                     _set_file_path_of_loaded_configuration,
-                                     _ensure_properties_are_valid)
+                                     _set_file_path_of_loaded_configuration)
 
 
 class GetProperties(TestCase):
@@ -254,13 +255,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('yadt-config-', actual_properties[KEY_CONFIG_RPM_PREFIX])
 
-    def test_should_return_property_custom_dns_searchlist(self):
+    @patch('config_rpm_maker.config._ensure_is_a_list_of_strings')
+    def test_should_return_property_custom_dns_searchlist(self, mock_ensure_is_a_list_of_strings):
 
-        properties = {'custom_dns_searchlist': ['spam-eggs']}
+        mock_ensure_is_a_list_of_strings.return_value = ['a', 'valid', 'list', 'of', 'strings']
+        properties = {'custom_dns_searchlist': ['a', 'list', 'of', 'dns', 'servers']}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(['spam-eggs'], actual_properties[KEY_CUSTOM_DNS_SEARCHLIST])
+        self.assertEqual(['a', 'valid', 'list', 'of', 'strings'], actual_properties[KEY_CUSTOM_DNS_SEARCHLIST])
+        mock_ensure_is_a_list_of_strings.assert_any_call(KEY_CUSTOM_DNS_SEARCHLIST, ['a', 'list', 'of', 'dns', 'servers'])
 
     def test_should_return_default_for_custom_dns_searchlist_if_not_defined(self):
 
@@ -702,7 +706,7 @@ class EnsureRepoPackageRegexIsValidOrNone(TestCase):
         self.assertEqual(".*", actual)
 
 
-class EnsureRpmUploadCommandIsAStringOrNone(TestCase):
+class EnsureRpmUploadCommandIsAStringOrNoneTests(TestCase):
 
     def test_should_raise_exception_when_given_value_is_not_a_string(self):
 
@@ -719,3 +723,26 @@ class EnsureRpmUploadCommandIsAStringOrNone(TestCase):
         actual = _ensure_is_a_string_or_none('key', 'foo-spam')
 
         self.assertEqual('foo-spam', actual)
+
+
+class EnsureIsAListOfStringsTest(TestCase):
+
+    def test_should_raise_exception_when_given_value_is_not_a_list(self):
+
+        self.assertRaises(ConfigException, _ensure_is_a_list_of_strings, 'spam', 123)
+
+    def test_should_return_given_empty_list(self):
+
+        actual = _ensure_is_a_list_of_strings('key', [])
+
+        self.assertEqual([], actual)
+
+    def test_should_raise_exception_when_a_list_with_an_integer_is_given(self):
+
+        self.assertRaises(ConfigException, _ensure_is_a_list_of_strings, 'spam', [1])
+
+    def test_should_return_given_list_with_multiple_strings(self):
+
+        actual = _ensure_is_a_list_of_strings('key', ['one', 'two', 'three'])
+
+        self.assertEqual(['one', 'two', 'three'], actual)

@@ -213,6 +213,7 @@ def _ensure_properties_are_valid(raw_properties):
     allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)
     config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX)
     config_viewer_hosts_dir = raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR)
+    custom_dns_searchlist = raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST)
     error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY)
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
@@ -229,7 +230,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
         KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
         KEY_CONFIG_VIEWER_HOSTS_DIR: _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
-        KEY_CUSTOM_DNS_SEARCHLIST: raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST),
+        KEY_CUSTOM_DNS_SEARCHLIST: _ensure_is_a_list_of_strings(KEY_CUSTOM_DNS_SEARCHLIST, custom_dns_searchlist),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
@@ -318,7 +319,23 @@ def _ensure_is_a_string_or_none(key, value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string which is a valid regex or do not provide the parameter.'
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
                               % (key, str(value), value_type.__name__))
+
+    return value
+
+
+def _ensure_is_a_list_of_strings(key, value):
+
+    value_type = type(value)
+    if value_type is not list:
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
+                              % (key, str(value), value_type.__name__))
+
+    for element in value:
+        element_type = type(element)
+        if element_type is not str:
+            raise ConfigException('Configuration parameter "%s": invalid list "%s"  with element "%s" of type "%s"! Please use a list of strings.'
+                                  % (key, str(value), str(element), element_type.__name__))
 
     return value
