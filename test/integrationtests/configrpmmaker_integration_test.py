@@ -34,13 +34,13 @@ stderr was: "{stderr}"
 
 class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
-    def test_find_matching_hosts(self):
+    def test_should_find_matching_hosts(self):
         config_rpm_maker = ConfigRpmMaker(None, None)
         self.assertEqual(['berweb01', 'devweb01'], config_rpm_maker._find_matching_hosts(All(), 'all/foo/bar', ['berweb01', 'devweb01']))
         self.assertEqual([], config_rpm_maker._find_matching_hosts(All(), 'foo/bar', ['berweb01', 'devweb01']))
         self.assertEqual(['berweb01', 'devweb01'], config_rpm_maker._find_matching_hosts(Typ(), 'typ/web', ['berweb01', 'devweb01']))
 
-    def test_affected_hosts(self):
+    def test_should_identify_affected_hosts(self):
         config_rpm_maker = ConfigRpmMaker(None, None)
         self.assertEqual(set(['berweb01', 'devweb01', 'tuvweb02']), config_rpm_maker._get_affected_hosts(['typ/web', 'foo/bar'], ['berweb01', 'devweb01', 'tuvweb02']))
         self.assertEqual(set(['berweb01', 'devweb01', 'tuvweb02']), config_rpm_maker._get_affected_hosts(['foo/bar', 'all'], ['berweb01', 'devweb01', 'tuvweb02']))
@@ -48,7 +48,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertEqual(set(['devweb01']), config_rpm_maker._get_affected_hosts(['foo/bar', 'loctyp/devweb'], ['berweb01', 'devweb01', 'tuvweb02']))
         self.assertEqual(set(['devweb01']), config_rpm_maker._get_affected_hosts(['foo/bar', 'host/devweb01'], ['berweb01', 'devweb01', 'tuvweb02']))
 
-    def test_build_hosts_and_cleanup_work_dir(self):
+    def test_should_build_hosts_and_cleanup_work_dir(self):
         config_rpm_maker = self._given_config_rpm_maker()
         try:
             config_rpm_maker.build()
@@ -58,7 +58,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertFalse(os.path.exists(config_rpm_maker.work_dir))
         self.assertFalse(os.path.exists(config_rpm_maker.error_log_file))
 
-    def test_build_hosts(self):
+    def test_should_build_rpms_for_hosts(self):
 
         os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
         config_rpm_maker = self._given_config_rpm_maker()
@@ -88,7 +88,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             files = host_to_check.get('files', None)
             self.assertRpm(host, rpms, requires=requires, provides=provides, files=files)
 
-    def test_chunked_uploads(self):
+    def test_should_perform_chunked_uploads(self):
         old_config = config.get('rpm_upload_cmd')
         target_file = os.path.abspath(os.path.join(config.get('temp_dir'), 'upload.txt'))
         if os.path.exists(target_file):
@@ -108,6 +108,53 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertTrue(os.path.exists(target_file))
         with open(target_file) as f:
             self.assertEqual(f.read(), '10 a a a a a a a a a a\n10 a a a a a a a a a a\n5 a a a a a\n')
+
+    def test_should_raise_CouldNotBuildSomeRpmsException(self):
+        self.assertRaises(CouldNotBuildSomeRpmsException, ConfigRpmMaker(None, None)._build_hosts, ['devabc123'])
+
+    def test_should_raise_CouldNotUploadRpmsException(self):
+        rpm_upload_command_before_test = config.get(KEY_RPM_UPLOAD_COMMAND)
+        config.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
+
+        self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
+
+        config.set_property(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
+
+    def test_should_move_config_viewer_data_to_destination(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        config_rpm_maker.build()
+
+        self.assert_revision_file_contains_revision('devweb01', '2')
+        self.assert_revision_file_contains_revision('tuvweb01', '2')
+        self.assert_revision_file_contains_revision('berweb01', '2')
+
+    def test_should_only_move_config_viewer_data_to_destination_when_revision_is_higher(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        self.write_revision_file_for_hostname('tuvweb01', revision='3')
+        self.write_revision_file_for_hostname('berweb01', revision='4')
+
+        config_rpm_maker.build()
+
+        self.assert_revision_file_contains_revision('devweb01', revision='2')
+        self.assert_revision_file_contains_revision('tuvweb01', revision='3')
+        self.assert_revision_file_contains_revision('berweb01', revision='4')
+
+    def test_should_move_or_remove_temporary_directories(self):
+
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        self.write_revision_file_for_hostname('tuvweb01', revision='3')
+        self.write_revision_file_for_hostname('berweb01', revision='4')
+
+        config_rpm_maker.build()
+
+        self.assert_path_does_not_exists(build_config_viewer_host_directory('devweb01', revision='2'))
+        self.assert_path_does_not_exists(build_config_viewer_host_directory('tuvweb01', revision='2'))
+        self.assert_path_does_not_exists(build_config_viewer_host_directory('berweb01', revision='2'))
 
     def _given_config_rpm_maker(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
@@ -193,49 +240,3 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         return extract_path
 
-    def test_should_raise_CouldNotBuildSomeRpmsException(self):
-        self.assertRaises(CouldNotBuildSomeRpmsException, ConfigRpmMaker(None, None)._build_hosts, ['devabc123'])
-
-    def test_should_raise_CouldNotUploadRpmsException(self):
-        rpm_upload_command_before_test = config.get(KEY_RPM_UPLOAD_COMMAND)
-        config.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
-
-        self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
-
-        config.set_property(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
-
-    def test_should_move_config_viewer_data_to_destination(self):
-
-        config_rpm_maker = self._given_config_rpm_maker()
-
-        config_rpm_maker.build()
-
-        self.assert_revision_file_contains_revision('devweb01', '2')
-        self.assert_revision_file_contains_revision('tuvweb01', '2')
-        self.assert_revision_file_contains_revision('berweb01', '2')
-
-    def test_should_only_move_config_viewer_data_to_destination_when_revision_is_higher(self):
-
-        config_rpm_maker = self._given_config_rpm_maker()
-
-        self.write_revision_file_for_hostname('tuvweb01', revision='3')
-        self.write_revision_file_for_hostname('berweb01', revision='4')
-
-        config_rpm_maker.build()
-
-        self.assert_revision_file_contains_revision('devweb01', revision='2')
-        self.assert_revision_file_contains_revision('tuvweb01', revision='3')
-        self.assert_revision_file_contains_revision('berweb01', revision='4')
-
-    def test_should_move_or_remove_temporary_directories(self):
-
-        config_rpm_maker = self._given_config_rpm_maker()
-
-        self.write_revision_file_for_hostname('tuvweb01', revision='3')
-        self.write_revision_file_for_hostname('berweb01', revision='4')
-
-        config_rpm_maker.build()
-
-        self.assert_path_does_not_exists(build_config_viewer_host_directory('devweb01', revision='2'))
-        self.assert_path_does_not_exists(build_config_viewer_host_directory('tuvweb01', revision='2'))
-        self.assert_path_does_not_exists(build_config_viewer_host_directory('berweb01', revision='2'))

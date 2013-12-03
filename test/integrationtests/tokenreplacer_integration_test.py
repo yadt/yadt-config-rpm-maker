@@ -76,7 +76,8 @@ class IntegrationTestBase(unittest.TestCase):
             self.assertEquals(contents, actual, failure_message)
 
 
-class TokenReplacerFromDirectoryTest(IntegrationTestBase):
+class TokenReplacerFromDirectoryIntegrationTest(IntegrationTestBase):
+
     def test_should_return_token_replacer_for_existing_directory(self):
         self.create_tmp_file("SPAM", "spam")
         self.create_tmp_file("EGGS", "eggs")
@@ -95,15 +96,16 @@ class TokenReplacerFromDirectoryTest(IntegrationTestBase):
         self.assertEquals({'SPAM': 'spam', 'EGGS': 'eggs'}, token_replacer.token_values)
 
 
-class TokenReplacerFilterFileTest(IntegrationTestBase):
-    def test_ensure_that_file_without_tokens_is_not_modified_when_filter_is_called(self):
+class TokenReplacerFilterFileIntegrationTest(IntegrationTestBase):
+
+    def test_should_ensure_that_file_without_tokens_is_not_modified_when_filter_is_called(self):
         self.create_tmp_file("spam", "eggs")
 
         TokenReplacer().filter_file(self.tmp_file_name("spam"))
 
         self.ensure_file_contents("spam", "eggs")
 
-    def test_ensure_that_file_with_single_token_is_modified_when_filter_is_called(self):
+    def test_should_ensure_that_file_with_single_token_is_modified_when_filter_is_called(self):
         self.create_tmp_file("spam", "@@@spam@@@")
 
         TokenReplacer({"spam": "eggs"}).filter_file(self.tmp_file_name("spam"))
@@ -120,7 +122,7 @@ class TokenReplacerFilterFileTest(IntegrationTestBase):
             self.assertEquals("spam", e.token)
             self.assertTrue(e.file.endswith("spam"))
 
-    def test_ensure_that_binary_file_is_not_modified(self):
+    def test_should_ensure_that_binary_file_is_not_modified(self):
         binary_data = ""
         for num in range(50):
             binary_data += struct.pack("i", num)
@@ -131,12 +133,12 @@ class TokenReplacerFilterFileTest(IntegrationTestBase):
 
         self.ensure_file_contents("bin", binary_data, True)
 
-    def test_filter_throw_exception_for_files_bigger_than_file_size_limit(self):
+    def test_should_filter_throw_exception_for_files_bigger_than_file_size_limit(self):
         big_content = "x" * (200 * 1024)
         self.create_tmp_file("big_content", big_content)
         self.assertRaises(Exception, TokenReplacer().filter_file, self.tmp_file_name("big_content"))
 
-    def test_html_escaping(self):
+    def test_should_escaping_html(self):
         def html_token_replacer(token, replacement):
             filtered_replacement = replacement.rstrip()
             return '<strong title="%s">%s</strong>' % (token, filtered_replacement)
@@ -157,7 +159,8 @@ class TokenReplacerFilterFileTest(IntegrationTestBase):
         self.assertRaises(MissingOrRedundantTokenException, TokenReplacer, token_values={'RPM_REQUIRES': '@@@RPM_REQUIRES@@@'})
 
 
-class TokenReplacerFilterDirectory(IntegrationTestBase):
+class TokenReplacerFilterDirectoryIntegrationTest(IntegrationTestBase):
+
     def test_should_filter_directory(self):
         self.create_tmp_dir("VARIABLES.localhost")
         self.create_tmp_file(("VARIABLES.localhost", "SPAM"), "spam")
