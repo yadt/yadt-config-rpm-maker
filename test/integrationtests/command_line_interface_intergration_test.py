@@ -91,7 +91,7 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
         self.assert_stderr_ends_with('[ERROR] Given repository url "rss://spam/eggs" is invalid.')
 
     def config_rpm_maker(self, *args):
-        process = Popen(['python', 'src/config_rpm_maker'] + list(args),
+        process = Popen(['python', 'src/config_rpm_maker'] + list(args) + ['--debug', '--no-syslog'],
                         stdout=PIPE,
                         stderr=PIPE,
                         env=self.environment)
