@@ -45,6 +45,7 @@ from config_rpm_maker.config import (ConfigException,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
+                                     get,
                                      load_configuration_file,
                                      set_property,
                                      set_properties,
@@ -578,6 +579,40 @@ class LoadConfigurationFileTests(TestCase):
         load_configuration_file()
 
         mock_set_properties.assert_called_with(fake_valid_properties)
+
+
+class GetPropertyTests(TestCase):
+
+    @patch('config_rpm_maker.config.get_properties')
+    @patch('config_rpm_maker.config.load_configuration_file')
+    def test_should_load_configuration_file_when_no_properties_available(self, mock_load_configuration_file, mock_properties):
+
+        mock_properties.return_value = None
+
+        def mock_set_properties():
+            mock_properties.return_value = {KEY_MAX_FILE_SIZE: 12345}
+
+        mock_load_configuration_file.side_effect = mock_set_properties
+
+        get(KEY_MAX_FILE_SIZE)
+
+        mock_load_configuration_file.assert_called_with()
+
+    @patch('config_rpm_maker.config.get_properties')
+    def test_should_load_configuration_file_when_no_properties_available(self, mock_properties):
+
+        mock_properties.return_value = {}
+
+        self.assertRaises(ConfigException, get, KEY_MAX_FILE_SIZE)
+
+    @patch('config_rpm_maker.config.get_properties')
+    def test_should_return_value_of_property_when_in_properties(self, mock_properties):
+
+        mock_properties.return_value = {KEY_MAX_FILE_SIZE: 28374}
+
+        actual = get(KEY_MAX_FILE_SIZE)
+
+        self.assertEqual(28374, actual)
 
 
 class SetValueTests(TestCase):

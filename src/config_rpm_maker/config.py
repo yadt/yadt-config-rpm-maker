@@ -109,16 +109,19 @@ def load_configuration_file():
 
 def get(name):
     """ Get the configuration property """
-    if not _properties:
+
+    if not get_properties():
         try:
             load_configuration_file()
         except Exception as e:
             raise e
 
-    if name not in _properties:
+    properties = get_properties()
+
+    if name not in properties:
         raise ConfigException('Requested unknown configuration property "%s"' % name)
 
-    return _properties[name]
+    return properties[name]
 
 
 def build_config_viewer_host_directory(hostname, revision=False):
