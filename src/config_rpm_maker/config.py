@@ -233,7 +233,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_CUSTOM_DNS_SEARCHLIST: _ensure_is_a_list_of_strings(KEY_CUSTOM_DNS_SEARCHLIST, custom_dns_searchlist),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
-        KEY_MAX_FILE_SIZE: raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_FILE_SIZE_MAXIMUM)
+        KEY_MAX_FILE_SIZE: raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_FILE_SIZE_MAXIMUM),
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
         KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_valid_or_none(repo_packages_regex),
         KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
