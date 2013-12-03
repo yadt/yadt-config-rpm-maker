@@ -47,6 +47,11 @@ class IntegrationTest(unittest.TestCase):
 
         self.create_svn_repo()
 
+    def tearDown(self):
+
+        if exists(self.temporary_directory):
+            rmtree(self.temporary_directory)
+
     def create_svn_repo(self):
         self._create_repository_directory()
 
