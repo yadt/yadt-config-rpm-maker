@@ -44,6 +44,7 @@ from config_rpm_maker.config import (DEFAULT_CONFIGURATION_FILE_PATH,
                                      _ensure_is_a_boolean_value,
                                      _ensure_is_an_integer,
                                      _ensure_is_a_string,
+                                     _ensure_is_a_string_or_none,
                                      _ensure_repo_packages_regex_is_valid_or_none,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
@@ -364,13 +365,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(10, actual_properties[KEY_RPM_UPLOAD_CHUNK_SIZE])
 
-    def test_should_return_rpm_upload_command_regex(self):
+    @patch('config_rpm_maker.config._ensure_is_a_string_or_none')
+    def test_should_return_rpm_upload_command_regex(self, mock_ensure_is_a_string_or_none):
 
+        mock_ensure_is_a_string_or_none.return_value = 'a valid upload command'
         properties = {'rpm_upload_cmd': '/usr/bin/rm'}
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/usr/bin/rm', actual_properties[KEY_RPM_UPLOAD_COMMAND])
+        self.assertEqual('a valid upload command', actual_properties[KEY_RPM_UPLOAD_COMMAND])
+        mock_ensure_is_a_string_or_none.assert_any_call(KEY_RPM_UPLOAD_COMMAND, '/usr/bin/rm')
 
     def test_should_return_default_for_rpm_upload_command_if_not_defined(self):
 
@@ -696,3 +700,22 @@ class EnsureRepoPackageRegexIsValidOrNone(TestCase):
         actual = _ensure_repo_packages_regex_is_valid_or_none(".*")
 
         self.assertEqual(".*", actual)
+
+
+class EnsureRpmUploadCommandIsAStringOrNone(TestCase):
+
+    def test_should_raise_exception_when_given_value_is_not_a_string(self):
+
+        self.assertRaises(ConfigException, _ensure_is_a_string_or_none, 'key', 123)
+
+    def test_should_return_none_when_none_is_given(self):
+
+        actual = _ensure_is_a_string_or_none('key', None)
+
+        self.assertEqual(None, actual)
+
+    def test_should_return_given_string(self):
+
+        actual = _ensure_is_a_string_or_none('key', 'foo-spam')
+
+        self.assertEqual('foo-spam', actual)

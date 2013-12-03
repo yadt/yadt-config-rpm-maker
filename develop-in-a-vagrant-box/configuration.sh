@@ -21,7 +21,7 @@ set -e
 readonly WORKING_DIRECTORY="/home/vagrant"
 
 # Please modify this if you would like to clone your own fork.
-readonly SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
+readonly SOURCE_REPOSITORY="https://github.com/aelgru/yadt-config-rpm-maker"
 readonly SOURCE_DIRECTORY="${WORKING_DIRECTORY}/yadt-config-rpm-maker"
 
 readonly SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
