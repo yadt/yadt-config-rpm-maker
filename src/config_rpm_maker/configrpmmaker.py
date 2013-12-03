@@ -29,8 +29,7 @@ from Queue import Queue
 from shutil import rmtree, move
 from threading import Thread
 
-from config_rpm_maker.config import (DEFAULT_THREAD_COUNT,
-                                     ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
+from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
                                      KEY_ERROR_LOG_URL,
                                      KEY_RPM_UPLOAD_COMMAND,
                                      KEY_RPM_UPLOAD_CHUNK_SIZE,

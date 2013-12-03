@@ -599,7 +599,7 @@ class GetPropertyTests(TestCase):
         mock_load_configuration_file.assert_called_with()
 
     @patch('config_rpm_maker.config.get_properties')
-    def test_should_load_configuration_file_when_no_properties_available(self, mock_properties):
+    def test_should_raise_exception_when_property_key_not_in_properties(self, mock_properties):
 
         mock_properties.return_value = {}
 

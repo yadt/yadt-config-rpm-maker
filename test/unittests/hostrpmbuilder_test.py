@@ -23,7 +23,7 @@ from mock import Mock, patch
 
 import config_rpm_maker
 
-from config_rpm_maker.config import DEFAULT_CONFIG_VIEWER_ONLY, KEY_CONFIG_VIEWER_ONLY
+from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY
 from config_rpm_maker.hostrpmbuilder import ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 
