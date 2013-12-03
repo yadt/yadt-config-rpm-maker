@@ -20,10 +20,10 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 | config_rpm_prefix       | yadt-config-     | A prefix which will be prepended to the configuration rpms file names.
 | config_viewer_hosts_dir | /tmp             | The directory where to put the config_viewer data.
 | custom_dns_searchlist   | []               | Helps to resolve the hosts. If your organisation has hosts in "*.datacenter.intern" and in "*.organisation.intern" you can set this to ['datacenter.intern', 'organisation.intern']
-| error_log_dir           | ""               | The directory from where your config viewer will serve the error files.
-| error_log_url           | ""               | The url under which the config viewer will be accessible.
+| error_log_dir           |                  | The directory from where your config viewer will serve the error files.
+| error_log_url           |                  | The url under which the config viewer will be accessible.
 | path_to_spec_file       | default.spec     | The path within the configuration subversion repository where to find the template spec file for your configuration rpms.
-| repo_packages_regex     | ^yadt-.*-repos?$ | This filter will be applied when writing the dependencies into the rpm.
+| repo_packages_regex     | '.*-repo.*'      | This filter will be applied when writing the dependencies into the rpm.
 | rpm_upload_chunk_size   | 10               | Building the configuration rpms will happen in chunks. The number you specify here will define how many rpms will be built at the same time.
 | rpm_upload_cmd          |                  | The command which will be used to upload the rpms. The command will get the list rpms to build as arguments. How many rpms will be given is defined via 'rpm_upload_chunk_size'. If this is not defined no command will be executed.
 | svn_path_to_config      | /config          | The path within the configuration subversion repository where to find the configuration directory structure.
