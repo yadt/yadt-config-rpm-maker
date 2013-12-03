@@ -164,6 +164,7 @@ Authors
 * [Schlomo Schapiro](https://github.com/schlomo)
 * [Ingmar Krusch](https://github.com/ingmarkrusch)
 * [Maximillien Riehl](https://github.com/mriehl)
+* [Oliver Schmitz-Hennemann](https://github.com/oli99sc)
 * [Michael Gruber](https://github.com/aelgru)
 * [Hasan Hosgel](https://github.com/alosdev)
 * Konrad Hosemann
