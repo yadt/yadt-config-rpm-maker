@@ -72,6 +72,7 @@ KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
 KEY_SVN_PATH_TO_CONFIGURATION = 'svn_path_to_config'
 KEY_THREAD_COUNT = 'thread_count'
 KEY_TEMP_DIR = 'temp_dir'
+KEY_MAX_FILE_SIZE = 'max_file_size'
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
@@ -224,7 +225,8 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_RPM_UPLOAD_COMMAND: raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND),
         KEY_SVN_PATH_TO_CONFIG: raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG),
         KEY_THREAD_COUNT: raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT),
-        KEY_TEMP_DIR: raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
+        KEY_TEMP_DIR: raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR),
+        KEY_MAX_FILE_SIZE: raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_FILE_SIZE_MAXIMUM)
     }
 
     return valid_properties
