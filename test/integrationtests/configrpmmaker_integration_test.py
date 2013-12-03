@@ -239,4 +239,3 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             raise IntegrationTestException(message)
 
         return extract_path
-

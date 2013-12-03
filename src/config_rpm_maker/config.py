@@ -193,8 +193,8 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
             properties = yaml.load(configuration_file)
             _set_file_path_of_loaded_configuration(configuration_file_path)
             return properties
-    except Exception as e:
 
+    except Exception as e:
         error_message = 'Could not load configuration file "%s".\nCurrent working directory is "%s"\nError: %s' % (configuration_file_path, getcwd(), str(e))
         raise ConfigException(error_message)
 
@@ -248,7 +248,6 @@ def _ensure_properties_are_valid(raw_properties):
 
     if len(difference) > 0:
         raise ConfigException('Unknown configuration parameter(s) found: %s' % ', '.join(difference))
-
 
     return valid_properties
 
