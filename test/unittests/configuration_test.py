@@ -343,7 +343,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(None, actual_properties[KEY_REPO_PACKAGES_REGEX])
+        self.assertEqual(".*-repo.*", actual_properties[KEY_REPO_PACKAGES_REGEX])
 
     @patch('config_rpm_maker.config._ensure_is_an_integer')
     def test_should_return_rpm_upload_chunk_size(self, mock_ensure_is_an_integer):
