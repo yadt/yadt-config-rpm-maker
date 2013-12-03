@@ -266,10 +266,11 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = process.communicate()
                 if process.returncode:
-                    error_message = """Rpm upload failed. Executed command "%s"
-stdout: "%s"
-stderr: "%s"
-return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
+                    error_message = 'Rpm upload failed with exit code %s. Executed command "%s"\n' % (process.returncode, cmd)
+                    if stdout:
+                        error_message += 'stdout: "%s"\n' % stdout.strip()
+                    if stderr:
+                        error_message += 'stderr: "%s"\n' % stderr.strip()
                     raise CouldNotUploadRpmsException(error_message)
                 pos += chunk_size
         else:
