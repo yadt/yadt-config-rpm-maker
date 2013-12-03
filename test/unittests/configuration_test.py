@@ -187,7 +187,7 @@ class EnsurePropertiesAreValidTest(TestCase):
     @patch('config_rpm_maker.config.LOGGER')
     def test_should_pass_through_if_some_configuration_properties_are_given(self, mock_logger):
 
-        _ensure_properties_are_valid({'foo': 'bar'})
+        _ensure_properties_are_valid({'allow_unknown_hosts': True})
 
     @patch('config_rpm_maker.config._ensure_valid_log_level')
     def test_should_return_log_level_valid_properties(self, mock_ensure_valid_log_level):
@@ -463,6 +463,12 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual('/tmp', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
+
+    def test_should_raise_exception_when_raw_properties_contain_unknown_key_name(self):
+
+        properties = {'foo_spam': '/usr/bin/tralala'}
+
+        self.assertRaises(ConfigException, _ensure_properties_are_valid, properties)
 
 
 class LoadConfigurationFileTests(TestCase):
