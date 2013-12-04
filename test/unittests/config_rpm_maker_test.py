@@ -24,6 +24,7 @@ from config_rpm_maker import (main,
                               start_building_configuration_rpms,
                               initialize_logging_to_console,
                               initialize_configuration,
+                              initialize_logging_to_syslog,
                               extract_repository_url_and_revision_from_arguments)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
@@ -223,3 +224,30 @@ class ExtractRepositoryUrlAndRevisionFromArgumentsTests(TestCase):
 
         mock_ensure_valid_revision.assert_called_with('123')
         self.assertEqual('valid revision', actual_revision)
+
+
+class InitializeLoggingToSysLogTests(TestCase):
+
+    @patch('config_rpm_maker.LOGGER')
+    @patch('config_rpm_maker.create_sys_log_handler')
+    def test_should_initialize_sys_log_handler_with_given_revision_when_optin_not_given(self, mock_create_sys_log_handler, mock_logger):
+
+        mock_handler = Mock()
+        mock_create_sys_log_handler.return_value = mock_handler
+
+        initialize_logging_to_syslog({'--no-syslog': False}, '23784')
+
+        mock_create_sys_log_handler.assert_called_with('23784')
+        mock_logger.addHandler.assert_called_with(mock_handler)
+
+    @patch('config_rpm_maker.LOGGER')
+    @patch('config_rpm_maker.create_sys_log_handler')
+    def test_should_not_initialize_sys_log_handler_when_optin_is_given(self, mock_create_sys_log_handler, mock_logger):
+
+        mock_handler = Mock()
+        mock_create_sys_log_handler.return_value = mock_handler
+
+        initialize_logging_to_syslog({'--no-syslog': True}, '23784')
+
+        self.assertEqual(0, mock_create_sys_log_handler.call_count)
+        self.assertEqual(0, mock_logger.addHandler.call_count)
