@@ -34,7 +34,7 @@ DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
 DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 DEFAULT_ERROR_LOG_URL = ''
 DEFAULT_ERROR_LOG_DIRECTORY = ""
-DEFAULT_FILE_SIZE_MAXIMUM = 100 * 1024
+DEFAULT_MAX_FILE_SIZE = 100 * 1024
 DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = 'DEBUG'
@@ -217,7 +217,7 @@ def _ensure_properties_are_valid(raw_properties):
     error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY)
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
-    max_file_size = raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_FILE_SIZE_MAXIMUM)
+    max_file_size = raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_MAX_FILE_SIZE)
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
     repo_packages_regex = raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX)
     rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE)
