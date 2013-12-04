@@ -306,7 +306,7 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string which is a valid regex.'
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
                               % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
 
     try:
