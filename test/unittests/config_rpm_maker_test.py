@@ -20,7 +20,11 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from config_rpm_maker import main, start_building_configuration_rpms, initialize_logging_to_console, initialize_configuration
+from config_rpm_maker import (main,
+                              start_building_configuration_rpms,
+                              initialize_logging_to_console,
+                              initialize_configuration,
+                              extract_repository_url_and_revision_from_arguments)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
 
@@ -194,3 +198,28 @@ class InitializeConfigurationTest(TestCase):
         initialize_configuration(mock_arguments)
 
         mock_apply_arguments_to_config.assert_called_with(mock_arguments)
+
+
+class ExtractRepositoryUrlAndRevisionFromArgumentsTests(TestCase):
+
+    @patch('config_rpm_maker.ensure_valid_repository_url')
+    @patch('config_rpm_maker.ensure_valid_revision')
+    def test_should_ensure_repository_url_is_valid_before_returning_it(self, mock_ensure_valid_revision, mock_ensure_valid_repository_url):
+
+        mock_ensure_valid_repository_url.return_value = 'valid repository URL'
+
+        actual_repository_url, _ = extract_repository_url_and_revision_from_arguments({'<repository-url>': 'given repository URL', '<revision>': '123'})
+
+        mock_ensure_valid_repository_url.assert_called_with('given repository URL')
+        self.assertEqual('valid repository URL', actual_repository_url)
+
+    @patch('config_rpm_maker.ensure_valid_repository_url')
+    @patch('config_rpm_maker.ensure_valid_revision')
+    def test_should_ensure_revision_is_valid_before_returning_it(self, mock_ensure_valid_revision, mock_ensure_valid_repository_url):
+
+        mock_ensure_valid_revision.return_value = 'valid revision'
+
+        _, actual_revision = extract_repository_url_and_revision_from_arguments({'<repository-url>': 'given repository URL', '<revision>': '123'})
+
+        mock_ensure_valid_revision.assert_called_with('123')
+        self.assertEqual('valid revision', actual_revision)
