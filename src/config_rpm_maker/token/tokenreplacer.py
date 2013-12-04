@@ -24,7 +24,7 @@ from os.path import getsize
 import config_rpm_maker.magic
 
 from config_rpm_maker import config
-from config_rpm_maker.config import DEFAULT_FILE_SIZE_MAXIMUM
+from config_rpm_maker.config import KEY_MAX_FILE_SIZE
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
@@ -77,7 +77,7 @@ class FileLimitExceededException(BaseConfigRpmMakerException):
         self.size_limit = size_limit
 
     def __str__(self):
-        return "The file '%s' (%d bytes) is bigger than the allowed file size %d bytes." % (self.path, os.path.getsize(self.path), self.size_limit)
+        return 'The file "%s" (%d bytes) is bigger than the allowed file size %d bytes.' % (self.path, getsize(self.path), self.size_limit)
 
 
 class TokenReplacer(object):
@@ -187,11 +187,10 @@ class TokenReplacer(object):
 
     def filter_file(self, filename, html_escape=False):
         try:
-            self.file_size_limit = config.get('max_file_size', DEFAULT_FILE_SIZE_MAXIMUM)
+            self.file_size_limit = config.get(KEY_MAX_FILE_SIZE)
 
-            file_size = getsize(filename)
-            if file_size > self.file_size_limit:
-                raise Exception("FileTooFatException : %s\n\t(size is %s bytes, limit is %s bytes)" % (os.path.basename(filename), file_size, self.file_size_limit))
+            if getsize(filename) > self.file_size_limit:
+                raise FileLimitExceededException(filename, self.file_size_limit)
 
             file_content = self._read_content_from_file(filename)
 

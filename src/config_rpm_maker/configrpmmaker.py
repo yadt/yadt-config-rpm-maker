@@ -29,12 +29,11 @@ from Queue import Queue
 from shutil import rmtree, move
 from threading import Thread
 
-from config_rpm_maker.config import (DEFAULT_ERROR_LOG_URL,
-                                     DEFAULT_THREAD_COUNT,
-                                     DEFAULT_UPLOAD_CHUNK_SIZE,
-                                     ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
-                                     KEY_THREAD_COUNT,
+from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
+                                     KEY_ERROR_LOG_URL,
                                      KEY_RPM_UPLOAD_COMMAND,
+                                     KEY_RPM_UPLOAD_CHUNK_SIZE,
+                                     KEY_THREAD_COUNT,
                                      KEY_TEMPORARY_DIRECTORY,
                                      build_config_viewer_host_directory)
 
@@ -121,7 +120,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self.work_dir = None
 
     def __build_error_msg_and_move_to_public_access(self, revision):
-        err_url = config.get('error_log_url', DEFAULT_ERROR_LOG_URL)
+        err_url = config.get(KEY_ERROR_LOG_URL)
         error_msg = self.ERROR_MSG % (err_url, revision)
         for line in error_msg.split('\n'):
             LOGGER.error(line)
@@ -266,10 +265,11 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = process.communicate()
                 if process.returncode:
-                    error_message = """Rpm upload failed. Executed command "%s"
-stdout: "%s"
-stderr: "%s"
-return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
+                    error_message = 'Rpm upload failed with exit code %s. Executed command "%s"\n' % (process.returncode, cmd)
+                    if stdout:
+                        error_message += 'stdout: "%s"\n' % stdout.strip()
+                    if stderr:
+                        error_message += 'stderr: "%s"\n' % stderr.strip()
                     raise CouldNotUploadRpmsException(error_message)
                 pos += chunk_size
         else:
@@ -294,7 +294,7 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
         return result
 
     def _get_thread_count(self, affected_hosts):
-        thread_count = int(config.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT))
+        thread_count = int(config.get(KEY_THREAD_COUNT))
         if thread_count < 0:
             raise ConfigurationException('%s is %s, values <0 are not allowed)' % (KEY_THREAD_COUNT, thread_count))
 
@@ -348,7 +348,7 @@ return code: %d""" % (cmd, stdout.strip(), stderr.strip(), process.returncode)
                 os.makedirs(path)
 
     def _get_chunk_size(self, rpms):
-        chunk_size_raw = config.get('rpm_upload_chunk_size', DEFAULT_UPLOAD_CHUNK_SIZE)
+        chunk_size_raw = config.get(KEY_RPM_UPLOAD_CHUNK_SIZE)
         try:
             chunk_size = int(chunk_size_raw)
         except ValueError:

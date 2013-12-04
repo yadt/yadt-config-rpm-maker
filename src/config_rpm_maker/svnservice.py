@@ -88,6 +88,7 @@ class SvnService(object):
         normalized_length = len(os.path.normpath(target_dir) + os.sep)
         normalized_paths = [file_path[normalized_length:] for file_path in self.exported_files]
         normalized_paths = filter(lambda path: path != '', normalized_paths)
+
         return [(svn_path, path) for path in normalized_paths]
 
     @measure_execution_time

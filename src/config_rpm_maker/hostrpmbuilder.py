@@ -25,7 +25,7 @@ from os import mkdir
 from os.path import exists
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -107,7 +107,7 @@ class HostRpmBuilder(object):
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
-        repo_packages_regex = config.get('repo_packages_regex')
+        repo_packages_regex = config.get(KEY_REPO_PACKAGES_REGEX)
         if repo_packages_regex:
             self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)
             self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'), filter_regex=repo_packages_regex, positive_filter=False)
@@ -132,7 +132,7 @@ class HostRpmBuilder(object):
 
         self._filter_tokens_in_rpm_sources()
 
-        if not config.get(config.KEY_CONFIG_VIEWER_ONLY, config.DEFAULT_CONFIG_VIEWER_ONLY):
+        if not config.get(config.KEY_CONFIG_VIEWER_ONLY):
             self._build_rpm_using_rpmbuild()
 
         LOGGER.debug('%s: writing configviewer data for host "%s"', self.thread_name, self.hostname)

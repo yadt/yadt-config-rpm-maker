@@ -20,8 +20,8 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 | config_rpm_prefix       | yadt-config-     | A prefix which will be prepended to the configuration rpms file names.
 | config_viewer_hosts_dir | /tmp             | The directory where to put the config_viewer data.
 | custom_dns_searchlist   | []               | Helps to resolve the hosts. If your organisation has hosts in "*.datacenter.intern" and in "*.organisation.intern" you can set this to ['datacenter.intern', 'organisation.intern']
-| error_log_dir           | ""               | The directory from where your config viewer will serve the error files.
-| error_log_url           | ""               | The url under which the config viewer will be accessible.
+| error_log_dir           |                  | The directory from where your config viewer will serve the error files.
+| error_log_url           |                  | The url under which the config viewer will be accessible.
 | path_to_spec_file       | default.spec     | The path within the configuration subversion repository where to find the template spec file for your configuration rpms.
 | max_file_size           | 1024 * 100       | Maximum size of files allowed in config RPMs. This limit may prevent people from putting code or data into the config.
 | repo_packages_regex     | ^yadt-.*-repos?$ | This filter will be applied when writing the dependencies into the rpm.

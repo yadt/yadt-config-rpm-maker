@@ -21,7 +21,7 @@ import unittest
 from mock import Mock, patch
 
 from config_rpm_maker.token.cycle import ContainsCyclesException
-from config_rpm_maker.token.tokenreplacer import MissingTokenException, TokenReplacer
+from config_rpm_maker.token.tokenreplacer import CannotFilterFileException, MissingTokenException, TokenReplacer
 
 
 class TokenReplacerTest(unittest.TestCase):
@@ -84,3 +84,14 @@ class TokenReplacerTest(unittest.TestCase):
         TokenReplacer.filter_file(mock_token_replacer, "binary.file")
 
         self.assertEqual(0, mock_token_replacer._perform_filtering_on_file.call_count)
+
+    @patch('config_rpm_maker.token.tokenreplacer.config')
+    @patch('config_rpm_maker.token.tokenreplacer.getsize')
+    def test_raise_exeception_when_file_limit_exceeded(self, mock_get_size, mock_config):
+
+        mock_get_size.return_value = 4000
+        mock_config.get.return_value = 2000
+
+        mock_token_replacer = Mock(TokenReplacer)
+
+        self.assertRaises(CannotFilterFileException, TokenReplacer.filter_file, mock_token_replacer, "binary.file")

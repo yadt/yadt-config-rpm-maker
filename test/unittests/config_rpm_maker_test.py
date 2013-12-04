@@ -20,7 +20,12 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from config_rpm_maker import main, start_building_configuration_rpms
+from config_rpm_maker import (main,
+                              start_building_configuration_rpms,
+                              initialize_logging_to_console,
+                              initialize_configuration,
+                              initialize_logging_to_syslog,
+                              extract_repository_url_and_revision_from_arguments)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
 
@@ -155,3 +160,94 @@ class BuildConfigurationRpmsTests(TestCase):
         start_building_configuration_rpms('file:///path_to/testdata/repository', 1980)
 
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision=1980)
+
+
+class InitializeLoggingToConsoleTests(TestCase):
+
+    @patch('config_rpm_maker.LOGGER')
+    @patch('config_rpm_maker.append_console_logger')
+    @patch('config_rpm_maker.determine_console_log_level')
+    def test_should_determine_log_level_using_arguments_and_append_handler_to_root_logger(self, mock_determine_console_log_level, mock_append_console_logger, mock_root_logger):
+
+        mock_arguments = Mock()
+        mock_determine_console_log_level.return_value = 'log-level'
+
+        initialize_logging_to_console(mock_arguments)
+
+        mock_determine_console_log_level.assert_called_with(mock_arguments)
+        mock_append_console_logger.assert_called_with(mock_root_logger, 'log-level')
+
+
+class InitializeConfigurationTest(TestCase):
+
+    @patch('config_rpm_maker.apply_arguments_to_config')
+    @patch('config_rpm_maker.config')
+    def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config):
+
+        mock_arguments = Mock()
+
+        initialize_configuration(mock_arguments)
+
+        mock_config.load_configuration_file.assert_called_with()
+
+    @patch('config_rpm_maker.apply_arguments_to_config')
+    @patch('config_rpm_maker.config')
+    def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config):
+
+        mock_arguments = Mock()
+
+        initialize_configuration(mock_arguments)
+
+        mock_apply_arguments_to_config.assert_called_with(mock_arguments)
+
+
+class ExtractRepositoryUrlAndRevisionFromArgumentsTests(TestCase):
+
+    @patch('config_rpm_maker.ensure_valid_repository_url')
+    @patch('config_rpm_maker.ensure_valid_revision')
+    def test_should_ensure_repository_url_is_valid_before_returning_it(self, mock_ensure_valid_revision, mock_ensure_valid_repository_url):
+
+        mock_ensure_valid_repository_url.return_value = 'valid repository URL'
+
+        actual_repository_url, _ = extract_repository_url_and_revision_from_arguments({'<repository-url>': 'given repository URL', '<revision>': '123'})
+
+        mock_ensure_valid_repository_url.assert_called_with('given repository URL')
+        self.assertEqual('valid repository URL', actual_repository_url)
+
+    @patch('config_rpm_maker.ensure_valid_repository_url')
+    @patch('config_rpm_maker.ensure_valid_revision')
+    def test_should_ensure_revision_is_valid_before_returning_it(self, mock_ensure_valid_revision, mock_ensure_valid_repository_url):
+
+        mock_ensure_valid_revision.return_value = 'valid revision'
+
+        _, actual_revision = extract_repository_url_and_revision_from_arguments({'<repository-url>': 'given repository URL', '<revision>': '123'})
+
+        mock_ensure_valid_revision.assert_called_with('123')
+        self.assertEqual('valid revision', actual_revision)
+
+
+class InitializeLoggingToSysLogTests(TestCase):
+
+    @patch('config_rpm_maker.LOGGER')
+    @patch('config_rpm_maker.create_sys_log_handler')
+    def test_should_initialize_sys_log_handler_with_given_revision_when_optin_not_given(self, mock_create_sys_log_handler, mock_logger):
+
+        mock_handler = Mock()
+        mock_create_sys_log_handler.return_value = mock_handler
+
+        initialize_logging_to_syslog({'--no-syslog': False}, '23784')
+
+        mock_create_sys_log_handler.assert_called_with('23784')
+        mock_logger.addHandler.assert_called_with(mock_handler)
+
+    @patch('config_rpm_maker.LOGGER')
+    @patch('config_rpm_maker.create_sys_log_handler')
+    def test_should_not_initialize_sys_log_handler_when_optin_is_given(self, mock_create_sys_log_handler, mock_logger):
+
+        mock_handler = Mock()
+        mock_create_sys_log_handler.return_value = mock_handler
+
+        initialize_logging_to_syslog({'--no-syslog': True}, '23784')
+
+        self.assertEqual(0, mock_create_sys_log_handler.call_count)
+        self.assertEqual(0, mock_logger.addHandler.call_count)

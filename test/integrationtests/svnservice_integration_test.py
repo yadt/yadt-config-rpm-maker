@@ -21,25 +21,37 @@ from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.svnservice import SvnServiceException, SvnService
 
 
-class SvnServiceTest(IntegrationTest):
+class SvnServiceIntegrationTest(IntegrationTest):
 
-    def test_get_change_set(self):
+    def test_should_return_changed_paths(self):
+
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+
         self.assertEqual(['typ/web/data/index.html'], service.get_change_set(2))
 
-    def test_get_hosts(self):
+    def test_should_return_by_change_set_affected_hosts(self):
+
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+
         self.assertEqual(['berweb01', 'devweb01', 'tuvweb01'], service.get_hosts(2))
 
-    def test_export(self):
-        service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
-        self.assertEqual([('host/berweb01', 'VARIABLES'), ('host/berweb01', 'VARIABLES/RPM_REQUIRES')], service.export('host/berweb01', 'target/tmp/test', 2))
+    def test_should_return_tuples_of_svn_path_and_the_affected_file(self):
 
-    def test_log(self):
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+
+        self.assertEqual([('host/berweb01', 'VARIABLES'), ('host/berweb01', 'VARIABLES/RPM_REQUIRES')],
+                         service.export('host/berweb01', 'target/tmp/test', 2))
+
+    def test_should_return_exactly_one_svn_log(self):
+
+        service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+
         logs = service.log('', 2, 5)
+
         self.assertEqual(1, len(logs))
 
-    def test_should_raise_SvnServiceException(self):
+    def test_should_raise_SvnServiceException_when_invalid_revision_is_given(self):
+
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+
         self.assertRaises(SvnServiceException, service.get_change_set, 13)

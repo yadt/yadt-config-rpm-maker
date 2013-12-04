@@ -19,7 +19,7 @@ import unittest
 from config_rpm_maker.hostresolver import HostResolver
 
 
-class HostResolverTest(unittest.TestCase):
+class HostResolverIntegrationTest(unittest.TestCase):
 
     def test_should_resolve_localhost(self):
 

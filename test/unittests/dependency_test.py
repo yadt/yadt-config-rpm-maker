@@ -21,6 +21,7 @@ from config_rpm_maker.dependency import Dependency
 
 
 class DependencyTest(TestCase):
+
     def setUp(self):
         self.identicalDependAsString = "a=1, b >2, a> 3 c = 4 a< 5"
         self.identicaldependAsList = ["a=1", "b >2", "a> 3", "c = 4", "a< 5"]
@@ -34,7 +35,7 @@ class DependencyTest(TestCase):
 
                         """
 
-    def test_filter_for_repos(self):
+    def test_should_filter_for_repos(self):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
         dep = Dependency(False, "^yadt-.*-repo$")
         dep.add(rawDependency)
@@ -44,7 +45,7 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("yadt-foo"), 0, msg="Filter don't work. Found yadt-foo <" + result + ">")
         self.assertEqual(result.count("yadt-bla"), 0, msg="Filter don't work. Found yadt-bla <" + result + ">")
 
-    def test_negative_filter_for_repos(self):
+    def test_should_negative_filter_for_repos(self):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
         dep = Dependency(False, "^yadt-.*-repo$", False)
         dep.add(rawDependency)
@@ -54,7 +55,7 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("yadt-foo"), 1, msg="Filter don't work. Not found yadt-foo <" + result + ">")
         self.assertEqual(result.count("yadt-bla"), 1, msg="Filter don't work. Not found yadt-bla <" + result + ">")
 
-    def test_multipleCompletlyEqualDependenciesGetAlwaysCollapsed(self):
+    def test_should_multiple_completly_equal_dependencies_get_always_collapsed(self):
         rawDependency = "httpd httpd httpd a b httpd"
         dep = Dependency(False)
         dep.add(rawDependency)
@@ -63,7 +64,7 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 1, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
-    def test_multipleCompletlyEqualDependenciesGetAlwaysCollapsedButDifferingVersionSpecCountAsNotEqual(self):
+    def test_should_multiple_completly_equal_dependencies_get_always_collapsed_but_differing_version_spec_count_as_not_equal(self):
         rawDependency = "httpd httpd httpd a b httpd a httpd > 4"
         dep = Dependency(False)
         dep.add(rawDependency)
@@ -72,43 +73,43 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 2, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
-    def test_readDependencyWithSnapshotAsVersionMixedWithDigitsOnlyCollapse(self):
+    def test_should_read_dependency_with_snapshot_as_version_mixed_with_digits_only_collapse(self):
         rawDependency = "a= 12 dummy-snapshot = 1.30-SNAPSHOT20100819155634 a = 13"
         dep = Dependency(True)
         dep.add(rawDependency)
         result = repr(dep)
         self.assertEquals("a = 13, dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
-    def test_readDependencyWithSnapshotAsVersion(self):
+    def test_should_read_dependency_with_snapshot_as_version(self):
         rawDependency = """dummy-snapshot = 1.30-SNAPSHOT20100819155634"""
         dep = Dependency(True)
         dep.add(rawDependency)
         result = repr(dep)
         self.assertEqual("dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
-    def test_readDependenciesFromArgsNotCollapsedAndList(self):
+    def test_should_read_dependencies_from_args_not_collapsed_and_list(self):
         resultString = self.__readDependencies(self.identicalDependAsString, False)
         resultList = self.__readDependencies(self.identicaldependAsList, False)
         self.assertEqual(resultString, resultList)
 
-    def test_readDependenciesCollapsedFromArgsAndList(self):
+    def test_should_read_dependencies_collapsed_from_args_and_list(self):
         resultString = self.__readDependencies(self.identicalDependAsString, True)
         resultList = self.__readDependencies(self.identicaldependAsList, True)
         self.assertEqual(resultString, resultList)
 
-    def test_readDependenciesNotCollapsedFromArgs(self):
+    def test_should_read_dependencies_not_collapsed_from_args(self):
         resultString = self.__readDependencies(self.identicalDependAsString, False)
         self.__checkDependenciesAreCorrectAndNotCollapsed(resultString)
 
-    def test_readDependenciesCollapsedFromArgs(self):
+    def test_should_read_dependencies_collapsed_from_args(self):
         resultString = self.__readDependencies(self.identicalDependAsString, True)
         self.__checkDependenciesAreCorrectAndCollapsed(resultString)
 
-    def test_readDependenciesCollapsedFromWiredArgs(self):
+    def test_should_read_dependencies_collapsed_from_wired_args(self):
         resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, True)
         self.__checkDependenciesAreCorrectAndCollapsed(resultWired)
 
-    def test_readDependenciesNotCollapsedFromWiredArgs(self):
+    def test_should_read_dependencies_not_collapsed_from_wired_args(self):
         resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, False)
         self.__checkDependenciesAreCorrectAndNotCollapsed(resultWired)
 

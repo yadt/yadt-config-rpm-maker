@@ -19,12 +19,12 @@ import subprocess
 import unittest
 
 from Queue import Queue
-from os import makedirs
+from os import environ, makedirs
 from os.path import abspath, exists, join
 from shutil import rmtree
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
+from config_rpm_maker.config import ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
 from config_rpm_maker.svnservice import SvnService
 
 
@@ -35,6 +35,9 @@ class IntegrationTestException(Exception):
 class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        if ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in environ:
+            del environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
+
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
 
         if exists(temporary_directory):
@@ -43,6 +46,11 @@ class IntegrationTest(unittest.TestCase):
         self.temporary_directory = temporary_directory
 
         self.create_svn_repo()
+
+    def tearDown(self):
+
+        if exists(self.temporary_directory):
+            rmtree(self.temporary_directory)
 
     def create_svn_repo(self):
         self._create_repository_directory()
