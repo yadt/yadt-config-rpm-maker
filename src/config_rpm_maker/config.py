@@ -245,10 +245,10 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory)
     }
 
-    difference = set(raw_properties.keys()) - set(valid_properties.keys())
+    unknown_configuration_parameters = set(raw_properties.keys()) - set(valid_properties.keys())
 
-    if len(difference) > 0:
-        raise ConfigException('Unknown configuration parameter(s) found: %s' % ', '.join(difference))
+    if len(unknown_configuration_parameters) > 0:
+        raise ConfigException('Unknown configuration parameter(s) found: %s' % ', '.join(unknown_configuration_parameters))
 
     return valid_properties
 
