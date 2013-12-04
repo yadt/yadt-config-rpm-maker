@@ -20,7 +20,7 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from config_rpm_maker import main, start_building_configuration_rpms
+from config_rpm_maker import main, start_building_configuration_rpms, initialize_logging_to_console
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
 
@@ -155,3 +155,19 @@ class BuildConfigurationRpmsTests(TestCase):
         start_building_configuration_rpms('file:///path_to/testdata/repository', 1980)
 
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision=1980)
+
+
+class InitializeLoggingToConsoleTests(TestCase):
+
+    @patch('config_rpm_maker.LOGGER')
+    @patch('config_rpm_maker.append_console_logger')
+    @patch('config_rpm_maker.determine_console_log_level')
+    def test_should_determine_log_level_using_arguments_and_append_handler_to_root_logger(self, mock_determine_console_log_level, mock_append_console_logger, mock_root_logger):
+
+        mock_arguments = Mock()
+        mock_determine_console_log_level.return_value = 'log-level'
+
+        initialize_logging_to_console(mock_arguments)
+
+        mock_determine_console_log_level.assert_called_with(mock_arguments)
+        mock_append_console_logger.assert_called_with(mock_root_logger, 'log-level')
