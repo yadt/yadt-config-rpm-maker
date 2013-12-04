@@ -20,7 +20,7 @@ from unittest import TestCase
 
 from mock import Mock, patch
 
-from config_rpm_maker import main, start_building_configuration_rpms, initialize_logging_to_console
+from config_rpm_maker import main, start_building_configuration_rpms, initialize_logging_to_console, initialize_configuration
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
 
@@ -171,3 +171,26 @@ class InitializeLoggingToConsoleTests(TestCase):
 
         mock_determine_console_log_level.assert_called_with(mock_arguments)
         mock_append_console_logger.assert_called_with(mock_root_logger, 'log-level')
+
+
+class InitializeConfigurationTest(TestCase):
+
+    @patch('config_rpm_maker.apply_arguments_to_config')
+    @patch('config_rpm_maker.config')
+    def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config):
+
+        mock_arguments = Mock()
+
+        initialize_configuration(mock_arguments)
+
+        mock_config.load_configuration_file.assert_called_with()
+
+    @patch('config_rpm_maker.apply_arguments_to_config')
+    @patch('config_rpm_maker.config')
+    def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config):
+
+        mock_arguments = Mock()
+
+        initialize_configuration(mock_arguments)
+
+        mock_apply_arguments_to_config.assert_called_with(mock_arguments)
