@@ -237,7 +237,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_MAX_FILE_SIZE: _ensure_is_an_integer(KEY_MAX_FILE_SIZE, max_file_size),
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
-        KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_valid_or_none(repo_packages_regex),
+        KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_a_valid_regular_expression(repo_packages_regex),
         KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
         KEY_RPM_UPLOAD_COMMAND: _ensure_is_a_string_or_none(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command),
         KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
@@ -302,14 +302,11 @@ def _ensure_is_an_integer(key, value):
     return value
 
 
-def _ensure_repo_packages_regex_is_valid_or_none(value):
-
-    if value is None:
-        return None
+def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string which is a valid regex or do not provide the parameter.'
+        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string which is a valid regex.'
                               % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
 
     try:

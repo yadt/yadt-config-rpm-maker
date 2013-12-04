@@ -56,7 +56,7 @@ from config_rpm_maker.config import (ConfigException,
                                      _ensure_is_a_string,
                                      _ensure_is_a_string_or_none,
                                      _ensure_is_a_list_of_strings,
-                                     _ensure_repo_packages_regex_is_valid_or_none,
+                                     _ensure_repo_packages_regex_is_a_valid_regular_expression,
                                      _ensure_properties_are_valid,
                                      _load_configuration_properties_from_yaml_file,
                                      _set_file_path_of_loaded_configuration)
@@ -334,7 +334,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('default.spec', actual_properties[KEY_PATH_TO_SPEC_FILE])
 
-    @patch('config_rpm_maker.config._ensure_repo_packages_regex_is_valid_or_none')
+    @patch('config_rpm_maker.config._ensure_repo_packages_regex_is_a_valid_regular_expression')
     def test_should_return_repo_packages_regex(self, mock_ensure_repo_packages_regex_is_valid_or_none):
 
         mock_ensure_repo_packages_regex_is_valid_or_none.return_value = 'a valid regex'
@@ -753,25 +753,19 @@ class EnsureIsAInteger(TestCase):
         self.assertEqual(123, actual)
 
 
-class EnsureRepoPackageRegexIsValidOrNone(TestCase):
+class EnsureRepoPackageRegexIsAValidRegularExpressionTests(TestCase):
 
     def test_should_raise_an_exception_if_given_value_is_not_of_type_string(self):
 
-        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_valid_or_none, 123)
+        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_a_valid_regular_expression, 123)
 
     def test_should_raise_an_exception_when_a_invalid_regex_is_given(self):
 
-        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_valid_or_none, '[')
-
-    def test_should_return_none_if_none_is_given(self):
-
-        actual = _ensure_repo_packages_regex_is_valid_or_none(None)
-
-        self.assertEqual(None, actual)
+        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_a_valid_regular_expression, '[')
 
     def test_should_return_given_value_if_it_is_a_valid_regex(self):
 
-        actual = _ensure_repo_packages_regex_is_valid_or_none(".*")
+        actual = _ensure_repo_packages_regex_is_a_valid_regular_expression(".*")
 
         self.assertEqual(".*", actual)
 
