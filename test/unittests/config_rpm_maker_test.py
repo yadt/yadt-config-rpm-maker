@@ -296,5 +296,3 @@ class AppendConsoleLoggerTests(TestCase):
         append_console_logger(mock_logger, 'log level')
 
         mock_logger.addHandler(mock_handler)
-
-

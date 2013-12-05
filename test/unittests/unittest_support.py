@@ -23,7 +23,7 @@ from unittest import TestCase
 class UnitTests(TestCase):
 
     def assert_mock_not_called(self, mock_object):
-        error_message = "Mock has been called %d times." % (mock_object.count)
+        error_message = "Asserted that mock has not been called, but mock has been called %d times." % (mock_object.count)
         self.assertEqual(0, mock_object.call_count, error_message)
 
     def create_fake_file(self, content=""):
