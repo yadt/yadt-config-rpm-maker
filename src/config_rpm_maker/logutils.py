@@ -22,9 +22,38 @@ from config_rpm_maker.config import (DEFAULT_LOG_FORMAT,
                                      DEFAULT_LOG_LEVEL,
                                      DEFAULT_SYS_LOG_ADDRESS,
                                      DEFAULT_SYS_LOG_FORMAT,
-                                     DEFAULT_SYS_LOG_LEVEL)
+                                     DEFAULT_SYS_LOG_LEVEL,
+                                     KEY_VERBOSE,
+                                     get)
 
 LOGGER = getLogger(__name__)
+
+
+class MutedLogger(object):
+
+    def info(self, *args):
+        pass
+
+    def warn(self, *args):
+        pass
+
+    def error(self, *args):
+        pass
+
+    def debug(self, *args):
+        pass
+
+
+_muted_logger = MutedLogger()
+
+
+def verbose(logger):
+    """ Returns the given logger if verbose is configured or it will return _muted_logger """
+
+    if get(KEY_VERBOSE):
+        return logger
+
+    return _muted_logger
 
 
 def create_console_handler(log_level=DEFAULT_LOG_LEVEL):

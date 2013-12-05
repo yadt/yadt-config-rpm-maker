@@ -49,6 +49,7 @@ DEFAULT_SYS_LOG_LEVEL = DEBUG
 DEFAULT_THREAD_COUNT = 1
 DEFAULT_TEMP_DIR = '/tmp'
 DEFAULT_UPLOAD_CHUNK_SIZE = 0
+DEFAULT_VERBOSE = False
 
 ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE = 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'
 ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY = 'KEEPWORKDIR'
@@ -62,6 +63,7 @@ KEY_ERROR_LOG_DIRECTORY = 'error_log_dir'
 KEY_ERROR_LOG_URL = 'error_log_url'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
+KEY_MAX_FILE_SIZE = 'max_file_size'
 KEY_PATH_TO_SPEC_FILE = 'path_to_spec_file'
 KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
 KEY_RPM_UPLOAD_COMMAND = 'rpm_upload_cmd'
@@ -71,7 +73,8 @@ KEY_SVN_PATH_TO_CONFIGURATION = 'svn_path_to_config'
 KEY_TEMPORARY_DIRECTORY = "temp_dir"
 KEY_THREAD_COUNT = 'thread_count'
 KEY_TEMP_DIR = 'temp_dir'
-KEY_MAX_FILE_SIZE = 'max_file_size'
+KEY_VERBOSE = 'verbose'
+
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
@@ -243,7 +246,8 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_RPM_UPLOAD_COMMAND: _ensure_is_a_string_or_none(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command),
         KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
         KEY_THREAD_COUNT: _ensure_is_an_integer(KEY_THREAD_COUNT, thread_count),
-        KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory)
+        KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory),
+        KEY_VERBOSE: DEFAULT_VERBOSE
     }
 
     unknown_configuration_parameters = set(raw_properties.keys()) - set(valid_properties.keys())

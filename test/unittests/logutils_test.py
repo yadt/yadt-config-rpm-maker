@@ -16,16 +16,18 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from logging import ERROR
+from logging import ERROR, Logger
 from mock import Mock, call, patch
 from unittest import TestCase
 
 from config_rpm_maker.config import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
-from config_rpm_maker.logutils import (create_console_handler,
+from config_rpm_maker.logutils import (MutedLogger,
+                                       create_console_handler,
                                        create_sys_log_handler,
                                        log_configuration,
                                        log_elements_of_list,
-                                       log_process_id)
+                                       log_process_id,
+                                       verbose)
 
 
 @patch('config_rpm_maker.logutils.StreamHandler')
@@ -205,3 +207,80 @@ class LogProcessId(TestCase):
         log_process_id(mock_logging_function)
 
         mock_logging_function.assert_called_with('Process ID is %s', 1234)
+
+
+class MutedLoggerTests(TestCase):
+
+    def test_should_pass_when_calling_info_with_a_simple_string(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.info("Hello world.")
+
+    def test_should_pass_when_calling_info_with_a_pattern_and_some_arguments(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.info("Hello world.", 12, "abc")
+
+    def test_should_pass_when_calling_error_with_a_simple_string(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.error("Why did you do this?")
+
+    def test_should_pass_when_calling_error_with_a_pattern_and_some_arguments(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.error("You did it %d times and I think %s.", 12, "abc")
+
+    def test_should_pass_when_calling_warn_with_a_simple_string(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.warn("Hello I am warning you.")
+
+    def test_should_pass_when_calling_warn_with_a_pattern_and_some_arguments(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.warn("Warning you about %s and %d", "abc", 12)
+
+    def test_should_pass_when_calling_debug_with_a_simple_string(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.debug("Hello I am debugging you.")
+
+    def test_should_pass_when_calling_debug_with_a_pattern_and_some_arguments(self):
+
+        muted_logger = MutedLogger()
+
+        muted_logger.debug("Debugging %d and %s.", 12, "abc")
+
+
+class VerboseTests(TestCase):
+
+    @patch('config_rpm_maker.logutils.get')
+    def test_should_return_given_logger_when_configuration_value_for_verbose_is_false(self, mock_get):
+
+        mock_logger = Mock(Logger)
+        mock_get.return_value = True
+
+        verbose(mock_logger).info("Hello")
+
+        mock_logger.info.assert_called_with("Hello")
+        mock_get.assert_called_with('verbose')
+
+    @patch('config_rpm_maker.logutils._muted_logger')
+    @patch('config_rpm_maker.logutils.get')
+    def test_should_return_given_logger_when_configuration_value_for_verbose_is_false(self, mock_get, mock_muted_logger):
+
+        mock_logger = Mock(Logger)
+        mock_get.return_value = False
+
+        verbose(mock_logger).info("Hello")
+
+        mock_muted_logger.info.assert_called_with("Hello")
+        mock_get.assert_called_with('verbose')

@@ -19,8 +19,8 @@
 from mock import patch, Mock
 from unittest import TestCase
 
-from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND
-from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD
+from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE
+from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE
 from config_rpm_maker.parsearguments import apply_arguments_to_config, parse_arguments
 
 
@@ -79,6 +79,18 @@ class ParseArgumentsTests(TestCase):
 
         self.assertTrue(actual_arguments["--debug"])
 
+    def test_should_return_verbose_option_as_false_when_no_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123"], version="")
+
+        self.assertFalse(actual_arguments["--verbose"])
+
+    def test_should_return_verbose_option_as_true_when_debug_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--verbose"], version="")
+
+        self.assertTrue(actual_arguments["--verbose"])
+
     def test_should_return_no_syslog_option_as_true_when_no_syslog_option_given(self):
 
         actual_arguments = parse_arguments(["foo", "123", "--no-syslog"], version="")
@@ -115,7 +127,8 @@ class ApplyArgumentsToConfiguration(TestCase):
 
     def setUp(self):
         self.arguments = {OPTION_RPM_UPLOAD_CMD: False,
-                          OPTION_CONFIG_VIEWER_ONLY: False}
+                          OPTION_CONFIG_VIEWER_ONLY: False,
+                          OPTION_VERBOSE: False}
 
     def test_should_not_apply_anything_if_no_options_given(self, mock_set_property):
 
@@ -138,3 +151,11 @@ class ApplyArgumentsToConfiguration(TestCase):
         apply_arguments_to_config(self.arguments)
 
         mock_set_property.assert_any_call(KEY_CONFIG_VIEWER_ONLY, True)
+
+    def test_should_set_verbose_when_option_is_given(self, mock_set_property):
+
+        self.arguments[OPTION_VERBOSE] = True
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_set_property.assert_any_call(KEY_VERBOSE, True)

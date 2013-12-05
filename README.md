@@ -22,6 +22,7 @@ Options:
   --rpm-upload-cmd=RPM_UPLOAD_COMMAND
                         Overwrite rpm_upload_config in config file
   --no-syslog           switch logging of debug information to syslog off
+  --verbose             increase number of logging messages
   --version             show version
 ```
 

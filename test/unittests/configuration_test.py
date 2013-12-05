@@ -42,6 +42,7 @@ from config_rpm_maker.config import (ConfigException,
                                      KEY_SVN_PATH_TO_CONFIGURATION,
                                      KEY_THREAD_COUNT,
                                      KEY_TEMP_DIR,
+                                     KEY_VERBOSE,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
@@ -504,6 +505,14 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertFalse(actual_properties[KEY_CONFIG_VIEWER_ONLY])
+
+    def test_should_return_default_verbose(self):
+
+        properties = {}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertFalse(actual_properties[KEY_VERBOSE])
 
 
 class LoadConfigurationFileTests(TestCase):
