@@ -467,11 +467,14 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/tmp', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
 
-    def test_should_raise_exception_when_raw_properties_contain_unknown_key_name(self):
+    @patch('config_rpm_maker.config.LOGGER')
+    def test_should_warn_when_raw_properties_contain_an_unknown_property_name(self, mock_logger):
 
         properties = {'foo_spam': '/usr/bin/tralala'}
 
-        self.assertRaises(ConfigException, _ensure_properties_are_valid, properties)
+        _ensure_properties_are_valid(properties)
+
+        mock_logger.warn.assert_called_with('Unknown configuration parameter(s) found: foo_spam')
 
     @patch('config_rpm_maker.config._ensure_is_an_integer')
     def test_should_return_max_file_size(self, mock_ensure_is_an_integer):

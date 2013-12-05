@@ -248,7 +248,7 @@ def _ensure_properties_are_valid(raw_properties):
     unknown_configuration_parameters = set(raw_properties.keys()) - set(valid_properties.keys())
 
     if len(unknown_configuration_parameters) > 0:
-        raise ConfigException('Unknown configuration parameter(s) found: %s' % ', '.join(unknown_configuration_parameters))
+        LOGGER.warn('Unknown configuration parameter(s) found: %s' % ', '.join(unknown_configuration_parameters))
 
     return valid_properties
 
