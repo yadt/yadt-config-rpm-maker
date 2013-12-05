@@ -21,7 +21,8 @@ from unittest import TestCase
 from logging import DEBUG, INFO
 from mock import Mock, patch
 
-from config_rpm_maker import (determine_console_log_level,
+from config_rpm_maker import (append_console_logger,
+                              determine_console_log_level,
                               extract_repository_url_and_revision_from_arguments,
                               initialize_configuration,
                               initialize_logging_to_console,
@@ -272,3 +273,28 @@ class DetermineConsoleLogLevelTests(TestCase):
         actual = determine_console_log_level(fake_arguments)
 
         self.assertEqual(INFO, actual)
+
+
+class AppendConsoleLoggerTests(TestCase):
+
+    @patch('config_rpm_maker.create_console_handler')
+    def test_should_create_console_logger_using_the_given_log_level(self, mock_create_console_handler):
+
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_create_console_handler.assert_called_with('log level')
+
+    @patch('config_rpm_maker.create_console_handler')
+    def test_should_append_created_log_handler_to_given_logger(self, mock_create_console_handler):
+
+        mock_handler = Mock()
+        mock_create_console_handler.return_value = mock_handler
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_logger.addHandler(mock_handler)
+
+
