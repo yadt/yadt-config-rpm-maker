@@ -55,11 +55,9 @@ def main():
         arguments = parse_arguments(argv[1:], version='yadt-config-rpm-maker %s' % __version__)
 
         initialize_logging_to_console(arguments)
-        initialize_configuration(arguments)
-
         repository_url, revision = extract_repository_url_and_revision_from_arguments(arguments)
-
         initialize_logging_to_syslog(arguments, revision)
+        initialize_configuration(arguments)
 
         start_measuring_time()
         log_additional_information()
