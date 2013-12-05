@@ -47,9 +47,16 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
         self.assert_exit_code(0)
 
-    def test_should_return_with_exit_code_foure_strange_repository_url_is_given(self):
+    def test_should_return_with_exit_code_zero_when_valid_repository_url_given(self):
 
         self.config_rpm_maker(self.repository_directory, '1')
+
+        self.assert_exit_code(0)
+        self.assert_stderr_ends_with('[ INFO] Success.')
+
+    def test_should_return_with_exit_code_zero_when_valid_repository_url_and_verbose_option_given(self):
+
+        self.config_rpm_maker(self.repository_directory, '1', '--verbose')
 
         self.assert_exit_code(0)
         self.assert_stderr_ends_with('[ INFO] Success.')
