@@ -64,21 +64,21 @@ def parse_arguments(argv, version):
 
     usage = USAGE_INFORMATION
     parser = OptionParser(usage=usage)
+    parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
+                      action="store_true", dest='config_viewer_only', default=False,
+                      help=OPTION_CONFIG_VIEWER_ONLY_HELP)
     parser.add_option("", OPTION_DEBUG,
                       action="store_true", dest="debug", default=False,
                       help=OPTION_DEBUG_HELP)
+    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
+                      dest='rpm_upload_command', default=False,
+                      help=OPTION_RPM_UPLOAD_CMD_HELP)
     parser.add_option("", OPTION_NO_SYSLOG,
                       action="store_true", dest="no_syslog", default=False,
                       help=OPTION_NO_SYSLOG_HELP)
     parser.add_option("", OPTION_VERSION,
                       action="store_true", dest="version", default=False,
                       help=OPTION_VERSION_HELP)
-    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
-                      dest='rpm_upload_command', default=False,
-                      help=OPTION_RPM_UPLOAD_CMD_HELP)
-    parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
-                      action="store_true", dest='config_viewer_only', default=False,
-                      help=OPTION_CONFIG_VIEWER_ONLY_HELP)
     values, args = parser.parse_args(argv)
 
     if values.version:

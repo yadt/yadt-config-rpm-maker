@@ -16,13 +16,13 @@ Arguments:
 
 Options:
   -h, --help            show this help message and exit
-  --debug               force DEBUG log level on console
-  --no-syslog           switch logging of debug information to syslog off
-  --version             show version
-  --rpm-upload-cmd=RPM_UPLOAD_COMMAND
-                        Overwrite rpm_upload_config in config file
   --config-viewer-only  Only generate files for config viewer. Skip RPM build
                         and upload.
+  --debug               force DEBUG log level on console
+  --rpm-upload-cmd=RPM_UPLOAD_COMMAND
+                        Overwrite rpm_upload_config in config file
+  --no-syslog           switch logging of debug information to syslog off
+  --version             show version
 ```
 
 ### Examples
