@@ -208,7 +208,8 @@ def _ensure_properties_are_valid(raw_properties):
         Throws a exception if some parameters are invalid.
     """
     if raw_properties is None:
-        raise ConfigurationValidationException("Loaded configuration properties are empty.")
+        LOGGER.warn("Loaded configuration properties are empty.")
+        raw_properties = {}
 
     allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)
     config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX)

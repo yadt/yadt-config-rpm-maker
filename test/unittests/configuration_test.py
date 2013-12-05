@@ -185,7 +185,9 @@ class EnsurePropertiesAreValidTest(TestCase):
     @patch('config_rpm_maker.config.LOGGER')
     def test_should_log_that_configuration_properties_are_empty(self, mock_logger):
 
-        self.assertRaises(ConfigurationValidationException, _ensure_properties_are_valid, None)
+        _ensure_properties_are_valid(None)
+
+        mock_logger.warn.assert_called_with('Loaded configuration properties are empty.')
 
     @patch('config_rpm_maker.config.LOGGER')
     def test_should_pass_through_if_some_configuration_properties_are_given(self, mock_logger):
