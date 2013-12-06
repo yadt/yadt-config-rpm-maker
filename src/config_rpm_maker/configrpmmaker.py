@@ -165,8 +165,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
     def _clean_up_work_dir(self):
         log_subdirectories_summary(LOGGER.info, self.work_dir)
 
-        LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
         if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
+            LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
             shutil.rmtree(self.work_dir)
 
         if os.path.exists(self.error_log_file):
