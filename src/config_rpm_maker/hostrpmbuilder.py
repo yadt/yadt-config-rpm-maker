@@ -62,6 +62,8 @@ class HostRpmBuilder(object):
         self.revision = revision
         self.work_dir = work_dir
         self.error_logging_handler = error_logging_handler
+        self.output_file_path = os.path.join(self.work_dir, self.hostname + '.output')
+        self.error_file_path = os.path.join(self.work_dir, self.hostname + '.error')
         self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get(KEY_CONFIG_RPM_PREFIX)
@@ -400,11 +402,11 @@ Change set:
         log_level = config.get(KEY_LOG_LEVEL)
         formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
 
-        self.handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        self.handler = FileHandler(self.output_file_path)
         self.handler.setFormatter(formatter)
         self.handler.setLevel(log_level)
 
-        self.error_handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
+        self.error_handler = FileHandler(self.error_file_path)
         self.error_handler.setFormatter(formatter)
         self.error_handler.setLevel(ERROR)
 

@@ -140,6 +140,18 @@ class ConstructorTests(TestCase):
 
         self.assertEqual('/tmp/rpmbuild', self.mock_host_rpm_builder.rpm_build_dir)
 
+    def test_should_have_error_file_path(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/hostname.error', self.mock_host_rpm_builder.error_file_path)
+
+    def test_should_have_output_file_path(self):
+
+        self.call_constructor()
+
+        self.assertEqual('/tmp/hostname.output', self.mock_host_rpm_builder.output_file_path)
+
 
 class BuildTests(TestCase):
 
