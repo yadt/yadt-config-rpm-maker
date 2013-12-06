@@ -22,6 +22,7 @@ from logging import DEBUG, INFO
 from mock import Mock, patch
 
 from config_rpm_maker import (append_console_logger,
+                              apply_environment_variables_to_configuration,
                               determine_console_log_level,
                               extract_repository_url_and_revision_from_arguments,
                               initialize_configuration,
@@ -30,7 +31,7 @@ from config_rpm_maker import (append_console_logger,
                               main,
                               start_building_configuration_rpms)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.config import ConfigException
+from config_rpm_maker.config import ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, KEY_NO_CLEAN_UP, ConfigException
 
 
 class MainTests(TestCase):
@@ -183,9 +184,10 @@ class InitializeLoggingToConsoleTests(TestCase):
 
 class InitializeConfigurationTest(TestCase):
 
+    @patch('config_rpm_maker.apply_environment_variables_to_configuration')
     @patch('config_rpm_maker.apply_arguments_to_config')
     @patch('config_rpm_maker.config')
-    def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config):
+    def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config, mock_apply_environment_variables_to_configuration):
 
         mock_arguments = Mock()
 
@@ -193,15 +195,52 @@ class InitializeConfigurationTest(TestCase):
 
         mock_config.load_configuration_file.assert_called_with()
 
+    @patch('config_rpm_maker.apply_environment_variables_to_configuration')
     @patch('config_rpm_maker.apply_arguments_to_config')
     @patch('config_rpm_maker.config')
-    def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config):
+    def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config, mock_apply_environment_variables_to_configuration):
 
         mock_arguments = Mock()
 
         initialize_configuration(mock_arguments)
 
         mock_apply_arguments_to_config.assert_called_with(mock_arguments)
+
+    @patch('config_rpm_maker.apply_environment_variables_to_configuration')
+    @patch('config_rpm_maker.apply_arguments_to_config')
+    @patch('config_rpm_maker.config')
+    def test_should_apply_environment_variables_to_configuration(self, mock_config, mock_apply_arguments_to_config, mock_apply_environment_variables_to_configuration):
+
+        mock_arguments = Mock()
+
+        initialize_configuration(mock_arguments)
+
+        mock_apply_environment_variables_to_configuration.assert_called_with()
+
+
+class ApplyEnvironmentVariablesToConfigurationTests(TestCase):
+
+    @patch('config_rpm_maker.getenv')
+    @patch('config_rpm_maker.config')
+    def test_should_set_no_clean_up_property_if_environ_mentvariable_is_given(self, mock_config, mock_getenv):
+
+        mock_getenv.return_value = 'yes'
+
+        apply_environment_variables_to_configuration()
+
+        mock_config.set_property.assert_called_with(KEY_NO_CLEAN_UP, True)
+        mock_getenv.assert_called_with(ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, False)
+
+    @patch('config_rpm_maker.getenv')
+    @patch('config_rpm_maker.config')
+    def test_should_set_no_clean_up_property_to_false_if_environment_variable_not_given(self, mock_config, mock_getenv):
+
+        mock_getenv.return_value = False
+
+        apply_environment_variables_to_configuration()
+
+        mock_config.set_property.assert_called_with(KEY_NO_CLEAN_UP, False)
+        mock_getenv.assert_called_with(ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, False)
 
 
 class ExtractRepositoryUrlAndRevisionFromArgumentsTests(TestCase):

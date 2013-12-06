@@ -17,13 +17,13 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import TestCase
-
 from mock import Mock, patch
 
+from unittest_support import UnitTests
 
 import config_rpm_maker
 
-from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY
+from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_NO_CLEAN_UP
 from config_rpm_maker.hostrpmbuilder import ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 
@@ -468,11 +468,28 @@ class BuildTests(TestCase):
         self.mock_host_rpm_builder._clean_up.assert_called_with()
 
 
-class CleanUpTests(TestCase):
+class CleanUpTests(UnitTests):
 
+    @patch('config_rpm_maker.hostrpmbuilder.config')
     @patch('config_rpm_maker.hostrpmbuilder.rmtree')
-    def test_should_remove_variables_directory(self, mock_rmtree):
+    def test_should_remove_anything_if_configuration_asks_for_no_clean_up(self, mock_rmtree, mock_config):
 
+        mock_config.get.return_value = True
+        mock_host_rpm_builder = Mock(HostRpmBuilder)
+        mock_host_rpm_builder.host_config_dir = 'host configuration directory'
+        mock_host_rpm_builder.variables_dir = 'variables directory'
+        mock_host_rpm_builder.hostname = 'devweb01'
+
+        HostRpmBuilder._clean_up(mock_host_rpm_builder)
+
+        self.assert_mock_not_called(mock_rmtree)
+        mock_config.get.assert_called_with(KEY_NO_CLEAN_UP)
+
+    @patch('config_rpm_maker.hostrpmbuilder.config')
+    @patch('config_rpm_maker.hostrpmbuilder.rmtree')
+    def test_should_remove_variables_directory(self, mock_rmtree, mock_config):
+
+        mock_config.get.return_value = False
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.host_config_dir = 'host configuration directory'
         mock_host_rpm_builder.variables_dir = 'variables directory'
@@ -482,9 +499,11 @@ class CleanUpTests(TestCase):
 
         mock_rmtree.assert_any_call('variables directory')
 
+    @patch('config_rpm_maker.hostrpmbuilder.config')
     @patch('config_rpm_maker.hostrpmbuilder.rmtree')
-    def test_should_remove_host_configuration_directory(self, mock_rmtree):
+    def test_should_remove_host_configuration_directory(self, mock_rmtree, mock_config):
 
+        mock_config.get.return_value = False
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.host_config_dir = 'host configuration directory'
         mock_host_rpm_builder.variables_dir = 'variables directory'

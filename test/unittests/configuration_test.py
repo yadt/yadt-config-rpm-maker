@@ -33,6 +33,7 @@ from config_rpm_maker.config import (ConfigException,
                                      KEY_ERROR_LOG_DIRECTORY,
                                      KEY_ERROR_LOG_URL,
                                      KEY_LOG_LEVEL,
+                                     KEY_NO_CLEAN_UP,
                                      KEY_MAX_FILE_SIZE,
                                      KEY_PATH_TO_SPEC_FILE,
                                      KEY_REPO_PACKAGES_REGEX,
@@ -512,6 +513,14 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertFalse(actual_properties[KEY_VERBOSE])
+
+    def test_should_return_default_no_clean_up(self):
+
+        properties = {}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertFalse(actual_properties[KEY_NO_CLEAN_UP])
 
 
 class LoadConfigurationFileTests(TestCase):

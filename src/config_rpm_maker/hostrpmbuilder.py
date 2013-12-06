@@ -26,10 +26,11 @@ from os.path import exists
 from shutil import rmtree
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
+from config_rpm_maker.logutils import verbose
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
 from config_rpm_maker.profiler import measure_execution_time
@@ -146,7 +147,11 @@ class HostRpmBuilder(object):
         return self._find_rpms()
 
     def _clean_up(self):
-        LOGGER.debug('Cleaning up working director for host "%s"', self.hostname)
+        if config.get(KEY_NO_CLEAN_UP):
+            verbose(LOGGER).debug('Not cleaning up anything for host "%s"', self.hostname)
+            return
+
+        LOGGER.debug('Cleaning up temporary files for host "%s"', self.hostname)
 
         rmtree(self.variables_dir)
         rmtree(self.host_config_dir)

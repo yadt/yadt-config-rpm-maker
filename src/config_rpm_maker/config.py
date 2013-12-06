@@ -38,6 +38,7 @@ DEFAULT_MAX_FILE_SIZE = 100 * 1024
 DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 DEFAULT_LOG_LEVEL = 'DEBUG'
+DEFAULT_NO_CLEAN_UP = False
 DEFAULT_PATH_TO_SPEC_FILE = 'default.spec'
 DEFAULT_REPO_PACKAGES_REGEX = '.*-repo.*'
 DEFAULT_RPM_UPLOAD_CHUNK_SIZE = 10
@@ -64,6 +65,7 @@ KEY_ERROR_LOG_URL = 'error_log_url'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_MAX_FILE_SIZE = 'max_file_size'
+KEY_NO_CLEAN_UP = 'no_clean_up'
 KEY_PATH_TO_SPEC_FILE = 'path_to_spec_file'
 KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
 KEY_RPM_UPLOAD_COMMAND = 'rpm_upload_cmd'
@@ -240,6 +242,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_MAX_FILE_SIZE: _ensure_is_an_integer(KEY_MAX_FILE_SIZE, max_file_size),
+        KEY_NO_CLEAN_UP: DEFAULT_NO_CLEAN_UP,
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
         KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_a_valid_regular_expression(repo_packages_regex),
         KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
