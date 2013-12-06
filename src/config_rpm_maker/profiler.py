@@ -155,4 +155,4 @@ def log_subdirectories_summary(logging_function, start_path):
     for directory in sorted(directories_summary.keys()):
         count_of_files = directories_summary[directory][0]
         total_size = directories_summary[directory][1]
-        logging_function('    %5d files with total size of %10d bytes in subdirectory "%s"', count_of_files, total_size, directory)
+        logging_function('    %5d files with total size of %10d bytes in directory "%s"', count_of_files, total_size, directory)
