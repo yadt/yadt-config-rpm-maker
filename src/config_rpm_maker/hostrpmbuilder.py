@@ -23,6 +23,7 @@ from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
 from os import mkdir
 from os.path import exists
+from shutil import rmtree
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
@@ -140,8 +141,12 @@ class HostRpmBuilder(object):
         self._write_overlaying_for_config_viewer(overall_exported)
 
         self._remove_logger_handlers()
+        self._remove_variables_directory()
 
         return self._find_rpms()
+
+    def _remove_variables_directory(self):
+        rmtree(self.variables_dir)
 
     def _filter_tokens_in_config_viewer(self):
 

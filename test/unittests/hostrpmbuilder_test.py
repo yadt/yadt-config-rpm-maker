@@ -457,6 +457,29 @@ class BuildTests(TestCase):
 
         self.assertEqual(found_rpms, actual_built_rpms)
 
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    def test_should_remove_variables_directory(self, mock_exists, mock_mkdir):
+
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._remove_variables_directory.assert_called_with()
+
+
+class RemoveVariablesDirectoryTests(TestCase):
+
+    @patch('config_rpm_maker.hostrpmbuilder.rmtree')
+    def test_should_remove_variables_directory(self, mock_rmtree):
+
+        mock_host_rpm_builder = Mock(HostRpmBuilder)
+        mock_host_rpm_builder.variables_dir = 'variables directory'
+
+        HostRpmBuilder._remove_variables_directory(mock_host_rpm_builder)
+
+        mock_rmtree.assert_called_with('variables directory')
+
 
 class WriteRevisionFileForConfigViewerTests(TestCase):
 
