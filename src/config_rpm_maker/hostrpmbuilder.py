@@ -21,7 +21,7 @@ import subprocess
 from pysvn import ClientError
 from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
-from os import mkdir
+from os import mkdir, remove
 from os.path import exists
 from shutil import rmtree
 
@@ -157,6 +157,8 @@ class HostRpmBuilder(object):
 
         rmtree(self.variables_dir)
         rmtree(self.host_config_dir)
+        remove(self.output_file_path)
+        remove(self.error_file_path)
 
     def _filter_tokens_in_config_viewer(self):
 

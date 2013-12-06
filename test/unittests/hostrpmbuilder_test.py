@@ -480,50 +480,61 @@ class BuildTests(TestCase):
         self.mock_host_rpm_builder._clean_up.assert_called_with()
 
 
+@patch('config_rpm_maker.hostrpmbuilder.config')
+@patch('config_rpm_maker.hostrpmbuilder.rmtree')
+@patch('config_rpm_maker.hostrpmbuilder.remove')
 class CleanUpTests(UnitTests):
 
-    @patch('config_rpm_maker.hostrpmbuilder.config')
-    @patch('config_rpm_maker.hostrpmbuilder.rmtree')
-    def test_should_remove_anything_if_configuration_asks_for_no_clean_up(self, mock_rmtree, mock_config):
-
-        mock_config.get.return_value = True
+    def setUp(self):
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.host_config_dir = 'host configuration directory'
         mock_host_rpm_builder.variables_dir = 'variables directory'
         mock_host_rpm_builder.hostname = 'devweb01'
+        mock_host_rpm_builder.output_file_path = '/path/to/output/file'
+        mock_host_rpm_builder.error_file_path = '/path/to/error/file'
 
-        HostRpmBuilder._clean_up(mock_host_rpm_builder)
+        self.mock_host_rpm_builder = mock_host_rpm_builder
+
+    def test_should_remove_anything_if_configuration_asks_for_no_clean_up(self, mock_remove, mock_rmtree, mock_config):
+
+        mock_config.get.return_value = True
+
+        HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
         self.assert_mock_never_called(mock_rmtree)
         mock_config.get.assert_called_with(KEY_NO_CLEAN_UP)
 
-    @patch('config_rpm_maker.hostrpmbuilder.config')
-    @patch('config_rpm_maker.hostrpmbuilder.rmtree')
-    def test_should_remove_variables_directory(self, mock_rmtree, mock_config):
+    def test_should_remove_variables_directory(self, moc_remove, mock_rmtree, mock_config):
 
         mock_config.get.return_value = False
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.host_config_dir = 'host configuration directory'
-        mock_host_rpm_builder.variables_dir = 'variables directory'
-        mock_host_rpm_builder.hostname = 'devweb01'
 
-        HostRpmBuilder._clean_up(mock_host_rpm_builder)
+        HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
         mock_rmtree.assert_any_call('variables directory')
 
-    @patch('config_rpm_maker.hostrpmbuilder.config')
-    @patch('config_rpm_maker.hostrpmbuilder.rmtree')
-    def test_should_remove_host_configuration_directory(self, mock_rmtree, mock_config):
+    def test_should_remove_host_configuration_directory(self, mock_remove, mock_rmtree, mock_config):
 
         mock_config.get.return_value = False
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.host_config_dir = 'host configuration directory'
-        mock_host_rpm_builder.variables_dir = 'variables directory'
-        mock_host_rpm_builder.hostname = 'devweb01'
 
-        HostRpmBuilder._clean_up(mock_host_rpm_builder)
+        HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
         mock_rmtree.assert_any_call('host configuration directory')
+
+    def test_should_remove_host_output_file(self, mock_remove, mock_rmtree, mock_config):
+
+        mock_config.get.return_value = False
+
+        HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
+
+        mock_remove.assert_any_call('/path/to/output/file')
+
+    def test_should_remove_host_error_file(self, mock_remove, mock_rmtree, mock_config):
+
+        mock_config.get.return_value = False
+
+        HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
+
+        mock_remove.assert_any_call('/path/to/error/file')
 
 
 class WriteRevisionFileForConfigViewerTests(TestCase):
