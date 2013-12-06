@@ -459,49 +459,40 @@ class BuildTests(TestCase):
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
-    def test_should_remove_variables_directory(self, mock_exists, mock_mkdir):
+    def test_should_clean_up_after_successful_build(self, mock_exists, mock_mkdir):
 
         mock_exists.return_value = False
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        self.mock_host_rpm_builder._remove_variables_directory.assert_called_with()
-
-    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
-    @patch('config_rpm_maker.hostrpmbuilder.exists')
-    def test_should_remove_host_configuration_directory(self, mock_exists, mock_mkdir):
-
-        mock_exists.return_value = False
-
-        HostRpmBuilder.build(self.mock_host_rpm_builder)
-
-        self.mock_host_rpm_builder._remove_host_configuration_directory.assert_called_with()
+        self.mock_host_rpm_builder._clean_up.assert_called_with()
 
 
-class RemoveVariablesDirectoryTests(TestCase):
+class CleanUpTests(TestCase):
 
     @patch('config_rpm_maker.hostrpmbuilder.rmtree')
     def test_should_remove_variables_directory(self, mock_rmtree):
 
         mock_host_rpm_builder = Mock(HostRpmBuilder)
+        mock_host_rpm_builder.host_config_dir = 'host configuration directory'
         mock_host_rpm_builder.variables_dir = 'variables directory'
+        mock_host_rpm_builder.hostname = 'devweb01'
 
-        HostRpmBuilder._remove_variables_directory(mock_host_rpm_builder)
+        HostRpmBuilder._clean_up(mock_host_rpm_builder)
 
-        mock_rmtree.assert_called_with('variables directory')
-
-
-class RemoveHostConfigurationDirectoryTests(TestCase):
+        mock_rmtree.assert_any_call('variables directory')
 
     @patch('config_rpm_maker.hostrpmbuilder.rmtree')
     def test_should_remove_host_configuration_directory(self, mock_rmtree):
 
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.host_config_dir = 'host configuration directory'
+        mock_host_rpm_builder.variables_dir = 'variables directory'
+        mock_host_rpm_builder.hostname = 'devweb01'
 
-        HostRpmBuilder._remove_host_configuration_directory(mock_host_rpm_builder)
+        HostRpmBuilder._clean_up(mock_host_rpm_builder)
 
-        mock_rmtree.assert_called_with('host configuration directory')
+        mock_rmtree.assert_any_call('host configuration directory')
 
 
 class WriteRevisionFileForConfigViewerTests(TestCase):

@@ -141,15 +141,14 @@ class HostRpmBuilder(object):
         self._write_overlaying_for_config_viewer(overall_exported)
 
         self._remove_logger_handlers()
-        self._remove_variables_directory()
-        self._remove_host_configuration_directory()
+        self._clean_up()
 
         return self._find_rpms()
 
-    def _remove_variables_directory(self):
-        rmtree(self.variables_dir)
+    def _clean_up(self):
+        LOGGER.debug('Cleaning up working director for host "%s"', self.hostname)
 
-    def _remove_host_configuration_directory(self):
+        rmtree(self.variables_dir)
         rmtree(self.host_config_dir)
 
     def _filter_tokens_in_config_viewer(self):
