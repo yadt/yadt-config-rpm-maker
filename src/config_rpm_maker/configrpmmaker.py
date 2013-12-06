@@ -42,7 +42,7 @@ from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIREC
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.logutils import log_elements_of_list
-from config_rpm_maker.profiler import measure_execution_time
+from config_rpm_maker.profiler import measure_execution_time, log_directory_size_summary
 from config_rpm_maker.segment import OVERLAY_ORDER
 
 LOGGER = getLogger(__name__)
@@ -163,6 +163,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return rpms
 
     def _clean_up_work_dir(self):
+        log_directory_size_summary(LOGGER.info, self.work_dir)
+
         LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
         if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
             shutil.rmtree(self.work_dir)

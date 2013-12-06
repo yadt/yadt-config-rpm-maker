@@ -50,6 +50,7 @@ OPTION_VERBOSE_HELP = "increase number of logging messages"
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
 
+
 def parse_arguments(argv, version):
     """
         Parses the given command line arguments.

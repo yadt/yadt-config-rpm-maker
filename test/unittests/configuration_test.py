@@ -23,7 +23,6 @@ from unittest import TestCase
 from unittest_support import UnitTests
 from config_rpm_maker import config
 from config_rpm_maker.config import (ConfigException,
-                                     ConfigurationValidationException,
                                      DEFAULT_CONFIGURATION_FILE_PATH,
                                      ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
