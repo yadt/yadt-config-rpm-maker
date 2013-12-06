@@ -122,15 +122,25 @@ def log_subdirectories_summary(logging_function, start_path):
     if not get(KEY_VERBOSE):
         return
 
-    subdirectories_summary = {}
-    subdirectories = walk(start_path).next()[1]
+    directories_summary = {}
+    directories = walk(start_path).next()[1]
 
     absolute_count_of_files = 0
     absolute_total_size = 0
-    for subdirectory in subdirectories:
+
+    for file_name in walk(start_path).next()[2]:
+        file_path = join(start_path, file_name)
+        file_size = getsize(file_path)
+        absolute_total_size += file_size
+        absolute_count_of_files += 1
+
+    directories_summary[start_path] = (absolute_count_of_files, absolute_total_size)
+
+    for directory in directories:
         total_size = 0
         count_of_files = 0
-        for dirpath, dirnames, filenames in walk(join(start_path, subdirectory)):
+        directory_path = join(start_path, directory)
+        for dirpath, dirnames, filenames in walk(directory_path):
             for file_name in filenames:
                 file_path = join(dirpath, file_name)
                 file_size = getsize(file_path)
@@ -139,10 +149,10 @@ def log_subdirectories_summary(logging_function, start_path):
                 count_of_files += 1
                 absolute_count_of_files += 1
 
-        subdirectories_summary[subdirectory] = (count_of_files, total_size)
+        directories_summary[directory_path] = (count_of_files, total_size)
 
     logging_function('Found %d files in directory "%s" with a total size of %d bytes', absolute_count_of_files, start_path, absolute_total_size)
-    for subdirectory in sorted(subdirectories_summary.keys()):
-        count_of_files = subdirectories_summary[subdirectory][0]
-        total_size = subdirectories_summary[subdirectory][1]
-        logging_function('    %5d files with total size of %10d bytes in subdirectory "%s".', count_of_files, total_size, subdirectory)
+    for directory in sorted(directories_summary.keys()):
+        count_of_files = directories_summary[directory][0]
+        total_size = directories_summary[directory][1]
+        logging_function('    %5d files with total size of %10d bytes in subdirectory "%s"', count_of_files, total_size, directory)
