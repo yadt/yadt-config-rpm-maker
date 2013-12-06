@@ -119,7 +119,7 @@ def log_directory_size_summary(logging_function, start_path):
 
 def log_subdirectories_summary(logging_function, start_path):
 
-    if not get(KEY_VERBOSE):
+    if not get(KEY_VERBOSE) or start_path is None:
         return
 
     directories_summary = {}
