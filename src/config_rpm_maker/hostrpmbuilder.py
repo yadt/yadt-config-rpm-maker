@@ -142,11 +142,15 @@ class HostRpmBuilder(object):
 
         self._remove_logger_handlers()
         self._remove_variables_directory()
+        self._remove_host_configuration_directory()
 
         return self._find_rpms()
 
     def _remove_variables_directory(self):
         rmtree(self.variables_dir)
+
+    def _remove_host_configuration_directory(self):
+        rmtree(self.host_config_dir)
 
     def _filter_tokens_in_config_viewer(self):
 

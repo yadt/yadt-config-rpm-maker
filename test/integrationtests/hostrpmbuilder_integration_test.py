@@ -98,3 +98,16 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
         host_rpm_builder.build()
 
         self.assert_path_does_not_exists(join(self.temporary_directory, 'VARIABLES.berweb01'))
+
+    def test_should_remove_host_configuration_directory_after_build_finished(self):
+
+        svn_service_queue = self.create_svn_service_queue()
+        host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
+                                          hostname="berweb01",
+                                          revision='1',
+                                          work_dir=self.temporary_directory,
+                                          svn_service_queue=svn_service_queue)
+
+        host_rpm_builder.build()
+
+        self.assert_path_does_not_exists(join(self.temporary_directory, 'yadt-config-berweb01'))
