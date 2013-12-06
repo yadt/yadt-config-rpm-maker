@@ -268,24 +268,6 @@ class BuildTests(TestCase):
 
         self.mock_host_rpm_builder._write_dependency_file.assert_any_called(['segment1-requires', 'segment2-requires', 'segment3-requires'], 'variables-directory/RPM_REQUIRES_NON_REPOS', positive_filter=False, filter_regex='^yadt-.*-repos?$')
 
-    @patch('config_rpm_maker.hostrpmbuilder.config.get')
-    @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
-    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
-    @patch('config_rpm_maker.hostrpmbuilder.exists')
-    def test_should_write_not_write_rpm_requires_with_repo_stuff_if_no_repo_packages_regex_configured(self, mock_exists, mock_mkdir, mock_overlay_order, mock_get):
-
-        config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER = ['segment1', 'segment2', 'segment3']
-
-        mock_get.return_value = False
-        mock_exists.return_value = False
-        self.mock_host_rpm_builder._write_dependency_file = Mock()
-
-        HostRpmBuilder.build(self.mock_host_rpm_builder)
-
-        self.assertEqual(2, self.mock_host_rpm_builder._write_dependency_file.call_count)
-        self.mock_host_rpm_builder._write_dependency_file.assert_any_called(['segment1-requires', 'segment2-requires', 'segment3-requires'], 'rpm-requires-path', collapse_duplicates=True)
-        self.mock_host_rpm_builder._write_dependency_file.assert_any_called(['segment1-requires', 'segment2-requires', 'segment3-requires'], 'variables-directory/RPM_REQUIRES_REPOS', filter_regex='^yadt-.*-repos?$')
-
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
     def test_should_export_spec_file(self, mock_exists, mock_mkdir):

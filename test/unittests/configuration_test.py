@@ -42,6 +42,7 @@ from config_rpm_maker.config import (ConfigException,
                                      KEY_SVN_PATH_TO_CONFIGURATION,
                                      KEY_THREAD_COUNT,
                                      KEY_TEMP_DIR,
+                                     KEY_VERBOSE,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
@@ -56,7 +57,7 @@ from config_rpm_maker.config import (ConfigException,
                                      _ensure_is_a_string,
                                      _ensure_is_a_string_or_none,
                                      _ensure_is_a_list_of_strings,
-                                     _ensure_repo_packages_regex_is_valid_or_none,
+                                     _ensure_repo_packages_regex_is_a_valid_regular_expression,
                                      _ensure_properties_are_valid,
                                      _load_configuration_properties_from_yaml_file,
                                      _set_file_path_of_loaded_configuration)
@@ -185,7 +186,9 @@ class EnsurePropertiesAreValidTest(TestCase):
     @patch('config_rpm_maker.config.LOGGER')
     def test_should_log_that_configuration_properties_are_empty(self, mock_logger):
 
-        self.assertRaises(ConfigurationValidationException, _ensure_properties_are_valid, None)
+        _ensure_properties_are_valid(None)
+
+        mock_logger.warn.assert_called_with('Loaded configuration properties are empty.')
 
     @patch('config_rpm_maker.config.LOGGER')
     def test_should_pass_through_if_some_configuration_properties_are_given(self, mock_logger):
@@ -334,7 +337,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('default.spec', actual_properties[KEY_PATH_TO_SPEC_FILE])
 
-    @patch('config_rpm_maker.config._ensure_repo_packages_regex_is_valid_or_none')
+    @patch('config_rpm_maker.config._ensure_repo_packages_regex_is_a_valid_regular_expression')
     def test_should_return_repo_packages_regex(self, mock_ensure_repo_packages_regex_is_valid_or_none):
 
         mock_ensure_repo_packages_regex_is_valid_or_none.return_value = 'a valid regex'
@@ -467,11 +470,14 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/tmp', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
 
-    def test_should_raise_exception_when_raw_properties_contain_unknown_key_name(self):
+    @patch('config_rpm_maker.config.LOGGER')
+    def test_should_warn_when_raw_properties_contain_an_unknown_property_name(self, mock_logger):
 
         properties = {'foo_spam': '/usr/bin/tralala'}
 
-        self.assertRaises(ConfigException, _ensure_properties_are_valid, properties)
+        _ensure_properties_are_valid(properties)
+
+        mock_logger.warn.assert_called_with('Unknown configuration parameter(s) found: foo_spam')
 
     @patch('config_rpm_maker.config._ensure_is_an_integer')
     def test_should_return_max_file_size(self, mock_ensure_is_an_integer):
@@ -499,6 +505,14 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertFalse(actual_properties[KEY_CONFIG_VIEWER_ONLY])
+
+    def test_should_return_default_verbose(self):
+
+        properties = {}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertFalse(actual_properties[KEY_VERBOSE])
 
 
 class LoadConfigurationFileTests(TestCase):
@@ -753,25 +767,19 @@ class EnsureIsAInteger(TestCase):
         self.assertEqual(123, actual)
 
 
-class EnsureRepoPackageRegexIsValidOrNone(TestCase):
+class EnsureRepoPackageRegexIsAValidRegularExpressionTests(TestCase):
 
     def test_should_raise_an_exception_if_given_value_is_not_of_type_string(self):
 
-        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_valid_or_none, 123)
+        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_a_valid_regular_expression, 123)
 
     def test_should_raise_an_exception_when_a_invalid_regex_is_given(self):
 
-        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_valid_or_none, '[')
-
-    def test_should_return_none_if_none_is_given(self):
-
-        actual = _ensure_repo_packages_regex_is_valid_or_none(None)
-
-        self.assertEqual(None, actual)
+        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_a_valid_regular_expression, '[')
 
     def test_should_return_given_value_if_it_is_a_valid_regex(self):
 
-        actual = _ensure_repo_packages_regex_is_valid_or_none(".*")
+        actual = _ensure_repo_packages_regex_is_a_valid_regular_expression(".*")
 
         self.assertEqual(".*", actual)
 

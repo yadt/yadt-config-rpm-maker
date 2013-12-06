@@ -25,6 +25,7 @@ import config_rpm_maker.magic
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_MAX_FILE_SIZE
+from config_rpm_maker.logutils import verbose
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
@@ -199,7 +200,7 @@ class TokenReplacer(object):
                 if file_encoding != 'binary' and file_encoding != 'unknown-8bit':
                     self._perform_filtering_on_file(filename, file_content, file_encoding, html_escape)
                 else:
-                    LOGGER.warn('Not filtering file "%s" since it has encoding "%s".', filename, file_encoding)
+                    verbose(LOGGER).warn('Not filtering file "%s" since it has encoding "%s".', filename, file_encoding)
 
         except MissingTokenException as exception:
             raise MissingTokenException(exception.token, filename)

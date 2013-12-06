@@ -16,7 +16,6 @@
 
 from mock import Mock, call, patch
 
-
 from unittest_support import UnitTests
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 
@@ -204,3 +203,122 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/berweb01')
         mock_move.assert_any_call('target/tmp/configviewer/hosts/berweb01.new-revision-54', 'target/tmp/configviewer/hosts/berweb01')
+
+
+@patch('config_rpm_maker.configrpmmaker.exists')
+@patch('config_rpm_maker.configrpmmaker.mkdtemp')
+@patch('config_rpm_maker.configrpmmaker.makedirs')
+class PrepareWorkDirTests(UnitTests):
+
+    def test_should_create_working_directory_in_configured_temporary_directory(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_mkdtemp.assert_called_with(prefix='yadt-config-rpm-maker.', suffix='.4852', dir='temporary directory')
+
+    def test_should_not_create_any_directory_when_all_directories_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = True
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_not_called(mock_makedirs)
+
+    def test_should_create_tmp_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/tmp')
+
+    def test_should_create_RPMS_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/RPMS')
+
+    def test_should_create_RPMS_x86_64_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/RPMS/x86_64')
+
+    def test_should_create_RPMS_noarch_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/RPMS/noarch')
+
+    def test_should_create_BUILD_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/BUILD')
+
+    def test_should_create_BUILDROOT_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/BUILDROOT')
+
+    def test_should_create_SRPMS_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/SRPMS')
+
+    def test_should_create_SPECS_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/SPECS')
+
+    def test_should_create_SOURCES_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
+
+        mock_config_rpm_maker = self.create_mock_config_rpm_maker()
+        mock_exists.return_value = False
+        mock_mkdtemp.return_value = 'working-directory'
+
+        ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
+
+        mock_makedirs.assert_any_call('working-directory/rpmbuild/SOURCES')
+
+    def create_mock_config_rpm_maker(self):
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker.temp_dir = 'temporary directory'
+        mock_config_rpm_maker.revision = '4852'
+        return mock_config_rpm_maker

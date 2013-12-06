@@ -108,9 +108,8 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
         repo_packages_regex = config.get(KEY_REPO_PACKAGES_REGEX)
-        if repo_packages_regex:
-            self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)
-            self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'), filter_regex=repo_packages_regex, positive_filter=False)
+        self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)
+        self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'), filter_regex=repo_packages_regex, positive_filter=False)
 
         self._export_spec_file()
         self._save_log_entries_to_variable(overall_svn_paths)

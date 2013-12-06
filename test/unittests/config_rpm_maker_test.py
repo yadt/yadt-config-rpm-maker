@@ -18,14 +18,17 @@
 
 from unittest import TestCase
 
+from logging import DEBUG, INFO
 from mock import Mock, patch
 
-from config_rpm_maker import (main,
-                              start_building_configuration_rpms,
-                              initialize_logging_to_console,
+from config_rpm_maker import (append_console_logger,
+                              determine_console_log_level,
+                              extract_repository_url_and_revision_from_arguments,
                               initialize_configuration,
+                              initialize_logging_to_console,
                               initialize_logging_to_syslog,
-                              extract_repository_url_and_revision_from_arguments)
+                              main,
+                              start_building_configuration_rpms)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
 
@@ -102,7 +105,7 @@ class MainTests(TestCase):
         mock_exit_program.assert_called_with('An unknown exception occurred!', return_code=5)
 
 
-class BuildConfigurationRpmsTests(TestCase):
+class StartBuildingConfigurationRpmsTests(TestCase):
 
     @patch('config_rpm_maker.config')
     @patch('config_rpm_maker.exit_program')
@@ -251,3 +254,45 @@ class InitializeLoggingToSysLogTests(TestCase):
 
         self.assertEqual(0, mock_create_sys_log_handler.call_count)
         self.assertEqual(0, mock_logger.addHandler.call_count)
+
+
+class DetermineConsoleLogLevelTests(TestCase):
+
+    def test_should_return_debug_when_debug_option_is_given(self):
+
+        fake_arguments = {'--debug': True}
+
+        actual = determine_console_log_level(fake_arguments)
+
+        self.assertEqual(DEBUG, actual)
+
+    def test_should_return_info_when_no_debug_option_is_given(self):
+
+        fake_arguments = {'--debug': False}
+
+        actual = determine_console_log_level(fake_arguments)
+
+        self.assertEqual(INFO, actual)
+
+
+class AppendConsoleLoggerTests(TestCase):
+
+    @patch('config_rpm_maker.create_console_handler')
+    def test_should_create_console_logger_using_the_given_log_level(self, mock_create_console_handler):
+
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_create_console_handler.assert_called_with('log level')
+
+    @patch('config_rpm_maker.create_console_handler')
+    def test_should_append_created_log_handler_to_given_logger(self, mock_create_console_handler):
+
+        mock_handler = Mock()
+        mock_create_console_handler.return_value = mock_handler
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_logger.addHandler(mock_handler)

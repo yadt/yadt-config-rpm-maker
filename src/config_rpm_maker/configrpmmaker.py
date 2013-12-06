@@ -24,10 +24,12 @@ import traceback
 import config
 
 from logging import ERROR, FileHandler, Formatter, getLogger
+from os import makedirs
 from os.path import exists, join
 from Queue import Queue
 from shutil import rmtree, move
 from threading import Thread
+from tempfile import mkdtemp
 
 from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
                                      KEY_ERROR_LOG_URL,
@@ -336,16 +338,16 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     def _prepare_work_dir(self):
         LOGGER.debug('Preparing working directory "%s"', self.temp_dir)
-        self.work_dir = tempfile.mkdtemp(prefix='yadt-config-rpm-maker.',
-                                         suffix='.' + self.revision,
-                                         dir=self.temp_dir)
+        self.work_dir = mkdtemp(prefix='yadt-config-rpm-maker.',
+                                suffix='.' + self.revision,
+                                dir=self.temp_dir)
 
-        self.rpm_build_dir = os.path.join(self.work_dir, 'rpmbuild')
+        self.rpm_build_dir = join(self.work_dir, 'rpmbuild')
         LOGGER.debug('Creating directory structure for rpmbuild in "%s"', self.rpm_build_dir)
-        for name in ['tmp', 'RPMS', 'RPMS/x86_64,RPMS/noarch', 'BUILD', 'SRPMS', 'SPECS', 'SOURCES']:
-            path = os.path.join(self.rpm_build_dir, name)
-            if not os.path.exists(path):
-                os.makedirs(path)
+        for name in ['tmp', 'RPMS', 'RPMS/x86_64', 'RPMS/noarch', 'BUILD', 'BUILDROOT', 'SRPMS', 'SPECS', 'SOURCES']:
+            path = join(self.rpm_build_dir, name)
+            if not exists(path):
+                makedirs(path)
 
     def _get_chunk_size(self, rpms):
         chunk_size_raw = config.get(KEY_RPM_UPLOAD_CHUNK_SIZE)
