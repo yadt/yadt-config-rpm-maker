@@ -117,9 +117,9 @@ def log_directory_size_summary(logging_function, start_path):
                 logging_function('    %10d %s', file_size, file_path)
 
 
-def log_subdirectories_summary(logging_function, start_path):
+def log_directories_summary(logging_function, start_path):
 
-    if not get(KEY_VERBOSE) or start_path is None:
+    if not get(KEY_VERBOSE):
         return
 
     directories_summary = {}
