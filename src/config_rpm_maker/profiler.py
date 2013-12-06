@@ -93,10 +93,10 @@ def log_execution_time_summaries(logging_function):
 
 def log_directory_size_summary(logging_function, start_path):
 
-    file_and_size = {}
     if not get(KEY_VERBOSE):
         return
 
+    file_and_size = {}
     total_size = 0
     count_of_files = 0
     for dirpath, dirnames, filenames in walk(start_path):
@@ -115,3 +115,34 @@ def log_directory_size_summary(logging_function, start_path):
         for file_path in file_and_size.keys():
             if file_size == file_and_size[file_path]:
                 logging_function('    %10d %s', file_size, file_path)
+
+
+def log_subdirectories_summary(logging_function, start_path):
+
+    if not get(KEY_VERBOSE):
+        return
+
+    subdirectories_summary = {}
+    subdirectories = walk(start_path).next()[1]
+
+    absolute_count_of_files = 0
+    absolute_total_size = 0
+    for subdirectory in subdirectories:
+        total_size = 0
+        count_of_files = 0
+        for dirpath, dirnames, filenames in walk(join(start_path, subdirectory)):
+            for file_name in filenames:
+                file_path = join(dirpath, file_name)
+                file_size = getsize(file_path)
+                total_size += file_size
+                absolute_total_size += file_size
+                count_of_files += 1
+                absolute_count_of_files += 1
+
+        subdirectories_summary[subdirectory] = (count_of_files, total_size)
+
+    logging_function('Found %d files in directory "%s" with a total size of %d bytes', absolute_count_of_files, start_path, absolute_total_size)
+    for subdirectory in sorted(subdirectories_summary.keys()):
+        count_of_files = subdirectories_summary[subdirectory][0]
+        total_size = subdirectories_summary[subdirectory][1]
+        logging_function('    %5d files with total size of %10d bytes in subdirectory "%s".', count_of_files, total_size, subdirectory)
