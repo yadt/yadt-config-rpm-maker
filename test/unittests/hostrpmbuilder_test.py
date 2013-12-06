@@ -482,7 +482,7 @@ class CleanUpTests(UnitTests):
 
         HostRpmBuilder._clean_up(mock_host_rpm_builder)
 
-        self.assert_mock_not_called(mock_rmtree)
+        self.assert_mock_never_called(mock_rmtree)
         mock_config.get.assert_called_with(KEY_NO_CLEAN_UP)
 
     @patch('config_rpm_maker.hostrpmbuilder.config')

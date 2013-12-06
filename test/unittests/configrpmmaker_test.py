@@ -33,8 +33,8 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, [])
 
-        self.assert_mock_not_called(mock_move)
-        self.assert_mock_not_called(mock_rmtree)
+        self.assert_mock_never_called(mock_move)
+        self.assert_mock_never_called(mock_rmtree)
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
@@ -56,7 +56,7 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01'])
 
-        self.assert_mock_not_called(mock_rmtree)
+        self.assert_mock_never_called(mock_rmtree)
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
@@ -225,7 +225,7 @@ class PrepareWorkDirTests(UnitTests):
 
         ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
 
-        self.assert_mock_not_called(mock_makedirs)
+        self.assert_mock_never_called(mock_makedirs)
 
     def test_should_create_tmp_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
 
