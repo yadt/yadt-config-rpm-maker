@@ -21,9 +21,10 @@ import subprocess
 from pysvn import ClientError
 from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
-from os import mkdir, remove
-from os.path import exists
+from os import mkdir, remove, environ
+from os.path import exists, abspath
 from shutil import rmtree
+from subprocess import PIPE, Popen
 
 from config_rpm_maker import config
 from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
@@ -196,18 +197,24 @@ class HostRpmBuilder(object):
     def _build_rpm_using_rpmbuild(self):
         tar_path = self._tar_sources()
 
-        working_environment = os.environ.copy()
-        working_environment['HOME'] = os.path.abspath(self.work_dir)
-        rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
+        working_environment = environ.copy()
+        working_environment['HOME'] = abspath(self.work_dir)
+        absolute_rpm_build_path = abspath(self.rpm_build_dir)
+
+        clean_option = "--clean"
+        if config.get(KEY_NO_CLEAN_UP):
+            clean_option = ""
+
+        rpmbuild_cmd = "rpmbuild %s --define '_topdir %s' -ta %s" % (clean_option, absolute_rpm_build_path, tar_path)
 
         LOGGER.debug('%s: building rpms by executing "%s"', self.thread_name, rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
 
-        process = subprocess.Popen(rpmbuild_cmd,
-                                   shell=True,
-                                   env=working_environment,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+        process = Popen(rpmbuild_cmd,
+                        shell=True,
+                        env=working_environment,
+                        stdout=PIPE,
+                        stderr=PIPE)
 
         stdout, stderr = process.communicate()
 
