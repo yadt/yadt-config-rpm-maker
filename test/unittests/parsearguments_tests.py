@@ -134,6 +134,7 @@ class ApplyArgumentsToConfiguration(TestCase):
     def setUp(self):
         self.arguments = {OPTION_RPM_UPLOAD_CMD: False,
                           OPTION_CONFIG_VIEWER_ONLY: False,
+                          OPTION_NO_CLEAN_UP: False,
                           OPTION_VERBOSE: False}
 
     def test_should_not_apply_anything_if_no_options_given(self, mock_set_property):
