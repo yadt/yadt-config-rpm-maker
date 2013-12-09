@@ -19,8 +19,8 @@
 from mock import patch, Mock
 from unittest import TestCase
 
-from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE
-from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE
+from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE, KEY_NO_CLEAN_UP
+from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE, OPTION_NO_CLEAN_UP
 from config_rpm_maker.parsearguments import apply_arguments_to_config, parse_arguments
 
 
@@ -157,6 +157,22 @@ class ApplyArgumentsToConfiguration(TestCase):
         apply_arguments_to_config(self.arguments)
 
         mock_set_property.assert_any_call(KEY_CONFIG_VIEWER_ONLY, True)
+
+    def test_should_set_verbose_when_option_is_given(self, mock_set_property):
+
+        self.arguments[OPTION_VERBOSE] = True
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_set_property.assert_any_call(KEY_VERBOSE, True)
+
+    def test_should_set_no_clean_up_when_option_is_given(self, mock_set_property):
+
+        self.arguments[OPTION_NO_CLEAN_UP] = True
+
+        apply_arguments_to_config(self.arguments)
+
+        mock_set_property.assert_any_call(KEY_NO_CLEAN_UP, True)
 
     def test_should_set_verbose_when_option_is_given(self, mock_set_property):
 
