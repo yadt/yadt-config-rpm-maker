@@ -35,8 +35,8 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         svn_service_queue = self.create_svn_service_queue()
         host_rpm_builder = HostRpmBuilder(thread_name="Thread-0",
-                                          hostname="berweb01",
                                           revision='1',
+                                          hostname="berweb01",
                                           work_dir=self.temporary_directory,
                                           svn_service_queue=svn_service_queue)
 

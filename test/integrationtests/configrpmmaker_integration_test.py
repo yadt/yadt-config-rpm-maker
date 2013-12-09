@@ -21,7 +21,7 @@ import rpm
 from integration_test_support import IntegrationTest, IntegrationTestException
 
 from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, build_config_viewer_host_directory
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
@@ -50,17 +50,19 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
     def test_should_build_hosts_and_cleanup_work_dir(self):
         config_rpm_maker = self._given_config_rpm_maker()
+
         try:
             config_rpm_maker.build()
         except Exception:
             # the cleanup should be independent of the result of the build operation
             pass
-        self.assertFalse(os.path.exists(config_rpm_maker.work_dir))
-        self.assertFalse(os.path.exists(config_rpm_maker.error_log_file))
+
+        self.assert_path_does_not_exists(config_rpm_maker.work_dir)
+        self.assert_path_does_not_exists(config_rpm_maker.error_log_file)
 
     def test_should_build_rpms_for_hosts(self):
 
-        os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY] = '1'
+        config.set_property(KEY_NO_CLEAN_UP, True)
         config_rpm_maker = self._given_config_rpm_maker()
         rpms = config_rpm_maker.build()
 

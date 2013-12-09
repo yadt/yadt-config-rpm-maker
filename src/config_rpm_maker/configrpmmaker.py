@@ -31,8 +31,8 @@ from shutil import rmtree, move
 from threading import Thread
 from tempfile import mkdtemp
 
-from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
-                                     KEY_ERROR_LOG_URL,
+from config_rpm_maker.config import (KEY_ERROR_LOG_URL,
+                                     KEY_NO_CLEAN_UP,
                                      KEY_RPM_UPLOAD_COMMAND,
                                      KEY_RPM_UPLOAD_CHUNK_SIZE,
                                      KEY_THREAD_COUNT,
@@ -173,7 +173,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             os.remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ and os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
+        return config.get(KEY_NO_CLEAN_UP)
 
     def _move_error_log_for_public_access(self):
         error_log_dir = os.path.join(config.get('error_log_dir'))

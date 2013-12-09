@@ -24,8 +24,7 @@ from sys import argv
 
 from config_rpm_maker import config
 from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
-from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
-                                     DEFAULT_NO_CLEAN_UP,
+from config_rpm_maker.config import (DEFAULT_NO_CLEAN_UP,
                                      KEY_SVN_PATH_TO_CONFIG,
                                      KEY_NO_CLEAN_UP,
                                      ConfigException)
@@ -97,16 +96,6 @@ def initialize_configuration(arguments):
     """ Load the configuration file and applies the given arguments to the configuration. """
     config.load_configuration_file()
     apply_arguments_to_config(arguments)
-    apply_environment_variables_to_configuration()
-
-
-def apply_environment_variables_to_configuration():
-    """ Will add configuration properties for the environment variables """
-
-    if getenv(ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, DEFAULT_NO_CLEAN_UP):
-        config.set_property(KEY_NO_CLEAN_UP, True)
-    else:
-        config.set_property(KEY_NO_CLEAN_UP, False)
 
 
 def extract_repository_url_and_revision_from_arguments(arguments):

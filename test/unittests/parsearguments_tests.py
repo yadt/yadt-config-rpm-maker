@@ -91,6 +91,12 @@ class ParseArgumentsTests(TestCase):
 
         self.assertTrue(actual_arguments["--verbose"])
 
+    def test_should_return_no_clean_up_option_as_true_when_no_clean_up_option_given(self):
+
+        actual_arguments = parse_arguments(["foo", "123", "--no-clean-up"], version="")
+
+        self.assertTrue(actual_arguments["--no-clean-up"])
+
     def test_should_return_no_syslog_option_as_true_when_no_syslog_option_given(self):
 
         actual_arguments = parse_arguments(["foo", "123", "--no-syslog"], version="")
