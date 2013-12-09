@@ -225,6 +225,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         svn_service_queue.put(self.svn_service)
 
         def notify_that_host_failed(host_name, stack_trace):
+            LOGGER.error('Build for host "{host_name}" failed.'.format(host_name=host_name))
             failure_information = (host_name, stack_trace)
             failed_host_queue.put(failure_information)
 
