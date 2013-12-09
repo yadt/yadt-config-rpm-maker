@@ -19,7 +19,7 @@ import subprocess
 import unittest
 
 from Queue import Queue
-from os import environ, makedirs
+from os import makedirs
 from os.path import abspath, exists, join
 from shutil import rmtree
 

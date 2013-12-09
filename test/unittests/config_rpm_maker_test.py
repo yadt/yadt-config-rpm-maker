@@ -30,7 +30,7 @@ from config_rpm_maker import (append_console_logger,
                               main,
                               start_building_configuration_rpms)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.config import KEY_NO_CLEAN_UP, ConfigException
+from config_rpm_maker.config import ConfigException
 
 
 class MainTests(TestCase):

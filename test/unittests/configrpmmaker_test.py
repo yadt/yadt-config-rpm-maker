@@ -323,6 +323,7 @@ class PrepareWorkDirTests(UnitTests):
         mock_config_rpm_maker.revision = '4852'
         return mock_config_rpm_maker
 
+
 @patch('config_rpm_maker.configrpmmaker.remove')
 @patch('config_rpm_maker.configrpmmaker.rmtree')
 @patch('config_rpm_maker.configrpmmaker.exists')
