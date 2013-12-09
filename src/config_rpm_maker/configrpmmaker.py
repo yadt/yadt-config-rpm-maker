@@ -50,14 +50,14 @@ LOGGER = getLogger(__name__)
 
 class BuildHostThread(Thread):
 
-    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
+    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, notify_that_host_failed, work_dir, name=None, error_logging_handler=None):
         super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
         self.rpm_queue = rpm_queue
         self.work_dir = work_dir
-        self.failed_host_queue = failed_host_queue
+        self.notify_that_host_failed = notify_that_host_failed
         self.error_logging_handler = error_logging_handler
 
     def run(self):
@@ -76,10 +76,10 @@ class BuildHostThread(Thread):
                     self.rpm_queue.put(rpm)
 
             except BaseConfigRpmMakerException as e:
-                self.failed_host_queue.put((host, str(e)))
+                self.notify_that_host_failed(host, str(e))
 
             except Exception:
-                self.failed_host_queue.put((host, traceback.format_exc()))
+                self.notify_that_host_failed(host, traceback.format_exc())
 
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
@@ -224,12 +224,16 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         svn_service_queue = Queue()
         svn_service_queue.put(self.svn_service)
 
+        def notify_that_host_failed(host_name, stack_trace):
+            failure_information = (host_name, stack_trace)
+            failed_host_queue.put(failure_information)
+
         thread_count = self._get_thread_count(hosts)
         thread_pool = [BuildHostThread(name='Thread-%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
-                                       failed_host_queue=failed_host_queue,
+                                       notify_that_host_failed=notify_that_host_failed,
                                        host_queue=host_queue,
                                        work_dir=self.work_dir,
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
