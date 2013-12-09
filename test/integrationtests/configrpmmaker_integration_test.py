@@ -60,6 +60,20 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(config_rpm_maker.work_dir)
         self.assert_path_does_not_exist(config_rpm_maker.error_log_file)
 
+    def test_should_not_clean_up_working_directory(self):
+
+        config.set_property(KEY_NO_CLEAN_UP, True)
+        config_rpm_maker = self._given_config_rpm_maker()
+
+        try:
+            config_rpm_maker.build()
+        except Exception:
+            # the cleanup should be independent of the result of the build operation
+            pass
+
+        self.assert_path_exists(config_rpm_maker.work_dir)
+        self.assert_path_exists(config_rpm_maker.error_log_file)
+
     def test_should_build_rpms_for_hosts(self):
 
         config.set_property(KEY_NO_CLEAN_UP, True)

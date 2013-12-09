@@ -322,3 +322,85 @@ class PrepareWorkDirTests(UnitTests):
         mock_config_rpm_maker.temp_dir = 'temporary directory'
         mock_config_rpm_maker.revision = '4852'
         return mock_config_rpm_maker
+
+@patch('config_rpm_maker.configrpmmaker.remove')
+@patch('config_rpm_maker.configrpmmaker.rmtree')
+@patch('config_rpm_maker.configrpmmaker.exists')
+class CleanUpWorkingDirectoryTests(UnitTests):
+
+    def test_should_not_remove_anything_when_configuration_says_we_should_not_clean_up(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = True
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_exists)
+        self.assert_mock_never_called(mock_rmtree)
+        self.assert_mock_never_called(mock_remove)
+
+    def test_should_not_try_to_remove_working_directory_if_it_is_not_set(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = False
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = None
+        mock_config_rpm_maker.error_log_file = None
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_rmtree)
+        self.assert_mock_never_called(mock_remove)
+
+    def test_should_not_remove_working_directory_if_it_does_not_exist(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = False
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = None
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_rmtree)
+        self.assert_mock_never_called(mock_remove)
+        mock_exists.assert_any_call('/path/to/working/directory')
+
+    def test_should_remove_working_directory_if_it_exists(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = True
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = None
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        mock_exists.assert_any_call('/path/to/working/directory')
+        mock_rmtree.assert_called_with('/path/to/working/directory')
+
+    def test_should_not_remove_error_log_if_it_does_not_exist(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = False
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = '/path/to/error.log'
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_remove)
+
+    def test_should_remove_error_log_if_it_exists(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = True
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = '/path/to/error.log'
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        mock_exists.assert_any_call('/path/to/error.log')
+        mock_remove.assert_called_with('/path/to/error.log')

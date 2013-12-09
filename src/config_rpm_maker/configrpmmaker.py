@@ -24,7 +24,7 @@ import traceback
 import config
 
 from logging import ERROR, FileHandler, Formatter, getLogger
-from os import makedirs
+from os import makedirs, remove
 from os.path import exists, join
 from Queue import Queue
 from shutil import rmtree, move
@@ -163,14 +163,17 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return rpms
 
     def _clean_up_work_dir(self):
-        if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
-            log_directories_summary(LOGGER.info, self.work_dir)
-            LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
-            shutil.rmtree(self.work_dir)
+        if self._keep_work_dir():
+            LOGGER.info('All working data can be found in "{working_directory}"'.format(working_directory=self.work_dir))
+        else:
+            if self.work_dir and exists(self.work_dir):
+                log_directories_summary(LOGGER.info, self.work_dir)
+                LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
+                rmtree(self.work_dir)
 
-        if os.path.exists(self.error_log_file):
-            LOGGER.debug('Removing error log "%s"', self.error_log_file)
-            os.remove(self.error_log_file)
+            if exists(self.error_log_file):
+                LOGGER.debug('Removing error log "%s"', self.error_log_file)
+                remove(self.error_log_file)
 
     def _keep_work_dir(self):
         return config.get(KEY_NO_CLEAN_UP)
