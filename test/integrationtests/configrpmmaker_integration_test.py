@@ -57,8 +57,8 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             # the cleanup should be independent of the result of the build operation
             pass
 
-        self.assert_path_does_not_exists(config_rpm_maker.work_dir)
-        self.assert_path_does_not_exists(config_rpm_maker.error_log_file)
+        self.assert_path_does_not_exist(config_rpm_maker.work_dir)
+        self.assert_path_does_not_exist(config_rpm_maker.error_log_file)
 
     def test_should_build_rpms_for_hosts(self):
 
@@ -154,9 +154,9 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         config_rpm_maker.build()
 
-        self.assert_path_does_not_exists(build_config_viewer_host_directory('devweb01', revision='2'))
-        self.assert_path_does_not_exists(build_config_viewer_host_directory('tuvweb01', revision='2'))
-        self.assert_path_does_not_exists(build_config_viewer_host_directory('berweb01', revision='2'))
+        self.assert_path_does_not_exist(build_config_viewer_host_directory('devweb01', revision='2'))
+        self.assert_path_does_not_exist(build_config_viewer_host_directory('tuvweb01', revision='2'))
+        self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
 
     def _given_config_rpm_maker(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))

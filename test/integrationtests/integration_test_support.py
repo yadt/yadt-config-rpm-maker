@@ -117,5 +117,5 @@ Expected content: {expected_content}
     def assert_path_exists(self, path):
         self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
 
-    def assert_path_does_not_exists(self, path):
+    def assert_path_does_not_exist(self, path):
         self.assertFalse(exists(path), 'Path "%s" should not exist!' % path)

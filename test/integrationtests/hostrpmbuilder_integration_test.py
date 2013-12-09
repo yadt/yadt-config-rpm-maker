@@ -97,7 +97,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         host_rpm_builder.build()
 
-        self.assert_path_does_not_exists(join(self.temporary_directory, 'VARIABLES.berweb01'))
+        self.assert_path_does_not_exist(join(self.temporary_directory, 'VARIABLES.berweb01'))
 
     def test_should_remove_host_configuration_directory_after_build_finished(self):
 
@@ -110,7 +110,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         host_rpm_builder.build()
 
-        self.assert_path_does_not_exists(join(self.temporary_directory, 'yadt-config-berweb01'))
+        self.assert_path_does_not_exist(join(self.temporary_directory, 'yadt-config-berweb01'))
 
     def test_should_remove_host_output_file_after_build_finished(self):
 
@@ -123,7 +123,7 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         host_rpm_builder.build()
 
-        self.assert_path_does_not_exists(join(self.temporary_directory, 'berweb01.output'))
+        self.assert_path_does_not_exist(join(self.temporary_directory, 'berweb01.output'))
 
     def test_should_remove_host_error_file_after_build_finished(self):
 
@@ -136,4 +136,4 @@ class HostRpmBuilderIntegrationTest(IntegrationTest):
 
         host_rpm_builder.build()
 
-        self.assert_path_does_not_exists(join(self.temporary_directory, 'berweb01.error'))
+        self.assert_path_does_not_exist(join(self.temporary_directory, 'berweb01.error'))
