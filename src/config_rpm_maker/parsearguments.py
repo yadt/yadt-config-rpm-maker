@@ -30,7 +30,8 @@ USAGE_INFORMATION = """Usage: %prog repo-url revision [options]
 
 Arguments:
   repo-url    URL to subversion repository or absolute path on localhost
-  revision    subversion revision for which the configuration rpms are going to be built"""
+  revision    subversion revision for which the configuration rpms are going
+              to be built"""
 
 OPTION_CONFIG_VIEWER_ONLY = '--config-viewer-only'
 OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generate files for config viewer. Skip RPM build and upload.'
