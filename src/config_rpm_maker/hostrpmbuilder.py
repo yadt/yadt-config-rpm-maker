@@ -223,12 +223,14 @@ class HostRpmBuilder(object):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
         self.logger.debug("Executing %s ...", tar_cmd)
-        p = subprocess.Popen(tar_cmd,
-                             shell=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        if p.returncode:
+        process = subprocess.Popen(tar_cmd,
+                                   shell=True,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        if process.returncode:
+            stdout = stdout.strip()
+            stderr = stderr.strip()
             raise CouldNotTarConfigurationDirectoryException('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
