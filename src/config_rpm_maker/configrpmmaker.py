@@ -213,32 +213,32 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.debug('Updating configviewer data for host "%s"', host)
             move(temp_path, dest_path)
 
+    def _notify_that_host_failed(self, host_name, stack_trace):
+        LOGGER.error('Build for host "{host_name}" failed.'.format(host_name=host_name))
+        failure_information = (host_name, stack_trace)
+        self.failed_host_queue.put(failure_information)
+
     def _build_hosts(self, hosts):
         if not hosts:
             LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
             return
 
-        host_queue = Queue()
+        self.host_queue = Queue()
         for host in hosts:
-            host_queue.put(host)
+            self.host_queue.put(host)
 
-        failed_host_queue = Queue()
+        self.failed_host_queue = Queue()
         rpm_queue = Queue()
         svn_service_queue = Queue()
         svn_service_queue.put(self.svn_service)
-
-        def notify_that_host_failed(host_name, stack_trace):
-            LOGGER.error('Build for host "{host_name}" failed.'.format(host_name=host_name))
-            failure_information = (host_name, stack_trace)
-            failed_host_queue.put(failure_information)
 
         thread_count = self._get_thread_count(hosts)
         thread_pool = [BuildHostThread(name='Thread-%d' % i,
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
-                                       notify_that_host_failed=notify_that_host_failed,
-                                       host_queue=host_queue,
+                                       notify_that_host_failed=self._notify_that_host_failed,
+                                       host_queue=self.host_queue,
                                        work_dir=self.work_dir,
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
@@ -249,7 +249,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         for thread in thread_pool:
             thread.join()
 
-        failed_hosts = dict(self._consume_queue(failed_host_queue))
+        failed_hosts = dict(self._consume_queue(self.failed_host_queue))
         if failed_hosts:
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
