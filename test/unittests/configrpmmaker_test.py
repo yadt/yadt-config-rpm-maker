@@ -16,8 +16,44 @@
 
 from mock import Mock, call, patch
 
+from Queue import Queue
+
 from unittest_support import UnitTests
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
+
+
+class ConstructorTests(UnitTests):
+
+    def setUp(self):
+
+        self.mock_svn_service = Mock()
+        self.config_rpm_maker = ConfigRpmMaker('123', self.mock_svn_service)
+
+    def test_should_use_given_revision(self):
+
+        self.assertEqual('123', self.config_rpm_maker.revision)
+
+    def test_should_use_given_svn_service(self):
+
+        self.assertEqual(self.mock_svn_service, self.config_rpm_maker.svn_service)
+
+    def test_should_read_temporary_directory_from_configuration(self):
+
+        self.assertEqual('target/tmp', self.config_rpm_maker.temp_dir)
+
+    def test_should_initialize_working_directory(self):
+
+        self.assertEqual(None, self.config_rpm_maker.work_dir)
+
+    def test_should_initialize_host_queue(self):
+
+        self.assert_is_instance_of(self.config_rpm_maker.host_queue, Queue)
+
+    def test_should_initialize_failed_host_queue(self):
+
+        mock_svn_service = Mock()
+
+        self.assert_is_instance_of(self.config_rpm_maker.failed_host_queue, Queue)
 
 
 class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
@@ -408,15 +444,6 @@ class CleanUpWorkingDirectoryTests(UnitTests):
 
 
 class NotifyThatHostBuildFailedTest(UnitTests):
-
-    def test_should_add_fail_information_to_failed_host_queue(self):
-
-        mock_config_rpm_maker = Mock(ConfigRpmMaker)
-        mock_config_rpm_maker.failed_host_queue = Mock()
-
-        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
-
-        mock_config_rpm_maker.failed_host_queue.put.assert_called_with(('devabc123', 'Stacktrace'))
 
     def test_should_add_fail_information_to_failed_host_queue(self):
 

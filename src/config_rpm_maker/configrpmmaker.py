@@ -120,6 +120,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self._assure_temp_dir_if_set()
         self._create_logger()
         self.work_dir = None
+        self.host_queue = Queue()
+        self.failed_host_queue = Queue()
 
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get(KEY_ERROR_LOG_URL)
@@ -225,11 +227,9 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
             return
 
-        self.host_queue = Queue()
         for host in hosts:
             self.host_queue.put(host)
 
-        self.failed_host_queue = Queue()
         rpm_queue = Queue()
         svn_service_queue = Queue()
         svn_service_queue.put(self.svn_service)

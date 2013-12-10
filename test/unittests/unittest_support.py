@@ -27,6 +27,14 @@ class UnitTests(TestCase):
         error_message = "Asserted that mock has not been called, but mock has been called %d times." % (mock_call_count)
         self.assertEqual(0, mock_call_count, error_message)
 
+    def assert_is_instance_of(self, test_object, the_class):
+
+        error_message = 'The given object "{test_object}" is not a instance of {class_name}'.format(test_object=str(test_object),
+                                                                                                    class_name=the_class.__name__)
+
+        self.assertTrue(isinstance(test_object, the_class), error_message)
+
+
     def create_fake_file(self, content=""):
         """
             Creates a fake file-like object. Use this is if you have to mock away
