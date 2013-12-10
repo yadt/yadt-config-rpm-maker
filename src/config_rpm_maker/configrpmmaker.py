@@ -214,9 +214,11 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             move(temp_path, dest_path)
 
     def _notify_that_host_failed(self, host_name, stack_trace):
-        LOGGER.error('Build for host "{host_name}" failed.'.format(host_name=host_name))
         failure_information = (host_name, stack_trace)
         self.failed_host_queue.put(failure_information)
+        approximately_count = self.failed_host_queue.qsize()
+        LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
+                                                                                                        count=approximately_count))
 
     def _build_hosts(self, hosts):
         if not hosts:
