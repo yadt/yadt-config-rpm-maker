@@ -34,6 +34,7 @@ from config_rpm_maker.config import (ConfigException,
                                      KEY_ERROR_LOG_URL,
                                      KEY_LOG_LEVEL,
                                      KEY_NO_CLEAN_UP,
+                                     KEY_MAX_FAILED_HOSTS,
                                      KEY_MAX_FILE_SIZE,
                                      KEY_PATH_TO_SPEC_FILE,
                                      KEY_REPO_PACKAGES_REGEX,
@@ -497,6 +498,25 @@ class EnsurePropertiesAreValidTest(TestCase):
         actual_properties = _ensure_properties_are_valid(properties)
 
         self.assertEqual(102400, actual_properties[KEY_MAX_FILE_SIZE])
+
+    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    def test_should_return_max_failed_hosts(self, mock_ensure_is_an_integer):
+
+        mock_ensure_is_an_integer.return_value = 5
+        properties = {'max_failed_hosts': 3}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertEqual(5, actual_properties[KEY_MAX_FAILED_HOSTS])
+        mock_ensure_is_an_integer.assert_any_call(KEY_MAX_FAILED_HOSTS, 3)
+
+    def test_should_return_default_for_max_failed_hosts_if_not_defined(self):
+
+        properties = {}
+
+        actual_properties = _ensure_properties_are_valid(properties)
+
+        self.assertEqual(3, actual_properties[KEY_MAX_FAILED_HOSTS])
 
     def test_should_return_default_config_viewer_only(self):
 

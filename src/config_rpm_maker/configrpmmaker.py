@@ -32,6 +32,7 @@ from threading import Thread
 from tempfile import mkdtemp
 
 from config_rpm_maker.config import (KEY_ERROR_LOG_URL,
+                                     KEY_MAX_FAILED_HOSTS,
                                      KEY_NO_CLEAN_UP,
                                      KEY_RPM_UPLOAD_COMMAND,
                                      KEY_RPM_UPLOAD_CHUNK_SIZE,
@@ -46,8 +47,6 @@ from config_rpm_maker.profiler import measure_execution_time, log_directories_su
 from config_rpm_maker.segment import OVERLAY_ORDER
 
 LOGGER = getLogger(__name__)
-
-MAX_FAILED_HOSTS = 3
 
 
 class BuildHostThread(Thread):
@@ -224,8 +223,9 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
                                                                                                         count=approximately_count))
 
-        if approximately_count >= MAX_FAILED_HOSTS:
-            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % MAX_FAILED_HOSTS)
+        maximum_allowed_failed_hosts = config.get(KEY_MAX_FAILED_HOSTS)
+        if approximately_count >= maximum_allowed_failed_hosts:
+            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % maximum_allowed_failed_hosts)
             self.host_queue.queue.clear()
 
     def _build_hosts(self, hosts):

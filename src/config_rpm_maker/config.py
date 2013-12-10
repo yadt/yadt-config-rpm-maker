@@ -34,6 +34,7 @@ DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
 DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 DEFAULT_ERROR_LOG_URL = ''
 DEFAULT_ERROR_LOG_DIRECTORY = ""
+DEFAULT_MAX_FAILED_HOSTS = 3
 DEFAULT_MAX_FILE_SIZE = 100 * 1024
 DEFAULT_HOST_NAME_ENCODING = 'ascii'
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
@@ -64,6 +65,7 @@ KEY_ERROR_LOG_URL = 'error_log_url'
 KEY_LOG_FORMAT = "log_format"
 KEY_LOG_LEVEL = "log_level"
 KEY_MAX_FILE_SIZE = 'max_file_size'
+KEY_MAX_FAILED_HOSTS = 'max_failed_hosts'
 KEY_NO_CLEAN_UP = 'no_clean_up'
 KEY_PATH_TO_SPEC_FILE = 'path_to_spec_file'
 KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
@@ -223,6 +225,7 @@ def _ensure_properties_are_valid(raw_properties):
     error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
     log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
     max_file_size = raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_MAX_FILE_SIZE)
+    max_failed_hosts = raw_properties.get(KEY_MAX_FAILED_HOSTS, DEFAULT_MAX_FAILED_HOSTS)
     path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
     repo_packages_regex = raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX)
     rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE)
@@ -240,6 +243,7 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_CUSTOM_DNS_SEARCHLIST: _ensure_is_a_list_of_strings(KEY_CUSTOM_DNS_SEARCHLIST, custom_dns_searchlist),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
+        KEY_MAX_FAILED_HOSTS: _ensure_is_an_integer(KEY_MAX_FAILED_HOSTS, max_failed_hosts),
         KEY_MAX_FILE_SIZE: _ensure_is_an_integer(KEY_MAX_FILE_SIZE, max_file_size),
         KEY_NO_CLEAN_UP: DEFAULT_NO_CLEAN_UP,
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
