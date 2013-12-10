@@ -449,7 +449,37 @@ class NotifyThatHostBuildFailedTest(UnitTests):
 
         mock_config_rpm_maker = Mock(ConfigRpmMaker)
         mock_config_rpm_maker.failed_host_queue = Mock()
+        mock_host_queue = Mock()
+        mock_config_rpm_maker.host_queue = mock_host_queue
 
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         mock_config_rpm_maker.failed_host_queue.put.assert_called_with(('devabc123', 'Stacktrace'))
+
+    def test_should_clear_hosts_queue_when_more_than_maximum_hosts_maximum_of_failed_hosts(self):
+
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        fake_queue = Queue()
+        fake_queue.put(('hostname1', 'stacktrace1'))
+        fake_queue.put(('hostname2', 'stacktrace2'))
+        fake_queue.put(('hostname3', 'stacktrace3'))
+        mock_config_rpm_maker.failed_host_queue = fake_queue
+        mock_config_rpm_maker.host_queue = Mock()
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
+
+    def test_should_clear_hosts_queue_when_maximum_of_failed_hosts_reached(self):
+
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        fake_queue = Queue()
+        fake_queue.put(('hostname1', 'stacktrace1'))
+        fake_queue.put(('hostname2', 'stacktrace2'))
+        mock_config_rpm_maker.failed_host_queue = fake_queue
+        mock_config_rpm_maker.host_queue = Mock()
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
+

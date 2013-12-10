@@ -47,6 +47,8 @@ from config_rpm_maker.segment import OVERLAY_ORDER
 
 LOGGER = getLogger(__name__)
 
+MAX_FAILED_HOSTS = 3
+
 
 class BuildHostThread(Thread):
 
@@ -221,6 +223,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         approximately_count = self.failed_host_queue.qsize()
         LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
                                                                                                         count=approximately_count))
+
+        if approximately_count >= MAX_FAILED_HOSTS:
+            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % MAX_FAILED_HOSTS)
+            self.host_queue.queue.clear()
 
     def _build_hosts(self, hosts):
         if not hosts:
