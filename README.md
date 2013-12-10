@@ -12,16 +12,18 @@ Usage: config_rpm_maker repo-url revision [options]
 
 Arguments:
   repo-url    URL to subversion repository or absolute path on localhost
-  revision    subversion revision for which the configuration rpms are going to be built
+  revision    subversion revision for which the configuration rpms are going
+              to be built
 
 Options:
   -h, --help            show this help message and exit
   --config-viewer-only  Only generate files for config viewer. Skip RPM build
                         and upload.
   --debug               force DEBUG log level on console
+  --no-clean-up         do not clean up working directory
+  --no-syslog           switch logging of debug information to syslog off
   --rpm-upload-cmd=RPM_UPLOAD_COMMAND
                         Overwrite rpm_upload_config in config file
-  --no-syslog           switch logging of debug information to syslog off
   --verbose             increase number of logging messages
   --version             show version
 ```

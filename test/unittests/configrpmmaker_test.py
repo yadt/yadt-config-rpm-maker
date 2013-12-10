@@ -16,8 +16,44 @@
 
 from mock import Mock, call, patch
 
+from Queue import Queue
+
 from unittest_support import UnitTests
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
+
+
+class ConstructorTests(UnitTests):
+
+    def setUp(self):
+
+        self.mock_svn_service = Mock()
+        self.config_rpm_maker = ConfigRpmMaker('123', self.mock_svn_service)
+
+    def test_should_use_given_revision(self):
+
+        self.assertEqual('123', self.config_rpm_maker.revision)
+
+    def test_should_use_given_svn_service(self):
+
+        self.assertEqual(self.mock_svn_service, self.config_rpm_maker.svn_service)
+
+    def test_should_read_temporary_directory_from_configuration(self):
+
+        self.assertEqual('target/tmp', self.config_rpm_maker.temp_dir)
+
+    def test_should_initialize_working_directory(self):
+
+        self.assertEqual(None, self.config_rpm_maker.work_dir)
+
+    def test_should_initialize_host_queue(self):
+
+        self.assert_is_instance_of(self.config_rpm_maker.host_queue, Queue)
+
+    def test_should_initialize_failed_host_queue(self):
+
+        mock_svn_service = Mock()
+
+        self.assert_is_instance_of(self.config_rpm_maker.failed_host_queue, Queue)
 
 
 class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
@@ -33,8 +69,8 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, [])
 
-        self.assert_mock_not_called(mock_move)
-        self.assert_mock_not_called(mock_rmtree)
+        self.assert_mock_never_called(mock_move)
+        self.assert_mock_never_called(mock_rmtree)
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
@@ -56,7 +92,7 @@ class MoveConfigviewerDirsToFinalDestinationTest(UnitTests):
 
         ConfigRpmMaker._move_configviewer_dirs_to_final_destination(self.mock_config_rpm_maker, ['devweb01'])
 
-        self.assert_mock_not_called(mock_rmtree)
+        self.assert_mock_never_called(mock_rmtree)
 
     @patch('config_rpm_maker.configrpmmaker.rmtree')
     @patch('config_rpm_maker.configrpmmaker.move')
@@ -225,7 +261,7 @@ class PrepareWorkDirTests(UnitTests):
 
         ConfigRpmMaker._prepare_work_dir(mock_config_rpm_maker)
 
-        self.assert_mock_not_called(mock_makedirs)
+        self.assert_mock_never_called(mock_makedirs)
 
     def test_should_create_tmp_directory_when_it_does_not_exist(self, mock_makedirs, mock_mkdtemp, mock_exists):
 
@@ -322,3 +358,151 @@ class PrepareWorkDirTests(UnitTests):
         mock_config_rpm_maker.temp_dir = 'temporary directory'
         mock_config_rpm_maker.revision = '4852'
         return mock_config_rpm_maker
+
+
+@patch('config_rpm_maker.configrpmmaker.remove')
+@patch('config_rpm_maker.configrpmmaker.rmtree')
+@patch('config_rpm_maker.configrpmmaker.exists')
+class CleanUpWorkingDirectoryTests(UnitTests):
+
+    def test_should_not_remove_anything_when_configuration_says_we_should_not_clean_up(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = True
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_exists)
+        self.assert_mock_never_called(mock_rmtree)
+        self.assert_mock_never_called(mock_remove)
+
+    def test_should_not_try_to_remove_working_directory_if_it_is_not_set(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = False
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = None
+        mock_config_rpm_maker.error_log_file = None
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_rmtree)
+        self.assert_mock_never_called(mock_remove)
+
+    def test_should_not_remove_working_directory_if_it_does_not_exist(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = False
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = None
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_rmtree)
+        self.assert_mock_never_called(mock_remove)
+        mock_exists.assert_any_call('/path/to/working/directory')
+
+    def test_should_remove_working_directory_if_it_exists(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = True
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = None
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        mock_exists.assert_any_call('/path/to/working/directory')
+        mock_rmtree.assert_called_with('/path/to/working/directory')
+
+    def test_should_not_remove_error_log_if_it_does_not_exist(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = False
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = '/path/to/error.log'
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        self.assert_mock_never_called(mock_remove)
+
+    def test_should_remove_error_log_if_it_exists(self, mock_exists, mock_rmtree, mock_remove):
+
+        mock_exists.return_value = True
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker._keep_work_dir.return_value = False
+        mock_config_rpm_maker.work_dir = '/path/to/working/directory'
+        mock_config_rpm_maker.error_log_file = '/path/to/error.log'
+
+        ConfigRpmMaker._clean_up_work_dir(mock_config_rpm_maker)
+
+        mock_exists.assert_any_call('/path/to/error.log')
+        mock_remove.assert_called_with('/path/to/error.log')
+
+
+class NotifyThatHostBuildFailedTest(UnitTests):
+
+    def test_should_add_fail_information_to_failed_host_queue(self):
+
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker.failed_host_queue = Mock()
+        mock_host_queue = Mock()
+        mock_config_rpm_maker.host_queue = mock_host_queue
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        mock_config_rpm_maker.failed_host_queue.put.assert_called_with(('devabc123', 'Stacktrace'))
+
+    @patch('config_rpm_maker.configrpmmaker.config')
+    def test_should_not_clear_hosts_queue_when_failed_hosts_under_maximum(self, mock_config):
+
+        mock_config.get.return_value = 100
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        fake_queue = Queue()
+        fake_queue.put(('hostname1', 'stacktrace1'))
+        fake_queue.put(('hostname2', 'stacktrace2'))
+        fake_queue.put(('hostname3', 'stacktrace3'))
+        mock_config_rpm_maker.failed_host_queue = fake_queue
+        mock_config_rpm_maker.host_queue = Mock()
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        self.assert_mock_never_called(mock_config_rpm_maker.host_queue.queue.clear)
+        mock_config.get.assert_called_with('max_failed_hosts')
+
+    @patch('config_rpm_maker.configrpmmaker.config')
+    def test_should_clear_hosts_queue_when_more_than_maximum_hosts_maximum_of_failed_hosts(self, mock_config):
+
+        mock_config.get.return_value = 3
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        fake_queue = Queue()
+        fake_queue.put(('hostname1', 'stacktrace1'))
+        fake_queue.put(('hostname2', 'stacktrace2'))
+        fake_queue.put(('hostname3', 'stacktrace3'))
+        mock_config_rpm_maker.failed_host_queue = fake_queue
+        mock_config_rpm_maker.host_queue = Mock()
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
+        mock_config.get.assert_called_with('max_failed_hosts')
+
+    @patch('config_rpm_maker.configrpmmaker.config')
+    def test_should_clear_hosts_queue_when_maximum_of_failed_hosts_reached(self, mock_config):
+
+        mock_config.get.return_value = 3
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        fake_queue = Queue()
+        fake_queue.put(('hostname1', 'stacktrace1'))
+        fake_queue.put(('hostname2', 'stacktrace2'))
+        mock_config_rpm_maker.failed_host_queue = fake_queue
+        mock_config_rpm_maker.host_queue = Mock()
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
+        mock_config.get.assert_called_with('max_failed_hosts')
+

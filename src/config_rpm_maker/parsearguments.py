@@ -20,7 +20,7 @@ from optparse import OptionParser
 from sys import stdout, exit
 
 from config_rpm_maker.returncodes import RETURN_CODE_NOT_ENOUGH_ARGUMENTS, RETURN_CODE_VERSION
-from config_rpm_maker.config import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, KEY_VERBOSE, set_property
+from config_rpm_maker.config import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, KEY_VERBOSE, KEY_NO_CLEAN_UP, set_property
 
 
 ARGUMENT_REPOSITORY = '<repository-url>'
@@ -30,13 +30,17 @@ USAGE_INFORMATION = """Usage: %prog repo-url revision [options]
 
 Arguments:
   repo-url    URL to subversion repository or absolute path on localhost
-  revision    subversion revision for which the configuration rpms are going to be built"""
+  revision    subversion revision for which the configuration rpms are going
+              to be built"""
 
 OPTION_CONFIG_VIEWER_ONLY = '--config-viewer-only'
 OPTION_CONFIG_VIEWER_ONLY_HELP = 'Only generate files for config viewer. Skip RPM build and upload.'
 
 OPTION_DEBUG = '--debug'
 OPTION_DEBUG_HELP = "force DEBUG log level on console"
+
+OPTION_NO_CLEAN_UP = '--no-clean-up'
+OPTION_NO_CLEAN_UP_HELP = "do not clean up working directory"
 
 OPTION_NO_SYSLOG = '--no-syslog'
 OPTION_NO_SYSLOG_HELP = "switch logging of debug information to syslog off"
@@ -49,6 +53,7 @@ OPTION_VERBOSE_HELP = "increase number of logging messages"
 
 OPTION_VERSION = '--version'
 OPTION_VERSION_HELP = "show version"
+
 
 def parse_arguments(argv, version):
     """
@@ -64,20 +69,23 @@ def parse_arguments(argv, version):
             ARGUMENT_REVISION: string, the second argument
     """
 
-    usage = USAGE_INFORMATION
-    parser = OptionParser(usage=usage)
+    parser = OptionParser(usage=USAGE_INFORMATION)
+
     parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
                       action="store_true", dest='config_viewer_only', default=False,
                       help=OPTION_CONFIG_VIEWER_ONLY_HELP)
     parser.add_option("", OPTION_DEBUG,
                       action="store_true", dest="debug", default=False,
                       help=OPTION_DEBUG_HELP)
-    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
-                      dest='rpm_upload_command', default=False,
-                      help=OPTION_RPM_UPLOAD_CMD_HELP)
+    parser.add_option("", OPTION_NO_CLEAN_UP,
+                      action="store_true", dest="no_clean_up", default=False,
+                      help=OPTION_NO_CLEAN_UP_HELP)
     parser.add_option("", OPTION_NO_SYSLOG,
                       action="store_true", dest="no_syslog", default=False,
                       help=OPTION_NO_SYSLOG_HELP)
+    parser.add_option("", OPTION_RPM_UPLOAD_CMD,
+                      dest='rpm_upload_command', default=False,
+                      help=OPTION_RPM_UPLOAD_CMD_HELP)
     parser.add_option("", OPTION_VERBOSE,
                       action="store_true", dest="verbose", default=False,
                       help=OPTION_VERBOSE_HELP)
@@ -95,6 +103,7 @@ def parse_arguments(argv, version):
         return exit(RETURN_CODE_NOT_ENOUGH_ARGUMENTS)
 
     arguments = {OPTION_DEBUG: values.debug,
+                 OPTION_NO_CLEAN_UP: values.no_clean_up,
                  OPTION_NO_SYSLOG: values.no_syslog,
                  OPTION_RPM_UPLOAD_CMD: values.rpm_upload_command,
                  OPTION_CONFIG_VIEWER_ONLY: values.config_viewer_only,
@@ -113,6 +122,9 @@ def apply_arguments_to_config(arguments):
 
     if arguments[OPTION_CONFIG_VIEWER_ONLY]:
         set_property(KEY_CONFIG_VIEWER_ONLY, arguments[OPTION_CONFIG_VIEWER_ONLY])
+
+    if arguments[OPTION_NO_CLEAN_UP]:
+        set_property(KEY_NO_CLEAN_UP, arguments[OPTION_NO_CLEAN_UP])
 
     if arguments[OPTION_VERBOSE]:
         set_property(KEY_VERBOSE, arguments[OPTION_VERBOSE])

@@ -19,12 +19,12 @@ import subprocess
 import unittest
 
 from Queue import Queue
-from os import environ, makedirs
+from os import makedirs
 from os.path import abspath, exists, join
 from shutil import rmtree
 
 from config_rpm_maker import config
-from config_rpm_maker.config import ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY, KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
 from config_rpm_maker.svnservice import SvnService
 
 
@@ -35,8 +35,8 @@ class IntegrationTestException(Exception):
 class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        if ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in environ:
-            del environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
+
+        config.set_property(KEY_NO_CLEAN_UP, False)
 
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
 
@@ -117,5 +117,5 @@ Expected content: {expected_content}
     def assert_path_exists(self, path):
         self.assertTrue(exists(path), 'Path "%s" does not exist.' % path)
 
-    def assert_path_does_not_exists(self, path):
+    def assert_path_does_not_exist(self, path):
         self.assertFalse(exists(path), 'Path "%s" should not exist!' % path)

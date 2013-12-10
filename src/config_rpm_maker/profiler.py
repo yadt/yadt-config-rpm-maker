@@ -19,11 +19,14 @@ from functools import wraps
 from logging import getLogger
 from math import ceil
 from time import time
+from os import walk
+from os.path import join, getsize
 
-from config_rpm_maker.config import KEY_THREAD_COUNT, get
+from config_rpm_maker.config import KEY_THREAD_COUNT, KEY_VERBOSE, get
 
 LOGGER = getLogger(__name__)
 
+NUMBER_OF_LARGEST_FILES_TO_LOG = 10
 LOG_EACH_MEASUREMENT = False
 
 _summary = {}
@@ -86,3 +89,70 @@ def log_execution_time_summaries(logging_function):
 
         logging_function('    %3s times with average %5ss = sum %5ss : %s',
                          summary_of_function[1], average_time, rounded_elapsed_time, function_name)
+
+
+def log_directory_size_summary(logging_function, start_path):
+
+    if not get(KEY_VERBOSE):
+        return
+
+    file_and_size = {}
+    total_size = 0
+    count_of_files = 0
+    for dirpath, dirnames, filenames in walk(start_path):
+        for file_name in filenames:
+            file_path = join(dirpath, file_name)
+            file_size = getsize(file_path)
+            file_and_size[file_path] = file_size
+            total_size += file_size
+            count_of_files += 1
+
+    sorted_files_sizes = sorted(file_and_size.values())
+
+    logging_function('Found %d files in directory "%s" with a total size of %d bytes', count_of_files, start_path, total_size)
+    logging_function("The %d largest files are (size in bytes):", NUMBER_OF_LARGEST_FILES_TO_LOG)
+    for file_size in sorted_files_sizes[-NUMBER_OF_LARGEST_FILES_TO_LOG:]:
+        for file_path in file_and_size.keys():
+            if file_size == file_and_size[file_path]:
+                logging_function('    %10d %s', file_size, file_path)
+
+
+def log_directories_summary(logging_function, start_path):
+
+    if not get(KEY_VERBOSE):
+        return
+
+    directories_summary = {}
+    directories = walk(start_path).next()[1]
+
+    absolute_count_of_files = 0
+    absolute_total_size = 0
+
+    for file_name in walk(start_path).next()[2]:
+        file_path = join(start_path, file_name)
+        file_size = getsize(file_path)
+        absolute_total_size += file_size
+        absolute_count_of_files += 1
+
+    directories_summary[start_path] = (absolute_count_of_files, absolute_total_size)
+
+    for directory in directories:
+        total_size = 0
+        count_of_files = 0
+        directory_path = join(start_path, directory)
+        for dirpath, dirnames, filenames in walk(directory_path):
+            for file_name in filenames:
+                file_path = join(dirpath, file_name)
+                file_size = getsize(file_path)
+                total_size += file_size
+                absolute_total_size += file_size
+                count_of_files += 1
+                absolute_count_of_files += 1
+
+        directories_summary[directory_path] = (count_of_files, total_size)
+
+    logging_function('Found %d files in directory "%s" with a total size of %d bytes', absolute_count_of_files, start_path, absolute_total_size)
+    for directory in sorted(directories_summary.keys()):
+        count_of_files = directories_summary[directory][0]
+        total_size = directories_summary[directory][1]
+        logging_function('    %5d files with total size of %10d bytes in directory "%s"', count_of_files, total_size, directory)

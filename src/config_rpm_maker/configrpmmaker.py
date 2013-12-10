@@ -24,15 +24,16 @@ import traceback
 import config
 
 from logging import ERROR, FileHandler, Formatter, getLogger
-from os import makedirs
+from os import makedirs, remove
 from os.path import exists, join
 from Queue import Queue
 from shutil import rmtree, move
 from threading import Thread
 from tempfile import mkdtemp
 
-from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY,
-                                     KEY_ERROR_LOG_URL,
+from config_rpm_maker.config import (KEY_ERROR_LOG_URL,
+                                     KEY_MAX_FAILED_HOSTS,
+                                     KEY_NO_CLEAN_UP,
                                      KEY_RPM_UPLOAD_COMMAND,
                                      KEY_RPM_UPLOAD_CHUNK_SIZE,
                                      KEY_THREAD_COUNT,
@@ -42,7 +43,7 @@ from config_rpm_maker.config import (ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIREC
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.logutils import log_elements_of_list
-from config_rpm_maker.profiler import measure_execution_time
+from config_rpm_maker.profiler import measure_execution_time, log_directories_summary
 from config_rpm_maker.segment import OVERLAY_ORDER
 
 LOGGER = getLogger(__name__)
@@ -50,14 +51,14 @@ LOGGER = getLogger(__name__)
 
 class BuildHostThread(Thread):
 
-    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
+    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, notify_that_host_failed, work_dir, name=None, error_logging_handler=None):
         super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
         self.rpm_queue = rpm_queue
         self.work_dir = work_dir
-        self.failed_host_queue = failed_host_queue
+        self.notify_that_host_failed = notify_that_host_failed
         self.error_logging_handler = error_logging_handler
 
     def run(self):
@@ -76,10 +77,10 @@ class BuildHostThread(Thread):
                     self.rpm_queue.put(rpm)
 
             except BaseConfigRpmMakerException as e:
-                self.failed_host_queue.put((host, str(e)))
+                self.notify_that_host_failed(host, str(e))
 
             except Exception:
-                self.failed_host_queue.put((host, traceback.format_exc()))
+                self.notify_that_host_failed(host, traceback.format_exc())
 
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
@@ -120,6 +121,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self._assure_temp_dir_if_set()
         self._create_logger()
         self.work_dir = None
+        self.host_queue = Queue()
+        self.failed_host_queue = Queue()
 
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = config.get(KEY_ERROR_LOG_URL)
@@ -163,16 +166,20 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return rpms
 
     def _clean_up_work_dir(self):
-        LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
-        if self.work_dir and os.path.exists(self.work_dir) and not self._keep_work_dir():
-            shutil.rmtree(self.work_dir)
+        if self._keep_work_dir():
+            LOGGER.info('All working data can be found in "{working_directory}"'.format(working_directory=self.work_dir))
+        else:
+            if self.work_dir and exists(self.work_dir):
+                log_directories_summary(LOGGER.info, self.work_dir)
+                LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
+                rmtree(self.work_dir)
 
-        if os.path.exists(self.error_log_file):
-            LOGGER.debug('Removing error log "%s"', self.error_log_file)
-            os.remove(self.error_log_file)
+            if exists(self.error_log_file):
+                LOGGER.debug('Removing error log "%s"', self.error_log_file)
+                remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY in os.environ and os.environ[ENVIRONMENT_VARIABLE_KEY_KEEP_WORKING_DIRECTORY]
+        return config.get(KEY_NO_CLEAN_UP)
 
     def _move_error_log_for_public_access(self):
         error_log_dir = os.path.join(config.get('error_log_dir'))
@@ -209,16 +216,26 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.debug('Updating configviewer data for host "%s"', host)
             move(temp_path, dest_path)
 
+    def _notify_that_host_failed(self, host_name, stack_trace):
+        failure_information = (host_name, stack_trace)
+        self.failed_host_queue.put(failure_information)
+        approximately_count = self.failed_host_queue.qsize()
+        LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
+                                                                                                        count=approximately_count))
+
+        maximum_allowed_failed_hosts = config.get(KEY_MAX_FAILED_HOSTS)
+        if approximately_count >= maximum_allowed_failed_hosts:
+            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % maximum_allowed_failed_hosts)
+            self.host_queue.queue.clear()
+
     def _build_hosts(self, hosts):
         if not hosts:
             LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
             return
 
-        host_queue = Queue()
         for host in hosts:
-            host_queue.put(host)
+            self.host_queue.put(host)
 
-        failed_host_queue = Queue()
         rpm_queue = Queue()
         svn_service_queue = Queue()
         svn_service_queue.put(self.svn_service)
@@ -228,8 +245,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
-                                       failed_host_queue=failed_host_queue,
-                                       host_queue=host_queue,
+                                       notify_that_host_failed=self._notify_that_host_failed,
+                                       host_queue=self.host_queue,
                                        work_dir=self.work_dir,
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
@@ -240,7 +257,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         for thread in thread_pool:
             thread.join()
 
-        failed_hosts = dict(self._consume_queue(failed_host_queue))
+        failed_hosts = dict(self._consume_queue(self.failed_host_queue))
         if failed_hosts:
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))

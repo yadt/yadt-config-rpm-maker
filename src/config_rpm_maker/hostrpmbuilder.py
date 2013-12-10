@@ -21,14 +21,17 @@ import subprocess
 from pysvn import ClientError
 from datetime import datetime
 from logging import ERROR, Formatter, FileHandler, getLogger
-from os import mkdir
-from os.path import exists
+from os import mkdir, remove, environ
+from os.path import exists, abspath
+from shutil import rmtree
+from subprocess import PIPE, Popen
 
 from config_rpm_maker import config
-from config_rpm_maker.config import KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
+from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
+from config_rpm_maker.logutils import verbose
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
 from config_rpm_maker.profiler import measure_execution_time
@@ -60,6 +63,8 @@ class HostRpmBuilder(object):
         self.revision = revision
         self.work_dir = work_dir
         self.error_logging_handler = error_logging_handler
+        self.output_file_path = os.path.join(self.work_dir, self.hostname + '.output')
+        self.error_file_path = os.path.join(self.work_dir, self.hostname + '.error')
         self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
         self.config_rpm_prefix = config.get(KEY_CONFIG_RPM_PREFIX)
@@ -140,8 +145,21 @@ class HostRpmBuilder(object):
         self._write_overlaying_for_config_viewer(overall_exported)
 
         self._remove_logger_handlers()
+        self._clean_up()
 
         return self._find_rpms()
+
+    def _clean_up(self):
+        if config.get(KEY_NO_CLEAN_UP):
+            verbose(LOGGER).debug('Not cleaning up anything for host "%s"', self.hostname)
+            return
+
+        LOGGER.debug('Cleaning up temporary files for host "%s"', self.hostname)
+
+        rmtree(self.variables_dir)
+        rmtree(self.host_config_dir)
+        remove(self.output_file_path)
+        remove(self.error_file_path)
 
     def _filter_tokens_in_config_viewer(self):
 
@@ -179,18 +197,24 @@ class HostRpmBuilder(object):
     def _build_rpm_using_rpmbuild(self):
         tar_path = self._tar_sources()
 
-        working_environment = os.environ.copy()
-        working_environment['HOME'] = os.path.abspath(self.work_dir)
-        rpmbuild_cmd = "rpmbuild --define '_topdir %s' -ta %s" % (os.path.abspath(self.rpm_build_dir), tar_path)
+        working_environment = environ.copy()
+        working_environment['HOME'] = abspath(self.work_dir)
+        absolute_rpm_build_path = abspath(self.rpm_build_dir)
+
+        clean_option = "--clean"
+        if config.get(KEY_NO_CLEAN_UP):
+            clean_option = ""
+
+        rpmbuild_cmd = "rpmbuild %s --define '_topdir %s' -ta %s" % (clean_option, absolute_rpm_build_path, tar_path)
 
         LOGGER.debug('%s: building rpms by executing "%s"', self.thread_name, rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
 
-        process = subprocess.Popen(rpmbuild_cmd,
-                                   shell=True,
-                                   env=working_environment,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+        process = Popen(rpmbuild_cmd,
+                        shell=True,
+                        env=working_environment,
+                        stdout=PIPE,
+                        stderr=PIPE)
 
         stdout, stderr = process.communicate()
 
@@ -206,12 +230,14 @@ class HostRpmBuilder(object):
         output_file = self.host_config_dir + '.tar.gz'
         tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
         self.logger.debug("Executing %s ...", tar_cmd)
-        p = subprocess.Popen(tar_cmd,
-                             shell=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        if p.returncode:
+        process = subprocess.Popen(tar_cmd,
+                                   shell=True,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        if process.returncode:
+            stdout = stdout.strip()
+            stderr = stderr.strip()
             raise CouldNotTarConfigurationDirectoryException('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
@@ -387,11 +413,11 @@ Change set:
         log_level = config.get(KEY_LOG_LEVEL)
         formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
 
-        self.handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.output'))
+        self.handler = FileHandler(self.output_file_path)
         self.handler.setFormatter(formatter)
         self.handler.setLevel(log_level)
 
-        self.error_handler = FileHandler(os.path.join(self.work_dir, self.hostname + '.error'))
+        self.error_handler = FileHandler(self.error_file_path)
         self.error_handler.setFormatter(formatter)
         self.error_handler.setLevel(ERROR)
 
