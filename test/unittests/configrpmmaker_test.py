@@ -405,3 +405,15 @@ class CleanUpWorkingDirectoryTests(UnitTests):
 
         mock_exists.assert_any_call('/path/to/error.log')
         mock_remove.assert_called_with('/path/to/error.log')
+
+
+class NotifyThatHostBuildFailedTest(UnitTests):
+
+    def test_should_add_fail_information_to_failed_host_queue(self):
+
+        mock_config_rpm_maker = Mock(ConfigRpmMaker)
+        mock_config_rpm_maker.failed_host_queue = Mock()
+
+        ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
+
+        mock_config_rpm_maker.failed_host_queue.put.assert_called_with(('devabc123', 'Stacktrace'))
