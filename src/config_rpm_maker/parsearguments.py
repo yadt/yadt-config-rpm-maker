@@ -69,8 +69,8 @@ def parse_arguments(argv, version):
             ARGUMENT_REVISION: string, the second argument
     """
 
-    usage = USAGE_INFORMATION
-    parser = OptionParser(usage=usage)
+    parser = OptionParser(usage=USAGE_INFORMATION)
+
     parser.add_option("", OPTION_CONFIG_VIEWER_ONLY,
                       action="store_true", dest='config_viewer_only', default=False,
                       help=OPTION_CONFIG_VIEWER_ONLY_HELP)
