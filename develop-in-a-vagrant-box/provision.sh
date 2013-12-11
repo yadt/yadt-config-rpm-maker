@@ -18,8 +18,6 @@
 
 set -e
 
-sudo -u vagrant
-
 source "configuration.sh"
 source "library.sh"
 
