@@ -43,6 +43,7 @@ svn commit -m "We will need httpd since we are building a web application."
 
 After you made code changes and committed them to your fork you will want to reinstall `yadt-config-rpm-maker` to your vagrant box.
 ```bash
+cd /vagrant
 ./reinstall
 ```
 We use this quite complicated way to omit working in the vagrant directory (which can be accessed by the vagrant box).
