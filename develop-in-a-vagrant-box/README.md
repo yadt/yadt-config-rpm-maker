@@ -22,11 +22,6 @@ Now you should have a svnserve daemon running on your vagrant box.
 vagrant ssh
 ```
 
-Change into the vagrant home directory.
-```bash
-cd ~
-```
-
 Checkout the configuration repository.
 ```bash
 svn checkout svn://localhost.localdomain/ working-copy
