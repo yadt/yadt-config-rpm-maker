@@ -338,8 +338,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     def _create_logger(self):
         self.error_log_file = tempfile.mktemp(dir=config.get(KEY_TEMPORARY_DIRECTORY),
-                                              prefix='yadt-config-rpm-maker',
-                                              suffix='.error.log')
+                                              prefix='yadt-config-rpm-maker.',
+                                              suffix='.revision-%s.error.log' % self.revision)
         self.error_handler = FileHandler(self.error_log_file)
         formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
         self.error_handler.setFormatter(formatter)
