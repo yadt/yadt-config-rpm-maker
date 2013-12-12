@@ -67,8 +67,15 @@ class SvnService(object):
         self._log_change_set_meta_information(logs)
 
         start_pos = len(self.path_to_config + '/')
-        changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
-        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s).', changed_paths)
+        changed_paths = []
+        changed_paths_with_action = []
+        for info in logs:
+            for path_obj in info.changed_paths:
+                changed_path = path_obj.path[start_pos:]
+                changed_paths.append(changed_path)
+                changed_paths_with_action.append(path_obj.action + " " + changed_path)
+
+        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s). Listing with svn action.', changed_paths_with_action)
         return changed_paths
 
     @measure_execution_time
