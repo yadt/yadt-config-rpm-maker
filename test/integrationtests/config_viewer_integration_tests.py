@@ -98,7 +98,80 @@ loctyp/berweb:/vars/var_in_var
         self.assert_config_viewer_file('devweb01', join('VARIABLES', 'RPM_REQUIRES_REPOS'), "")
         self.assert_config_viewer_file('devweb01', join('vars', 'override'), '''<!DOCTYPE html><html><head><title>override</title></head><body><pre><strong title="OVERRIDE">all</strong></pre></body></html>''')
 
+        self.assert_config_viewer_file('devweb01', 'devweb01.overlaying', """host/devweb01:/VARIABLES
+host/devweb01:/VARIABLES/DUMMY_VAR1
+all:/VARIABLES/OVERRIDE
+typ/web:/VARIABLES/RPM_PROVIDES
+typ/web:/VARIABLES/RPM_REQUIRES
+typ/web:/data
+typ/web:/data/file-with-special-character
+typ/web:/data/index.html
+typ/web:/data/other.html
+all:/files
+all:/files/binary.zip
+all:/files/file_from_all
+all:/files/override
+all:/vars
+all:/vars/override
+""")
+
+        self.assert_config_viewer_file('devweb01', 'devweb01.variables', """<!DOCTYPE html><html><head><title>devweb01.variables</title></head><body><pre>                                 ALIASES :
+                                     ALL : all
+                              DUMMY_VAR1 :
+                                    FQDN : localhost.localdomain
+                                    HOST : devweb01
+                                  HOSTNR : 01
+                                      IP : 127.0.0.1
+                                     LOC : dev
+                                  LOCTYP : devweb
+                                OVERRIDE : all
+                                REVISION : 2
+                            RPM_PROVIDES : typ-web-provides, all-prov, all-prov2, all-prov3
+                            RPM_REQUIRES : all-req2, all-req, ty-web-requirement
+                  RPM_REQUIRES_NON_REPOS : all-req2, all-req, ty-web-requirement
+                      RPM_REQUIRES_REPOS :
+                            SHORT_HOSTNR : 1
+                                     TYP : web
+</pre></body></html>""")
+
         self.assert_host_files_are_there('tuvweb01')
+
+        self.assert_config_viewer_file_exactly('tuvweb01', 'tuvweb01.overlaying', """host/tuvweb01:/VARIABLES
+host/tuvweb01:/VARIABLES/DUMMY_VAR2
+all:/VARIABLES/OVERRIDE
+typ/web:/VARIABLES/RPM_PROVIDES
+typ/web:/VARIABLES/RPM_REQUIRES
+typ/web:/data
+typ/web:/data/file-with-special-character
+typ/web:/data/index.html
+typ/web:/data/other.html
+all:/files
+all:/files/binary.zip
+all:/files/file_from_all
+all:/files/override
+all:/vars
+all:/vars/override
+""")
+
+        self.assert_config_viewer_file('tuvweb01', 'tuvweb01.variables', """<!DOCTYPE html><html><head><title>tuvweb01.variables</title></head><body><pre>                                 ALIASES :
+                                     ALL : all
+                              DUMMY_VAR2 :
+                                    FQDN : localhost.localdomain
+                                    HOST : tuvweb01
+                                  HOSTNR : 01
+                                      IP : 127.0.0.1
+                                     LOC : tuv
+                                  LOCTYP : tuvweb
+                                OVERRIDE : all
+                                REVISION : 2
+                            RPM_PROVIDES : typ-web-provides, all-prov, all-prov2, all-prov3
+                            RPM_REQUIRES : all-req2, all-req, ty-web-requirement
+                  RPM_REQUIRES_NON_REPOS : all-req2, all-req, ty-web-requirement
+                      RPM_REQUIRES_REPOS :
+                            SHORT_HOSTNR : 1
+                                     TYP : web
+</pre></body></html>""")
+
         self.assert_config_viewer_file('tuvweb01', join('files', 'override'), "<!DOCTYPE html><html><head><title>override</title></head><body><pre>all</pre></body></html>")
         self.assert_config_viewer_file('tuvweb01', join('VARIABLES', 'LOC'), "<!DOCTYPE html><html><head><title>LOC</title></head><body><pre>tuv</pre></body></html>")
         self.assert_config_viewer_file('tuvweb01', join('VARIABLES', 'LOCTYP'), "<!DOCTYPE html><html><head><title>LOCTYP</title></head><body><pre>tuvweb</pre></body></html>")
