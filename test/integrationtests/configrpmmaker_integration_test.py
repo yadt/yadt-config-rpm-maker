@@ -173,7 +173,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
 
     def _given_config_rpm_maker(self):
-        svn_service = SvnService(base_url=self.repo_url, username=None, password=None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
 
         return ConfigRpmMaker('2', svn_service)
 
