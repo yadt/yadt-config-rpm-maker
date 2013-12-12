@@ -99,18 +99,24 @@ loctyp/berweb:/vars/var_in_var
         self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_REQUIRES'), "<!DOCTYPE html><html><head><title>RPM_REQUIRES</title></head><body><pre>ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement</pre></body></html>")
         self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_REQUIRES_NON_REPOS'), "<!DOCTYPE html><html><head><title>RPM_REQUIRES_NON_REPOS</title></head><body><pre>ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement</pre></body></html>")
         self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_REQUIRES_REPOS'), "")
-        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'SHORT_HOSTNR'), "1")
+        self.assert_config_viewer_file_exactly('berweb01', join('VARIABLES', 'SHORT_HOSTNR'), "1")
         self.assert_config_viewer_file('berweb01', join('VARIABLES', 'SVNLOG'), "<!DOCTYPE html><html><head><title>SVNLOG</title></head><body><pre>")
         self.assert_config_viewer_file('berweb01', join('VARIABLES', 'TYP'), "<!DOCTYPE html><html><head><title>TYP</title></head><body><pre>web</pre></body></html>")
         self.assert_config_viewer_file('berweb01', join('VARIABLES', 'VAR_IN_VAR'), '''<!DOCTYPE html><html><head><title>VAR_IN_VAR</title></head><body><pre><strong title="LOC">ber</strong><strong title="TYP">web</strong><strong title="OVERRIDE">berweb</strong></pre></body></html>''')
 
         self.assert_config_viewer_file('berweb01', join('vars', 'override'), '''<!DOCTYPE html><html><head><title>override</title></head><body><pre><strong title="OVERRIDE">berweb</strong></pre></body></html>''')
         self.assert_config_viewer_file('berweb01', join('vars', 'var_in_var'), '''<!DOCTYPE html><html><head><title>var_in_var</title></head><body><pre><strong title="VAR_IN_VAR">berwebberweb</strong></pre></body></html>''')
+        self.assert_config_viewer_path_exists('berweb01', 'yadt-config-berweb01.spec')
+
+    def assert_config_viewer_file_exactly(self, host_name, file_path, content):
+        host_directory = config.build_config_viewer_host_directory(host_name)
+        overlaying_path = join(host_directory, file_path)
+        self.assert_file_content(overlaying_path, content)
 
     def assert_config_viewer_file(self, host_name, file_path, content):
         host_directory = config.build_config_viewer_host_directory(host_name)
         overlaying_path = join(host_directory, file_path)
-        self.assert_file_content(overlaying_path, content)
+        self.assert_file_content_line_by_line(overlaying_path, content)
 
     def assert_config_viewer_path_exists(self, host_name, *path):
         path_to_check = join(config.build_config_viewer_host_directory(host_name), *path)

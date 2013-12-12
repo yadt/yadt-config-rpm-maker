@@ -104,6 +104,22 @@ class IntegrationTest(unittest.TestCase):
         with open(path_to_file) as revision_file:
             actual_content = revision_file.read()
 
+            error_message = """File "{path_to_file}" did not have expected content.
+Expected: "{expected}"
+ but was: "{actual}"
+""".format(path_to_file=path_to_file,
+           expected=expected_content,
+           actual=actual_content)
+
+            self.assertEqual(expected_content, actual_content, error_message)
+
+    def assert_file_content_line_by_line(self, path_to_file, expected_content):
+
+        self.assert_path_exists(path_to_file)
+
+        with open(path_to_file) as revision_file:
+            actual_content = revision_file.read()
+
             expected_lines = expected_content.split('\n')
             actual_lines = actual_content.split('\n')
 
