@@ -40,8 +40,7 @@ class IntegrationTest(unittest.TestCase):
 
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
 
-        if exists(temporary_directory):
-            rmtree(temporary_directory)
+        self.clean_up_temporary_directory(temporary_directory)
 
         self.temporary_directory = temporary_directory
 
@@ -49,8 +48,7 @@ class IntegrationTest(unittest.TestCase):
 
     def tearDown(self):
 
-        if exists(self.temporary_directory):
-            rmtree(self.temporary_directory)
+        self.clean_up_temporary_directory(self.temporary_directory)
 
     def create_svn_repo(self):
         self._create_repository_directory()
@@ -119,3 +117,7 @@ Expected content: {expected_content}
 
     def assert_path_does_not_exist(self, path):
         self.assertFalse(exists(path), 'Path "%s" should not exist!' % path)
+
+    def clean_up_temporary_directory(self, temporary_directory):
+        if exists(temporary_directory):
+            rmtree(temporary_directory)
