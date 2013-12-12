@@ -33,10 +33,7 @@ class ConfigViewerIntegrationTests(IntegrationTest):
 
         ConfigRpmMaker('2', svn_service).build()
 
-        host_name = 'berweb01'
-        host_directory = config.build_config_viewer_host_directory(host_name)
-        overlaying_path = join(host_directory, host_name + '.overlaying')
-        self.assert_file_content(overlaying_path, """host/berweb01:/VARIABLES
+        self.assert_config_viewer_file('berweb01', 'berweb01.overlaying', """host/berweb01:/VARIABLES
 loctyp/berweb:/VARIABLES/OVERRIDE
 loc/pro:/VARIABLES/RPM_PROVIDES
 host/berweb01:/VARIABLES/RPM_REQUIRES
@@ -55,3 +52,66 @@ loctyp/berweb:/vars
 all:/vars/override
 loctyp/berweb:/vars/var_in_var
 """)
+
+        self.assert_config_viewer_file('berweb01', 'berweb01.variables', """<!DOCTYPE html><html><head><title>berweb01.variables</title></head><body><pre>                                 ALIASES :
+                                     ALL : all
+                                    FQDN : localhost.localdomain
+                                    HOST : berweb01
+                                  HOSTNR : 01
+                                      IP : 127.0.0.1
+                                     LOC : ber
+                                  LOCTYP : berweb
+                                OVERRIDE : berweb
+                                REVISION : 2
+                            RPM_PROVIDES : pro-prov2, all-prov2, all-prov, pro-prov, typ-web-provides, all-prov3
+                            RPM_REQUIRES : ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement
+                  RPM_REQUIRES_NON_REPOS : ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement
+                      RPM_REQUIRES_REPOS :
+                            SHORT_HOSTNR : 1
+                                     TYP : web
+                              VAR_IN_VAR : <strong title="LOC">ber</strong><strong title="TYP">web</strong><strong title="OVERRIDE">berweb</strong>
+</pre></body></html>""")
+
+        self.assert_config_viewer_path_exists('berweb01', 'data', 'file-with-special-character')
+
+        self.assert_config_viewer_file('berweb01', join('data', 'index.html'), "<!DOCTYPE html><html><head><title>index.html</title></head><body><pre>&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;/html&gt;")
+        self.assert_config_viewer_file('berweb01', join('data', 'other.html'), "<!DOCTYPE html><html><head><title>other.html</title></head><body><pre>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;")
+
+        self.assert_config_viewer_path_exists('berweb01', 'files', 'binary.zip')
+        self.assert_config_viewer_file('berweb01', join('files', 'file_from_all'), "")
+        self.assert_config_viewer_file('berweb01', join('files', 'file_from_ber'), "")
+        self.assert_config_viewer_file('berweb01', join('files', 'file_from_pro'), "")
+        self.assert_config_viewer_file('berweb01', join('files', 'override'), "<!DOCTYPE html><html><head><title>override</title></head><body><pre>berweb</pre></body></html>")
+
+        self.assert_config_viewer_file('berweb01', 'unused_variables.txt', "<!DOCTYPE html><html><head><title>unused_variables.txt</title></head><body><pre>ALIASES")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'ALIASES'), "")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'ALL'), "<!DOCTYPE html><html><head><title>ALL</title></head><body><pre>all</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'FQDN'), "<!DOCTYPE html><html><head><title>FQDN</title></head><body><pre>localhost.localdomain</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'HOST'), "<!DOCTYPE html><html><head><title>HOST</title></head><body><pre>berweb01</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'HOSTNR'), "<!DOCTYPE html><html><head><title>HOSTNR</title></head><body><pre>01</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'IP'), "<!DOCTYPE html><html><head><title>IP</title></head><body><pre>127.0.0.1</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'LOC'), "<!DOCTYPE html><html><head><title>LOC</title></head><body><pre>ber</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'LOCTYP'), "<!DOCTYPE html><html><head><title>LOCTYP</title></head><body><pre>berweb</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'OVERLAYING'), "<!DOCTYPE html><html><head><title>OVERLAYING</title></head><body><pre>            host/berweb01 : /VARIABLES")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'OVERRIDE'), "<!DOCTYPE html><html><head><title>OVERRIDE</title></head><body><pre>berweb</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'REVISION'), "2")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_PROVIDES'), "<!DOCTYPE html><html><head><title>RPM_PROVIDES</title></head><body><pre>pro-prov2, all-prov2, all-prov, pro-prov, typ-web-provides, all-prov3</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_REQUIRES'), "<!DOCTYPE html><html><head><title>RPM_REQUIRES</title></head><body><pre>ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_REQUIRES_NON_REPOS'), "<!DOCTYPE html><html><head><title>RPM_REQUIRES_NON_REPOS</title></head><body><pre>ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'RPM_REQUIRES_REPOS'), "")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'SHORT_HOSTNR'), "1")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'SVNLOG'), "<!DOCTYPE html><html><head><title>SVNLOG</title></head><body><pre>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'TYP'), "<!DOCTYPE html><html><head><title>TYP</title></head><body><pre>web</pre></body></html>")
+        self.assert_config_viewer_file('berweb01', join('VARIABLES', 'VAR_IN_VAR'), '''<!DOCTYPE html><html><head><title>VAR_IN_VAR</title></head><body><pre><strong title="LOC">ber</strong><strong title="TYP">web</strong><strong title="OVERRIDE">berweb</strong></pre></body></html>''')
+
+        self.assert_config_viewer_file('berweb01', join('vars', 'override'), '''<!DOCTYPE html><html><head><title>override</title></head><body><pre><strong title="OVERRIDE">berweb</strong></pre></body></html>''')
+        self.assert_config_viewer_file('berweb01', join('vars', 'var_in_var'), '''<!DOCTYPE html><html><head><title>var_in_var</title></head><body><pre><strong title="VAR_IN_VAR">berwebberweb</strong></pre></body></html>''')
+
+    def assert_config_viewer_file(self, host_name, file_path, content):
+        host_directory = config.build_config_viewer_host_directory(host_name)
+        overlaying_path = join(host_directory, file_path)
+        self.assert_file_content(overlaying_path, content)
+
+    def assert_config_viewer_path_exists(self, host_name, *path):
+        path_to_check = join(config.build_config_viewer_host_directory(host_name), *path)
+        self.assert_path_exists(path_to_check)

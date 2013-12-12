@@ -27,6 +27,10 @@ from config_rpm_maker import config
 from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
 from config_rpm_maker.svnservice import SvnService
 
+# This constant exists for debugging purposes.
+# Switch this to True if you want to see the generated files after executing a test.
+KEEP_TEMPORARY_DIRECTORY = False
+
 
 class IntegrationTestException(Exception):
     pass
@@ -36,7 +40,7 @@ class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, False)
+        config.set_property(KEY_NO_CLEAN_UP, KEEP_TEMPORARY_DIRECTORY)
 
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
 
@@ -99,11 +103,23 @@ class IntegrationTest(unittest.TestCase):
 
         with open(path_to_file) as revision_file:
             actual_content = revision_file.read()
-            error_message = """File "{path_to_file}" did not have expected content.
-Expected content: {expected_content}
-  Actual content: {actual_content}
-""".format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
-            self.assertEqual(expected_content, actual_content, error_message)
+
+            expected_lines = expected_content.split('\n')
+            actual_lines = actual_content.split('\n')
+
+            line_number = 0;
+            for expected_line in expected_lines:
+                actual_line = actual_lines[line_number]
+                error_message = """File "{path_to_file}" did not have expected content in line {line_number} (white space is trimmed).
+Expected: "{expected}"
+ but was: "{actual}"
+""".format(path_to_file=path_to_file,
+           expected=expected_line,
+           actual=actual_line,
+           line_number=line_number + 1)
+
+                self.assertEqual(expected_line.strip(), actual_line.strip(), error_message)
+                line_number += 1
 
     def create_svn_service_queue(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
@@ -119,5 +135,5 @@ Expected content: {expected_content}
         self.assertFalse(exists(path), 'Path "%s" should not exist!' % path)
 
     def clean_up_temporary_directory(self, temporary_directory):
-        if exists(temporary_directory):
+        if not KEEP_TEMPORARY_DIRECTORY and exists(temporary_directory):
             rmtree(temporary_directory)
