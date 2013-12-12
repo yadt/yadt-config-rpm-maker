@@ -107,9 +107,7 @@ class IntegrationTest(unittest.TestCase):
             error_message = """File "{path_to_file}" did not have expected content.
 Expected: "{expected}"
  but was: "{actual}"
-""".format(path_to_file=path_to_file,
-           expected=expected_content,
-           actual=actual_content)
+""".format(path_to_file=path_to_file, expected=expected_content, actual=actual_content)
 
             self.assertEqual(expected_content, actual_content, error_message)
 
@@ -123,16 +121,13 @@ Expected: "{expected}"
             expected_lines = expected_content.split('\n')
             actual_lines = actual_content.split('\n')
 
-            line_number = 0;
+            line_number = 0
             for expected_line in expected_lines:
                 actual_line = actual_lines[line_number]
                 error_message = """File "{path_to_file}" did not have expected content in line {line_number} (white space is trimmed).
 Expected: "{expected}"
  but was: "{actual}"
-""".format(path_to_file=path_to_file,
-           expected=expected_line,
-           actual=actual_line,
-           line_number=line_number + 1)
+""".format(path_to_file=path_to_file, expected=expected_line, actual=actual_line, line_number=line_number + 1)
 
                 self.assertEqual(expected_line.strip(), actual_line.strip(), error_message)
                 line_number += 1
