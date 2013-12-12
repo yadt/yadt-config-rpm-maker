@@ -53,7 +53,7 @@ class SvnService(object):
 
     def _log_change_set_meta_information(self, logs):
         for info in logs:
-            LOGGER.info('Commit message is "%s" (%s, %s)', info.message, info.author, ctime(info.date))
+            LOGGER.info('Commit message is "%s" (%s, %s)', info.message.strip(), info.author, ctime(info.date))
 
     @measure_execution_time
     def get_change_set(self, revision):
