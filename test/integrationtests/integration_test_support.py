@@ -95,7 +95,7 @@ class IntegrationTest(unittest.TestCase):
 
     def assert_file_content(self, path_to_file, expected_content):
 
-        self.assertTrue(exists(path_to_file))
+        self.assert_path_exists(path_to_file)
 
         with open(path_to_file) as revision_file:
             actual_content = revision_file.read()
