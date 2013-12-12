@@ -61,9 +61,9 @@ def create_type(abbreviation):
         create_production_host(abbreviation, host_number)
 
     print 'type "%s": %02d dev   %02d tuv   %02d ber' % (abbreviation,
-                                                        count_of_development_hosts,
-                                                        count_of_test_hosts,
-                                                        count_of_production_hosts)
+                                                         count_of_development_hosts,
+                                                         count_of_test_hosts,
+                                                         count_of_production_hosts)
 
     return count_of_development_hosts + count_of_test_hosts + count_of_production_hosts
 
