@@ -51,8 +51,6 @@ class ConstructorTests(UnitTests):
 
     def test_should_initialize_failed_host_queue(self):
 
-        mock_svn_service = Mock()
-
         self.assert_is_instance_of(self.config_rpm_maker.failed_host_queue, Queue)
 
 
@@ -505,4 +503,3 @@ class NotifyThatHostBuildFailedTest(UnitTests):
 
         mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
         mock_config.get.assert_called_with('max_failed_hosts')
-

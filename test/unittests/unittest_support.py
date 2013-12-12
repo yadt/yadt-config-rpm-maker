@@ -34,7 +34,6 @@ class UnitTests(TestCase):
 
         self.assertTrue(isinstance(test_object, the_class), error_message)
 
-
     def create_fake_file(self, content=""):
         """
             Creates a fake file-like object. Use this is if you have to mock away
