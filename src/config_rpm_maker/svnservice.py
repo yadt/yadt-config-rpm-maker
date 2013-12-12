@@ -19,6 +19,7 @@ import os
 
 from logging import getLogger
 
+from time import ctime
 from config_rpm_maker.config import DEFAULT_HOST_NAME_ENCODING
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -50,6 +51,10 @@ class SvnService(object):
             LOGGER.debug('Setting default password for subversion client.')
             self.client.set_default_password(password)
 
+    def _log_change_set_meta_information(self, logs):
+        for info in logs:
+            LOGGER.info('Commit message is "%s" (%s, %s)', info.message, info.author, ctime(info.date))
+
     @measure_execution_time
     def get_change_set(self, revision):
         try:
@@ -58,6 +63,8 @@ class SvnService(object):
             LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
                          revision, self.config_url)
             raise SvnServiceException(str(e))
+
+        self._log_change_set_meta_information(logs)
 
         start_pos = len(self.path_to_config + '/')
         changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
