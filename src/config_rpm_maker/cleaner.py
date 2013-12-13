@@ -44,4 +44,4 @@ def clean_up_deleted_hosts_data(svn_service, revision):
                     LOGGER.info('Deleting config viewer data for host "%s"', host_name)
                     rmtree(build_config_viewer_host_directory(host_name))
     else:
-        verbose(LOGGER).debug("Change set did not contain any deleted paths." )
+        verbose(LOGGER).debug("Change set did not contain any deleted paths.")

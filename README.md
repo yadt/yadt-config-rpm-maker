@@ -100,7 +100,7 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ## Build
 
-### Setup a Devlopment Enviroment
+### Setup a Development Environment
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
