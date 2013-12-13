@@ -46,19 +46,25 @@ class SvnService(object):
     def _initialize_pysvn_client(self, username, password):
         self.client = pysvn.Client()
         self.client.set_auth_cache(True)
+
         if username:
             LOGGER.debug('Setting default username for subversion client to "%s".', username)
             self.client.set_default_username(username)
+
         if password:
             LOGGER.debug('Setting default password for subversion client.')
             self.client.set_default_password(password)
 
     def log_change_set_meta_information(self, revision):
+        """ Logs the commit message, author and commit date. """
+
         log_entries = self.get_logs_for_revision(revision)
         for info in log_entries:
             LOGGER.info('Commit message is "%s" (%s, %s)', info.message.strip(), info.author, ctime(info.date))
 
     def get_logs_for_revision(self, revision):
+        """ Returns the logs for the given revision of the repository at the config_url """
+
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision),
                                    discover_changed_paths=True)
@@ -69,6 +75,8 @@ class SvnService(object):
         return logs
 
     def get_changed_paths_with_action(self, revision):
+        """ Returns a list of all paths from the change set which were marked with action "delete" """
+
         log_entries = self.get_logs_for_revision(revision)
 
         start_pos = len(self.path_to_config + '/')
@@ -89,6 +97,8 @@ class SvnService(object):
 
     @measure_execution_time
     def get_changed_paths(self, revision):
+        """ Returns the list of all changed paths from the change set with the given revision """
+
         path_with_action = self.get_changed_paths_with_action(revision)
 
         changed_paths_and_action = []
