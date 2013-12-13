@@ -44,7 +44,7 @@ def clean_up_deleted_hosts_data(svn_service, revision):
 def _delete_host_directories(deleted_paths):
     """ checks for each given path if it contains the svn_prefix for a host
         and if it does it will check if the rest of the path is a host name
-        if so it will delete the corresponding directory"""
+        if so it will delete the corresponding directory """
 
     svn_prefix = Host().get_svn_prefix()
     svn_prefix_length = len(svn_prefix)

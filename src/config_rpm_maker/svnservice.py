@@ -53,11 +53,12 @@ class SvnService(object):
             LOGGER.debug('Setting default password for subversion client.')
             self.client.set_default_password(password)
 
-    def _log_change_set_meta_information(self, logs):
-        for info in logs:
+    def log_change_set_meta_information(self, revision):
+        log_entries = self.get_logs_for_revision(revision)
+        for info in log_entries:
             LOGGER.info('Commit message is "%s" (%s, %s)', info.message.strip(), info.author, ctime(info.date))
 
-    def get_changed_paths_with_action(self, revision):
+    def get_logs_for_revision(self, revision):
         try:
             logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision),
                                    discover_changed_paths=True)
@@ -65,11 +66,14 @@ class SvnService(object):
             LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
                          revision, self.config_url)
             raise SvnServiceException(str(e))
+        return logs
 
-        self._log_change_set_meta_information(logs)
+    def get_changed_paths_with_action(self, revision):
+        log_entries = self.get_logs_for_revision(revision)
+
         start_pos = len(self.path_to_config + '/')
         action_and_path = []
-        for info in logs:
+        for info in log_entries:
             for path_obj in info.changed_paths:
                 changed_path = path_obj.path[start_pos:]
                 action_and_path.append((changed_path, path_obj.action))

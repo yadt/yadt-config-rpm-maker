@@ -46,7 +46,7 @@ class SvnServiceTests(TestCase):
         self.assertTrue(isinstance(text, str), '"%s" is NOT a ordniary string!' % text)
 
 
-class GetChangedPathsWithActionTests(TestCase):
+class GetLogsForRevision(TestCase):
 
     def test_should_raise_exception_when_pysvn_client_fails_to_log(self):
 
@@ -56,20 +56,34 @@ class GetChangedPathsWithActionTests(TestCase):
         mock_svn_service.client = Mock()
         mock_svn_service.client.log.side_effect = Exception("Aaarrrgggghh...")
 
-        self.assertRaises(SvnServiceException, SvnService.get_changed_paths_with_action, mock_svn_service, '1980')
+        self.assertRaises(SvnServiceException, SvnService.get_logs_for_revision, mock_svn_service, '1980')
+
+    def test_should_return_logs_for_revision(self):
+        mock_svn_service = Mock(SvnService)
+        mock_svn_service.config_url = 'svn://url/for/configuration/repository'
+        mock_svn_service.path_to_config = '/config'
+        mock_svn_service.client = Mock()
+        mock_logs = Mock()
+        mock_svn_service.client.log.return_value = mock_logs
+
+        actual = SvnService.get_logs_for_revision(mock_svn_service, '1980')
+
+        self.assertEqual(mock_logs, actual)
+
+
+class GetChangedPathsWithActionTests(TestCase):
 
     def test_should_return_list_with_empty_string_and_action_string_when_configuration_directory_has_been_created_in_commit(self):
 
         mock_svn_service = Mock(SvnService)
         mock_svn_service.config_url = 'svn://url/for/configuration/repository'
         mock_svn_service.path_to_config = '/config'
-        mock_svn_service.client = Mock()
         mock_info = Mock()
         mock_path_object = Mock()
         mock_path_object.path = '/config/'
         mock_path_object.action = 'A'
         mock_info.changed_paths = [mock_path_object]
-        mock_svn_service.client.log.return_value = [mock_info]
+        mock_svn_service.get_logs_for_revision.return_value = [mock_info]
 
         actual = SvnService.get_changed_paths_with_action(mock_svn_service, '1980')
 
@@ -90,7 +104,7 @@ class GetChangedPathsWithActionTests(TestCase):
         mock_path_object_2.path = '/config/spam.egg'
         mock_path_object_2.action = 'A'
         mock_info.changed_paths = [mock_path_object_1, mock_path_object_2]
-        mock_svn_service.client.log.return_value = [mock_info]
+        mock_svn_service.get_logs_for_revision.return_value = [mock_info]
 
         actual = SvnService.get_changed_paths_with_action(mock_svn_service, '1980')
 
@@ -114,7 +128,7 @@ class GetChangedPathsWithActionTests(TestCase):
         mock_path_object_3.path = '/config/foo.bar'
         mock_path_object_3.action = 'D'
         mock_info.changed_paths = [mock_path_object_1, mock_path_object_2, mock_path_object_3]
-        mock_svn_service.client.log.return_value = [mock_info]
+        mock_svn_service.get_logs_for_revision.return_value = [mock_info]
 
         actual = SvnService.get_changed_paths_with_action(mock_svn_service, '1980')
 

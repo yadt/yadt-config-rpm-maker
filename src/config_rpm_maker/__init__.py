@@ -117,6 +117,7 @@ def building_configuration_rpms_and_clean_host_directories(repository, revision)
 
     path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
     svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
+    svn_service.log_change_set_meta_information(revision)
     ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
     clean_up_deleted_hosts_data(svn_service, revision)
 
