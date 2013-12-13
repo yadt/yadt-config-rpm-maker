@@ -27,6 +27,8 @@ from config_rpm_maker.profiler import measure_execution_time
 
 LOGGER = getLogger(__name__)
 
+PYSVN_DELETE_ACTION = 'D'
+
 
 class SvnServiceException(BaseConfigRpmMakerException):
     error_info = "SVN Service error:\n"
@@ -55,27 +57,43 @@ class SvnService(object):
         for info in logs:
             LOGGER.info('Commit message is "%s" (%s, %s)', info.message.strip(), info.author, ctime(info.date))
 
-    @measure_execution_time
-    def get_change_set(self, revision):
+    def get_changed_paths_with_action(self, revision):
         try:
-            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
+            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision),
+                                   discover_changed_paths=True)
         except Exception as e:
             LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
                          revision, self.config_url)
             raise SvnServiceException(str(e))
 
         self._log_change_set_meta_information(logs)
-
         start_pos = len(self.path_to_config + '/')
-        changed_paths = []
-        changed_paths_with_action = []
+        action_and_path = []
         for info in logs:
             for path_obj in info.changed_paths:
                 changed_path = path_obj.path[start_pos:]
-                changed_paths.append(changed_path)
-                changed_paths_with_action.append(path_obj.action + " " + changed_path)
+                action_and_path.append((changed_path, path_obj.action))
 
-        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s). Listing with svn action.', changed_paths_with_action)
+        return action_and_path
+
+    def get_deleted_paths(self, revision):
+        """ Returns all paths which have been deleted in the given revision"""
+
+        paths_with_action = self.get_changed_paths_with_action(revision)
+
+        return [element[0] for element in paths_with_action if element[1] == PYSVN_DELETE_ACTION]
+
+    @measure_execution_time
+    def get_changed_paths(self, revision):
+        path_with_action = self.get_changed_paths_with_action(revision)
+
+        changed_paths_and_action = []
+        changed_paths = []
+        for path, action in path_with_action:
+            changed_paths.append(path)
+            changed_paths_and_action.append("%s (%s)" % (path, action))
+
+        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s). Listing with svn action.', changed_paths_and_action)
         return changed_paths
 
     @measure_execution_time

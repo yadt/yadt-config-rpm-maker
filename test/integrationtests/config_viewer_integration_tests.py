@@ -111,6 +111,7 @@ all:/files
 all:/files/binary.zip
 all:/files/file_from_all
 all:/files/override
+host/devweb01:/host_specific_file
 all:/vars
 all:/vars/override
 """)

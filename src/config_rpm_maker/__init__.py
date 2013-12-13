@@ -25,6 +25,7 @@ from config_rpm_maker import config
 from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
 from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
+from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.logutils import (create_console_handler,
@@ -61,7 +62,7 @@ def main():
 
         start_measuring_time()
         log_additional_information()
-        start_building_configuration_rpms(repository_url, revision)
+        building_configuration_rpms_and_clean_host_directories(repository_url, revision)
 
     except ConfigException as e:
         log_exception_message(e)
@@ -110,12 +111,14 @@ def initialize_logging_to_syslog(arguments, revision):
         LOGGER.addHandler(sys_log_handler)
 
 
-def start_building_configuration_rpms(repository, revision):
+def building_configuration_rpms_and_clean_host_directories(repository, revision):
     """ This function will start the process of building configuration rpms
         for the given configuration repository and the revision. """
+
     path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
     svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
-    ConfigRpmMaker(revision=revision, svn_service=svn_service).build()  # first use case is post-commit hook. repo dir can be used as file:/// SVN URL
+    ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
+    clean_up_deleted_hosts_data(svn_service, revision)
 
 
 def determine_console_log_level(arguments):

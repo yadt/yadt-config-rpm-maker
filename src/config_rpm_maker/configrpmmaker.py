@@ -137,7 +137,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.info('Working on revision %s', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
-            change_set = self.svn_service.get_change_set(self.revision)
+            change_set = self.svn_service.get_changed_paths(self.revision)
             available_hosts = self.svn_service.get_hosts(self.revision)
 
             affected_hosts = list(self._get_affected_hosts(change_set, available_hosts))
