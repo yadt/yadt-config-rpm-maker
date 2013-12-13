@@ -49,11 +49,12 @@ def exit_program(message, return_code):
 
     timestamp_from_start = get_timestamp_from_start()
     if timestamp_from_start is not None:
+        log_execution_time_summaries(LOGGER.debug)
+
         elapsed_time_in_seconds = time() - timestamp_from_start
         elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
-        LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
 
-        log_execution_time_summaries(LOGGER.debug)
+        LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
 
     if return_code == RETURN_CODE_SUCCESS:
         LOGGER.info(message)
