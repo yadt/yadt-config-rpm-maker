@@ -30,10 +30,13 @@ def clean_up_deleted_hosts_data(svn_service, revision):
         when svn change set deletes host directory """
 
     deleted_paths = svn_service.get_deleted_paths(revision)
-    svn_prefix = Host().get_svn_prefix()
 
     if deleted_paths:
-        if deleted_paths[0].startswith(svn_prefix):
-            host_name = deleted_paths[0][len(svn_prefix):]
-            if host_name.find('/') == -1:
-                rmtree(build_config_viewer_host_directory(host_name))
+        svn_prefix = Host().get_svn_prefix()
+        svn_prefix_length = len(svn_prefix)
+
+        for deleted_path in deleted_paths:
+            if deleted_path.startswith(svn_prefix):
+                host_name = deleted_path[svn_prefix_length:]
+                if host_name.find('/') == -1:
+                    rmtree(build_config_viewer_host_directory(host_name))

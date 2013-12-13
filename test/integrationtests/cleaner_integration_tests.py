@@ -42,7 +42,7 @@ from config_rpm_maker.svnservice import SvnService
 
 class CleanerIntegrationTests(IntegrationTest):
 
-    def test_should_config_viewer_host_directory_when_directory_has_been_deleted_in_repository(self):
+    def test_should_delete_config_viewer_host_directory_when_directory_has_been_deleted_in_repository(self):
 
         svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
         ConfigRpmMaker('1', svn_service).build()
@@ -70,6 +70,17 @@ class CleanerIntegrationTests(IntegrationTest):
         self.assert_path_exists(build_config_viewer_host_directory('tuvweb01'))
         self.assert_path_exists(build_config_viewer_host_directory('devweb01'))
 
+    def test_should_delete_config_viewer_host_directories_when_directories_have_been_deleted_in_repository(self):
 
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        ConfigRpmMaker('1', svn_service).build()
 
+        if call('svn delete -q -m "deleting host tuvweb01 and devweb01" {0}/config/host/devweb01 {0}/config/host/tuvweb01'.format(self.repo_url), shell=True):
+            raise IntegrationTestException('Could not delete test data.')
+
+        clean_up_deleted_hosts_data(svn_service, '3')
+
+        self.assert_path_exists(build_config_viewer_host_directory('berweb01'))
+        self.assert_path_does_not_exist(build_config_viewer_host_directory('devweb01'))
+        self.assert_path_does_not_exist(build_config_viewer_host_directory('tuvweb01'))
 

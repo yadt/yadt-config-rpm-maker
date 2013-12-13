@@ -56,3 +56,27 @@ class CleanerTests(UnitTests):
         clean_up_deleted_hosts_data(mock_svn_service, '42')
 
         self.assert_mock_never_called(mock_rmtree)
+
+    @patch('config_rpm_maker.cleaner.rmtree')
+    def test_should_delete_two_config_viewer_host_directories_when_change_set_contains_two_deleted_paths(self, mock_rmtree):
+
+        mock_svn_service = Mock(SvnService)
+        mock_svn_service.get_deleted_paths.return_value = ['host/devweb01', 'host/tuvweb01']
+
+        clean_up_deleted_hosts_data(mock_svn_service, '42')
+
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb01')
+
+    @patch('config_rpm_maker.cleaner.rmtree')
+    def test_should_delete_three_config_viewer_host_directories_when_change_set_contains_three_deleted_paths(self, mock_rmtree):
+
+        mock_svn_service = Mock(SvnService)
+        mock_svn_service.get_deleted_paths.return_value = ['host/devweb01', 'host/tuvweb01', 'host/tuvweb02']
+
+        clean_up_deleted_hosts_data(mock_svn_service, '42')
+
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb01')
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb02')
+
