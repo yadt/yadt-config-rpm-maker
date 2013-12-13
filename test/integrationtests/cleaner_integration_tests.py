@@ -83,4 +83,3 @@ class CleanerIntegrationTests(IntegrationTest):
         self.assert_path_exists(build_config_viewer_host_directory('berweb01'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('devweb01'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('tuvweb01'))
-

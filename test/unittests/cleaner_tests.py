@@ -16,8 +16,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mock import Mock, call, patch
-from unittest import TestCase
+from mock import Mock, patch
 
 from unittest_support import UnitTests
 
@@ -79,4 +78,3 @@ class CleanerTests(UnitTests):
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb01')
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb02')
-

@@ -188,4 +188,3 @@ class GetDeletedPathsTests(TestCase):
         actual = SvnService.get_deleted_paths(mock_svn_service, '1980')
 
         self.assertEqual(['example', 'spam.egg'], actual)
-
