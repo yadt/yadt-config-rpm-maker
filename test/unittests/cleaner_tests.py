@@ -26,8 +26,9 @@ from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 
 class CleanerTests(UnitTests):
 
+    @patch('config_rpm_maker.cleaner.exists')
     @patch('config_rpm_maker.cleaner.rmtree')
-    def test_should_pass_through_if_change_set_is_empty(self, mock_rmtree):
+    def test_should_pass_through_if_change_set_is_empty(self, mock_rmtree, mock_exists):
 
         mock_svn_service = Mock(SvnService)
         mock_svn_service.get_deleted_paths.return_value = []
@@ -36,8 +37,9 @@ class CleanerTests(UnitTests):
 
         mock_svn_service.get_deleted_paths.assert_called_with('42')
 
+    @patch('config_rpm_maker.cleaner.exists')
     @patch('config_rpm_maker.cleaner.rmtree')
-    def test_should_delete_config_viewer_host_directory_when_change_set_contains_delete_path_to_host_dir(self, mock_rmtree):
+    def test_should_delete_config_viewer_host_directory_when_change_set_contains_delete_path_to_host_dir(self, mock_rmtree, mock_exists):
 
         mock_svn_service = Mock(SvnService)
         mock_svn_service.get_deleted_paths.return_value = ['host/devweb01']
@@ -46,8 +48,9 @@ class CleanerTests(UnitTests):
 
         mock_rmtree.assert_called_with('target/tmp/configviewer/hosts/devweb01')
 
+    @patch('config_rpm_maker.cleaner.exists')
     @patch('config_rpm_maker.cleaner.rmtree')
-    def test_should_not_delete_config_viewer_host_directory_when_change_set_contains_delete_of_a_file_in_host_directory(self, mock_rmtree):
+    def test_should_not_delete_config_viewer_host_directory_when_change_set_contains_delete_of_a_file_in_host_directory(self, mock_rmtree, mock_exists):
 
         mock_svn_service = Mock(SvnService)
         mock_svn_service.get_deleted_paths.return_value = ['host/devweb01/host_specific_file']
@@ -56,8 +59,9 @@ class CleanerTests(UnitTests):
 
         self.assert_mock_never_called(mock_rmtree)
 
+    @patch('config_rpm_maker.cleaner.exists')
     @patch('config_rpm_maker.cleaner.rmtree')
-    def test_should_delete_two_config_viewer_host_directories_when_change_set_contains_two_deleted_paths(self, mock_rmtree):
+    def test_should_delete_two_config_viewer_host_directories_when_change_set_contains_two_deleted_paths(self, mock_rmtree, mock_exists):
 
         mock_svn_service = Mock(SvnService)
         mock_svn_service.get_deleted_paths.return_value = ['host/devweb01', 'host/tuvweb01']
@@ -67,8 +71,9 @@ class CleanerTests(UnitTests):
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb01')
 
+    @patch('config_rpm_maker.cleaner.exists')
     @patch('config_rpm_maker.cleaner.rmtree')
-    def test_should_delete_three_config_viewer_host_directories_when_change_set_contains_three_deleted_paths(self, mock_rmtree):
+    def test_should_delete_three_config_viewer_host_directories_when_change_set_contains_three_deleted_paths(self, mock_rmtree, mock_exists):
 
         mock_svn_service = Mock(SvnService)
         mock_svn_service.get_deleted_paths.return_value = ['host/devweb01', 'host/tuvweb01', 'host/tuvweb02']
@@ -78,3 +83,29 @@ class CleanerTests(UnitTests):
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb01')
         mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/tuvweb02')
+
+    @patch('config_rpm_maker.cleaner.exists')
+    @patch('config_rpm_maker.cleaner.rmtree')
+    def test_should_not_try_to_delete_directories_which_do_not_exist(self, mock_rmtree, mock_exists):
+
+        mock_exists.return_value = False
+        mock_svn_service = Mock(SvnService)
+        mock_svn_service.get_deleted_paths.return_value = ['host/devweb01']
+
+        clean_up_deleted_hosts_data(mock_svn_service, '42')
+
+        self.assert_mock_never_called(mock_rmtree)
+        mock_exists.assert_any_call('target/tmp/configviewer/hosts/devweb01')
+
+    @patch('config_rpm_maker.cleaner.exists')
+    @patch('config_rpm_maker.cleaner.rmtree')
+    def test_should_check_if_directory_exists_before_deleting_it(self, mock_rmtree, mock_exists):
+
+        mock_exists.return_value = True
+        mock_svn_service = Mock(SvnService)
+        mock_svn_service.get_deleted_paths.return_value = ['host/devweb01']
+
+        clean_up_deleted_hosts_data(mock_svn_service, '42')
+
+        mock_exists.assert_any_call('target/tmp/configviewer/hosts/devweb01')
+        mock_rmtree.assert_any_call('target/tmp/configviewer/hosts/devweb01')
