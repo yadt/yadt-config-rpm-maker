@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from os import sep as PATH_SEPARATOR
 from logging import getLogger
 from shutil import rmtree
 
@@ -40,7 +41,7 @@ def clean_up_deleted_hosts_data(svn_service, revision):
         for deleted_path in deleted_paths:
             if deleted_path.startswith(svn_prefix):
                 host_name = deleted_path[svn_prefix_length:]
-                if host_name.find('/') == -1:
+                if host_name.find(PATH_SEPARATOR) == -1:
                     LOGGER.info('Deleting config viewer data for host "%s"', host_name)
                     rmtree(build_config_viewer_host_directory(host_name))
     else:
