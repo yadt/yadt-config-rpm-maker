@@ -21,6 +21,7 @@ from shutil import rmtree
 
 from config_rpm_maker.config import build_config_viewer_host_directory
 from config_rpm_maker.segment import Host
+from config_rpm_maker.logutils import verbose
 
 LOGGER = getLogger(__name__)
 
@@ -32,6 +33,7 @@ def clean_up_deleted_hosts_data(svn_service, revision):
     deleted_paths = svn_service.get_deleted_paths(revision)
 
     if deleted_paths:
+        LOGGER.debug("Change set contains %d deleted path(s).", len(deleted_paths))
         svn_prefix = Host().get_svn_prefix()
         svn_prefix_length = len(svn_prefix)
 
@@ -39,4 +41,7 @@ def clean_up_deleted_hosts_data(svn_service, revision):
             if deleted_path.startswith(svn_prefix):
                 host_name = deleted_path[svn_prefix_length:]
                 if host_name.find('/') == -1:
+                    LOGGER.info('Deleting config viewer data for host "%s"', host_name)
                     rmtree(build_config_viewer_host_directory(host_name))
+    else:
+        verbose(LOGGER).debug("Change set did not contain any deleted paths." )
