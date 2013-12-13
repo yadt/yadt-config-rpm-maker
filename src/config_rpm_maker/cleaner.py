@@ -42,12 +42,20 @@ def clean_up_deleted_hosts_data(svn_service, revision):
         for deleted_path in deleted_paths:
             if deleted_path.startswith(svn_prefix):
                 host_name = deleted_path[svn_prefix_length:]
-                if host_name.find(PATH_SEPARATOR) == -1:
-                    host_directory = build_config_viewer_host_directory(host_name)
-                    if exists(host_directory):
-                        LOGGER.info('Deleting config viewer data for host "%s"', host_name)
-                        rmtree(host_directory)
-                    else:
-                        verbose(LOGGER).debug('Wanted to delete host directory "%s", but it did not exist.' % host_directory)
+                if _is_a_host_name_and_not_a_path(host_name):
+                    _delete_host_directory(host_name)
     else:
         verbose(LOGGER).debug("Change set did not contain any deleted paths.")
+
+
+def _delete_host_directory(host_name):
+    host_directory = build_config_viewer_host_directory(host_name)
+    if exists(host_directory):
+        LOGGER.info('Deleting config viewer data for host "%s"', host_name)
+        rmtree(host_directory)
+    else:
+        verbose(LOGGER).debug('Wanted to delete host directory "%s", but it did not exist.' % host_directory)
+
+
+def _is_a_host_name_and_not_a_path(host_name):
+    return host_name.find(PATH_SEPARATOR) == -1
