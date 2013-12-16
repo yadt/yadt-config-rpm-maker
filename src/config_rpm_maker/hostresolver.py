@@ -20,6 +20,7 @@ import subprocess
 from logging import getLogger
 
 from config_rpm_maker import configuration
+from config_rpm_maker.logutils import verbose
 
 LOGGER = getLogger(__name__)
 
@@ -50,12 +51,14 @@ class HostResolver(object):
         return ip, fqdn, aliases
 
     def _resolve(self, hostname):
-        p = subprocess.Popen("getent hosts " + hostname, stdout=subprocess.PIPE, shell=True)
-        out, err = p.communicate()
-        if p.returncode:
-            raise Exception("getent had returncode " + str(p.returncode))
+        process = subprocess.Popen("getent hosts " + hostname, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = process.communicate()
 
-        line = re.sub("\s+", " ", out)
+        verbose(LOGGER).debug('Resolving host "%s" using gentent: return_code=%d, stdout="%s", stderr="%s"', hostname, process.returncode, stdout.strip(), stderr.strip())
+        if process.returncode:
+            raise Exception("getent had returncode " + str(process.returncode))
+
+        line = re.sub("\s+", " ", stdout)
         line = line[:-1]
         parts = line.split(' ')
         return parts[0], parts[1], ' '.join(parts[2:])
