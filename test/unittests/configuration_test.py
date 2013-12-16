@@ -22,7 +22,7 @@ from unittest import TestCase
 
 from unittest_support import UnitTests
 from config_rpm_maker import config
-from config_rpm_maker.config import (ConfigException,
+from config_rpm_maker.config import (ConfigurationException,
                                      DEFAULT_CONFIGURATION_FILE_PATH,
                                      ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
@@ -159,13 +159,13 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
     @patch('config_rpm_maker.config.yaml')
     @patch('__builtin__.open')
-    def test_should_raise_ConfigException_when_loading_fails(self, mock_open, mock_yaml):
+    def test_should_raise_ConfigurationException_when_loading_fails(self, mock_open, mock_yaml):
 
         fake_file = self.create_fake_file()
         mock_open.return_value = fake_file
         mock_yaml.load.side_effect = Exception()
 
-        self.assertRaises(ConfigException, _load_configuration_properties_from_yaml_file, 'path-to-configuration-file')
+        self.assertRaises(ConfigurationException, _load_configuration_properties_from_yaml_file, 'path-to-configuration-file')
 
     @patch('config_rpm_maker.config._set_file_path_of_loaded_configuration')
     @patch('config_rpm_maker.config.yaml')
@@ -551,7 +551,7 @@ class LoadConfigurationFileTests(TestCase):
 
         mock_exists.return_value = False
 
-        self.assertRaises(ConfigException, load_configuration_file)
+        self.assertRaises(ConfigurationException, load_configuration_file)
 
     @patch('config_rpm_maker.config.exists')
     @patch('config_rpm_maker.config._determine_configuration_file_path')
@@ -559,7 +559,7 @@ class LoadConfigurationFileTests(TestCase):
 
         mock_exists.return_value = False
 
-        self.assertRaises(ConfigException, load_configuration_file)
+        self.assertRaises(ConfigurationException, load_configuration_file)
 
         mock_determine_configuration_file_path.assert_called_with()
 
@@ -645,7 +645,7 @@ class GetPropertyTests(TestCase):
 
         mock_properties.return_value = {}
 
-        self.assertRaises(ConfigException, get, KEY_MAX_FILE_SIZE)
+        self.assertRaises(ConfigurationException, get, KEY_MAX_FILE_SIZE)
 
     @patch('config_rpm_maker.config.get_properties')
     def test_should_return_value_of_property_when_in_properties(self, mock_properties):
@@ -661,7 +661,7 @@ class SetValueTests(TestCase):
 
     def test_should_raise_configuration_exception_when_trying_to_set_value_without_name(self):
 
-        self.assertRaises(ConfigException, set_property, name=None, value='123')
+        self.assertRaises(ConfigurationException, set_property, name=None, value='123')
 
     @patch('config_rpm_maker.config.get_properties')
     @patch('config_rpm_maker.config.load_configuration_file')
@@ -690,7 +690,7 @@ class EnsureValidLogLevelTests(TestCase):
 
     def test_should_raise_exception_if_given_value_is_not_a_string(self):
 
-        self.assertRaises(ConfigException, _ensure_valid_log_level, 1)
+        self.assertRaises(ConfigurationException, _ensure_valid_log_level, 1)
 
     def test_should_return_debug_log_level_if_lower_debug_is_given(self):
 
@@ -724,7 +724,7 @@ class EnsureValidLogLevelTests(TestCase):
 
     def test_should_raise_exception_when_strange_log_level_given(self):
 
-        self.assertRaises(ConfigException, _ensure_valid_log_level, "FOO")
+        self.assertRaises(ConfigurationException, _ensure_valid_log_level, "FOO")
 
 
 class GetConfigViewerHostDirTests(TestCase):
@@ -754,7 +754,7 @@ class EnsureIsABooleanValueTests(TestCase):
 
     def test_should_raise_exception_if_type_is_not_boolean(self):
 
-        self.assertRaises(ConfigException, _ensure_is_a_boolean_value, 'foo', 'bar')
+        self.assertRaises(ConfigurationException, _ensure_is_a_boolean_value, 'foo', 'bar')
 
     def test_should_return_valid_value_when_given_value_is_true(self):
 
@@ -773,7 +773,7 @@ class EnsureIsAString(TestCase):
 
     def test_should_raise_exception_if_type_is_not_string(self):
 
-        self.assertRaises(ConfigException, _ensure_is_a_string, 'key', True)
+        self.assertRaises(ConfigurationException, _ensure_is_a_string, 'key', True)
 
     def test_should_return_given_string(self):
 
@@ -786,7 +786,7 @@ class EnsureIsAInteger(TestCase):
 
     def test_should_raise_exception_if_type_is_not_integer(self):
 
-        self.assertRaises(ConfigException, _ensure_is_an_integer, 'key', 'hello')
+        self.assertRaises(ConfigurationException, _ensure_is_an_integer, 'key', 'hello')
 
     def test_should_return_given_integer(self):
 
@@ -799,11 +799,11 @@ class EnsureRepoPackageRegexIsAValidRegularExpressionTests(TestCase):
 
     def test_should_raise_an_exception_if_given_value_is_not_of_type_string(self):
 
-        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_a_valid_regular_expression, 123)
+        self.assertRaises(ConfigurationException, _ensure_repo_packages_regex_is_a_valid_regular_expression, 123)
 
     def test_should_raise_an_exception_when_a_invalid_regex_is_given(self):
 
-        self.assertRaises(ConfigException, _ensure_repo_packages_regex_is_a_valid_regular_expression, '[')
+        self.assertRaises(ConfigurationException, _ensure_repo_packages_regex_is_a_valid_regular_expression, '[')
 
     def test_should_return_given_value_if_it_is_a_valid_regex(self):
 
@@ -816,7 +816,7 @@ class EnsureRpmUploadCommandIsAStringOrNoneTests(TestCase):
 
     def test_should_raise_exception_when_given_value_is_not_a_string(self):
 
-        self.assertRaises(ConfigException, _ensure_is_a_string_or_none, 'key', 123)
+        self.assertRaises(ConfigurationException, _ensure_is_a_string_or_none, 'key', 123)
 
     def test_should_return_none_when_none_is_given(self):
 
@@ -835,7 +835,7 @@ class EnsureIsAListOfStringsTest(TestCase):
 
     def test_should_raise_exception_when_given_value_is_not_a_list(self):
 
-        self.assertRaises(ConfigException, _ensure_is_a_list_of_strings, 'spam', 123)
+        self.assertRaises(ConfigurationException, _ensure_is_a_list_of_strings, 'spam', 123)
 
     def test_should_return_given_empty_list(self):
 
@@ -845,7 +845,7 @@ class EnsureIsAListOfStringsTest(TestCase):
 
     def test_should_raise_exception_when_a_list_with_an_integer_is_given(self):
 
-        self.assertRaises(ConfigException, _ensure_is_a_list_of_strings, 'spam', [1])
+        self.assertRaises(ConfigurationException, _ensure_is_a_list_of_strings, 'spam', [1])
 
     def test_should_return_given_list_with_multiple_strings(self):
 

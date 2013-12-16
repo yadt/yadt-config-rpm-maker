@@ -30,7 +30,7 @@ from config_rpm_maker import (append_console_logger,
                               main,
                               building_configuration_rpms_and_clean_host_directories)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.config import ConfigException
+from config_rpm_maker.config import ConfigurationException
 
 
 class MainTests(TestCase):
@@ -66,7 +66,7 @@ class MainTests(TestCase):
     @patch('config_rpm_maker.exit_program')
     def test_should_return_with_error_message_and_error_code_when_configuration_exception_occurrs(self, mock_exit_program, mock_parse_arguments):
 
-        mock_parse_arguments.side_effect = ConfigException("We knew this could happen!")
+        mock_parse_arguments.side_effect = ConfigurationException("We knew this could happen!")
 
         main()
 

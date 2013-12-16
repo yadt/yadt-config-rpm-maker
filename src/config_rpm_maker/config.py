@@ -91,12 +91,8 @@ _properties = None
 _file_path_of_loaded_configuration = None
 
 
-class ConfigException(BaseConfigRpmMakerException):
+class ConfigurationException(BaseConfigRpmMakerException):
     error_info = "Configuration Error:\n"
-
-
-class ConfigurationValidationException(ConfigException):
-    error_info = "Invalid configuration:\n"
 
 
 def load_configuration_file():
@@ -111,7 +107,7 @@ def load_configuration_file():
                                                             default_path=DEFAULT_CONFIGURATION_FILE_PATH,
                                                             current_working_directory=abspath('.'),
                                                             environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
-        raise ConfigException(message)
+        raise ConfigurationException(message)
 
     raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
     valid_properties = _ensure_properties_are_valid(raw_properties)
@@ -130,7 +126,7 @@ def get(name):
     properties = get_properties()
 
     if name not in properties:
-        raise ConfigException('Requested unknown configuration property "%s"' % name)
+        raise ConfigurationException('Requested unknown configuration property "%s"' % name)
 
     return properties[name]
 
@@ -154,7 +150,7 @@ def set_property(name, value):
         If this is not the case it will load the configuration file.
     """
     if not name:
-        raise ConfigException("No configuration property name given")
+        raise ConfigurationException("No configuration property name given")
 
     configuration = get_properties()
 
@@ -207,7 +203,7 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
 
     except Exception as e:
         error_message = 'Could not load configuration file "%s".\nCurrent working directory is "%s"\nError: %s' % (configuration_file_path, getcwd(), str(e))
-        raise ConfigException(error_message)
+        raise ConfigurationException(error_message)
 
 
 def _ensure_properties_are_valid(raw_properties):
@@ -273,7 +269,7 @@ def _ensure_is_a_boolean_value(key, value):
     """ Returns a boolean value or raises a exception if the given value is not a boolean """
 
     if type(value) is not bool:
-        raise ConfigException('Invalid value "%s" for "%s" has to be a boolean.' % (value, key))
+        raise ConfigurationException('Invalid value "%s" for "%s" has to be a boolean.' % (value, key))
 
     return value
 
@@ -282,7 +278,7 @@ def _ensure_valid_log_level(log_level_name):
     """ Returns a valid log level """
 
     if type(log_level_name) is not str:
-        raise ConfigException('Invalid log level "%s". Log level has to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
+        raise ConfigurationException('Invalid log level "%s". Log level has to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
 
     log_level_name = log_level_name.upper().strip()
 
@@ -293,7 +289,7 @@ def _ensure_valid_log_level(log_level_name):
     elif log_level_name == 'ERROR':
         return ERROR
 
-    raise ConfigException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
+    raise ConfigurationException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
 
 
 def _ensure_is_a_string(key, value):
@@ -301,7 +297,7 @@ def _ensure_is_a_string(key, value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
+        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
                               % (key, str(value), value_type.__name__))
 
     return value
@@ -312,7 +308,7 @@ def _ensure_is_an_integer(key, value):
 
     value_type = type(value)
     if value_type is not int:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
+        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
                               % (key, str(value), value_type.__name__))
 
     return value
@@ -322,13 +318,13 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
+        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
                               % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
 
     try:
         compile(value)
     except Exception as e:
-        raise ConfigException('The given string "%s" is not a valid regular expression. Error was "%s".' % (value, str(e)))
+        raise ConfigurationException('The given string "%s" is not a valid regular expression. Error was "%s".' % (value, str(e)))
 
     return value
 
@@ -340,7 +336,7 @@ def _ensure_is_a_string_or_none(key, value):
 
     value_type = type(value)
     if value_type is not str:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
+        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
                               % (key, str(value), value_type.__name__))
 
     return value
@@ -350,13 +346,13 @@ def _ensure_is_a_list_of_strings(key, value):
 
     value_type = type(value)
     if value_type is not list:
-        raise ConfigException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
+        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
                               % (key, str(value), value_type.__name__))
 
     for element in value:
         element_type = type(element)
         if element_type is not str:
-            raise ConfigException('Configuration parameter "%s": invalid list "%s"  with element "%s" of type "%s"! Please use a list of strings.'
+            raise ConfigurationException('Configuration parameter "%s": invalid list "%s"  with element "%s" of type "%s"! Please use a list of strings.'
                                   % (key, str(value), str(element), element_type.__name__))
 
     return value

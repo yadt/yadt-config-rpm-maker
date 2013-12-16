@@ -23,7 +23,7 @@ from sys import argv
 
 from config_rpm_maker import config
 from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigException
+from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigurationException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -64,7 +64,7 @@ def main():
         log_additional_information()
         building_configuration_rpms_and_clean_host_directories(repository_url, revision)
 
-    except ConfigException as e:
+    except ConfigurationException as e:
         log_exception_message(e)
         return exit_program('Configuration error!', return_code=RETURN_CODE_CONFIGURATION_ERROR)
 
