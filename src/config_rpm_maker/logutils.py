@@ -93,7 +93,7 @@ def log_configuration(logging_function, configuration, path):
     for key in keys:
         indentet_key = ('"%s"' % key).ljust(max_length)
         value = configuration[key]
-        logging_function('Configuraton property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
+        logging_function('Configuration property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
 
 
 def log_elements_of_list(logging_function, summary_message, unsorted_list):

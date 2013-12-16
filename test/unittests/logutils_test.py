@@ -122,19 +122,19 @@ class LogConfigurationTests(TestCase):
 
         log_configuration(self.mock_log, {'property': '123'}, 'configuration_file.yaml')
 
-        self.mock_log.assert_any_call('Configuraton property %s = "%s" (%s)', '"property"', '123', 'str')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', '123', 'str')
 
     def test_should_log_given_boolean_configuration_property(self):
 
         log_configuration(self.mock_log, {'property': True}, 'configuration_file.yaml')
 
-        self.mock_log.assert_any_call('Configuraton property %s = "%s" (%s)', '"property"', True, 'bool')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', True, 'bool')
 
     def test_should_log_given_integer_configuration_property(self):
 
         log_configuration(self.mock_log, {'property': 123}, 'configuration_file.yaml')
 
-        self.mock_log.assert_any_call('Configuraton property %s = "%s" (%s)', '"property"', 123, 'int')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', 123, 'int')
 
     def test_should_log_given_configuration_properties_in_alphabetical_order(self):
 
@@ -145,9 +145,9 @@ class LogConfigurationTests(TestCase):
         log_configuration(self.mock_log, configuration, 'configuration_file.yaml')
 
         self.assertEqual([call('Loaded configuration file "%s"', 'configuration_file.yaml'),
-                          call('Configuraton property %s = "%s" (%s)', '"a_property"', 123, 'int'),
-                          call('Configuraton property %s = "%s" (%s)', '"b_property"', False, 'bool'),
-                          call('Configuraton property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')],
+                          call('Configuration property %s = "%s" (%s)', '"a_property"', 123, 'int'),
+                          call('Configuration property %s = "%s" (%s)', '"b_property"', False, 'bool'),
+                          call('Configuration property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')],
                          self.mock_log.call_args_list)
 
 

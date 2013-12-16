@@ -14,13 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
-import subprocess
+import socket
 
 from logging import getLogger
 
 from config_rpm_maker import configuration
-from config_rpm_maker.logutils import verbose
 
 LOGGER = getLogger(__name__)
 
@@ -51,14 +49,5 @@ class HostResolver(object):
         return ip, fqdn, aliases
 
     def _resolve(self, hostname):
-        process = subprocess.Popen("getent hosts " + hostname, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = process.communicate()
-
-        verbose(LOGGER).debug('Resolving host "%s" using gentent: return_code=%d, stdout="%s", stderr="%s"', hostname, process.returncode, stdout.strip(), stderr.strip())
-        if process.returncode:
-            raise Exception("getent had returncode " + str(process.returncode))
-
-        line = re.sub("\s+", " ", stdout)
-        line = line[:-1]
-        parts = line.split(' ')
-        return parts[0], parts[1], ' '.join(parts[2:])
+        host, aliaslist, ipaddrlist = socket.gethostbyname_ex(hostname)
+        return ipaddrlist[0], host, ' '.join(aliaslist)
