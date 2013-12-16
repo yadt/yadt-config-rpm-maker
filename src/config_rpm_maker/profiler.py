@@ -29,7 +29,7 @@ LOGGER = getLogger(__name__)
 NUMBER_OF_LARGEST_FILES_TO_LOG = 10
 LOG_EACH_MEASUREMENT = False
 
-_summary = {}
+_execution_time_summary = {}
 
 
 def round_to_two_decimals_after_dot(elapsed_time_in_seconds):
@@ -51,11 +51,11 @@ def measure_execution_time(original_function):
         else:
             function_name = original_function.__name__
 
-        if function_name not in _summary.keys():
-            _summary[function_name] = [elapsed_time_in_seconds, 1]
+        if function_name not in _execution_time_summary.keys():
+            _execution_time_summary[function_name] = [elapsed_time_in_seconds, 1]
         else:
-            _summary[function_name][0] += elapsed_time_in_seconds
-            _summary[function_name][1] += 1
+            _execution_time_summary[function_name][0] += elapsed_time_in_seconds
+            _execution_time_summary[function_name][1] += 1
 
         if LOG_EACH_MEASUREMENT:
             function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
@@ -82,8 +82,8 @@ def measure_execution_time(original_function):
 def log_execution_time_summaries(logging_function):
     logging_function('Execution times summary (keep in mind thread_count was set to %s):', get(KEY_THREAD_COUNT))
 
-    for function_name in sorted(_summary.keys()):
-        summary_of_function = _summary[function_name]
+    for function_name in sorted(_execution_time_summary.keys()):
+        summary_of_function = _execution_time_summary[function_name]
         rounded_elapsed_time = round_to_two_decimals_after_dot(summary_of_function[0])
         average_time = round_to_two_decimals_after_dot(summary_of_function[0] / summary_of_function[1])
 
