@@ -68,7 +68,7 @@ def create_type(abbreviation):
     return count_of_development_hosts + count_of_test_hosts + count_of_production_hosts
 
 
-if __name__ == '__main__':
+def main():
     min_count_of_hosts = 1000
 
     first_character = 'abcdefghijklmnopqrstuvxyz'
@@ -79,5 +79,8 @@ if __name__ == '__main__':
     while count_of_hosts < min_count_of_hosts:
         abbreviation = choice(first_character) + choice(second_character) + choice(third_character)
         count_of_hosts += create_type(abbreviation)
-
     print "Created %d hosts" % count_of_hosts
+
+
+if __name__ == '__main__':
+    main()
