@@ -18,9 +18,8 @@ from logging import DEBUG, Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
-from config_rpm_maker.configuration import (DEFAULT_LOG_FORMAT,
-                                            KEY_VERBOSE,
-                                            get_property)
+from config_rpm_maker.configuration import DEFAULT_LOG_FORMAT, KEY_VERBOSE, get_property
+
 
 LOGGER = getLogger(__name__)
 
