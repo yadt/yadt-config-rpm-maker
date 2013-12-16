@@ -14,8 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
-import subprocess
+import socket
 
 from logging import getLogger
 
@@ -50,12 +49,5 @@ class HostResolver(object):
         return ip, fqdn, aliases
 
     def _resolve(self, hostname):
-        p = subprocess.Popen("getent hosts " + hostname, stdout=subprocess.PIPE, shell=True)
-        out, err = p.communicate()
-        if p.returncode:
-            raise Exception("getent had returncode " + str(p.returncode))
-
-        line = re.sub("\s+", " ", out)
-        line = line[:-1]
-        parts = line.split(' ')
-        return parts[0], parts[1], ' '.join(parts[2:])
+        host, aliaslist, ipaddrlist = socket.gethostbyname_ex(hostname)
+        return ipaddrlist[0], host, ' '.join(aliaslist)
