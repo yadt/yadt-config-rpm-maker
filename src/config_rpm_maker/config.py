@@ -81,6 +81,11 @@ KEY_VERBOSE = 'verbose'
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
 
+MISSING_CONFIGURATION_FILE_MESSAGE = """Could not find configuration file "{configuration_file_path}"!
+
+Please provide "{default_path}" in the current working directory "{current_working_directory}"
+or set environment variable "{environment_variable_name}" to the path where to find the configuration file."""
+
 
 _properties = None
 _file_path_of_loaded_configuration = None
@@ -102,11 +107,11 @@ def load_configuration_file():
     configuration_file_path = _determine_configuration_file_path()
 
     if not exists(configuration_file_path):
-        raise ConfigException("""Could not find configuration file "%s". Please provide "%s" in the current working directory "%s" or set environment variable "%s".""" %
-                              (DEFAULT_CONFIGURATION_FILE_PATH,
-                               configuration_file_path,
-                               abspath('.'),
-                               ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE))
+        message = MISSING_CONFIGURATION_FILE_MESSAGE.format(configuration_file_path=configuration_file_path,
+                                                            default_path=DEFAULT_CONFIGURATION_FILE_PATH,
+                                                            current_working_directory=abspath('.'),
+                                                            environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
+        raise ConfigException(message)
 
     raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
     valid_properties = _ensure_properties_are_valid(raw_properties)
