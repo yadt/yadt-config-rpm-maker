@@ -87,7 +87,7 @@ def log_execution_time_summaries(logging_function):
         rounded_elapsed_time = round_to_two_decimals_after_dot(summary_of_function[0])
         average_time = round_to_two_decimals_after_dot(summary_of_function[0] / summary_of_function[1])
 
-        logging_function('    %3s times with average %5ss = sum %5ss : %s',
+        logging_function('    %5s times with average %5ss = sum %7ss : %s',
                          summary_of_function[1], average_time, rounded_elapsed_time, function_name)
 
 

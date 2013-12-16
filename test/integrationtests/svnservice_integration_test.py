@@ -27,7 +27,7 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
 
-        self.assertEqual(['typ/web/data/index.html'], service.get_change_set(2))
+        self.assertEqual(['typ/web/data/index.html'], service.get_changed_paths(2))
 
     def test_should_return_by_change_set_affected_hosts(self):
 
@@ -54,4 +54,4 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
         service = SvnService(self.repo_url, None, None, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
 
-        self.assertRaises(SvnServiceException, service.get_change_set, 13)
+        self.assertRaises(SvnServiceException, service.get_changed_paths, 13)

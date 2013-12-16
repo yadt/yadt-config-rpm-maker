@@ -27,6 +27,10 @@ from config_rpm_maker import config
 from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
 from config_rpm_maker.svnservice import SvnService
 
+# This constant exists for debugging purposes.
+# Switch this to True if you want to see the generated files after executing a test.
+KEEP_TEMPORARY_DIRECTORY = False
+
 
 class IntegrationTestException(Exception):
     pass
@@ -36,12 +40,11 @@ class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, False)
+        config.set_property(KEY_NO_CLEAN_UP, KEEP_TEMPORARY_DIRECTORY)
 
         temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
 
-        if exists(temporary_directory):
-            rmtree(temporary_directory)
+        self.clean_up_temporary_directory(temporary_directory)
 
         self.temporary_directory = temporary_directory
 
@@ -49,8 +52,7 @@ class IntegrationTest(unittest.TestCase):
 
     def tearDown(self):
 
-        if exists(self.temporary_directory):
-            rmtree(self.temporary_directory)
+        self.clean_up_temporary_directory(self.temporary_directory)
 
     def create_svn_repo(self):
         self._create_repository_directory()
@@ -97,15 +99,38 @@ class IntegrationTest(unittest.TestCase):
 
     def assert_file_content(self, path_to_file, expected_content):
 
-        self.assertTrue(exists(path_to_file))
+        self.assert_path_exists(path_to_file)
 
         with open(path_to_file) as revision_file:
             actual_content = revision_file.read()
+
             error_message = """File "{path_to_file}" did not have expected content.
-Expected content: {expected_content}
-  Actual content: {actual_content}
-""".format(path_to_file=path_to_file, expected_content=expected_content, actual_content=actual_content)
+Expected: "{expected}"
+ but was: "{actual}"
+""".format(path_to_file=path_to_file, expected=expected_content, actual=actual_content)
+
             self.assertEqual(expected_content, actual_content, error_message)
+
+    def assert_file_content_line_by_line(self, path_to_file, expected_content):
+
+        self.assert_path_exists(path_to_file)
+
+        with open(path_to_file) as revision_file:
+            actual_content = revision_file.read()
+
+            expected_lines = expected_content.split('\n')
+            actual_lines = actual_content.split('\n')
+
+            line_number = 0
+            for expected_line in expected_lines:
+                actual_line = actual_lines[line_number]
+                error_message = """File "{path_to_file}" did not have expected content in line {line_number} (white space is trimmed).
+Expected: "{expected}"
+ but was: "{actual}"
+""".format(path_to_file=path_to_file, expected=expected_line, actual=actual_line, line_number=line_number + 1)
+
+                self.assertEqual(expected_line.strip(), actual_line.strip(), error_message)
+                line_number += 1
 
     def create_svn_service_queue(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
@@ -119,3 +144,7 @@ Expected content: {expected_content}
 
     def assert_path_does_not_exist(self, path):
         self.assertFalse(exists(path), 'Path "%s" should not exist!' % path)
+
+    def clean_up_temporary_directory(self, temporary_directory):
+        if not KEEP_TEMPORARY_DIRECTORY and exists(temporary_directory):
+            rmtree(temporary_directory)

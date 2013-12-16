@@ -23,6 +23,7 @@ custom_dns_searchlist: []
 error_log_dir: 'target/tmp/configviewer/errors'
 error_log_url: 'http://localhost/errors'
 log_level: DEBUG
+max_file_size: 500000
 path_to_spec_file: 'default.spec'
 repo_packages_regex: '^yadt-.*-repos?$'
 rpm_upload_chunk_size: 10

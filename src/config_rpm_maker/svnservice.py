@@ -19,12 +19,15 @@ import os
 
 from logging import getLogger
 
+from time import ctime
 from config_rpm_maker.config import DEFAULT_HOST_NAME_ENCODING
 from config_rpm_maker.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.profiler import measure_execution_time
 
 LOGGER = getLogger(__name__)
+
+PYSVN_DELETE_ACTION = 'D'
 
 
 class SvnServiceException(BaseConfigRpmMakerException):
@@ -43,25 +46,68 @@ class SvnService(object):
     def _initialize_pysvn_client(self, username, password):
         self.client = pysvn.Client()
         self.client.set_auth_cache(True)
+
         if username:
             LOGGER.debug('Setting default username for subversion client to "%s".', username)
             self.client.set_default_username(username)
+
         if password:
             LOGGER.debug('Setting default password for subversion client.')
             self.client.set_default_password(password)
 
-    @measure_execution_time
-    def get_change_set(self, revision):
+    def log_change_set_meta_information(self, revision):
+        """ Logs the commit message, author and commit date. """
+
+        log_entries = self.get_logs_for_revision(revision)
+        for info in log_entries:
+            LOGGER.info('Commit message is "%s" (%s, %s)', info.message.strip(), info.author, ctime(info.date))
+
+    def get_logs_for_revision(self, revision):
+        """ Returns the logs for the given revision of the repository at the config_url """
+
         try:
-            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision), discover_changed_paths=True)
+            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision),
+                                   discover_changed_paths=True)
         except Exception as e:
             LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
                          revision, self.config_url)
             raise SvnServiceException(str(e))
+        return logs
+
+    def get_changed_paths_with_action(self, revision):
+        """ Returns a list of all paths from the change set which were marked with action "delete" """
+
+        log_entries = self.get_logs_for_revision(revision)
 
         start_pos = len(self.path_to_config + '/')
-        changed_paths = [path_obj.path[start_pos:] for log in logs for path_obj in log.changed_paths]
-        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s).', changed_paths)
+        action_and_path = []
+        for info in log_entries:
+            for path_obj in info.changed_paths:
+                changed_path = path_obj.path[start_pos:]
+                action_and_path.append((changed_path, path_obj.action))
+
+        return action_and_path
+
+    def get_deleted_paths(self, revision):
+        """ Returns all paths which have been deleted in the given revision"""
+
+        paths_with_action = self.get_changed_paths_with_action(revision)
+
+        return [element[0] for element in paths_with_action if element[1] == PYSVN_DELETE_ACTION]
+
+    @measure_execution_time
+    def get_changed_paths(self, revision):
+        """ Returns the list of all changed paths from the change set with the given revision """
+
+        path_with_action = self.get_changed_paths_with_action(revision)
+
+        changed_paths_and_action = []
+        changed_paths = []
+        for path, action in path_with_action:
+            changed_paths.append(path)
+            changed_paths_and_action.append("%s (%s)" % (path, action))
+
+        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s). Listing with svn action.', changed_paths_and_action)
         return changed_paths
 
     @measure_execution_time

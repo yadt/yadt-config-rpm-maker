@@ -28,14 +28,14 @@ from config_rpm_maker import (append_console_logger,
                               initialize_logging_to_console,
                               initialize_logging_to_syslog,
                               main,
-                              start_building_configuration_rpms)
+                              building_configuration_rpms_and_clean_host_directories)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.config import ConfigException
 
 
 class MainTests(TestCase):
 
-    @patch('config_rpm_maker.start_building_configuration_rpms')
+    @patch('config_rpm_maker.building_configuration_rpms_and_clean_host_directories')
     @patch('config_rpm_maker.log_additional_information')
     @patch('config_rpm_maker.start_measuring_time')
     @patch('config_rpm_maker.initialize_logging_to_syslog')
@@ -105,64 +105,84 @@ class MainTests(TestCase):
         mock_exit_program.assert_called_with('An unknown exception occurred!', return_code=5)
 
 
-class StartBuildingConfigurationRpmsTests(TestCase):
+class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
 
+    @patch('config_rpm_maker.clean_up_deleted_hosts_data')
     @patch('config_rpm_maker.config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_pass_when_everything_works_as_expected(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config):
+    def test_should_pass_when_everything_works_as_expected(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
         mock_config.get.return_value = '/path-to-configuration'
         mock_svn_service_class.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
-        start_building_configuration_rpms('file:///path_to/testdata/repository', 1)
+        building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', 1)
 
+    @patch('config_rpm_maker.clean_up_deleted_hosts_data')
     @patch('config_rpm_maker.config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_initialize_svn_service_with_given_repository_url(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config):
+    def test_should_initialize_svn_service_with_given_repository_url(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
         mock_config.get.return_value = '/path-to-configuration'
         mock_svn_service_constructor.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
-        start_building_configuration_rpms('file:///path_to/testdata/repository', 1)
+        building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', 1)
 
         mock_svn_service_constructor.assert_called_with(path_to_config='/path-to-configuration',
                                                         base_url='file:///path_to/testdata/repository')
 
+    @patch('config_rpm_maker.clean_up_deleted_hosts_data')
     @patch('config_rpm_maker.config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_initialize_svn_service_with_path_to_config_from_configuration(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config):
+    def test_should_initialize_svn_service_with_path_to_config_from_configuration(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
         mock_config.get.return_value = '/path-to-configuration'
         mock_svn_service_constructor.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
-        start_building_configuration_rpms('file:///path_to/testdata/repository', 1)
+        building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', 1)
 
         mock_svn_service_constructor.assert_called_with(path_to_config='/path-to-configuration',
                                                         base_url='file:///path_to/testdata/repository')
 
+    @patch('config_rpm_maker.clean_up_deleted_hosts_data')
     @patch('config_rpm_maker.config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
-    def test_should_initialize_config_rpm_maker_with_given_revision_and_svn_service(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config):
+    def test_should_initialize_config_rpm_maker_with_given_revision_and_svn_service(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
         mock_config.get.return_value = '/path-to-configuration'
         mock_svn_service = Mock()
         mock_svn_service_constructor.return_value = mock_svn_service
         mock_config_rpm_maker_class.return_value = Mock()
 
-        start_building_configuration_rpms('file:///path_to/testdata/repository', 1980)
+        building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', '1980')
 
-        mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision=1980)
+        mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision='1980')
+
+    @patch('config_rpm_maker.clean_up_deleted_hosts_data')
+    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.exit_program')
+    @patch('config_rpm_maker.SvnService')
+    @patch('config_rpm_maker.ConfigRpmMaker')
+    def test_should_clean_up_directories_of_hosts_which_have_been_deleted(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
+
+        mock_config.get.return_value = '/path-to-configuration'
+        mock_svn_service = Mock()
+        mock_svn_service_constructor.return_value = mock_svn_service
+        mock_config_rpm_maker_class.return_value = Mock()
+
+        building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', '1980')
+
+        mock_clean_up_deleted_hosts_data.assert_called_with(mock_svn_service, '1980')
 
 
 class InitializeLoggingToConsoleTests(TestCase):

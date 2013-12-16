@@ -134,7 +134,7 @@ class TokenReplacerFilterFileIntegrationTest(IntegrationTestBase):
         self.ensure_file_contents("bin", binary_data, True)
 
     def test_should_filter_throw_exception_for_files_bigger_than_file_size_limit(self):
-        big_content = "x" * (200 * 1024)
+        big_content = "x" * (2 * 1024 * 1024)
         self.create_tmp_file("big_content", big_content)
         self.assertRaises(Exception, TokenReplacer().filter_file, self.tmp_file_name("big_content"))
 

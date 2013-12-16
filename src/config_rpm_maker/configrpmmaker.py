@@ -137,12 +137,12 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.info('Working on revision %s', self.revision)
         self.logger.info("Starting with revision %s", self.revision)
         try:
-            change_set = self.svn_service.get_change_set(self.revision)
+            changed_paths = self.svn_service.get_changed_paths(self.revision)
             available_hosts = self.svn_service.get_hosts(self.revision)
 
-            affected_hosts = list(self._get_affected_hosts(change_set, available_hosts))
+            affected_hosts = list(self._get_affected_hosts(changed_paths, available_hosts))
             if not affected_hosts:
-                LOGGER.info("No rpm(s) built. No host affected by change set: %s", str(change_set))
+                LOGGER.info("No rpm(s) built. No host affected by change set: %s", str(changed_paths))
                 return
 
             log_elements_of_list(LOGGER.debug, 'Detected %s affected host(s).', affected_hosts)
@@ -294,11 +294,11 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         else:
             LOGGER.info("Rpms will not be uploaded since no upload command has been configured.")
 
-    def _get_affected_hosts(self, change_set, available_host):
+    def _get_affected_hosts(self, changed_paths, available_host):
         result = set()
         for segment in OVERLAY_ORDER:
-            for change_path in change_set:
-                result |= set(self._find_matching_hosts(segment, change_path, available_host))
+            for changed_path in changed_paths:
+                result |= set(self._find_matching_hosts(segment, changed_path, available_host))
 
         return result
 
@@ -338,8 +338,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     def _create_logger(self):
         self.error_log_file = tempfile.mktemp(dir=config.get(KEY_TEMPORARY_DIRECTORY),
-                                              prefix='yadt-config-rpm-maker',
-                                              suffix='.error.log')
+                                              prefix='yadt-config-rpm-maker.',
+                                              suffix='.revision-%s.error.log' % self.revision)
         self.error_handler = FileHandler(self.error_log_file)
         formatter = Formatter(config.LOG_FILE_FORMAT, config.LOG_FILE_DATE_FORMAT)
         self.error_handler.setFormatter(formatter)

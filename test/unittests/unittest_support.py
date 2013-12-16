@@ -24,7 +24,9 @@ class UnitTests(TestCase):
 
     def assert_mock_never_called(self, mock_object):
         mock_call_count = mock_object.call_count
-        error_message = "Asserted that mock has not been called, but mock has been called %d times." % (mock_call_count)
+        error_message = "mock object should not be called,\n    but has been called %d times:\n" % (mock_call_count)
+        for call in mock_object.call_args_list:
+            error_message += '        %s' % str(call)
         self.assertEqual(0, mock_call_count, error_message)
 
     def assert_is_instance_of(self, test_object, the_class):
@@ -33,7 +35,6 @@ class UnitTests(TestCase):
                                                                                                     class_name=the_class.__name__)
 
         self.assertTrue(isinstance(test_object, the_class), error_message)
-
 
     def create_fake_file(self, content=""):
         """
