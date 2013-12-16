@@ -478,7 +478,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         _ensure_properties_are_valid(properties)
 
-        mock_logger.warn.assert_called_with('Unknown configuration parameter(s) found: foo_spam')
+        mock_logger.warn.assert_called_with('Unknown configuration propertie(s) found: foo_spam')
 
     @patch('config_rpm_maker.config._ensure_is_an_integer')
     def test_should_return_max_file_size(self, mock_ensure_is_an_integer):

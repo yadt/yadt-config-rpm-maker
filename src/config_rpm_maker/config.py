@@ -257,10 +257,10 @@ def _ensure_properties_are_valid(raw_properties):
         KEY_VERBOSE: DEFAULT_VERBOSE
     }
 
-    unknown_configuration_parameters = set(raw_properties.keys()) - set(valid_properties.keys())
+    unknown_configuration_properties = set(raw_properties.keys()) - set(valid_properties.keys())
 
-    if len(unknown_configuration_parameters) > 0:
-        LOGGER.warn('Unknown configuration parameter(s) found: %s' % ', '.join(unknown_configuration_parameters))
+    if len(unknown_configuration_properties) > 0:
+        LOGGER.warn('Unknown configuration propertie(s) found: %s' % ', '.join(unknown_configuration_properties))
 
     return valid_properties
 
