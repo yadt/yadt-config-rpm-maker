@@ -25,11 +25,11 @@ class Dependency:
         so the first/gerneral ones get overwritten by the later/specific ones
     """
 
-    def __init__(self, collapseDependencies=False, filterRegex=".*", positiveFilter=True):
+    def __init__(self, collapse_dependencies=False, filter_regex=".*", positive_filter=True):
         self.dependencies = dict([])
-        self.collapse_dependencies = collapseDependencies
-        self.filter_regex = filterRegex
-        self.positive_filter = positiveFilter
+        self.collapse_dependencies = collapse_dependencies
+        self.filter_regex = filter_regex
+        self.positive_filter = positive_filter
 
     def _filter_dependencies(self):
         filtered_dependencies = dict([])

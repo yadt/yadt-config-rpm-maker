@@ -385,7 +385,7 @@ Change set:
         return []
 
     def _write_dependency_file(self, dependencies, file_path, collapse_duplicates=False, filter_regex='.*', positive_filter=True):
-        dep = Dependency(collapseDependencies=collapse_duplicates, filterRegex=filter_regex, positiveFilter=positive_filter)
+        dep = Dependency(collapse_dependencies=collapse_duplicates, filter_regex=filter_regex, positive_filter=positive_filter)
         dep.add(dependencies)
         self._write_file(file_path, dep.__repr__())
 
