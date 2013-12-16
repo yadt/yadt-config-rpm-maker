@@ -118,7 +118,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
     def __init__(self, revision, svn_service):
         self.revision = revision
         self.svn_service = svn_service
-        self.temp_dir = configuration.get(KEY_TEMPORARY_DIRECTORY)
+        self.temp_dir = configuration.get_property(KEY_TEMPORARY_DIRECTORY)
         self._assure_temp_dir_if_set()
         self._create_logger()
         self.work_dir = None
@@ -126,7 +126,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self.failed_host_queue = Queue()
 
     def __build_error_msg_and_move_to_public_access(self, revision):
-        err_url = configuration.get(KEY_ERROR_LOG_URL)
+        err_url = configuration.get_property(KEY_ERROR_LOG_URL)
         error_msg = self.ERROR_MSG % (err_url, revision)
         for line in error_msg.split('\n'):
             LOGGER.error(line)
@@ -172,7 +172,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         else:
             if self.work_dir and exists(self.work_dir):
 
-                if configuration.get(KEY_VERBOSE):
+                if configuration.get_property(KEY_VERBOSE):
                     log_directories_summary(LOGGER.debug, self.work_dir)
 
                 LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
@@ -183,10 +183,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 remove(self.error_log_file)
 
     def _keep_work_dir(self):
-        return configuration.get(KEY_NO_CLEAN_UP)
+        return configuration.get_property(KEY_NO_CLEAN_UP)
 
     def _move_error_log_for_public_access(self):
-        error_log_dir = os.path.join(configuration.get('error_log_dir'))
+        error_log_dir = os.path.join(configuration.get_property('error_log_dir'))
         if error_log_dir:
             if not os.path.exists(error_log_dir):
                 os.makedirs(error_log_dir)
@@ -227,7 +227,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
                                                                                                         count=approximately_count))
 
-        maximum_allowed_failed_hosts = configuration.get(KEY_MAX_FAILED_HOSTS)
+        maximum_allowed_failed_hosts = configuration.get_property(KEY_MAX_FAILED_HOSTS)
         if approximately_count >= maximum_allowed_failed_hosts:
             LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % maximum_allowed_failed_hosts)
             self.host_queue.queue.clear()
@@ -274,7 +274,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
     @measure_execution_time
     def _upload_rpms(self, rpms):
-        rpm_upload_cmd = configuration.get(KEY_RPM_UPLOAD_COMMAND)
+        rpm_upload_cmd = configuration.get_property(KEY_RPM_UPLOAD_COMMAND)
         chunk_size = self._get_chunk_size(rpms)
 
         if rpm_upload_cmd:
@@ -317,7 +317,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return result
 
     def _get_thread_count(self, affected_hosts):
-        thread_count = int(configuration.get(KEY_THREAD_COUNT))
+        thread_count = int(configuration.get_property(KEY_THREAD_COUNT))
         if thread_count < 0:
             raise ConfigurationException('%s is %s, values <0 are not allowed)' % (KEY_THREAD_COUNT, thread_count))
 
@@ -341,7 +341,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return items
 
     def _create_logger(self):
-        self.error_log_file = tempfile.mktemp(dir=configuration.get(KEY_TEMPORARY_DIRECTORY),
+        self.error_log_file = tempfile.mktemp(dir=configuration.get_property(KEY_TEMPORARY_DIRECTORY),
                                               prefix='yadt-config-rpm-maker.',
                                               suffix='.revision-%s.error.log' % self.revision)
         self.error_handler = FileHandler(self.error_log_file)
@@ -371,7 +371,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 makedirs(path)
 
     def _get_chunk_size(self, rpms):
-        chunk_size_raw = configuration.get(KEY_RPM_UPLOAD_CHUNK_SIZE)
+        chunk_size_raw = configuration.get_property(KEY_RPM_UPLOAD_CHUNK_SIZE)
         try:
             chunk_size = int(chunk_size_raw)
         except ValueError:

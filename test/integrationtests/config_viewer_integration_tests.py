@@ -29,7 +29,7 @@ class ConfigViewerIntegrationTests(IntegrationTest):
     def test_should_create_files_for_hosts(self):
 
         configuration.set_property(KEY_NO_CLEAN_UP, True)
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         ConfigRpmMaker('2', svn_service).build()
 

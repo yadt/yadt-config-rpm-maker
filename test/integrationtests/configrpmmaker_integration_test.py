@@ -105,11 +105,11 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             self.assertRpm(host, rpms, requires=requires, provides=provides, files=files)
 
     def test_should_perform_chunked_uploads(self):
-        old_config = configuration.get('rpm_upload_cmd')
-        target_file = os.path.abspath(os.path.join(configuration.get('temp_dir'), 'upload.txt'))
+        old_config = configuration.get_property('rpm_upload_cmd')
+        target_file = os.path.abspath(os.path.join(configuration.get_property('temp_dir'), 'upload.txt'))
         if os.path.exists(target_file):
             os.remove(target_file)
-        cmd_file = os.path.abspath(os.path.join(configuration.get('temp_dir'), 'upload.sh'))
+        cmd_file = os.path.abspath(os.path.join(configuration.get_property('temp_dir'), 'upload.sh'))
         with open(cmd_file, 'w') as f:
             f.write('#!/bin/bash\ndest=$1 ; shift ; echo "${#@} $@" >> "$dest"')
 
@@ -129,7 +129,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertRaises(CouldNotBuildSomeRpmsException, ConfigRpmMaker(None, None)._build_hosts, ['devabc123'])
 
     def test_should_raise_CouldNotUploadRpmsException(self):
-        rpm_upload_command_before_test = configuration.get(KEY_RPM_UPLOAD_COMMAND)
+        rpm_upload_command_before_test = configuration.get_property(KEY_RPM_UPLOAD_COMMAND)
         configuration.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
 
         self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
@@ -173,7 +173,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
 
     def _given_config_rpm_maker(self):
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         return ConfigRpmMaker('2', svn_service)
 
@@ -181,7 +181,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)
-            if name.startswith(config_dev.get('config_rpm_prefix') + hostname) and 'noarch' in name and not 'repos' in name:
+            if name.startswith(config_dev.get_property('config_rpm_prefix') + hostname) and 'noarch' in name and not 'repos' in name:
                 path = rpm_name
                 break
 
@@ -235,7 +235,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertEqual(expected, actual, "Lists are different.\nExpected: %s\n     Got: %s\ndifference is: %s" % (str(expected), str(actual), str(difference)))
 
     def extractRpmFiles(self, path, hostname):
-        extract_path = os.path.join(config_dev.get('temp_dir'), hostname + '.extract')
+        extract_path = os.path.join(config_dev.get_property('temp_dir'), hostname + '.extract')
         os.mkdir(extract_path)
 
         command_with_arguments = 'rpm2cpio ' + os.path.abspath(path) + ' | cpio  -idmv'

@@ -114,7 +114,7 @@ def load_configuration_file():
     set_properties(valid_properties)
 
 
-def get(name):
+def get_property(name):
     """ Get the configuration property """
 
     if not get_properties():
@@ -133,7 +133,7 @@ def get(name):
 
 def build_config_viewer_host_directory(hostname, revision=False):
     """ Returns a path to the config viewer host directory"""
-    config_viewer_hosts_directory = get(KEY_CONFIG_VIEWER_HOSTS_DIR)
+    config_viewer_hosts_directory = get_property(KEY_CONFIG_VIEWER_HOSTS_DIR)
     path = join(config_viewer_hosts_directory, hostname)
 
     if revision:

@@ -25,26 +25,26 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
     def test_should_return_changed_paths(self):
 
-        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         self.assertEqual(['typ/web/data/index.html'], service.get_changed_paths(2))
 
     def test_should_return_by_change_set_affected_hosts(self):
 
-        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         self.assertEqual(['berweb01', 'devweb01', 'tuvweb01'], service.get_hosts(2))
 
     def test_should_return_tuples_of_svn_path_and_the_affected_file(self):
 
-        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         self.assertEqual([('host/berweb01', 'VARIABLES'), ('host/berweb01', 'VARIABLES/RPM_REQUIRES')],
                          service.export('host/berweb01', 'target/tmp/test', 2))
 
     def test_should_return_exactly_one_svn_log(self):
 
-        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         logs = service.log('', 2, 5)
 
@@ -52,6 +52,6 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
     def test_should_raise_SvnServiceException_when_invalid_revision_is_given(self):
 
-        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+        service = SvnService(self.repo_url, None, None, path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
 
         self.assertRaises(SvnServiceException, service.get_changed_paths, 13)

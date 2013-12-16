@@ -42,7 +42,7 @@ class IntegrationTest(unittest.TestCase):
 
         configuration.set_property(KEY_NO_CLEAN_UP, KEEP_TEMPORARY_DIRECTORY)
 
-        temporary_directory = configuration.get(KEY_TEMPORARY_DIRECTORY)
+        temporary_directory = configuration.get_property(KEY_TEMPORARY_DIRECTORY)
 
         self.clean_up_temporary_directory(temporary_directory)
 
@@ -134,7 +134,7 @@ Expected: "{expected}"
 
     def create_svn_service_queue(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
-                                 path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
+                                 path_to_config=configuration.get_property(KEY_SVN_PATH_TO_CONFIG))
         svn_service_queue = Queue()
         svn_service_queue.put(svn_service)
         return svn_service_queue

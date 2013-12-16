@@ -188,7 +188,7 @@ class TokenReplacer(object):
 
     def filter_file(self, filename, html_escape=False):
         try:
-            self.file_size_limit = configuration.get(KEY_MAX_FILE_SIZE)
+            self.file_size_limit = configuration.get_property(KEY_MAX_FILE_SIZE)
 
             if getsize(filename) > self.file_size_limit:
                 raise FileLimitExceededException(filename, self.file_size_limit)

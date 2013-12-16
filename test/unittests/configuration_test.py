@@ -47,7 +47,7 @@ from config_rpm_maker.configuration import (ConfigurationException,
                                      build_config_viewer_host_directory,
                                      get_file_path_of_loaded_configuration,
                                      get_properties,
-                                     get,
+                                     get_property,
                                      load_configuration_file,
                                      set_property,
                                      set_properties,
@@ -636,7 +636,7 @@ class GetPropertyTests(TestCase):
 
         mock_load_configuration_file.side_effect = mock_set_properties
 
-        get(KEY_MAX_FILE_SIZE)
+        get_property(KEY_MAX_FILE_SIZE)
 
         mock_load_configuration_file.assert_called_with()
 
@@ -645,14 +645,14 @@ class GetPropertyTests(TestCase):
 
         mock_properties.return_value = {}
 
-        self.assertRaises(ConfigurationException, get, KEY_MAX_FILE_SIZE)
+        self.assertRaises(ConfigurationException, get_property, KEY_MAX_FILE_SIZE)
 
     @patch('config_rpm_maker.configuration.get_properties')
     def test_should_return_value_of_property_when_in_properties(self, mock_properties):
 
         mock_properties.return_value = {KEY_MAX_FILE_SIZE: 28374}
 
-        actual = get(KEY_MAX_FILE_SIZE)
+        actual = get_property(KEY_MAX_FILE_SIZE)
 
         self.assertEqual(28374, actual)
 
@@ -729,7 +729,7 @@ class EnsureValidLogLevelTests(TestCase):
 
 class GetConfigViewerHostDirTests(TestCase):
 
-    @patch('config_rpm_maker.configuration.get')
+    @patch('config_rpm_maker.configuration.get_property')
     def test_should_return_path_to_host_directory(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
@@ -739,7 +739,7 @@ class GetConfigViewerHostDirTests(TestCase):
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
 
-    @patch('config_rpm_maker.configuration.get')
+    @patch('config_rpm_maker.configuration.get_property')
     def test_should_return_path_and_append_a_postfix(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'

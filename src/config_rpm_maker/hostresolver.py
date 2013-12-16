@@ -27,7 +27,7 @@ LOGGER = getLogger(__name__)
 class HostResolver(object):
 
     def resolve(self, hostname):
-        dns_searchlist = configuration.get('custom_dns_searchlist')
+        dns_searchlist = configuration.get_property('custom_dns_searchlist')
 
         if dns_searchlist:
             for dns_entry in dns_searchlist:
@@ -41,7 +41,7 @@ class HostResolver(object):
             except Exception:
                 pass
 
-        if not configuration.get('allow_unknown_hosts'):
+        if not configuration.get_property('allow_unknown_hosts'):
             raise Exception("Could not lookup '%s' with 'getent hosts'" % hostname)
 
         ip = "127.0.0.1"

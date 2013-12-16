@@ -24,7 +24,7 @@ from config_rpm_maker.configuration import (DEFAULT_LOG_FORMAT,
                                      DEFAULT_SYS_LOG_FORMAT,
                                      DEFAULT_SYS_LOG_LEVEL,
                                      KEY_VERBOSE,
-                                     get)
+                                     get_property)
 
 LOGGER = getLogger(__name__)
 
@@ -50,7 +50,7 @@ _muted_logger = MutedLogger()
 def verbose(logger):
     """ Returns the given logger if verbose is configured or it will return _muted_logger """
 
-    if get(KEY_VERBOSE):
+    if get_property(KEY_VERBOSE):
         return logger
 
     return _muted_logger

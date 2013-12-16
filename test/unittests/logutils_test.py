@@ -262,7 +262,7 @@ class MutedLoggerTests(TestCase):
 
 class VerboseTests(TestCase):
 
-    @patch('config_rpm_maker.logutils.get')
+    @patch('config_rpm_maker.logutils.get_property')
     def test_should_return_given_logger_when_configuration_value_for_verbose_is_true(self, mock_get):
 
         mock_logger = Mock(Logger)
@@ -274,7 +274,7 @@ class VerboseTests(TestCase):
         mock_get.assert_called_with('verbose')
 
     @patch('config_rpm_maker.logutils._muted_logger')
-    @patch('config_rpm_maker.logutils.get')
+    @patch('config_rpm_maker.logutils.get_property')
     def test_should_not_return_muted_logger_when_configuration_value_for_verbose_is_false(self, mock_get, mock_muted_logger):
 
         mock_logger = Mock(Logger)

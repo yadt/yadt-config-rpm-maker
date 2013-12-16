@@ -67,7 +67,7 @@ class HostRpmBuilder(object):
         self.error_file_path = os.path.join(self.work_dir, self.hostname + '.error')
         self.logger = self._create_logger()
         self.svn_service_queue = svn_service_queue
-        self.config_rpm_prefix = configuration.get(KEY_CONFIG_RPM_PREFIX)
+        self.config_rpm_prefix = configuration.get_property(KEY_CONFIG_RPM_PREFIX)
         self.host_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.hostname)
         self.variables_dir = os.path.join(self.host_config_dir, 'VARIABLES')
         self.rpm_requires_path = os.path.join(self.variables_dir, 'RPM_REQUIRES')
@@ -112,7 +112,7 @@ class HostRpmBuilder(object):
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
-        repo_packages_regex = configuration.get(KEY_REPO_PACKAGES_REGEX)
+        repo_packages_regex = configuration.get_property(KEY_REPO_PACKAGES_REGEX)
         self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)
         self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'), filter_regex=repo_packages_regex, positive_filter=False)
 
@@ -136,7 +136,7 @@ class HostRpmBuilder(object):
 
         self._filter_tokens_in_rpm_sources()
 
-        if not configuration.get(configuration.KEY_CONFIG_VIEWER_ONLY):
+        if not configuration.get_property(configuration.KEY_CONFIG_VIEWER_ONLY):
             self._build_rpm_using_rpmbuild()
 
         LOGGER.debug('%s: writing configviewer data for host "%s"', self.thread_name, self.hostname)
@@ -150,7 +150,7 @@ class HostRpmBuilder(object):
         return self._find_rpms()
 
     def _clean_up(self):
-        if configuration.get(KEY_NO_CLEAN_UP):
+        if configuration.get_property(KEY_NO_CLEAN_UP):
             verbose(LOGGER).debug('Not cleaning up anything for host "%s"', self.hostname)
             return
 
@@ -202,7 +202,7 @@ class HostRpmBuilder(object):
         absolute_rpm_build_path = abspath(self.rpm_build_dir)
 
         clean_option = "--clean"
-        if configuration.get(KEY_NO_CLEAN_UP):
+        if configuration.get_property(KEY_NO_CLEAN_UP):
             clean_option = ""
 
         rpmbuild_cmd = "rpmbuild %s --define '_topdir %s' -ta %s" % (clean_option, absolute_rpm_build_path, tar_path)
@@ -342,7 +342,7 @@ Change set:
     def _export_spec_file(self):
         svn_service = self._get_next_svn_service_from_queue()
         try:
-            svn_service.export(configuration.get('path_to_spec_file'), self.spec_file_path, self.revision)
+            svn_service.export(configuration.get_property('path_to_spec_file'), self.spec_file_path, self.revision)
         finally:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()
@@ -410,7 +410,7 @@ Change set:
         self.handler.close()
 
     def _create_logger(self):
-        log_level = configuration.get(KEY_LOG_LEVEL)
+        log_level = configuration.get_property(KEY_LOG_LEVEL)
         formatter = Formatter(configuration.LOG_FILE_FORMAT, configuration.LOG_FILE_DATE_FORMAT)
 
         self.handler = FileHandler(self.output_file_path)
