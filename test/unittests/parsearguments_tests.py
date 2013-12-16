@@ -20,13 +20,13 @@ from mock import patch, Mock
 from unittest import TestCase
 
 from config_rpm_maker.configuration import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE, KEY_NO_CLEAN_UP
-from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE, OPTION_NO_CLEAN_UP
-from config_rpm_maker.parsearguments import apply_arguments_to_config, parse_arguments
+from config_rpm_maker.cli.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE, OPTION_NO_CLEAN_UP
+from config_rpm_maker.cli.parsearguments import apply_arguments_to_config, parse_arguments
 
 
 class ParseArgumentsTests(TestCase):
 
-    @patch('config_rpm_maker.parsearguments.OptionParser')
+    @patch('config_rpm_maker.cli.parsearguments.OptionParser')
     def test_should_use_usage_information(self, mock_option_parser_class):
 
         mock_option_parser = Mock()
@@ -41,8 +41,8 @@ class ParseArgumentsTests(TestCase):
 
         mock_option_parser_class.assert_called_with(usage=USAGE_INFORMATION)
 
-    @patch('config_rpm_maker.parsearguments.exit')
-    @patch('config_rpm_maker.parsearguments.OptionParser')
+    @patch('config_rpm_maker.cli.parsearguments.exit')
+    @patch('config_rpm_maker.cli.parsearguments.OptionParser')
     def test_should_print_help_screen_and_exit_when_less_than_two_positional_arguments_are_given(self, mock_option_parser_class, mock_exit):
 
         mock_option_parser = Mock()
@@ -58,8 +58,8 @@ class ParseArgumentsTests(TestCase):
         mock_option_parser.print_help.assert_called_with()
         mock_exit.assert_called_with(1)
 
-    @patch('config_rpm_maker.parsearguments.exit')
-    @patch('config_rpm_maker.parsearguments.stdout')
+    @patch('config_rpm_maker.cli.parsearguments.exit')
+    @patch('config_rpm_maker.cli.parsearguments.stdout')
     def test_should_print_version_and_exit_with_return_code_zero_when_version_option_given(self, mock_stdout, mock_exit):
 
         parse_arguments(["--version"], version="yadt-config-rpm-maker 2.0")
@@ -128,7 +128,7 @@ class ParseArgumentsTests(TestCase):
         self.assertEqual(actual_arguments["<revision>"], "123")
 
 
-@patch('config_rpm_maker.parsearguments.set_property')
+@patch('config_rpm_maker.cli.parsearguments.set_property')
 class ApplyArgumentsToConfiguration(TestCase):
 
     def setUp(self):

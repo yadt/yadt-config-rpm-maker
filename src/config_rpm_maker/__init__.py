@@ -22,24 +22,28 @@ from logging import DEBUG, INFO, getLogger
 from sys import argv
 
 from config_rpm_maker import configuration
-from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
+from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
+from config_rpm_maker.cli.exitprogram import start_measuring_time, exit_program
+from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
+                                              RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
+                                              RETURN_CODE_EXCEPTION_OCCURRED,
+                                              RETURN_CODE_SUCCESS,
+                                              RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
+from config_rpm_maker.cli.parsearguments import (ARGUMENT_REPOSITORY,
+                                                 ARGUMENT_REVISION,
+                                                 OPTION_DEBUG,
+                                                 OPTION_NO_SYSLOG,
+                                                 parse_arguments,
+                                                 apply_arguments_to_config)
 from config_rpm_maker.configuration import KEY_SVN_PATH_TO_CONFIG, ConfigurationException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.logutils import (create_console_handler,
                                        create_sys_log_handler,
                                        log_configuration,
                                        log_process_id)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
-                                          RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
-                                          RETURN_CODE_EXCEPTION_OCCURRED,
-                                          RETURN_CODE_SUCCESS,
-                                          RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
-from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
-    parse_arguments, apply_arguments_to_config
 
 LOGGER = getLogger(__name__)
 

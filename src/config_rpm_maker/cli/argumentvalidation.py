@@ -17,8 +17,8 @@
 from logging import getLogger
 from urlparse import urlparse
 
-from config_rpm_maker.exitprogram import exit_program
-from config_rpm_maker.returncodes import RETURN_CODE_REVISION_IS_NOT_AN_INTEGER, RETURN_CODE_REPOSITORY_URL_INVALID
+from config_rpm_maker.cli.exitprogram import exit_program
+from config_rpm_maker.cli.returncodes import RETURN_CODE_REVISION_IS_NOT_AN_INTEGER, RETURN_CODE_REPOSITORY_URL_INVALID
 
 LOGGER = getLogger(__name__)
 

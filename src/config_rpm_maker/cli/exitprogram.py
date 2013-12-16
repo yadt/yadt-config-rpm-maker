@@ -22,8 +22,8 @@ from sys import exit
 from time import time, strftime
 
 from config_rpm_maker.configuration import DATE_FORMAT
-from config_rpm_maker.returncodes import RETURN_CODE_SUCCESS
 from config_rpm_maker.profiler import log_execution_time_summaries
+from config_rpm_maker.cli.returncodes import RETURN_CODE_SUCCESS
 
 LOGGER = getLogger(__name__)
 
