@@ -119,9 +119,6 @@ def log_directory_size_summary(logging_function, start_path):
 
 def log_directories_summary(logging_function, start_path):
 
-    if not get(KEY_VERBOSE):
-        return
-
     directories_summary = {}
     directories = walk(start_path).next()[1]
 

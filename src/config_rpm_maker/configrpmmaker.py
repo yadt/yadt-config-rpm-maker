@@ -38,6 +38,7 @@ from config_rpm_maker.config import (KEY_ERROR_LOG_URL,
                                      KEY_RPM_UPLOAD_CHUNK_SIZE,
                                      KEY_THREAD_COUNT,
                                      KEY_TEMPORARY_DIRECTORY,
+                                     KEY_VERBOSE,
                                      build_config_viewer_host_directory)
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -170,7 +171,10 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.info('All working data can be found in "{working_directory}"'.format(working_directory=self.work_dir))
         else:
             if self.work_dir and exists(self.work_dir):
-                log_directories_summary(LOGGER.info, self.work_dir)
+
+                if config.get(KEY_VERBOSE):
+                    log_directories_summary(LOGGER.debug, self.work_dir)
+
                 LOGGER.debug('Cleaning up working directory "%s"', self.work_dir)
                 rmtree(self.work_dir)
 
