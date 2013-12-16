@@ -14,19 +14,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from logging import Formatter, StreamHandler, getLogger
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
 from config_rpm_maker.configuration import (DEFAULT_LOG_FORMAT,
-                                     DEFAULT_LOG_LEVEL,
-                                     DEFAULT_SYS_LOG_ADDRESS,
-                                     DEFAULT_SYS_LOG_FORMAT,
-                                     DEFAULT_SYS_LOG_LEVEL,
-                                     KEY_VERBOSE,
-                                     get_property)
+                                            KEY_VERBOSE,
+                                            get_property)
 
 LOGGER = getLogger(__name__)
+
+SYS_LOG_ADDRESS = "/dev/log"
+SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
+SYS_LOG_LEVEL = DEBUG
 
 
 class MutedLogger(object):
@@ -56,7 +56,7 @@ def verbose(logger):
     return _muted_logger
 
 
-def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
+def create_console_handler(log_level):
     """ Returnes a root_logger which logs to the console using the given log_level. """
     formatter = Formatter(DEFAULT_LOG_FORMAT)
 
@@ -69,12 +69,12 @@ def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
 
 def create_sys_log_handler(revision):
     """ Create a logger handler which logs to sys log and uses the given revision within the format """
-    format = DEFAULT_SYS_LOG_FORMAT.format(revision)
+    format = SYS_LOG_FORMAT.format(revision)
     formatter = Formatter(format)
 
-    sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
+    sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS)
     sys_log_handler.setFormatter(formatter)
-    sys_log_handler.setLevel(DEFAULT_SYS_LOG_LEVEL)
+    sys_log_handler.setLevel(SYS_LOG_LEVEL)
 
     return sys_log_handler
 

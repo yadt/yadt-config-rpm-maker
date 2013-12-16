@@ -21,7 +21,7 @@ from math import ceil
 from sys import exit
 from time import time, strftime
 
-from config_rpm_maker.configuration import DEFAULT_DATE_FORMAT
+from config_rpm_maker.configuration import DATE_FORMAT
 from config_rpm_maker.returncodes import RETURN_CODE_SUCCESS
 from config_rpm_maker.profiler import log_execution_time_summaries
 
@@ -33,7 +33,7 @@ _timestamp_at_start = None
 def start_measuring_time():
     """ Start measuring the time. This is required to calculate the elapsed time. """
 
-    LOGGER.info("Starting to measure time at %s", strftime(DEFAULT_DATE_FORMAT))
+    LOGGER.info("Starting to measure time at %s", strftime(DATE_FORMAT))
 
     global _timestamp_at_start
     _timestamp_at_start = time()

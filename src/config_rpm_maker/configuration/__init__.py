@@ -26,21 +26,17 @@ from config_rpm_maker.configuration.properties import *
 
 LOGGER = getLogger(__name__)
 
-DEFAULT_CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
-DEFAULT_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
-DEFAULT_SYS_LOG_ADDRESS = "/dev/log"
-DEFAULT_SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
-DEFAULT_SYS_LOG_LEVEL = DEBUG
-
-ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE = 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'
-
-LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-LOG_FILE_DATE_FORMAT = DEFAULT_DATE_FORMAT
-
 MISSING_CONFIGURATION_FILE_MESSAGE = """Could not find configuration file "{configuration_file_path}"!
 
 Please provide "{default_path}" in the current working directory "{current_working_directory}"
 or set environment variable "{environment_variable_name}" to the path where to find the configuration file."""
+
+ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE = 'YADT_CONFIG_RPM_MAKER_CONFIG_FILE'
+
+CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
+DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
+LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
+LOG_FILE_DATE_FORMAT = DATE_FORMAT
 
 
 _properties = None
@@ -60,7 +56,7 @@ def load_configuration_file():
 
     if not exists(configuration_file_path):
         message = MISSING_CONFIGURATION_FILE_MESSAGE.format(configuration_file_path=configuration_file_path,
-                                                            default_path=DEFAULT_CONFIGURATION_FILE_PATH,
+                                                            default_path=CONFIGURATION_FILE_PATH,
                                                             current_working_directory=abspath('.'),
                                                             environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
         raise ConfigurationException(message)
@@ -146,7 +142,7 @@ def _determine_configuration_file_path():
         It will try to read the environment variable and
         if this is not available it will fall back to the default file path.
     """
-    return environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
+    return environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, CONFIGURATION_FILE_PATH)
 
 
 def _load_configuration_properties_from_yaml_file(configuration_file_path):
