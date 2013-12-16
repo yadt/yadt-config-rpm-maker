@@ -125,11 +125,9 @@ def building_configuration_rpms_and_clean_host_directories(repository, revision)
 def determine_console_log_level(arguments):
     """ Determines the log level based on arguments and configuration """
     if arguments[OPTION_DEBUG]:
-        log_level = DEBUG
-    else:
-        log_level = INFO
+        return DEBUG
 
-    return log_level
+    return INFO
 
 
 def append_console_logger(logger, console_log_level):
