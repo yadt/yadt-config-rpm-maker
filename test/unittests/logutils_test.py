@@ -20,7 +20,7 @@ from logging import ERROR, Logger
 from mock import Mock, call, patch
 from unittest import TestCase
 
-from config_rpm_maker.config import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
+from config_rpm_maker.configuration import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
 from config_rpm_maker.logutils import (MutedLogger,
                                        create_console_handler,
                                        create_sys_log_handler,

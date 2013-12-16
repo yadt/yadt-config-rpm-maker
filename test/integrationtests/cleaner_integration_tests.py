@@ -34,8 +34,8 @@
 from subprocess import call
 from integration_test_support import IntegrationTest, IntegrationTestException
 
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
-from config_rpm_maker.configrpmmaker import ConfigRpmMaker, config
+from config_rpm_maker.configuration import KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker, configuration
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.svnservice import SvnService
 
@@ -44,7 +44,7 @@ class CleanerIntegrationTests(IntegrationTest):
 
     def test_should_delete_config_viewer_host_directory_when_directory_has_been_deleted_in_repository(self):
 
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
         ConfigRpmMaker('1', svn_service).build()
 
         if call('svn delete -q -m "deleting host devweb01" %s/config/host/devweb01' % self.repo_url, shell=True):
@@ -58,7 +58,7 @@ class CleanerIntegrationTests(IntegrationTest):
 
     def test_should_not_delete_host_directory_when_a_file_has_been_deleted_in_repository_host_directory(self):
 
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
         ConfigRpmMaker('1', svn_service).build()
 
         if call('svn delete -q -m "deleting hostspecific file devweb01" %s/config/host/devweb01/host_specific_file' % self.repo_url, shell=True):
@@ -72,7 +72,7 @@ class CleanerIntegrationTests(IntegrationTest):
 
     def test_should_delete_config_viewer_host_directories_when_directories_have_been_deleted_in_repository(self):
 
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
         ConfigRpmMaker('1', svn_service).build()
 
         if call('svn delete -q -m "deleting host tuvweb01 and devweb01" {0}/config/host/devweb01 {0}/config/host/tuvweb01'.format(self.repo_url), shell=True):

@@ -20,7 +20,7 @@ from optparse import OptionParser
 from sys import stdout, exit
 
 from config_rpm_maker.returncodes import RETURN_CODE_NOT_ENOUGH_ARGUMENTS, RETURN_CODE_VERSION
-from config_rpm_maker.config import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, KEY_VERBOSE, KEY_NO_CLEAN_UP, set_property
+from config_rpm_maker.configuration import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, KEY_VERBOSE, KEY_NO_CLEAN_UP, set_property
 
 
 ARGUMENT_REPOSITORY = '<repository-url>'

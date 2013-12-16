@@ -18,7 +18,7 @@ from logging import Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
-from config_rpm_maker.config import (DEFAULT_LOG_FORMAT,
+from config_rpm_maker.configuration import (DEFAULT_LOG_FORMAT,
                                      DEFAULT_LOG_LEVEL,
                                      DEFAULT_SYS_LOG_ADDRESS,
                                      DEFAULT_SYS_LOG_FORMAT,

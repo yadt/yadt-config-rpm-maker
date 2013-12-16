@@ -19,7 +19,7 @@
 from mock import patch, Mock
 from unittest import TestCase
 
-from config_rpm_maker.config import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE, KEY_NO_CLEAN_UP
+from config_rpm_maker.configuration import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE, KEY_NO_CLEAN_UP
 from config_rpm_maker.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE, OPTION_NO_CLEAN_UP
 from config_rpm_maker.parsearguments import apply_arguments_to_config, parse_arguments
 

@@ -21,8 +21,8 @@ from mock import patch
 from unittest import TestCase
 
 from unittest_support import UnitTests
-from config_rpm_maker import config
-from config_rpm_maker.config import (ConfigurationException,
+from config_rpm_maker import configuration
+from config_rpm_maker.configuration import (ConfigurationException,
                                      DEFAULT_CONFIGURATION_FILE_PATH,
                                      ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
                                      KEY_ALLOW_UNKNOWN_HOSTS,
@@ -66,7 +66,7 @@ from config_rpm_maker.config import (ConfigurationException,
 
 class GetProperties(TestCase):
 
-    @patch('config_rpm_maker.config._properties')
+    @patch('config_rpm_maker.configuration._properties')
     def test_should_return_configuration(self, mock_configuration):
 
         actual_configuration = get_properties()
@@ -76,19 +76,19 @@ class GetProperties(TestCase):
 
 class SetPropertiesTests(TestCase):
 
-    @patch('config_rpm_maker.config._properties')
+    @patch('config_rpm_maker.configuration._properties')
     def test_should_set_configuration_properties(self, mock_properties):
 
         fake_properties = {}
 
         set_properties(fake_properties)
 
-        self.assertEqual(config._properties, fake_properties)
+        self.assertEqual(configuration._properties, fake_properties)
 
 
 class GetFilePathOfLoadedConfiguration(TestCase):
 
-    @patch('config_rpm_maker.config._file_path_of_loaded_configuration')
+    @patch('config_rpm_maker.configuration._file_path_of_loaded_configuration')
     def test_should_return_configuration(self, mock_configuration_file_path):
 
         actual_configuration_file_path = get_file_path_of_loaded_configuration()
@@ -98,26 +98,26 @@ class GetFilePathOfLoadedConfiguration(TestCase):
 
 class SetFilePathOfLoadedConfigurationTests(TestCase):
 
-    @patch('config_rpm_maker.config._file_path_of_loaded_configuration')
+    @patch('config_rpm_maker.configuration._file_path_of_loaded_configuration')
     def test_should_set_file_path_of_loaded_configuration(self, mock_file_path_of_loaded_configuration):
 
         fake_file_path_to_configuration_file = 'path-to-configuration-file'
 
         _set_file_path_of_loaded_configuration(fake_file_path_to_configuration_file)
 
-        self.assertEqual(config._file_path_of_loaded_configuration, fake_file_path_to_configuration_file)
+        self.assertEqual(configuration._file_path_of_loaded_configuration, fake_file_path_to_configuration_file)
 
 
 class DetermineConfigurationFilePathTest(TestCase):
 
-    @patch('config_rpm_maker.config.environ')
+    @patch('config_rpm_maker.configuration.environ')
     def test_should_use_default_configuration_file_path_if_no_environment_variable_is_set(self, mock_environ):
 
         _determine_configuration_file_path()
 
         mock_environ.get.assert_called_with(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, DEFAULT_CONFIGURATION_FILE_PATH)
 
-    @patch('config_rpm_maker.config.environ')
+    @patch('config_rpm_maker.configuration.environ')
     def test_should_return_actual_determined_file_path(self, mock_environ):
 
         mock_environ.get.return_value = 'path-to-configuration-file'
@@ -129,8 +129,8 @@ class DetermineConfigurationFilePathTest(TestCase):
 
 class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
-    @patch('config_rpm_maker.config.set_properties')
-    @patch('config_rpm_maker.config.yaml')
+    @patch('config_rpm_maker.configuration.set_properties')
+    @patch('config_rpm_maker.configuration.yaml')
     @patch('__builtin__.open')
     def test_should_open_file_as_specified_in_argument(self, mock_open, mock_yaml, mock_set_properties):
 
@@ -143,8 +143,8 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
         mock_open.assert_called_with('path-to-configuration-file')
 
-    @patch('config_rpm_maker.config._set_file_path_of_loaded_configuration')
-    @patch('config_rpm_maker.config.yaml')
+    @patch('config_rpm_maker.configuration._set_file_path_of_loaded_configuration')
+    @patch('config_rpm_maker.configuration.yaml')
     @patch('__builtin__.open')
     def test_should_set_file_path_of_loaded_configuration(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
 
@@ -157,7 +157,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
         mock_set_file_path_of_loaded_configuration.assert_called_with('path-to-configuration-file')
 
-    @patch('config_rpm_maker.config.yaml')
+    @patch('config_rpm_maker.configuration.yaml')
     @patch('__builtin__.open')
     def test_should_raise_ConfigurationException_when_loading_fails(self, mock_open, mock_yaml):
 
@@ -167,8 +167,8 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
         self.assertRaises(ConfigurationException, _load_configuration_properties_from_yaml_file, 'path-to-configuration-file')
 
-    @patch('config_rpm_maker.config._set_file_path_of_loaded_configuration')
-    @patch('config_rpm_maker.config.yaml')
+    @patch('config_rpm_maker.configuration._set_file_path_of_loaded_configuration')
+    @patch('config_rpm_maker.configuration.yaml')
     @patch('__builtin__.open')
     def test_should_return_raw_loaded_properties(self, mock_open, mock_yaml, mock_set_file_path_of_loaded_configuration):
 
@@ -184,19 +184,19 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
 
 class EnsurePropertiesAreValidTest(TestCase):
 
-    @patch('config_rpm_maker.config.LOGGER')
+    @patch('config_rpm_maker.configuration.LOGGER')
     def test_should_log_that_configuration_properties_are_empty(self, mock_logger):
 
         _ensure_properties_are_valid(None)
 
         mock_logger.warn.assert_called_with('Loaded configuration properties are empty.')
 
-    @patch('config_rpm_maker.config.LOGGER')
+    @patch('config_rpm_maker.configuration.LOGGER')
     def test_should_pass_through_if_some_configuration_properties_are_given(self, mock_logger):
 
         _ensure_properties_are_valid({'allow_unknown_hosts': True})
 
-    @patch('config_rpm_maker.config._ensure_valid_log_level')
+    @patch('config_rpm_maker.configuration._ensure_valid_log_level')
     def test_should_return_log_level_valid_properties(self, mock_ensure_valid_log_level):
 
         mock_ensure_valid_log_level.return_value = 'valid_log_level'
@@ -206,7 +206,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('valid_log_level', actual_properties[KEY_LOG_LEVEL])
 
-    @patch('config_rpm_maker.config._ensure_valid_log_level')
+    @patch('config_rpm_maker.configuration._ensure_valid_log_level')
     def test_should_return_default_log_level_when_no_log_level_defined(self, mock_ensure_valid_log_level):
 
         mock_ensure_valid_log_level.return_value = 'valid_log_level'
@@ -216,7 +216,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('valid_log_level', actual_properties[KEY_LOG_LEVEL])
 
-    @patch('config_rpm_maker.config._ensure_is_a_boolean_value')
+    @patch('config_rpm_maker.configuration._ensure_is_a_boolean_value')
     def test_should_return_property_allow_unkown_hosts(self, mock_ensure_valid_allow_unknown_hosts):
 
         mock_ensure_valid_allow_unknown_hosts.return_value = False
@@ -243,7 +243,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertTrue(actual_properties[KEY_ALLOW_UNKNOWN_HOSTS])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_config_rpm_prefix(self, mock_ensure_is_a_string):
 
         mock_ensure_is_a_string.return_value = 'valid string'
@@ -262,7 +262,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('yadt-config-', actual_properties[KEY_CONFIG_RPM_PREFIX])
 
-    @patch('config_rpm_maker.config._ensure_is_a_list_of_strings')
+    @patch('config_rpm_maker.configuration._ensure_is_a_list_of_strings')
     def test_should_return_property_custom_dns_searchlist(self, mock_ensure_is_a_list_of_strings):
 
         mock_ensure_is_a_list_of_strings.return_value = ['a', 'valid', 'list', 'of', 'strings']
@@ -281,7 +281,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual([], actual_properties[KEY_CUSTOM_DNS_SEARCHLIST])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_error_log_dir(self, mock_ensure_is_a_string):
 
         mock_ensure_is_a_string.return_value = 'the valid error log'
@@ -300,7 +300,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('', actual_properties[KEY_ERROR_LOG_DIRECTORY])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_error_url_dir(self, mock_ensure_is_string):
 
         mock_ensure_is_string.return_value = 'a valid error log url'
@@ -319,7 +319,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('', actual_properties[KEY_ERROR_LOG_URL])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_path_to_spec_file(self, mock_ensure_is_a_string):
 
         mock_ensure_is_a_string.return_value = 'a valid spec file'
@@ -338,7 +338,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('default.spec', actual_properties[KEY_PATH_TO_SPEC_FILE])
 
-    @patch('config_rpm_maker.config._ensure_repo_packages_regex_is_a_valid_regular_expression')
+    @patch('config_rpm_maker.configuration._ensure_repo_packages_regex_is_a_valid_regular_expression')
     def test_should_return_repo_packages_regex(self, mock_ensure_repo_packages_regex_is_valid_or_none):
 
         mock_ensure_repo_packages_regex_is_valid_or_none.return_value = 'a valid regex'
@@ -357,7 +357,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(".*-repo.*", actual_properties[KEY_REPO_PACKAGES_REGEX])
 
-    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_rpm_upload_chunk_size(self, mock_ensure_is_an_integer):
 
         mock_ensure_is_an_integer.return_value = 123
@@ -376,7 +376,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(10, actual_properties[KEY_RPM_UPLOAD_CHUNK_SIZE])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string_or_none')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string_or_none')
     def test_should_return_rpm_upload_command_regex(self, mock_ensure_is_a_string_or_none):
 
         mock_ensure_is_a_string_or_none.return_value = 'a valid upload command'
@@ -395,7 +395,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(None, actual_properties[KEY_RPM_UPLOAD_COMMAND])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_svn_path_to_config(self, mock_ensure_is_a_string):
 
         mock_ensure_is_a_string.return_value = 'a valid svn path'
@@ -414,7 +414,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/config', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
 
-    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_thread_count(self, mock_ensure_is_an_integer):
 
         mock_ensure_is_an_integer.return_value = 123
@@ -433,7 +433,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(1, actual_properties[KEY_THREAD_COUNT])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_temp_dir(self, mock_ensure_is_a_string):
 
         mock_ensure_is_a_string.return_value = 'a valid temporary directory'
@@ -452,7 +452,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/tmp', actual_properties[KEY_TEMP_DIR])
 
-    @patch('config_rpm_maker.config._ensure_is_a_string')
+    @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_config_viewer_hosts_dir(self, mock_ensure_is_a_string):
 
         mock_ensure_is_a_string.return_value = 'a valid string'
@@ -471,7 +471,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual('/tmp', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
 
-    @patch('config_rpm_maker.config.LOGGER')
+    @patch('config_rpm_maker.configuration.LOGGER')
     def test_should_warn_when_raw_properties_contain_an_unknown_property_name(self, mock_logger):
 
         properties = {'foo_spam': '/usr/bin/tralala'}
@@ -480,7 +480,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         mock_logger.warn.assert_called_with('Unknown configuration propertie(s) found: foo_spam')
 
-    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_max_file_size(self, mock_ensure_is_an_integer):
 
         mock_ensure_is_an_integer.return_value = 123000000
@@ -499,7 +499,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         self.assertEqual(102400, actual_properties[KEY_MAX_FILE_SIZE])
 
-    @patch('config_rpm_maker.config._ensure_is_an_integer')
+    @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_max_failed_hosts(self, mock_ensure_is_an_integer):
 
         mock_ensure_is_an_integer.return_value = 5
@@ -545,16 +545,16 @@ class EnsurePropertiesAreValidTest(TestCase):
 
 class LoadConfigurationFileTests(TestCase):
 
-    @patch('config_rpm_maker.config.exists')
-    @patch('config_rpm_maker.config.environ')
+    @patch('config_rpm_maker.configuration.exists')
+    @patch('config_rpm_maker.configuration.environ')
     def test_should_raise_exception_if_configuration_file_does_not_exist(self, mock_environ, mock_exists):
 
         mock_exists.return_value = False
 
         self.assertRaises(ConfigurationException, load_configuration_file)
 
-    @patch('config_rpm_maker.config.exists')
-    @patch('config_rpm_maker.config._determine_configuration_file_path')
+    @patch('config_rpm_maker.configuration.exists')
+    @patch('config_rpm_maker.configuration._determine_configuration_file_path')
     def test_should_determine_the_configuration_file_path(self, mock_determine_configuration_file_path, mock_exists):
 
         mock_exists.return_value = False
@@ -563,10 +563,10 @@ class LoadConfigurationFileTests(TestCase):
 
         mock_determine_configuration_file_path.assert_called_with()
 
-    @patch('config_rpm_maker.config._ensure_properties_are_valid')
-    @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
-    @patch('config_rpm_maker.config.exists')
-    @patch('config_rpm_maker.config._determine_configuration_file_path')
+    @patch('config_rpm_maker.configuration._ensure_properties_are_valid')
+    @patch('config_rpm_maker.configuration._load_configuration_properties_from_yaml_file')
+    @patch('config_rpm_maker.configuration.exists')
+    @patch('config_rpm_maker.configuration._determine_configuration_file_path')
     def test_should_check_if_the_determined_configuration_file_path_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
@@ -576,10 +576,10 @@ class LoadConfigurationFileTests(TestCase):
 
         mock_exists.assert_called_with('path-to-configuration-file')
 
-    @patch('config_rpm_maker.config._ensure_properties_are_valid')
-    @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
-    @patch('config_rpm_maker.config.exists')
-    @patch('config_rpm_maker.config._determine_configuration_file_path')
+    @patch('config_rpm_maker.configuration._ensure_properties_are_valid')
+    @patch('config_rpm_maker.configuration._load_configuration_properties_from_yaml_file')
+    @patch('config_rpm_maker.configuration.exists')
+    @patch('config_rpm_maker.configuration._determine_configuration_file_path')
     def test_should_load_configuration_file_if_it_exists(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
@@ -589,10 +589,10 @@ class LoadConfigurationFileTests(TestCase):
 
         mock_load_configuration_properties_from_yaml_file.assert_called_with('path-to-configuration-file')
 
-    @patch('config_rpm_maker.config._ensure_properties_are_valid')
-    @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
-    @patch('config_rpm_maker.config.exists')
-    @patch('config_rpm_maker.config._determine_configuration_file_path')
+    @patch('config_rpm_maker.configuration._ensure_properties_are_valid')
+    @patch('config_rpm_maker.configuration._load_configuration_properties_from_yaml_file')
+    @patch('config_rpm_maker.configuration.exists')
+    @patch('config_rpm_maker.configuration._determine_configuration_file_path')
     def test_should_ensure_properties_are_valid(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
@@ -604,11 +604,11 @@ class LoadConfigurationFileTests(TestCase):
 
         mock_ensure_properties_are_valid.assert_called_with(mock_properties)
 
-    @patch('config_rpm_maker.config.set_properties')
-    @patch('config_rpm_maker.config._ensure_properties_are_valid')
-    @patch('config_rpm_maker.config._load_configuration_properties_from_yaml_file')
-    @patch('config_rpm_maker.config.exists')
-    @patch('config_rpm_maker.config._determine_configuration_file_path')
+    @patch('config_rpm_maker.configuration.set_properties')
+    @patch('config_rpm_maker.configuration._ensure_properties_are_valid')
+    @patch('config_rpm_maker.configuration._load_configuration_properties_from_yaml_file')
+    @patch('config_rpm_maker.configuration.exists')
+    @patch('config_rpm_maker.configuration._determine_configuration_file_path')
     def test_should_set_properties_to_valid_values(self, mock_determine_configuration_file_path, mock_exists, mock_load_configuration_properties_from_yaml_file, mock_ensure_properties_are_valid, mock_set_properties):
 
         mock_determine_configuration_file_path.return_value = 'path-to-configuration-file'
@@ -625,8 +625,8 @@ class LoadConfigurationFileTests(TestCase):
 
 class GetPropertyTests(TestCase):
 
-    @patch('config_rpm_maker.config.get_properties')
-    @patch('config_rpm_maker.config.load_configuration_file')
+    @patch('config_rpm_maker.configuration.get_properties')
+    @patch('config_rpm_maker.configuration.load_configuration_file')
     def test_should_load_configuration_file_when_no_properties_available(self, mock_load_configuration_file, mock_properties):
 
         mock_properties.return_value = None
@@ -640,14 +640,14 @@ class GetPropertyTests(TestCase):
 
         mock_load_configuration_file.assert_called_with()
 
-    @patch('config_rpm_maker.config.get_properties')
+    @patch('config_rpm_maker.configuration.get_properties')
     def test_should_raise_exception_when_property_key_not_in_properties(self, mock_properties):
 
         mock_properties.return_value = {}
 
         self.assertRaises(ConfigurationException, get, KEY_MAX_FILE_SIZE)
 
-    @patch('config_rpm_maker.config.get_properties')
+    @patch('config_rpm_maker.configuration.get_properties')
     def test_should_return_value_of_property_when_in_properties(self, mock_properties):
 
         mock_properties.return_value = {KEY_MAX_FILE_SIZE: 28374}
@@ -663,8 +663,8 @@ class SetValueTests(TestCase):
 
         self.assertRaises(ConfigurationException, set_property, name=None, value='123')
 
-    @patch('config_rpm_maker.config.get_properties')
-    @patch('config_rpm_maker.config.load_configuration_file')
+    @patch('config_rpm_maker.configuration.get_properties')
+    @patch('config_rpm_maker.configuration.load_configuration_file')
     def test_should_load_configuration_if_no_configuration_properties_are_empty(self, mock_load_configuration_file, mock_get_configuration):
 
         def set_configuration_properties():
@@ -676,7 +676,7 @@ class SetValueTests(TestCase):
 
         mock_load_configuration_file.assert_called_with()
 
-    @patch('config_rpm_maker.config.get_properties')
+    @patch('config_rpm_maker.configuration.get_properties')
     def test_should_set_value_of_configuration_properties(self, mock_get_properties):
         fake_properties = {}
         mock_get_properties.return_value = fake_properties
@@ -729,7 +729,7 @@ class EnsureValidLogLevelTests(TestCase):
 
 class GetConfigViewerHostDirTests(TestCase):
 
-    @patch('config_rpm_maker.config.get')
+    @patch('config_rpm_maker.configuration.get')
     def test_should_return_path_to_host_directory(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
@@ -739,7 +739,7 @@ class GetConfigViewerHostDirTests(TestCase):
         mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
 
-    @patch('config_rpm_maker.config.get')
+    @patch('config_rpm_maker.configuration.get')
     def test_should_return_path_and_append_a_postfix(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'

@@ -21,7 +21,7 @@ from os import sep as PATH_SEPARATOR
 from os.path import exists
 from shutil import rmtree
 
-from config_rpm_maker.config import build_config_viewer_host_directory
+from config_rpm_maker.configuration import build_config_viewer_host_directory
 from config_rpm_maker.segment import Host
 from config_rpm_maker.logutils import verbose
 

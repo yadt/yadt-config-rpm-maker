@@ -30,7 +30,7 @@ from config_rpm_maker import (append_console_logger,
                               main,
                               building_configuration_rpms_and_clean_host_directories)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.config import ConfigurationException
+from config_rpm_maker.configuration import ConfigurationException
 
 
 class MainTests(TestCase):
@@ -108,7 +108,7 @@ class MainTests(TestCase):
 class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -121,7 +121,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
         building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', 1)
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -137,7 +137,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
                                                         base_url='file:///path_to/testdata/repository')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -153,7 +153,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
                                                         base_url='file:///path_to/testdata/repository')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -169,7 +169,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision='1980')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -204,7 +204,7 @@ class InitializeLoggingToConsoleTests(TestCase):
 class InitializeConfigurationTest(TestCase):
 
     @patch('config_rpm_maker.apply_arguments_to_config')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config):
 
         mock_arguments = Mock()
@@ -214,7 +214,7 @@ class InitializeConfigurationTest(TestCase):
         mock_config.load_configuration_file.assert_called_with()
 
     @patch('config_rpm_maker.apply_arguments_to_config')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config):
 
         mock_arguments = Mock()

@@ -20,11 +20,11 @@ import rpm
 
 from integration_test_support import IntegrationTest, IntegrationTestException
 
-from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, config
-from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, build_config_viewer_host_directory
+from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, configuration
+from config_rpm_maker.configuration import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, build_config_viewer_host_directory
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker import config as config_dev  # TODO: WTF? config has been imported twice ...
+from config_rpm_maker import configuration as config_dev  # TODO: WTF? config has been imported twice ...
 
 EXECUTION_ERROR_MESSAGE = """Execution of "{command_with_arguments}" failed. Error code was {error_code}
 stdout was: "{stdout}"
@@ -62,7 +62,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
     def test_should_not_clean_up_working_directory(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, True)
+        configuration.set_property(KEY_NO_CLEAN_UP, True)
         config_rpm_maker = self._given_config_rpm_maker()
 
         try:
@@ -76,7 +76,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
     def test_should_build_rpms_for_hosts(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, True)
+        configuration.set_property(KEY_NO_CLEAN_UP, True)
         config_rpm_maker = self._given_config_rpm_maker()
         rpms = config_rpm_maker.build()
 
@@ -105,21 +105,21 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             self.assertRpm(host, rpms, requires=requires, provides=provides, files=files)
 
     def test_should_perform_chunked_uploads(self):
-        old_config = config.get('rpm_upload_cmd')
-        target_file = os.path.abspath(os.path.join(config.get('temp_dir'), 'upload.txt'))
+        old_config = configuration.get('rpm_upload_cmd')
+        target_file = os.path.abspath(os.path.join(configuration.get('temp_dir'), 'upload.txt'))
         if os.path.exists(target_file):
             os.remove(target_file)
-        cmd_file = os.path.abspath(os.path.join(config.get('temp_dir'), 'upload.sh'))
+        cmd_file = os.path.abspath(os.path.join(configuration.get('temp_dir'), 'upload.sh'))
         with open(cmd_file, 'w') as f:
             f.write('#!/bin/bash\ndest=$1 ; shift ; echo "${#@} $@" >> "$dest"')
 
         os.chmod(cmd_file, 0755)
         cmd = '%s %s' % (cmd_file, target_file)
-        config.set_property('rpm_upload_cmd', cmd)
+        configuration.set_property('rpm_upload_cmd', cmd)
         try:
             ConfigRpmMaker(None, None)._upload_rpms(['a' for x in range(25)])
         finally:
-            config.set_property('rpm_upload_cmd', old_config)
+            configuration.set_property('rpm_upload_cmd', old_config)
 
         self.assertTrue(os.path.exists(target_file))
         with open(target_file) as f:
@@ -129,12 +129,12 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertRaises(CouldNotBuildSomeRpmsException, ConfigRpmMaker(None, None)._build_hosts, ['devabc123'])
 
     def test_should_raise_CouldNotUploadRpmsException(self):
-        rpm_upload_command_before_test = config.get(KEY_RPM_UPLOAD_COMMAND)
-        config.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
+        rpm_upload_command_before_test = configuration.get(KEY_RPM_UPLOAD_COMMAND)
+        configuration.set_property(KEY_RPM_UPLOAD_COMMAND, "foobar")
 
         self.assertRaises(CouldNotUploadRpmsException, ConfigRpmMaker(None, None)._upload_rpms, [''])
 
-        config.set_property(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
+        configuration.set_property(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command_before_test)
 
     def test_should_move_config_viewer_data_to_destination(self):
 
@@ -173,7 +173,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
 
     def _given_config_rpm_maker(self):
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
 
         return ConfigRpmMaker('2', svn_service)
 

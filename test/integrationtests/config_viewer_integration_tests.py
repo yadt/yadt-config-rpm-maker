@@ -19,8 +19,8 @@ from os.path import join
 
 from integration_test_support import IntegrationTest
 
-from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG
-from config_rpm_maker.configrpmmaker import ConfigRpmMaker, config
+from config_rpm_maker.configuration import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker, configuration
 from config_rpm_maker.svnservice import SvnService
 
 
@@ -28,8 +28,8 @@ class ConfigViewerIntegrationTests(IntegrationTest):
 
     def test_should_create_files_for_hosts(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, True)
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        configuration.set_property(KEY_NO_CLEAN_UP, True)
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=configuration.get(KEY_SVN_PATH_TO_CONFIG))
 
         ConfigRpmMaker('2', svn_service).build()
 
@@ -208,15 +208,15 @@ all:/vars/override
         self.assert_config_viewer_path_exists(host_name, 'yadt-config-%s.spec' % host_name)
 
     def assert_config_viewer_file_exactly(self, host_name, file_path, content):
-        host_directory = config.build_config_viewer_host_directory(host_name)
+        host_directory = configuration.build_config_viewer_host_directory(host_name)
         overlaying_path = join(host_directory, file_path)
         self.assert_file_content(overlaying_path, content)
 
     def assert_config_viewer_file(self, host_name, file_path, content):
-        host_directory = config.build_config_viewer_host_directory(host_name)
+        host_directory = configuration.build_config_viewer_host_directory(host_name)
         overlaying_path = join(host_directory, file_path)
         self.assert_file_content_line_by_line(overlaying_path, content)
 
     def assert_config_viewer_path_exists(self, host_name, *path):
-        path_to_check = join(config.build_config_viewer_host_directory(host_name), *path)
+        path_to_check = join(configuration.build_config_viewer_host_directory(host_name), *path)
         self.assert_path_exists(path_to_check)

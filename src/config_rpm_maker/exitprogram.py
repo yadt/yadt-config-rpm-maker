@@ -21,7 +21,7 @@ from math import ceil
 from sys import exit
 from time import time, strftime
 
-from config_rpm_maker.config import DEFAULT_DATE_FORMAT
+from config_rpm_maker.configuration import DEFAULT_DATE_FORMAT
 from config_rpm_maker.returncodes import RETURN_CODE_SUCCESS
 from config_rpm_maker.profiler import log_execution_time_summaries
 

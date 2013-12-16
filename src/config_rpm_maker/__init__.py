@@ -21,9 +21,9 @@ import traceback
 from logging import DEBUG, INFO, getLogger
 from sys import argv
 
-from config_rpm_maker import config
+from config_rpm_maker import configuration
 from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigurationException
+from config_rpm_maker.configuration import KEY_SVN_PATH_TO_CONFIG, ConfigurationException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -91,7 +91,7 @@ def initialize_logging_to_console(arguments):
 
 def initialize_configuration(arguments):
     """ Load the configuration file and applies the given arguments to the configuration. """
-    config.load_configuration_file()
+    configuration.load_configuration_file()
     apply_arguments_to_config(arguments)
 
 
@@ -115,7 +115,7 @@ def building_configuration_rpms_and_clean_host_directories(repository, revision)
     """ This function will start the process of building configuration rpms
         for the given configuration repository and the revision. """
 
-    path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
+    path_to_config = configuration.get(KEY_SVN_PATH_TO_CONFIG)
     svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
     svn_service.log_change_set_meta_information(revision)
     ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
@@ -144,7 +144,7 @@ def append_console_logger(logger, console_log_level):
 def log_additional_information():
     """ Logs additional information as the process id and the configuration. """
     log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config.get_properties(), config.get_file_path_of_loaded_configuration())
+    log_configuration(LOGGER.debug, configuration.get_properties(), configuration.get_file_path_of_loaded_configuration())
 
 
 def log_exception_message(message):

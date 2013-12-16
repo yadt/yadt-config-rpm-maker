@@ -22,7 +22,7 @@ from time import time
 from os import walk
 from os.path import join, getsize
 
-from config_rpm_maker.config import KEY_THREAD_COUNT, get
+from config_rpm_maker.configuration import KEY_THREAD_COUNT, get
 
 LOGGER = getLogger(__name__)
 
