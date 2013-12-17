@@ -31,10 +31,10 @@ from config_rpm_maker.configuration import KEY_NO_CLEAN_UP, KEY_LOG_LEVEL, KEY_R
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
-from config_rpm_maker.logutils import verbose
+from config_rpm_maker.utilities.logutils import verbose
 from config_rpm_maker.segment import OVERLAY_ORDER, ALL_SEGEMENTS
 from config_rpm_maker.token.tokenreplacer import TokenReplacer
-from config_rpm_maker.profiler import measure_execution_time
+from config_rpm_maker.utilities.profiler import measure_execution_time
 
 
 LOGGER = getLogger(__name__)

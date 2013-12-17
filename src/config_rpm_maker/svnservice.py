@@ -21,9 +21,9 @@ from logging import getLogger
 
 from time import ctime
 from config_rpm_maker.configuration import DEFAULT_HOST_NAME_ENCODING
-from config_rpm_maker.logutils import log_elements_of_list
+from config_rpm_maker.utilities.logutils import log_elements_of_list
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.profiler import measure_execution_time
+from config_rpm_maker.utilities.profiler import measure_execution_time
 
 LOGGER = getLogger(__name__)
 

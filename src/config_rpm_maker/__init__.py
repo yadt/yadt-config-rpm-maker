@@ -39,7 +39,7 @@ from config_rpm_maker.configuration import KEY_SVN_PATH_TO_CONFIG, Configuration
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.logutils import (create_console_handler,
+from config_rpm_maker.utilities.logutils import (create_console_handler,
                                        create_sys_log_handler,
                                        log_configuration,
                                        log_process_id)

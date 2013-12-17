@@ -21,7 +21,7 @@ from unittest import TestCase
 
 from mock import Mock, call, patch
 
-from config_rpm_maker.logutils import (SYS_LOG_LEVEL,
+from config_rpm_maker.utilities.logutils import (SYS_LOG_LEVEL,
                                        MutedLogger,
                                        create_console_handler,
                                        create_sys_log_handler,
@@ -31,8 +31,8 @@ from config_rpm_maker.logutils import (SYS_LOG_LEVEL,
                                        verbose)
 
 
-@patch('config_rpm_maker.logutils.StreamHandler')
-@patch('config_rpm_maker.logutils.Formatter')
+@patch('config_rpm_maker.utilities.logutils.StreamHandler')
+@patch('config_rpm_maker.utilities.logutils.Formatter')
 class CreateConsoleHandlerTests(TestCase):
 
     def test_should_initialze_formatter_and_use_it(self, mock_formatter_class, mock_stream_handler_class):
@@ -66,8 +66,8 @@ class CreateConsoleHandlerTests(TestCase):
         self.assertEqual(mock_handler, actual_handler)
 
 
-@patch('config_rpm_maker.logutils.SysLogHandler')
-@patch('config_rpm_maker.logutils.Formatter')
+@patch('config_rpm_maker.utilities.logutils.SysLogHandler')
+@patch('config_rpm_maker.utilities.logutils.Formatter')
 class CreateSysLogHandlerTests(TestCase):
 
     def test_should_initialze_formatter_using_the_revision_number_in_the_format(self, mock_formatter_class, mock_sys_log_handler_class):
@@ -188,7 +188,7 @@ class LogElementsOfListTests(TestCase):
                          self.mock_log.call_args_list)
 
 
-@patch('config_rpm_maker.logutils.getpid')
+@patch('config_rpm_maker.utilities.logutils.getpid')
 class LogProcessId(TestCase):
 
     def test_should_log_process_id(self, mock_getpid):
@@ -254,7 +254,7 @@ class MutedLoggerTests(TestCase):
 
 class VerboseTests(TestCase):
 
-    @patch('config_rpm_maker.logutils.get_property')
+    @patch('config_rpm_maker.utilities.logutils.get_property')
     def test_should_return_given_logger_when_configuration_value_for_verbose_is_true(self, mock_get):
 
         mock_logger = Mock(Logger)
@@ -265,8 +265,8 @@ class VerboseTests(TestCase):
         mock_logger.info.assert_called_with("Hello")
         mock_get.assert_called_with('verbose')
 
-    @patch('config_rpm_maker.logutils._muted_logger')
-    @patch('config_rpm_maker.logutils.get_property')
+    @patch('config_rpm_maker.utilities.logutils._muted_logger')
+    @patch('config_rpm_maker.utilities.logutils.get_property')
     def test_should_not_return_muted_logger_when_configuration_value_for_verbose_is_false(self, mock_get, mock_muted_logger):
 
         mock_logger = Mock(Logger)
