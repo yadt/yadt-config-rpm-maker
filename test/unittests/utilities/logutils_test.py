@@ -278,6 +278,7 @@ class VerboseTests(TestCase):
         mock_muted_logger.info.assert_called_with("Hello")
         mock_get.assert_called_with('verbose')
 
+
 class AppendConsoleLoggerTests(TestCase):
 
     @patch('config_rpm_maker.utilities.logutils.create_console_handler')

@@ -14,8 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-
 DEFAULT_ALLOW_UNKNOWN_HOSTS = True
 KEY_ALLOW_UNKNOWN_HOSTS = 'allow_unknown_hosts'
 
@@ -77,4 +75,5 @@ DEFAULT_VERBOSE = False
 KEY_VERBOSE = 'verbose'
 
 KEY_SVN_PATH_TO_CONFIGURATION = 'svn_path_to_config'
+
 KEY_TEMPORARY_DIRECTORY = "temp_dir"

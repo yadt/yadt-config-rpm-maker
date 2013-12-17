@@ -137,5 +137,3 @@ def determine_console_log_level(arguments):
         return DEBUG
 
     return INFO
-
-
