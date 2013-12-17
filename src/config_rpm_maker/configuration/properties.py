@@ -43,8 +43,6 @@ KEY_MAX_FAILED_HOSTS = 'max_failed_hosts'
 DEFAULT_MAX_FILE_SIZE = 100 * 1024
 KEY_MAX_FILE_SIZE = 'max_file_size'
 
-DEFAULT_HOST_NAME_ENCODING = 'ascii'
-
 DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
 KEY_LOG_FORMAT = "log_format"
 
