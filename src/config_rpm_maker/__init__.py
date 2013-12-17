@@ -18,7 +18,7 @@ __version__ = '2.0'
 
 import traceback
 
-from logging import DEBUG, INFO, getLogger
+from logging import DEBUG, getLogger
 from sys import argv
 
 from config_rpm_maker import configuration
@@ -31,7 +31,6 @@ from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
                                               RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
 from config_rpm_maker.cli.parsearguments import (ARGUMENT_REPOSITORY,
                                                  ARGUMENT_REVISION,
-                                                 OPTION_DEBUG,
                                                  OPTION_NO_SYSLOG,
                                                  apply_arguments_to_config,
                                                  determine_console_log_level,
@@ -41,10 +40,7 @@ from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.utilities.logutils import (append_console_logger,
-                                                 create_console_handler,
                                                  create_sys_log_handler,
-                                                 log_configuration,
-                                                 log_process_id,
                                                  log_additional_information,
                                                  log_exception_message)
 from config_rpm_maker.svnservice import SvnService
