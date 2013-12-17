@@ -86,10 +86,10 @@ class ConstructorTests(TestCase):
 
         self.assertEqual(self.mock_svn_service_queue, self.mock_host_rpm_builder.svn_service_queue)
 
-    @patch('config_rpm_maker.hostrpmbuilder.configuration')
+    @patch('config_rpm_maker.hostrpmbuilder.KEY_CONFIG_RPM_PREFIX')
     def test_should_read_config_rpm_prefix_from_configuration(self, mock_config):
 
-        mock_config.get_property.return_value = 'config-rpm-prefix'
+        mock_config.return_value = 'config-rpm-prefix'
 
         self.call_constructor()
 
@@ -401,7 +401,7 @@ class BuildTests(TestCase):
 
         self.mock_host_rpm_builder._build_rpm_using_rpmbuild.assert_called_with()
 
-    @patch('config_rpm_maker.hostrpmbuilder.configuration.get_property')
+    @patch('config_rpm_maker.hostrpmbuilder.KEY_CONFIG_VIEWER_ONLY')
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
     def test_should_not_build_rpm_using_rpmbuild(self, mock_exists, mock_mkdir, mock_get):
@@ -411,7 +411,7 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        mock_get.assert_any_call(KEY_CONFIG_VIEWER_ONLY)
+        mock_get.assert_any_call()
         self.assertEqual(0, len(self.mock_host_rpm_builder._build_rpm_using_rpmbuild.call_args_list))
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
@@ -481,7 +481,7 @@ class BuildTests(TestCase):
         self.mock_host_rpm_builder._clean_up.assert_called_with()
 
 
-@patch('config_rpm_maker.hostrpmbuilder.configuration')
+@patch('config_rpm_maker.hostrpmbuilder.KEY_NO_CLEAN_UP')
 @patch('config_rpm_maker.hostrpmbuilder.rmtree')
 @patch('config_rpm_maker.hostrpmbuilder.remove')
 class CleanUpTests(UnitTests):
@@ -498,16 +498,16 @@ class CleanUpTests(UnitTests):
 
     def test_should_remove_anything_if_configuration_asks_for_no_clean_up(self, mock_remove, mock_rmtree, mock_config):
 
-        mock_config.get_property.return_value = True
+        mock_config.return_value = True
 
         HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
         self.assert_mock_never_called(mock_rmtree)
-        mock_config.get_property.assert_called_with(KEY_NO_CLEAN_UP)
+        mock_config.assert_called_with()
 
     def test_should_remove_variables_directory(self, moc_remove, mock_rmtree, mock_config):
 
-        mock_config.get_property.return_value = False
+        mock_config.return_value = False
 
         HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
@@ -515,7 +515,7 @@ class CleanUpTests(UnitTests):
 
     def test_should_remove_host_configuration_directory(self, mock_remove, mock_rmtree, mock_config):
 
-        mock_config.get_property.return_value = False
+        mock_config.return_value = False
 
         HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
@@ -523,7 +523,7 @@ class CleanUpTests(UnitTests):
 
     def test_should_remove_host_output_file(self, mock_remove, mock_rmtree, mock_config):
 
-        mock_config.get_property.return_value = False
+        mock_config.return_value = False
 
         HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
@@ -531,7 +531,7 @@ class CleanUpTests(UnitTests):
 
     def test_should_remove_host_error_file(self, mock_remove, mock_rmtree, mock_config):
 
-        mock_config.get_property.return_value = False
+        mock_config.return_value = False
 
         HostRpmBuilder._clean_up(self.mock_host_rpm_builder)
 
@@ -554,7 +554,7 @@ class WriteRevisionFileForConfigViewerTests(TestCase):
         self.mock_host_rpm_builder._write_file.assert_called_with('config-viewer-host-dir/hostname.rev', '1234')
 
 
-@patch('config_rpm_maker.hostrpmbuilder.configuration')
+@patch('config_rpm_maker.hostrpmbuilder.KEY_NO_CLEAN_UP')
 @patch('config_rpm_maker.hostrpmbuilder.Popen')
 @patch('config_rpm_maker.hostrpmbuilder.abspath')
 @patch('config_rpm_maker.hostrpmbuilder.environ')
@@ -616,7 +616,7 @@ class BuildRpmUsingRpmbuildTests(UnitTests):
         mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
         mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
 
-        mock_config.get_property.return_value = True
+        mock_config.return_value = True
         mock_process = Mock()
         mock_process.communicate.return_value = ('stdout', 'stderr')
         mock_process.returncode = 0

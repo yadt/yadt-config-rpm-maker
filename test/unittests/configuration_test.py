@@ -17,7 +17,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from logging import DEBUG, ERROR, INFO
-from mock import patch
+from mock import Mock, patch
 from unittest import TestCase
 
 from unittest_support import UnitTests
@@ -44,10 +44,10 @@ from config_rpm_maker.configuration import (ConfigurationException,
                                             KEY_THREAD_COUNT,
                                             KEY_TEMPORARY_DIRECTORY,
                                             KEY_VERBOSE,
+                                            ConfigurationProperty,
                                             build_config_viewer_host_directory,
                                             get_file_path_of_loaded_configuration,
                                             get_properties,
-                                            get_property,
                                             load_configuration_file,
                                             set_property,
                                             set_properties,
@@ -623,7 +623,11 @@ class LoadConfigurationFileTests(TestCase):
         mock_set_properties.assert_called_with(fake_valid_properties)
 
 
-class GetPropertyTests(TestCase):
+class ConfigurationPropertyTests(TestCase):
+
+    def setUp(self):
+        self.mock_configuration_property = Mock(ConfigurationProperty)
+        self.mock_configuration_property.key = 'max_file_size'
 
     @patch('config_rpm_maker.configuration.get_properties')
     @patch('config_rpm_maker.configuration.load_configuration_file')
@@ -632,11 +636,11 @@ class GetPropertyTests(TestCase):
         mock_properties.return_value = None
 
         def mock_set_properties():
-            mock_properties.return_value = {KEY_MAX_FILE_SIZE: 12345}
+            mock_properties.return_value = {self.mock_configuration_property: 12345}
 
         mock_load_configuration_file.side_effect = mock_set_properties
 
-        get_property(KEY_MAX_FILE_SIZE)
+        ConfigurationProperty.__call__(self.mock_configuration_property)
 
         mock_load_configuration_file.assert_called_with()
 
@@ -645,14 +649,14 @@ class GetPropertyTests(TestCase):
 
         mock_properties.return_value = {}
 
-        self.assertRaises(ConfigurationException, get_property, KEY_MAX_FILE_SIZE)
+        self.assertRaises(ConfigurationException, ConfigurationProperty.__call__, self.mock_configuration_property)
 
     @patch('config_rpm_maker.configuration.get_properties')
     def test_should_return_value_of_property_when_in_properties(self, mock_properties):
 
-        mock_properties.return_value = {KEY_MAX_FILE_SIZE: 28374}
+        mock_properties.return_value = {self.mock_configuration_property: 28374}
 
-        actual = get_property(KEY_MAX_FILE_SIZE)
+        actual = ConfigurationProperty.__call__(self.mock_configuration_property)
 
         self.assertEqual(28374, actual)
 
@@ -729,24 +733,24 @@ class EnsureValidLogLevelTests(TestCase):
 
 class GetConfigViewerHostDirTests(TestCase):
 
-    @patch('config_rpm_maker.configuration.get_property')
+    @patch('config_rpm_maker.configuration.KEY_CONFIG_VIEWER_HOSTS_DIR')
     def test_should_return_path_to_host_directory(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
         actual_path = build_config_viewer_host_directory('devweb01')
 
-        mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
+        mock_get.assert_called_with()
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
 
-    @patch('config_rpm_maker.configuration.get_property')
+    @patch('config_rpm_maker.configuration.KEY_CONFIG_VIEWER_HOSTS_DIR')
     def test_should_return_path_and_append_a_postfix(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
 
         actual_path = build_config_viewer_host_directory('devweb01', revision='123')
 
-        mock_get.assert_called_with(KEY_CONFIG_VIEWER_HOSTS_DIR)
+        mock_get.assert_called_with()
         self.assertEqual('path-to-config-viewer-host-directory/devweb01.new-revision-123', actual_path)
 
 

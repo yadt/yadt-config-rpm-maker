@@ -54,6 +54,22 @@ class ConfigurationProperty(object):
         self.default = default
         self.validator = validator
 
+    def __call__(self):
+        """ Get the configuration property """
+
+        if not get_properties():
+            try:
+                load_configuration_file()
+            except Exception as e:
+                raise e
+
+        properties = get_properties()
+
+        if self not in properties:
+            raise ConfigurationException('Requested unknown configuration property "%s"' % self.key)
+
+        return properties[self]
+
 
 from config_rpm_maker.configuration.properties import *
 
@@ -77,26 +93,9 @@ def load_configuration_file():
     set_properties(valid_properties)
 
 
-def get_property(name):
-    """ Get the configuration property """
-
-    if not get_properties():
-        try:
-            load_configuration_file()
-        except Exception as e:
-            raise e
-
-    properties = get_properties()
-
-    if name not in properties:
-        raise ConfigurationException('Requested unknown configuration property "%s"' % name)
-
-    return properties[name]
-
-
 def build_config_viewer_host_directory(hostname, revision=False):
     """ Returns a path to the config viewer host directory"""
-    config_viewer_hosts_directory = get_property(KEY_CONFIG_VIEWER_HOSTS_DIR)
+    config_viewer_hosts_directory = KEY_CONFIG_VIEWER_HOSTS_DIR()
     path = join(config_viewer_hosts_directory, hostname)
 
     if revision:

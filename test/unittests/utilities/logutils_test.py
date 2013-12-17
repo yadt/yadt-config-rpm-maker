@@ -261,7 +261,7 @@ class MutedLoggerTests(TestCase):
 
 class VerboseTests(TestCase):
 
-    @patch('config_rpm_maker.utilities.logutils.get_property')
+    @patch('config_rpm_maker.utilities.logutils.KEY_VERBOSE')
     def test_should_return_given_logger_when_configuration_value_for_verbose_is_true(self, mock_get):
 
         mock_logger = Mock(Logger)
@@ -270,10 +270,10 @@ class VerboseTests(TestCase):
         verbose(mock_logger).info("Hello")
 
         mock_logger.info.assert_called_with("Hello")
-        mock_get.assert_called_with(KEY_VERBOSE)
+        mock_get.assert_called_with()
 
     @patch('config_rpm_maker.utilities.logutils._muted_logger')
-    @patch('config_rpm_maker.utilities.logutils.get_property')
+    @patch('config_rpm_maker.utilities.logutils.KEY_VERBOSE')
     def test_should_not_return_muted_logger_when_configuration_value_for_verbose_is_false(self, mock_get, mock_muted_logger):
 
         mock_logger = Mock(Logger)
@@ -282,7 +282,7 @@ class VerboseTests(TestCase):
         verbose(mock_logger).info("Hello")
 
         mock_muted_logger.info.assert_called_with("Hello")
-        mock_get.assert_called_with(KEY_VERBOSE)
+        mock_get.assert_called_with()
 
 
 class AppendConsoleLoggerTests(TestCase):

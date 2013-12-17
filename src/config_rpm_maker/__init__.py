@@ -21,7 +21,7 @@ import traceback
 from logging import DEBUG, getLogger
 from sys import argv
 
-from config_rpm_maker import configuration
+from config_rpm_maker.configuration.properties import KEY_SVN_PATH_TO_CONFIG
 from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
 from config_rpm_maker.cli.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
@@ -119,7 +119,7 @@ def building_configuration_rpms_and_clean_host_directories(repository, revision)
     """ This function will start the process of building configuration rpms
         for the given configuration repository and the revision. """
 
-    path_to_config = configuration.get_property(KEY_SVN_PATH_TO_CONFIG)
+    path_to_config = KEY_SVN_PATH_TO_CONFIG()
     svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
     svn_service.log_change_set_meta_information(revision)
     ConfigRpmMaker(revision=revision, svn_service=svn_service).build()

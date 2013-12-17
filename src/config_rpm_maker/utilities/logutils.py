@@ -18,8 +18,8 @@ from logging import DEBUG, Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
-from config_rpm_maker.configuration import KEY_LOG_FORMAT, KEY_VERBOSE
-from config_rpm_maker.configuration import get_property, get_properties, get_file_path_of_loaded_configuration
+from config_rpm_maker.configuration.properties import KEY_LOG_FORMAT, KEY_VERBOSE
+from config_rpm_maker.configuration import get_properties, get_file_path_of_loaded_configuration
 
 
 LOGGER = getLogger(__name__)
@@ -50,7 +50,7 @@ _muted_logger = MutedLogger()
 def verbose(logger):
     """ Returns the given logger if verbose is configured or it will return _muted_logger """
 
-    if get_property(KEY_VERBOSE):
+    if KEY_VERBOSE():
         return logger
 
     return _muted_logger

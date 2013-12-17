@@ -24,7 +24,7 @@ from os.path import getsize
 import config_rpm_maker.utilities.magic
 
 from config_rpm_maker import configuration
-from config_rpm_maker.configuration import KEY_MAX_FILE_SIZE
+from config_rpm_maker.configuration.properties import KEY_MAX_FILE_SIZE
 from config_rpm_maker.utilities.logutils import verbose
 from config_rpm_maker.token.cycle import TokenCycleChecking
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -188,7 +188,7 @@ class TokenReplacer(object):
 
     def filter_file(self, filename, html_escape=False):
         try:
-            self.file_size_limit = configuration.get_property(KEY_MAX_FILE_SIZE)
+            self.file_size_limit = KEY_MAX_FILE_SIZE()
 
             if getsize(filename) > self.file_size_limit:
                 raise FileLimitExceededException(filename, self.file_size_limit)
