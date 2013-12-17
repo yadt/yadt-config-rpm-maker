@@ -180,7 +180,7 @@ def _ensure_properties_are_valid(raw_properties):
         LOGGER.warn("Loaded configuration properties are empty.")
         raw_properties = {}
 
-    allow_unknown_hosts = raw_properties.get(are_unknown_hosts_allowed.key, are_unknown_hosts_allowed.default)
+    allow_unknown_hosts = raw_properties.get(unknown_hosts_are_allowed.key, unknown_hosts_are_allowed.default)
     config_rpm_prefix = raw_properties.get(get_config_rpm_prefix.key, get_config_rpm_prefix.default)
     config_viewer_hosts_dir = raw_properties.get(get_config_viewer_host_directory.key, get_config_viewer_host_directory.default)
     custom_dns_searchlist = raw_properties.get(get_custom_dns_search_list.key, get_custom_dns_search_list.default)
@@ -199,7 +199,7 @@ def _ensure_properties_are_valid(raw_properties):
 
     valid_properties = {
         get_log_level: _ensure_valid_log_level(log_level),
-        are_unknown_hosts_allowed: _ensure_is_a_boolean_value(are_unknown_hosts_allowed, allow_unknown_hosts),
+        unknown_hosts_are_allowed: _ensure_is_a_boolean_value(unknown_hosts_are_allowed, allow_unknown_hosts),
         get_config_rpm_prefix: _ensure_is_a_string(get_config_rpm_prefix, config_rpm_prefix),
         is_config_viewer_only_enabled: is_config_viewer_only_enabled.default,
         get_config_viewer_host_directory: _ensure_is_a_string(get_config_viewer_host_directory, config_viewer_hosts_dir),

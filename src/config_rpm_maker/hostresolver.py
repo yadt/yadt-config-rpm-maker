@@ -18,7 +18,7 @@ import socket
 
 from logging import getLogger
 
-from config_rpm_maker.configuration.properties import are_unknown_hosts_allowed, get_custom_dns_search_list
+from config_rpm_maker.configuration.properties import unknown_hosts_are_allowed, get_custom_dns_search_list
 
 LOGGER = getLogger(__name__)
 
@@ -40,7 +40,7 @@ class HostResolver(object):
             except Exception:
                 pass
 
-        if not are_unknown_hosts_allowed():
+        if not unknown_hosts_are_allowed():
             raise Exception("Could not lookup '%s' with 'getent hosts'" % hostname)
 
         ip = "127.0.0.1"

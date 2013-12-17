@@ -16,8 +16,6 @@
 
 from config_rpm_maker.configuration import ConfigurationProperty
 
-are_unknown_hosts_allowed = ConfigurationProperty(key='allow_unknown_hosts', default=True)
-
 get_config_viewer_host_directory = ConfigurationProperty(key='config_viewer_hosts_dir', default='/tmp')
 get_config_rpm_prefix = ConfigurationProperty(key='config_rpm_prefix', default='yadt-config-')
 get_custom_dns_search_list = ConfigurationProperty(key='custom_dns_searchlist', default=[])
@@ -38,3 +36,5 @@ get_temporary_directory = ConfigurationProperty(key='temp_dir', default='/tmp')
 is_config_viewer_only_enabled = ConfigurationProperty(key='config_viewer_only', default=False)
 is_no_clean_up_enabled = ConfigurationProperty(key='no_clean_up', default=False)
 is_verbose_enabled = ConfigurationProperty(key='verbose', default=False)
+
+unknown_hosts_are_allowed = ConfigurationProperty(key='allow_unknown_hosts', default=True)

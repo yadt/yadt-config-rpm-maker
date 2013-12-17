@@ -25,7 +25,7 @@ from config_rpm_maker import configuration
 from config_rpm_maker.configuration import (ConfigurationException,
                                             CONFIGURATION_FILE_PATH,
                                             ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
-                                            are_unknown_hosts_allowed,
+                                            unknown_hosts_are_allowed,
                                             get_config_rpm_prefix,
                                             is_config_viewer_only_enabled,
                                             get_config_viewer_host_directory,
@@ -224,8 +224,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertFalse(actual_properties[are_unknown_hosts_allowed])
-        mock_ensure_valid_allow_unknown_hosts.assert_called_with(are_unknown_hosts_allowed, False)
+        self.assertFalse(actual_properties[unknown_hosts_are_allowed])
+        mock_ensure_valid_allow_unknown_hosts.assert_called_with(unknown_hosts_are_allowed, False)
 
     def test_should_return_default_property_for_allow_unkown_hosts(self):
 
@@ -233,7 +233,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertTrue(actual_properties[are_unknown_hosts_allowed])
+        self.assertTrue(actual_properties[unknown_hosts_are_allowed])
 
     def test_should_return_default_for_allow_unknown_hosts_if_not_defined(self):
 
@@ -241,7 +241,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertTrue(actual_properties[are_unknown_hosts_allowed])
+        self.assertTrue(actual_properties[unknown_hosts_are_allowed])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_config_rpm_prefix(self, mock_ensure_is_a_string):
