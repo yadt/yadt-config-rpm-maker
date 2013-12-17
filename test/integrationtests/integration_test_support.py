@@ -21,6 +21,7 @@ import unittest
 from Queue import Queue
 from os import makedirs
 from os.path import abspath, exists, join
+from re import compile
 from shutil import rmtree
 
 from config_rpm_maker import configuration
@@ -111,7 +112,7 @@ Expected: "{expected}"
 
             self.assertEqual(expected_content, actual_content, error_message)
 
-    def assert_file_content_line_by_line(self, path_to_file, expected_content):
+    def assert_file_matches_content_line_by_line(self, path_to_file, expected_content):
 
         self.assert_path_exists(path_to_file)
 
@@ -129,7 +130,12 @@ Expected: "{expected}"
  but was: "{actual}"
 """.format(path_to_file=path_to_file, expected=expected_line, actual=actual_line, line_number=line_number + 1)
 
-                self.assertEqual(expected_line.strip(), actual_line.strip(), error_message)
+                pattern = expected_line.strip()
+                string = actual_line.strip()
+
+                regular_expression = compile(pattern)
+
+                self.assertTrue(regular_expression.match(string), error_message)
                 line_number += 1
 
     def create_svn_service_queue(self):
