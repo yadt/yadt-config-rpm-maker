@@ -18,7 +18,7 @@ import socket
 
 from logging import getLogger
 
-from config_rpm_maker.configuration.properties import KEY_ALLOW_UNKNOWN_HOSTS, KEY_CUSTOM_DNS_SEARCHLIST
+from config_rpm_maker.configuration.properties import are_unknown_hosts_allowed, get_custom_dns_search_list
 
 LOGGER = getLogger(__name__)
 
@@ -26,7 +26,7 @@ LOGGER = getLogger(__name__)
 class HostResolver(object):
 
     def resolve(self, hostname):
-        dns_searchlist = KEY_CUSTOM_DNS_SEARCHLIST()
+        dns_searchlist = get_custom_dns_search_list()
 
         if dns_searchlist:
             for dns_entry in dns_searchlist:
@@ -40,7 +40,7 @@ class HostResolver(object):
             except Exception:
                 pass
 
-        if not KEY_ALLOW_UNKNOWN_HOSTS():
+        if not are_unknown_hosts_allowed():
             raise Exception("Could not lookup '%s' with 'getent hosts'" % hostname)
 
         ip = "127.0.0.1"

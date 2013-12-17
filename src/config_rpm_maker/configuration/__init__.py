@@ -95,7 +95,7 @@ def load_configuration_file():
 
 def build_config_viewer_host_directory(hostname, revision=False):
     """ Returns a path to the config viewer host directory"""
-    config_viewer_hosts_directory = KEY_CONFIG_VIEWER_HOSTS_DIR()
+    config_viewer_hosts_directory = get_config_viewer_host_directory()
     path = join(config_viewer_hosts_directory, hostname)
 
     if revision:
@@ -180,43 +180,43 @@ def _ensure_properties_are_valid(raw_properties):
         LOGGER.warn("Loaded configuration properties are empty.")
         raw_properties = {}
 
-    allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS.key, KEY_ALLOW_UNKNOWN_HOSTS.default)
-    config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX.key, KEY_CONFIG_RPM_PREFIX.default)
-    config_viewer_hosts_dir = raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR.key, KEY_CONFIG_VIEWER_HOSTS_DIR.default)
-    custom_dns_searchlist = raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST.key, KEY_CUSTOM_DNS_SEARCHLIST.default)
-    error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY.key, KEY_ERROR_LOG_DIRECTORY.default)
-    error_log_url = raw_properties.get(KEY_ERROR_LOG_URL.key, KEY_ERROR_LOG_URL.default)
-    log_level = raw_properties.get(KEY_LOG_LEVEL.key, KEY_LOG_LEVEL.default)
-    max_file_size = raw_properties.get(KEY_MAX_FILE_SIZE.key, KEY_MAX_FILE_SIZE.default)
-    max_failed_hosts = raw_properties.get(KEY_MAX_FAILED_HOSTS.key, KEY_MAX_FAILED_HOSTS.default)
-    path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE.key, KEY_PATH_TO_SPEC_FILE.default)
-    repo_packages_regex = raw_properties.get(KEY_REPO_PACKAGES_REGEX.key, KEY_REPO_PACKAGES_REGEX.default)
-    rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE.key, KEY_RPM_UPLOAD_CHUNK_SIZE.default)
-    rpm_upload_command = raw_properties.get(KEY_RPM_UPLOAD_COMMAND.key, KEY_RPM_UPLOAD_COMMAND.default)
-    svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG.key, KEY_SVN_PATH_TO_CONFIG.default)
-    temporary_directory = raw_properties.get(KEY_TEMPORARY_DIRECTORY.key, KEY_TEMPORARY_DIRECTORY.default)
-    thread_count = raw_properties.get(KEY_THREAD_COUNT.key, KEY_THREAD_COUNT.default)
+    allow_unknown_hosts = raw_properties.get(are_unknown_hosts_allowed.key, are_unknown_hosts_allowed.default)
+    config_rpm_prefix = raw_properties.get(get_config_rpm_prefix.key, get_config_rpm_prefix.default)
+    config_viewer_hosts_dir = raw_properties.get(get_config_viewer_host_directory.key, get_config_viewer_host_directory.default)
+    custom_dns_searchlist = raw_properties.get(get_custom_dns_search_list.key, get_custom_dns_search_list.default)
+    error_log_directory = raw_properties.get(get_error_log_directory.key, get_error_log_directory.default)
+    error_log_url = raw_properties.get(get_error_log_url.key, get_error_log_url.default)
+    log_level = raw_properties.get(get_log_level.key, get_log_level.default)
+    max_file_size = raw_properties.get(get_max_file_size.key, get_max_file_size.default)
+    max_failed_hosts = raw_properties.get(get_max_failed_hosts.key, get_max_failed_hosts.default)
+    path_to_spec_file = raw_properties.get(get_path_to_spec_file.key, get_path_to_spec_file.default)
+    repo_packages_regex = raw_properties.get(get_repo_packages_regex.key, get_repo_packages_regex.default)
+    rpm_upload_chunk_size = raw_properties.get(get_rpm_upload_chunk_size.key, get_rpm_upload_chunk_size.default)
+    rpm_upload_command = raw_properties.get(get_rpm_upload_command.key, get_rpm_upload_command.default)
+    svn_path_to_config = raw_properties.get(get_svn_path_to_config.key, get_svn_path_to_config.default)
+    temporary_directory = raw_properties.get(get_temporary_directory.key, get_temporary_directory.default)
+    thread_count = raw_properties.get(get_thread_count.key, get_thread_count.default)
 
     valid_properties = {
-        KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
-        KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
-        KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
-        KEY_CONFIG_VIEWER_ONLY: KEY_CONFIG_VIEWER_ONLY.default,
-        KEY_CONFIG_VIEWER_HOSTS_DIR: _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
-        KEY_CUSTOM_DNS_SEARCHLIST: _ensure_is_a_list_of_strings(KEY_CUSTOM_DNS_SEARCHLIST, custom_dns_searchlist),
-        KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
-        KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
-        KEY_MAX_FAILED_HOSTS: _ensure_is_an_integer(KEY_MAX_FAILED_HOSTS, max_failed_hosts),
-        KEY_MAX_FILE_SIZE: _ensure_is_an_integer(KEY_MAX_FILE_SIZE, max_file_size),
-        KEY_NO_CLEAN_UP: KEY_NO_CLEAN_UP.default,
-        KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
-        KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_a_valid_regular_expression(repo_packages_regex),
-        KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
-        KEY_RPM_UPLOAD_COMMAND: _ensure_is_a_string_or_none(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command),
-        KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIG, svn_path_to_config),
-        KEY_THREAD_COUNT: _ensure_is_an_integer(KEY_THREAD_COUNT, thread_count),
-        KEY_TEMPORARY_DIRECTORY: _ensure_is_a_string(KEY_TEMPORARY_DIRECTORY, temporary_directory),
-        KEY_VERBOSE: KEY_VERBOSE.default
+        get_log_level: _ensure_valid_log_level(log_level),
+        are_unknown_hosts_allowed: _ensure_is_a_boolean_value(are_unknown_hosts_allowed, allow_unknown_hosts),
+        get_config_rpm_prefix: _ensure_is_a_string(get_config_rpm_prefix, config_rpm_prefix),
+        is_config_viewer_only_enabled: is_config_viewer_only_enabled.default,
+        get_config_viewer_host_directory: _ensure_is_a_string(get_config_viewer_host_directory, config_viewer_hosts_dir),
+        get_custom_dns_search_list: _ensure_is_a_list_of_strings(get_custom_dns_search_list, custom_dns_searchlist),
+        get_error_log_directory: _ensure_is_a_string(get_error_log_directory, error_log_directory),
+        get_error_log_url: _ensure_is_a_string(get_error_log_url, error_log_url),
+        get_max_failed_hosts: _ensure_is_an_integer(get_max_failed_hosts, max_failed_hosts),
+        get_max_file_size: _ensure_is_an_integer(get_max_file_size, max_file_size),
+        is_no_clean_up_enabled: is_no_clean_up_enabled.default,
+        get_path_to_spec_file: _ensure_is_a_string(get_path_to_spec_file, path_to_spec_file),
+        get_repo_packages_regex: _ensure_repo_packages_regex_is_a_valid_regular_expression(repo_packages_regex),
+        get_rpm_upload_chunk_size: _ensure_is_an_integer(get_rpm_upload_chunk_size, rpm_upload_chunk_size),
+        get_rpm_upload_command: _ensure_is_a_string_or_none(get_rpm_upload_command, rpm_upload_command),
+        get_svn_path_to_config: _ensure_is_a_string(get_svn_path_to_config, svn_path_to_config),
+        get_thread_count: _ensure_is_an_integer(get_thread_count, thread_count),
+        get_temporary_directory: _ensure_is_a_string(get_temporary_directory, temporary_directory),
+        is_verbose_enabled: is_verbose_enabled.default
     }
 
     unknown_configuration_properties = set(raw_properties.keys()) - set(valid_properties.keys())
@@ -281,7 +281,7 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
     value_type = type(value)
     if value_type is not str:
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
-                                     % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
+                                     % (get_repo_packages_regex, str(value), value_type.__name__))
 
     try:
         compile(value)

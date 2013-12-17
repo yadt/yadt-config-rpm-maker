@@ -26,9 +26,9 @@ from shutil import rmtree
 
 from config_rpm_maker import configuration
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.configuration.properties import (KEY_NO_CLEAN_UP,
-                                                       KEY_TEMPORARY_DIRECTORY,
-                                                       KEY_SVN_PATH_TO_CONFIG)
+from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
+                                                       get_temporary_directory,
+                                                       get_svn_path_to_config)
 from config_rpm_maker.configuration import build_config_viewer_host_directory
 
 # This constant exists for debugging purposes.
@@ -44,9 +44,9 @@ class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
 
-        configuration.set_property(KEY_NO_CLEAN_UP, KEEP_TEMPORARY_DIRECTORY)
+        configuration.set_property(is_no_clean_up_enabled, KEEP_TEMPORARY_DIRECTORY)
 
-        temporary_directory = KEY_TEMPORARY_DIRECTORY()
+        temporary_directory = get_temporary_directory()
 
         self.clean_up_temporary_directory(temporary_directory)
 
@@ -143,7 +143,7 @@ Expected: "{expected}"
 
     def create_svn_service_queue(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
-                                 path_to_config=KEY_SVN_PATH_TO_CONFIG())
+                                 path_to_config=get_svn_path_to_config())
         svn_service_queue = Queue()
         svn_service_queue.put(svn_service)
         return svn_service_queue

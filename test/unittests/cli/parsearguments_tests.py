@@ -20,7 +20,7 @@ from logging import DEBUG, INFO
 from mock import patch, Mock
 from unittest import TestCase
 
-from config_rpm_maker.configuration import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE, KEY_NO_CLEAN_UP
+from config_rpm_maker.configuration import is_config_viewer_only_enabled, get_rpm_upload_command, is_verbose_enabled, is_no_clean_up_enabled
 from config_rpm_maker.cli.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE, OPTION_NO_CLEAN_UP
 from config_rpm_maker.cli.parsearguments import apply_arguments_to_config, parse_arguments, determine_console_log_level
 
@@ -150,7 +150,7 @@ class ApplyArgumentsToConfiguration(TestCase):
 
         apply_arguments_to_config(self.arguments)
 
-        mock_set_property.assert_any_call(KEY_RPM_UPLOAD_COMMAND, '/bin/true')
+        mock_set_property.assert_any_call(get_rpm_upload_command, '/bin/true')
 
     def test_should_set_config_viewer_only_when_option_is_given(self, mock_set_property):
 
@@ -158,7 +158,7 @@ class ApplyArgumentsToConfiguration(TestCase):
 
         apply_arguments_to_config(self.arguments)
 
-        mock_set_property.assert_any_call(KEY_CONFIG_VIEWER_ONLY, True)
+        mock_set_property.assert_any_call(is_config_viewer_only_enabled, True)
 
     def test_should_set_verbose_when_option_is_given(self, mock_set_property):
 
@@ -166,7 +166,7 @@ class ApplyArgumentsToConfiguration(TestCase):
 
         apply_arguments_to_config(self.arguments)
 
-        mock_set_property.assert_any_call(KEY_VERBOSE, True)
+        mock_set_property.assert_any_call(is_verbose_enabled, True)
 
     def test_should_set_no_clean_up_when_option_is_given(self, mock_set_property):
 
@@ -174,7 +174,7 @@ class ApplyArgumentsToConfiguration(TestCase):
 
         apply_arguments_to_config(self.arguments)
 
-        mock_set_property.assert_any_call(KEY_NO_CLEAN_UP, True)
+        mock_set_property.assert_any_call(is_no_clean_up_enabled, True)
 
 
 class DetermineConsoleLogLevelTests(TestCase):

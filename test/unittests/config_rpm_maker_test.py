@@ -105,7 +105,7 @@ class MainTests(TestCase):
 class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.KEY_SVN_PATH_TO_CONFIG')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -118,7 +118,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
         building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', 1)
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.KEY_SVN_PATH_TO_CONFIG')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -134,7 +134,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
                                                         base_url='file:///path_to/testdata/repository')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.KEY_SVN_PATH_TO_CONFIG')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -150,7 +150,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
                                                         base_url='file:///path_to/testdata/repository')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.KEY_SVN_PATH_TO_CONFIG')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
@@ -166,7 +166,7 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision='1980')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.KEY_SVN_PATH_TO_CONFIG')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')

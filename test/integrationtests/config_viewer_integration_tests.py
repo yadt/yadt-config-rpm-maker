@@ -19,7 +19,7 @@ from os.path import join
 
 from integration_test_support import IntegrationTest
 
-from config_rpm_maker.configuration.properties import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG
+from config_rpm_maker.configuration.properties import is_no_clean_up_enabled, get_svn_path_to_config
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker, configuration
 from config_rpm_maker.svnservice import SvnService
 
@@ -28,8 +28,8 @@ class ConfigViewerIntegrationTests(IntegrationTest):
 
     def test_should_create_files_for_hosts(self):
 
-        configuration.set_property(KEY_NO_CLEAN_UP, True)
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=KEY_SVN_PATH_TO_CONFIG())
+        configuration.set_property(is_no_clean_up_enabled, True)
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
 
         ConfigRpmMaker('2', svn_service).build()
 

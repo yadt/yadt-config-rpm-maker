@@ -25,25 +25,25 @@ from config_rpm_maker import configuration
 from config_rpm_maker.configuration import (ConfigurationException,
                                             CONFIGURATION_FILE_PATH,
                                             ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
-                                            KEY_ALLOW_UNKNOWN_HOSTS,
-                                            KEY_CONFIG_RPM_PREFIX,
-                                            KEY_CONFIG_VIEWER_ONLY,
-                                            KEY_CONFIG_VIEWER_HOSTS_DIR,
-                                            KEY_CUSTOM_DNS_SEARCHLIST,
-                                            KEY_ERROR_LOG_DIRECTORY,
-                                            KEY_ERROR_LOG_URL,
-                                            KEY_LOG_LEVEL,
-                                            KEY_NO_CLEAN_UP,
-                                            KEY_MAX_FAILED_HOSTS,
-                                            KEY_MAX_FILE_SIZE,
-                                            KEY_PATH_TO_SPEC_FILE,
-                                            KEY_SVN_PATH_TO_CONFIG,
-                                            KEY_REPO_PACKAGES_REGEX,
-                                            KEY_RPM_UPLOAD_CHUNK_SIZE,
-                                            KEY_RPM_UPLOAD_COMMAND,
-                                            KEY_THREAD_COUNT,
-                                            KEY_TEMPORARY_DIRECTORY,
-                                            KEY_VERBOSE,
+                                            are_unknown_hosts_allowed,
+                                            get_config_rpm_prefix,
+                                            is_config_viewer_only_enabled,
+                                            get_config_viewer_host_directory,
+                                            get_custom_dns_search_list,
+                                            get_error_log_directory,
+                                            get_error_log_url,
+                                            get_log_level,
+                                            is_no_clean_up_enabled,
+                                            get_max_failed_hosts,
+                                            get_max_file_size,
+                                            get_path_to_spec_file,
+                                            get_svn_path_to_config,
+                                            get_repo_packages_regex,
+                                            get_rpm_upload_chunk_size,
+                                            get_rpm_upload_command,
+                                            get_thread_count,
+                                            get_temporary_directory,
+                                            is_verbose_enabled,
                                             ConfigurationProperty,
                                             build_config_viewer_host_directory,
                                             get_file_path_of_loaded_configuration,
@@ -204,7 +204,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('valid_log_level', actual_properties[KEY_LOG_LEVEL])
+        self.assertEqual('valid_log_level', actual_properties[get_log_level])
 
     @patch('config_rpm_maker.configuration._ensure_valid_log_level')
     def test_should_return_default_log_level_when_no_log_level_defined(self, mock_ensure_valid_log_level):
@@ -214,7 +214,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('valid_log_level', actual_properties[KEY_LOG_LEVEL])
+        self.assertEqual('valid_log_level', actual_properties[get_log_level])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_boolean_value')
     def test_should_return_property_allow_unkown_hosts(self, mock_ensure_valid_allow_unknown_hosts):
@@ -224,8 +224,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertFalse(actual_properties[KEY_ALLOW_UNKNOWN_HOSTS])
-        mock_ensure_valid_allow_unknown_hosts.assert_called_with(KEY_ALLOW_UNKNOWN_HOSTS, False)
+        self.assertFalse(actual_properties[are_unknown_hosts_allowed])
+        mock_ensure_valid_allow_unknown_hosts.assert_called_with(are_unknown_hosts_allowed, False)
 
     def test_should_return_default_property_for_allow_unkown_hosts(self):
 
@@ -233,7 +233,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertTrue(actual_properties[KEY_ALLOW_UNKNOWN_HOSTS])
+        self.assertTrue(actual_properties[are_unknown_hosts_allowed])
 
     def test_should_return_default_for_allow_unknown_hosts_if_not_defined(self):
 
@@ -241,7 +241,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertTrue(actual_properties[KEY_ALLOW_UNKNOWN_HOSTS])
+        self.assertTrue(actual_properties[are_unknown_hosts_allowed])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_config_rpm_prefix(self, mock_ensure_is_a_string):
@@ -251,8 +251,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('valid string', actual_properties[KEY_CONFIG_RPM_PREFIX])
-        mock_ensure_is_a_string.assert_any_call(KEY_CONFIG_RPM_PREFIX, 'spam-eggs')
+        self.assertEqual('valid string', actual_properties[get_config_rpm_prefix])
+        mock_ensure_is_a_string.assert_any_call(get_config_rpm_prefix, 'spam-eggs')
 
     def test_should_return_default_for_config_rpm_prefix_if_not_defined(self):
 
@@ -260,7 +260,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('yadt-config-', actual_properties[KEY_CONFIG_RPM_PREFIX])
+        self.assertEqual('yadt-config-', actual_properties[get_config_rpm_prefix])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_list_of_strings')
     def test_should_return_property_custom_dns_searchlist(self, mock_ensure_is_a_list_of_strings):
@@ -270,8 +270,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(['a', 'valid', 'list', 'of', 'strings'], actual_properties[KEY_CUSTOM_DNS_SEARCHLIST])
-        mock_ensure_is_a_list_of_strings.assert_any_call(KEY_CUSTOM_DNS_SEARCHLIST, ['a', 'list', 'of', 'dns', 'servers'])
+        self.assertEqual(['a', 'valid', 'list', 'of', 'strings'], actual_properties[get_custom_dns_search_list])
+        mock_ensure_is_a_list_of_strings.assert_any_call(get_custom_dns_search_list, ['a', 'list', 'of', 'dns', 'servers'])
 
     def test_should_return_default_for_custom_dns_searchlist_if_not_defined(self):
 
@@ -279,7 +279,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual([], actual_properties[KEY_CUSTOM_DNS_SEARCHLIST])
+        self.assertEqual([], actual_properties[get_custom_dns_search_list])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_error_log_dir(self, mock_ensure_is_a_string):
@@ -289,8 +289,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('the valid error log', actual_properties[KEY_ERROR_LOG_DIRECTORY])
-        mock_ensure_is_a_string.assert_any_call(KEY_ERROR_LOG_DIRECTORY, 'error-spam-eggs/logs')
+        self.assertEqual('the valid error log', actual_properties[get_error_log_directory])
+        mock_ensure_is_a_string.assert_any_call(get_error_log_directory, 'error-spam-eggs/logs')
 
     def test_should_return_default_for_error_log_dir_if_not_defined(self):
 
@@ -298,7 +298,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('', actual_properties[KEY_ERROR_LOG_DIRECTORY])
+        self.assertEqual('', actual_properties[get_error_log_directory])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_property_error_url_dir(self, mock_ensure_is_string):
@@ -308,8 +308,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid error log url', actual_properties[KEY_ERROR_LOG_URL])
-        mock_ensure_is_string.assert_any_call(KEY_ERROR_LOG_URL, 'error-spam-eggs-url')
+        self.assertEqual('a valid error log url', actual_properties[get_error_log_url])
+        mock_ensure_is_string.assert_any_call(get_error_log_url, 'error-spam-eggs-url')
 
     def test_should_return_default_for_error_log_url_if_not_defined(self):
 
@@ -317,7 +317,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('', actual_properties[KEY_ERROR_LOG_URL])
+        self.assertEqual('', actual_properties[get_error_log_url])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_path_to_spec_file(self, mock_ensure_is_a_string):
@@ -327,8 +327,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid spec file', actual_properties[KEY_PATH_TO_SPEC_FILE])
-        mock_ensure_is_a_string.assert_any_call(KEY_PATH_TO_SPEC_FILE, 'spam-eggs.speck')
+        self.assertEqual('a valid spec file', actual_properties[get_path_to_spec_file])
+        mock_ensure_is_a_string.assert_any_call(get_path_to_spec_file, 'spam-eggs.speck')
 
     def test_should_return_default_for_path_to_spec_file_if_not_defined(self):
 
@@ -336,7 +336,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('default.spec', actual_properties[KEY_PATH_TO_SPEC_FILE])
+        self.assertEqual('default.spec', actual_properties[get_path_to_spec_file])
 
     @patch('config_rpm_maker.configuration._ensure_repo_packages_regex_is_a_valid_regular_expression')
     def test_should_return_repo_packages_regex(self, mock_ensure_repo_packages_regex_is_valid_or_none):
@@ -346,7 +346,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid regex', actual_properties[KEY_REPO_PACKAGES_REGEX])
+        self.assertEqual('a valid regex', actual_properties[get_repo_packages_regex])
         mock_ensure_repo_packages_regex_is_valid_or_none.assert_any_call('.*-spam-.*')
 
     def test_should_return_default_for_repo_packages_regex_if_not_defined(self):
@@ -355,7 +355,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(".*-repo.*", actual_properties[KEY_REPO_PACKAGES_REGEX])
+        self.assertEqual(".*-repo.*", actual_properties[get_repo_packages_regex])
 
     @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_rpm_upload_chunk_size(self, mock_ensure_is_an_integer):
@@ -365,8 +365,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(123, actual_properties[KEY_RPM_UPLOAD_CHUNK_SIZE])
-        mock_ensure_is_an_integer.assert_any_call(KEY_RPM_UPLOAD_CHUNK_SIZE, 5)
+        self.assertEqual(123, actual_properties[get_rpm_upload_chunk_size])
+        mock_ensure_is_an_integer.assert_any_call(get_rpm_upload_chunk_size, 5)
 
     def test_should_return_default_for_rpm_upload_chunk_size_if_not_defined(self):
 
@@ -374,7 +374,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(10, actual_properties[KEY_RPM_UPLOAD_CHUNK_SIZE])
+        self.assertEqual(10, actual_properties[get_rpm_upload_chunk_size])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string_or_none')
     def test_should_return_rpm_upload_command_regex(self, mock_ensure_is_a_string_or_none):
@@ -384,8 +384,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid upload command', actual_properties[KEY_RPM_UPLOAD_COMMAND])
-        mock_ensure_is_a_string_or_none.assert_any_call(KEY_RPM_UPLOAD_COMMAND, '/usr/bin/rm')
+        self.assertEqual('a valid upload command', actual_properties[get_rpm_upload_command])
+        mock_ensure_is_a_string_or_none.assert_any_call(get_rpm_upload_command, '/usr/bin/rm')
 
     def test_should_return_default_for_rpm_upload_command_if_not_defined(self):
 
@@ -393,7 +393,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(None, actual_properties[KEY_RPM_UPLOAD_COMMAND])
+        self.assertEqual(None, actual_properties[get_rpm_upload_command])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_svn_path_to_config(self, mock_ensure_is_a_string):
@@ -403,8 +403,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid svn path', actual_properties[KEY_SVN_PATH_TO_CONFIG])
-        mock_ensure_is_a_string.assert_any_call(KEY_SVN_PATH_TO_CONFIG, '/configuration')
+        self.assertEqual('a valid svn path', actual_properties[get_svn_path_to_config])
+        mock_ensure_is_a_string.assert_any_call(get_svn_path_to_config, '/configuration')
 
     def test_should_return_default_for_svn_path_to_config_if_not_defined(self):
 
@@ -412,7 +412,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/config', actual_properties[KEY_SVN_PATH_TO_CONFIG])
+        self.assertEqual('/config', actual_properties[get_svn_path_to_config])
 
     @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_thread_count(self, mock_ensure_is_an_integer):
@@ -422,8 +422,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(123, actual_properties[KEY_THREAD_COUNT])
-        mock_ensure_is_an_integer.assert_any_call(KEY_THREAD_COUNT, 10)
+        self.assertEqual(123, actual_properties[get_thread_count])
+        mock_ensure_is_an_integer.assert_any_call(get_thread_count, 10)
 
     def test_should_return_default_for_thread_count_if_not_defined(self):
 
@@ -431,7 +431,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(1, actual_properties[KEY_THREAD_COUNT])
+        self.assertEqual(1, actual_properties[get_thread_count])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_temp_dir(self, mock_ensure_is_a_string):
@@ -441,8 +441,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid temporary directory', actual_properties[KEY_TEMPORARY_DIRECTORY])
-        mock_ensure_is_a_string.assert_any_call(KEY_TEMPORARY_DIRECTORY, 'target/tmp')
+        self.assertEqual('a valid temporary directory', actual_properties[get_temporary_directory])
+        mock_ensure_is_a_string.assert_any_call(get_temporary_directory, 'target/tmp')
 
     def test_should_return_default_for_temp_dir_if_not_defined(self):
 
@@ -450,7 +450,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/tmp', actual_properties[KEY_TEMPORARY_DIRECTORY])
+        self.assertEqual('/tmp', actual_properties[get_temporary_directory])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_config_viewer_hosts_dir(self, mock_ensure_is_a_string):
@@ -460,8 +460,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid string', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
-        mock_ensure_is_a_string.assert_any_call(KEY_CONFIG_VIEWER_HOSTS_DIR, 'target/tmp/configviewer')
+        self.assertEqual('a valid string', actual_properties[get_config_viewer_host_directory])
+        mock_ensure_is_a_string.assert_any_call(get_config_viewer_host_directory, 'target/tmp/configviewer')
 
     def test_should_return_default_for_config_viewer_hosts_dir_if_not_defined(self):
 
@@ -469,7 +469,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/tmp', actual_properties[KEY_CONFIG_VIEWER_HOSTS_DIR])
+        self.assertEqual('/tmp', actual_properties[get_config_viewer_host_directory])
 
     @patch('config_rpm_maker.configuration.LOGGER')
     def test_should_warn_when_raw_properties_contain_an_unknown_property_name(self, mock_logger):
@@ -488,8 +488,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(123000000, actual_properties[KEY_MAX_FILE_SIZE])
-        mock_ensure_is_an_integer.assert_any_call(KEY_MAX_FILE_SIZE, 10000000)
+        self.assertEqual(123000000, actual_properties[get_max_file_size])
+        mock_ensure_is_an_integer.assert_any_call(get_max_file_size, 10000000)
 
     def test_should_return_default_for_max_file_size_if_not_defined(self):
 
@@ -497,7 +497,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(102400, actual_properties[KEY_MAX_FILE_SIZE])
+        self.assertEqual(102400, actual_properties[get_max_file_size])
 
     @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_max_failed_hosts(self, mock_ensure_is_an_integer):
@@ -507,8 +507,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(5, actual_properties[KEY_MAX_FAILED_HOSTS])
-        mock_ensure_is_an_integer.assert_any_call(KEY_MAX_FAILED_HOSTS, 3)
+        self.assertEqual(5, actual_properties[get_max_failed_hosts])
+        mock_ensure_is_an_integer.assert_any_call(get_max_failed_hosts, 3)
 
     def test_should_return_default_for_max_failed_hosts_if_not_defined(self):
 
@@ -516,7 +516,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual(3, actual_properties[KEY_MAX_FAILED_HOSTS])
+        self.assertEqual(3, actual_properties[get_max_failed_hosts])
 
     def test_should_return_default_config_viewer_only(self):
 
@@ -524,7 +524,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertFalse(actual_properties[KEY_CONFIG_VIEWER_ONLY])
+        self.assertFalse(actual_properties[is_config_viewer_only_enabled])
 
     def test_should_return_default_verbose(self):
 
@@ -532,7 +532,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertFalse(actual_properties[KEY_VERBOSE])
+        self.assertFalse(actual_properties[is_verbose_enabled])
 
     def test_should_return_default_no_clean_up(self):
 
@@ -540,7 +540,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertFalse(actual_properties[KEY_NO_CLEAN_UP])
+        self.assertFalse(actual_properties[is_no_clean_up_enabled])
 
 
 class LoadConfigurationFileTests(TestCase):
@@ -733,7 +733,7 @@ class EnsureValidLogLevelTests(TestCase):
 
 class GetConfigViewerHostDirTests(TestCase):
 
-    @patch('config_rpm_maker.configuration.KEY_CONFIG_VIEWER_HOSTS_DIR')
+    @patch('config_rpm_maker.configuration.get_config_viewer_host_directory')
     def test_should_return_path_to_host_directory(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'
@@ -743,7 +743,7 @@ class GetConfigViewerHostDirTests(TestCase):
         mock_get.assert_called_with()
         self.assertEqual('path-to-config-viewer-host-directory/devweb01', actual_path)
 
-    @patch('config_rpm_maker.configuration.KEY_CONFIG_VIEWER_HOSTS_DIR')
+    @patch('config_rpm_maker.configuration.get_config_viewer_host_directory')
     def test_should_return_path_and_append_a_postfix(self, mock_get):
 
         mock_get.return_value = 'path-to-config-viewer-host-directory'

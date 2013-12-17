@@ -22,7 +22,7 @@ from time import time
 from os import walk
 from os.path import join, getsize
 
-from config_rpm_maker.configuration import KEY_THREAD_COUNT
+from config_rpm_maker.configuration import get_thread_count
 
 LOGGER = getLogger(__name__)
 
@@ -80,7 +80,7 @@ def measure_execution_time(original_function):
 
 
 def log_execution_time_summaries(logging_function):
-    logging_function('Execution times summary (keep in mind thread_count was set to %s):', KEY_THREAD_COUNT())
+    logging_function('Execution times summary (keep in mind thread_count was set to %s):', get_thread_count())
 
     for function_name in sorted(_execution_time_summary.keys()):
         summary_of_function = _execution_time_summary[function_name]

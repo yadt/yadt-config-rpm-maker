@@ -70,7 +70,7 @@ class TokenReplacerTest(unittest.TestCase):
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@FOO@@@"})
         self.assertRaises(ContainsCyclesException, TokenReplacer, {"FOO": "@@@BAR@@@", "BAR": "@@@BLO@@@", "BLO": "@@@FOO@@@"})
 
-    @patch('config_rpm_maker.token.tokenreplacer.KEY_MAX_FILE_SIZE')
+    @patch('config_rpm_maker.token.tokenreplacer.get_max_file_size')
     @patch('config_rpm_maker.token.tokenreplacer.getsize')
     def test_should_not_filter_file_with_encoding_unknown_8bit(self, mock_get_size, mock_config):
 
@@ -85,7 +85,7 @@ class TokenReplacerTest(unittest.TestCase):
 
         self.assertEqual(0, mock_token_replacer._perform_filtering_on_file.call_count)
 
-    @patch('config_rpm_maker.token.tokenreplacer.KEY_MAX_FILE_SIZE')
+    @patch('config_rpm_maker.token.tokenreplacer.get_max_file_size')
     @patch('config_rpm_maker.token.tokenreplacer.getsize')
     def test_raise_exeception_when_file_limit_exceeded(self, mock_get_size, mock_config):
 

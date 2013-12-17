@@ -24,7 +24,7 @@ from unittest_support import UnitTests
 
 import config_rpm_maker
 
-from config_rpm_maker.configuration import KEY_CONFIG_VIEWER_ONLY, KEY_NO_CLEAN_UP
+from config_rpm_maker.configuration import is_config_viewer_only_enabled, is_no_clean_up_enabled
 from config_rpm_maker.hostrpmbuilder import CouldNotBuildRpmException, ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 
@@ -86,7 +86,7 @@ class ConstructorTests(TestCase):
 
         self.assertEqual(self.mock_svn_service_queue, self.mock_host_rpm_builder.svn_service_queue)
 
-    @patch('config_rpm_maker.hostrpmbuilder.KEY_CONFIG_RPM_PREFIX')
+    @patch('config_rpm_maker.hostrpmbuilder.get_config_rpm_prefix')
     def test_should_read_config_rpm_prefix_from_configuration(self, mock_config):
 
         mock_config.return_value = 'config-rpm-prefix'
@@ -401,7 +401,7 @@ class BuildTests(TestCase):
 
         self.mock_host_rpm_builder._build_rpm_using_rpmbuild.assert_called_with()
 
-    @patch('config_rpm_maker.hostrpmbuilder.KEY_CONFIG_VIEWER_ONLY')
+    @patch('config_rpm_maker.hostrpmbuilder.is_config_viewer_only_enabled')
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
     def test_should_not_build_rpm_using_rpmbuild(self, mock_exists, mock_mkdir, mock_get):
@@ -481,7 +481,7 @@ class BuildTests(TestCase):
         self.mock_host_rpm_builder._clean_up.assert_called_with()
 
 
-@patch('config_rpm_maker.hostrpmbuilder.KEY_NO_CLEAN_UP')
+@patch('config_rpm_maker.hostrpmbuilder.is_no_clean_up_enabled')
 @patch('config_rpm_maker.hostrpmbuilder.rmtree')
 @patch('config_rpm_maker.hostrpmbuilder.remove')
 class CleanUpTests(UnitTests):
@@ -554,7 +554,7 @@ class WriteRevisionFileForConfigViewerTests(TestCase):
         self.mock_host_rpm_builder._write_file.assert_called_with('config-viewer-host-dir/hostname.rev', '1234')
 
 
-@patch('config_rpm_maker.hostrpmbuilder.KEY_NO_CLEAN_UP')
+@patch('config_rpm_maker.hostrpmbuilder.is_no_clean_up_enabled')
 @patch('config_rpm_maker.hostrpmbuilder.Popen')
 @patch('config_rpm_maker.hostrpmbuilder.abspath')
 @patch('config_rpm_maker.hostrpmbuilder.environ')
