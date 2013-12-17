@@ -26,6 +26,7 @@ from config_rpm_maker.configuration.properties import *
 
 LOGGER = getLogger(__name__)
 
+
 MISSING_CONFIGURATION_FILE_MESSAGE = """Could not find configuration file "{configuration_file_path}"!
 
 Please provide "{default_path}" in the current working directory "{current_working_directory}"
@@ -250,7 +251,7 @@ def _ensure_is_a_string(key, value):
     value_type = type(value)
     if value_type is not str:
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
-                              % (key, str(value), value_type.__name__))
+                                     % (key, str(value), value_type.__name__))
 
     return value
 
@@ -261,7 +262,7 @@ def _ensure_is_an_integer(key, value):
     value_type = type(value)
     if value_type is not int:
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
-                              % (key, str(value), value_type.__name__))
+                                     % (key, str(value), value_type.__name__))
 
     return value
 
@@ -271,7 +272,7 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
     value_type = type(value)
     if value_type is not str:
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
-                              % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
+                                     % (KEY_REPO_PACKAGES_REGEX, str(value), value_type.__name__))
 
     try:
         compile(value)
@@ -289,7 +290,7 @@ def _ensure_is_a_string_or_none(key, value):
     value_type = type(value)
     if value_type is not str:
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
-                              % (key, str(value), value_type.__name__))
+                                     % (key, str(value), value_type.__name__))
 
     return value
 
@@ -299,12 +300,12 @@ def _ensure_is_a_list_of_strings(key, value):
     value_type = type(value)
     if value_type is not list:
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
-                              % (key, str(value), value_type.__name__))
+                                     % (key, str(value), value_type.__name__))
 
     for element in value:
         element_type = type(element)
         if element_type is not str:
             raise ConfigurationException('Configuration parameter "%s": invalid list "%s"  with element "%s" of type "%s"! Please use a list of strings.'
-                                  % (key, str(value), str(element), element_type.__name__))
+                                         % (key, str(value), str(element), element_type.__name__))
 
     return value

@@ -30,14 +30,14 @@ from tempfile import mkdtemp
 
 import configuration
 from config_rpm_maker.configuration import (KEY_ERROR_LOG_URL,
-                                     KEY_MAX_FAILED_HOSTS,
-                                     KEY_NO_CLEAN_UP,
-                                     KEY_RPM_UPLOAD_COMMAND,
-                                     KEY_RPM_UPLOAD_CHUNK_SIZE,
-                                     KEY_THREAD_COUNT,
-                                     KEY_TEMPORARY_DIRECTORY,
-                                     KEY_VERBOSE,
-                                     build_config_viewer_host_directory)
+                                            KEY_MAX_FAILED_HOSTS,
+                                            KEY_NO_CLEAN_UP,
+                                            KEY_RPM_UPLOAD_COMMAND,
+                                            KEY_RPM_UPLOAD_CHUNK_SIZE,
+                                            KEY_THREAD_COUNT,
+                                            KEY_TEMPORARY_DIRECTORY,
+                                            KEY_VERBOSE,
+                                            build_config_viewer_host_directory)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.utilities.logutils import log_elements_of_list
