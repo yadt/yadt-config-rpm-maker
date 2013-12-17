@@ -14,66 +14,25 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-DEFAULT_ALLOW_UNKNOWN_HOSTS = True
-KEY_ALLOW_UNKNOWN_HOSTS = 'allow_unknown_hosts'
+from config_rpm_maker.configuration import ConfigurationProperty
 
-KEY_CONFIG_VIEWER_HOSTS_DIR = 'config_viewer_hosts_dir'
-DEFAULT_CONFIG_VIEWER_DIR = '/tmp'
-
-DEFAULT_CONFIG_VIEWER_ONLY = False
-KEY_CONFIG_VIEWER_ONLY = 'config_viewer_only'
-
-DEFAULT_CONFIG_RPM_PREFIX = 'yadt-config-'
-KEY_CONFIG_RPM_PREFIX = 'config_rpm_prefix'
-
-DEFAULT_CUSTOM_DNS_SEARCHLIST = []
-KEY_CUSTOM_DNS_SEARCHLIST = 'custom_dns_searchlist'
-
-DEFAULT_ERROR_LOG_URL = ''
-KEY_ERROR_LOG_URL = 'error_log_url'
-
-DEFAULT_ERROR_LOG_DIRECTORY = ""
-KEY_ERROR_LOG_DIRECTORY = 'error_log_dir'
-
-DEFAULT_MAX_FAILED_HOSTS = 3
-KEY_MAX_FAILED_HOSTS = 'max_failed_hosts'
-
-DEFAULT_MAX_FILE_SIZE = 100 * 1024
-KEY_MAX_FILE_SIZE = 'max_file_size'
-
-DEFAULT_LOG_FORMAT = "[%(levelname)5s] %(message)s"
-KEY_LOG_FORMAT = "log_format"
-
-DEFAULT_LOG_LEVEL = 'DEBUG'
-KEY_LOG_LEVEL = "log_level"
-
-DEFAULT_NO_CLEAN_UP = False
-KEY_NO_CLEAN_UP = 'no_clean_up'
-
-DEFAULT_PATH_TO_SPEC_FILE = 'default.spec'
-KEY_PATH_TO_SPEC_FILE = 'path_to_spec_file'
-
-DEFAULT_REPO_PACKAGES_REGEX = '.*-repo.*'
-KEY_REPO_PACKAGES_REGEX = 'repo_packages_regex'
-
-DEFAULT_RPM_UPLOAD_CHUNK_SIZE = 10
-KEY_RPM_UPLOAD_CHUNK_SIZE = 'rpm_upload_chunk_size'
-
-DEFAULT_RPM_UPLOAD_COMMAND = None
-KEY_RPM_UPLOAD_COMMAND = 'rpm_upload_cmd'
-
-DEFAULT_SVN_PATH_TO_CONFIG = '/config'
-KEY_SVN_PATH_TO_CONFIG = 'svn_path_to_config'
-
-DEFAULT_THREAD_COUNT = 1
-KEY_THREAD_COUNT = 'thread_count'
-
-DEFAULT_TEMP_DIR = '/tmp'
-KEY_TEMP_DIR = 'temp_dir'
-
-DEFAULT_VERBOSE = False
-KEY_VERBOSE = 'verbose'
-
-KEY_SVN_PATH_TO_CONFIGURATION = 'svn_path_to_config'
-
-KEY_TEMPORARY_DIRECTORY = "temp_dir"
+KEY_ALLOW_UNKNOWN_HOSTS = ConfigurationProperty(key='allow_unknown_hosts', default=True)
+KEY_CONFIG_VIEWER_HOSTS_DIR = ConfigurationProperty(key='config_viewer_hosts_dir', default='/tmp')
+KEY_CONFIG_VIEWER_ONLY = ConfigurationProperty(key='config_viewer_only', default=False)
+KEY_CONFIG_RPM_PREFIX = ConfigurationProperty(key='config_rpm_prefix', default='yadt-config-')
+KEY_CUSTOM_DNS_SEARCHLIST = ConfigurationProperty(key='custom_dns_searchlist', default=[])
+KEY_ERROR_LOG_URL = ConfigurationProperty(key='error_log_url', default='')
+KEY_ERROR_LOG_DIRECTORY = ConfigurationProperty(key='error_log_dir', default="")
+KEY_MAX_FAILED_HOSTS = ConfigurationProperty(key='max_failed_hosts', default=3)
+KEY_MAX_FILE_SIZE = ConfigurationProperty(key='max_file_size', default=100 * 1024)
+KEY_LOG_FORMAT = ConfigurationProperty(key="log_format", default="[%(levelname)5s] %(message)s")
+KEY_LOG_LEVEL = ConfigurationProperty(key="log_level", default='DEBUG')
+KEY_NO_CLEAN_UP = ConfigurationProperty(key='no_clean_up', default=False)
+KEY_PATH_TO_SPEC_FILE = ConfigurationProperty(key='path_to_spec_file', default='default.spec')
+KEY_REPO_PACKAGES_REGEX = ConfigurationProperty(key='repo_packages_regex', default='.*-repo.*')
+KEY_RPM_UPLOAD_CHUNK_SIZE = ConfigurationProperty(key='rpm_upload_chunk_size', default=10)
+KEY_RPM_UPLOAD_COMMAND = ConfigurationProperty(key='rpm_upload_cmd', default=None)
+KEY_SVN_PATH_TO_CONFIG = ConfigurationProperty(key='svn_path_to_config', default='/config')
+KEY_THREAD_COUNT = ConfigurationProperty(key='thread_count', default=1)
+KEY_TEMPORARY_DIRECTORY = ConfigurationProperty(key='temp_dir', default='/tmp')
+KEY_VERBOSE = ConfigurationProperty(key='verbose', default=False)

@@ -22,7 +22,6 @@ from logging import DEBUG, ERROR, INFO, getLogger
 from re import compile
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.configuration.properties import *
 
 LOGGER = getLogger(__name__)
 
@@ -46,6 +45,17 @@ _file_path_of_loaded_configuration = None
 
 class ConfigurationException(BaseConfigRpmMakerException):
     error_info = "Configuration Error:\n"
+
+
+class ConfigurationProperty(object):
+
+    def __init__(self, key, default, validator=None):
+        self.key = key
+        self.default = default
+        self.validator = validator
+
+
+from config_rpm_maker.configuration.properties import *
 
 
 def load_configuration_file():
@@ -171,43 +181,43 @@ def _ensure_properties_are_valid(raw_properties):
         LOGGER.warn("Loaded configuration properties are empty.")
         raw_properties = {}
 
-    allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS, DEFAULT_ALLOW_UNKNOWN_HOSTS)
-    config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX, DEFAULT_CONFIG_RPM_PREFIX)
-    config_viewer_hosts_dir = raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR, DEFAULT_CONFIG_VIEWER_DIR)
-    custom_dns_searchlist = raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST, DEFAULT_CUSTOM_DNS_SEARCHLIST)
-    error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY, DEFAULT_ERROR_LOG_DIRECTORY)
-    error_log_url = raw_properties.get(KEY_ERROR_LOG_URL, DEFAULT_ERROR_LOG_URL)
-    log_level = raw_properties.get(KEY_LOG_LEVEL, DEFAULT_LOG_LEVEL)
-    max_file_size = raw_properties.get(KEY_MAX_FILE_SIZE, DEFAULT_MAX_FILE_SIZE)
-    max_failed_hosts = raw_properties.get(KEY_MAX_FAILED_HOSTS, DEFAULT_MAX_FAILED_HOSTS)
-    path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE, DEFAULT_PATH_TO_SPEC_FILE)
-    repo_packages_regex = raw_properties.get(KEY_REPO_PACKAGES_REGEX, DEFAULT_REPO_PACKAGES_REGEX)
-    rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE, DEFAULT_RPM_UPLOAD_CHUNK_SIZE)
-    rpm_upload_command = raw_properties.get(KEY_RPM_UPLOAD_COMMAND, DEFAULT_RPM_UPLOAD_COMMAND)
-    svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG, DEFAULT_SVN_PATH_TO_CONFIG)
-    temporary_directory = raw_properties.get(KEY_TEMP_DIR, DEFAULT_TEMP_DIR)
-    thread_count = raw_properties.get(KEY_THREAD_COUNT, DEFAULT_THREAD_COUNT)
+    allow_unknown_hosts = raw_properties.get(KEY_ALLOW_UNKNOWN_HOSTS.key, KEY_ALLOW_UNKNOWN_HOSTS.default)
+    config_rpm_prefix = raw_properties.get(KEY_CONFIG_RPM_PREFIX.key, KEY_CONFIG_RPM_PREFIX.default)
+    config_viewer_hosts_dir = raw_properties.get(KEY_CONFIG_VIEWER_HOSTS_DIR.key, KEY_CONFIG_VIEWER_HOSTS_DIR.default)
+    custom_dns_searchlist = raw_properties.get(KEY_CUSTOM_DNS_SEARCHLIST.key, KEY_CUSTOM_DNS_SEARCHLIST.default)
+    error_log_directory = raw_properties.get(KEY_ERROR_LOG_DIRECTORY.key, KEY_ERROR_LOG_DIRECTORY.default)
+    error_log_url = raw_properties.get(KEY_ERROR_LOG_URL.key, KEY_ERROR_LOG_URL.default)
+    log_level = raw_properties.get(KEY_LOG_LEVEL.key, KEY_LOG_LEVEL.default)
+    max_file_size = raw_properties.get(KEY_MAX_FILE_SIZE.key, KEY_MAX_FILE_SIZE.default)
+    max_failed_hosts = raw_properties.get(KEY_MAX_FAILED_HOSTS.key, KEY_MAX_FAILED_HOSTS.default)
+    path_to_spec_file = raw_properties.get(KEY_PATH_TO_SPEC_FILE.key, KEY_PATH_TO_SPEC_FILE.default)
+    repo_packages_regex = raw_properties.get(KEY_REPO_PACKAGES_REGEX.key, KEY_REPO_PACKAGES_REGEX.default)
+    rpm_upload_chunk_size = raw_properties.get(KEY_RPM_UPLOAD_CHUNK_SIZE.key, KEY_RPM_UPLOAD_CHUNK_SIZE.default)
+    rpm_upload_command = raw_properties.get(KEY_RPM_UPLOAD_COMMAND.key, KEY_RPM_UPLOAD_COMMAND.default)
+    svn_path_to_config = raw_properties.get(KEY_SVN_PATH_TO_CONFIG.key, KEY_SVN_PATH_TO_CONFIG.default)
+    temporary_directory = raw_properties.get(KEY_TEMPORARY_DIRECTORY.key, KEY_TEMPORARY_DIRECTORY.default)
+    thread_count = raw_properties.get(KEY_THREAD_COUNT.key, KEY_THREAD_COUNT.default)
 
     valid_properties = {
         KEY_LOG_LEVEL: _ensure_valid_log_level(log_level),
         KEY_ALLOW_UNKNOWN_HOSTS: _ensure_is_a_boolean_value(KEY_ALLOW_UNKNOWN_HOSTS, allow_unknown_hosts),
         KEY_CONFIG_RPM_PREFIX: _ensure_is_a_string(KEY_CONFIG_RPM_PREFIX, config_rpm_prefix),
-        KEY_CONFIG_VIEWER_ONLY: DEFAULT_CONFIG_VIEWER_ONLY,
+        KEY_CONFIG_VIEWER_ONLY: KEY_CONFIG_VIEWER_ONLY.default,
         KEY_CONFIG_VIEWER_HOSTS_DIR: _ensure_is_a_string(KEY_CONFIG_VIEWER_HOSTS_DIR, config_viewer_hosts_dir),
         KEY_CUSTOM_DNS_SEARCHLIST: _ensure_is_a_list_of_strings(KEY_CUSTOM_DNS_SEARCHLIST, custom_dns_searchlist),
         KEY_ERROR_LOG_DIRECTORY: _ensure_is_a_string(KEY_ERROR_LOG_DIRECTORY, error_log_directory),
         KEY_ERROR_LOG_URL: _ensure_is_a_string(KEY_ERROR_LOG_URL, error_log_url),
         KEY_MAX_FAILED_HOSTS: _ensure_is_an_integer(KEY_MAX_FAILED_HOSTS, max_failed_hosts),
         KEY_MAX_FILE_SIZE: _ensure_is_an_integer(KEY_MAX_FILE_SIZE, max_file_size),
-        KEY_NO_CLEAN_UP: DEFAULT_NO_CLEAN_UP,
+        KEY_NO_CLEAN_UP: KEY_NO_CLEAN_UP.default,
         KEY_PATH_TO_SPEC_FILE: _ensure_is_a_string(KEY_PATH_TO_SPEC_FILE, path_to_spec_file),
         KEY_REPO_PACKAGES_REGEX: _ensure_repo_packages_regex_is_a_valid_regular_expression(repo_packages_regex),
         KEY_RPM_UPLOAD_CHUNK_SIZE: _ensure_is_an_integer(KEY_RPM_UPLOAD_CHUNK_SIZE, rpm_upload_chunk_size),
         KEY_RPM_UPLOAD_COMMAND: _ensure_is_a_string_or_none(KEY_RPM_UPLOAD_COMMAND, rpm_upload_command),
-        KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIGURATION, svn_path_to_config),
+        KEY_SVN_PATH_TO_CONFIG: _ensure_is_a_string(KEY_SVN_PATH_TO_CONFIG, svn_path_to_config),
         KEY_THREAD_COUNT: _ensure_is_an_integer(KEY_THREAD_COUNT, thread_count),
-        KEY_TEMP_DIR: _ensure_is_a_string(KEY_TEMP_DIR, temporary_directory),
-        KEY_VERBOSE: DEFAULT_VERBOSE
+        KEY_TEMPORARY_DIRECTORY: _ensure_is_a_string(KEY_TEMPORARY_DIRECTORY, temporary_directory),
+        KEY_VERBOSE: KEY_VERBOSE.default
     }
 
     unknown_configuration_properties = set(raw_properties.keys()) - set(valid_properties.keys())

@@ -37,12 +37,12 @@ from config_rpm_maker.configuration import (ConfigurationException,
                                             KEY_MAX_FAILED_HOSTS,
                                             KEY_MAX_FILE_SIZE,
                                             KEY_PATH_TO_SPEC_FILE,
+                                            KEY_SVN_PATH_TO_CONFIG,
                                             KEY_REPO_PACKAGES_REGEX,
                                             KEY_RPM_UPLOAD_CHUNK_SIZE,
                                             KEY_RPM_UPLOAD_COMMAND,
-                                            KEY_SVN_PATH_TO_CONFIGURATION,
                                             KEY_THREAD_COUNT,
-                                            KEY_TEMP_DIR,
+                                            KEY_TEMPORARY_DIRECTORY,
                                             KEY_VERBOSE,
                                             build_config_viewer_host_directory,
                                             get_file_path_of_loaded_configuration,
@@ -403,8 +403,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid svn path', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
-        mock_ensure_is_a_string.assert_any_call(KEY_SVN_PATH_TO_CONFIGURATION, '/configuration')
+        self.assertEqual('a valid svn path', actual_properties[KEY_SVN_PATH_TO_CONFIG])
+        mock_ensure_is_a_string.assert_any_call(KEY_SVN_PATH_TO_CONFIG, '/configuration')
 
     def test_should_return_default_for_svn_path_to_config_if_not_defined(self):
 
@@ -412,7 +412,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/config', actual_properties[KEY_SVN_PATH_TO_CONFIGURATION])
+        self.assertEqual('/config', actual_properties[KEY_SVN_PATH_TO_CONFIG])
 
     @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_thread_count(self, mock_ensure_is_an_integer):
@@ -441,8 +441,8 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('a valid temporary directory', actual_properties[KEY_TEMP_DIR])
-        mock_ensure_is_a_string.assert_any_call(KEY_TEMP_DIR, 'target/tmp')
+        self.assertEqual('a valid temporary directory', actual_properties[KEY_TEMPORARY_DIRECTORY])
+        mock_ensure_is_a_string.assert_any_call(KEY_TEMPORARY_DIRECTORY, 'target/tmp')
 
     def test_should_return_default_for_temp_dir_if_not_defined(self):
 
@@ -450,7 +450,7 @@ class EnsurePropertiesAreValidTest(TestCase):
 
         actual_properties = _ensure_properties_are_valid(properties)
 
-        self.assertEqual('/tmp', actual_properties[KEY_TEMP_DIR])
+        self.assertEqual('/tmp', actual_properties[KEY_TEMPORARY_DIRECTORY])
 
     @patch('config_rpm_maker.configuration._ensure_is_a_string')
     def test_should_return_config_viewer_hosts_dir(self, mock_ensure_is_a_string):

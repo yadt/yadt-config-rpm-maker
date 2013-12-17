@@ -27,7 +27,12 @@ from shutil import rmtree
 from subprocess import PIPE, Popen
 
 from config_rpm_maker import configuration
-from config_rpm_maker.configuration import KEY_NO_CLEAN_UP, KEY_LOG_LEVEL, KEY_REPO_PACKAGES_REGEX, KEY_CONFIG_RPM_PREFIX, build_config_viewer_host_directory
+from config_rpm_maker.configuration import (KEY_NO_CLEAN_UP,
+                                            KEY_LOG_LEVEL,
+                                            KEY_REPO_PACKAGES_REGEX,
+                                            KEY_CONFIG_RPM_PREFIX,
+                                            KEY_PATH_TO_SPEC_FILE,
+                                            build_config_viewer_host_directory)
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 from config_rpm_maker.hostresolver import HostResolver
@@ -342,7 +347,7 @@ Change set:
     def _export_spec_file(self):
         svn_service = self._get_next_svn_service_from_queue()
         try:
-            svn_service.export(configuration.get_property('path_to_spec_file'), self.spec_file_path, self.revision)
+            svn_service.export(configuration.get_property(KEY_PATH_TO_SPEC_FILE), self.spec_file_path, self.revision)
         finally:
             self.svn_service_queue.put(svn_service)
             self.svn_service_queue.task_done()

@@ -20,8 +20,17 @@ import rpm
 
 from integration_test_support import IntegrationTest, IntegrationTestException
 
-from config_rpm_maker.configrpmmaker import CouldNotBuildSomeRpmsException, CouldNotUploadRpmsException, ConfigRpmMaker, configuration
-from config_rpm_maker.configuration import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG, KEY_RPM_UPLOAD_COMMAND, build_config_viewer_host_directory
+from config_rpm_maker.configrpmmaker import (CouldNotBuildSomeRpmsException,
+                                             CouldNotUploadRpmsException,
+                                             ConfigRpmMaker,
+                                             configuration)
+from config_rpm_maker.configuration import (KEY_NO_CLEAN_UP,
+                                            KEY_SVN_PATH_TO_CONFIG,
+                                            KEY_RPM_UPLOAD_COMMAND,
+                                            KEY_CONFIG_RPM_PREFIX,
+                                            KEY_TEMPORARY_DIRECTORY,
+                                            KEY_RPM_UPLOAD_COMMAND,
+                                            build_config_viewer_host_directory)
 from config_rpm_maker.segment import All, Typ
 from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker import configuration as config_dev  # TODO: WTF? config has been imported twice ...
@@ -105,21 +114,21 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             self.assertRpm(host, rpms, requires=requires, provides=provides, files=files)
 
     def test_should_perform_chunked_uploads(self):
-        old_config = configuration.get_property('rpm_upload_cmd')
-        target_file = os.path.abspath(os.path.join(configuration.get_property('temp_dir'), 'upload.txt'))
+        old_config = configuration.get_property(KEY_RPM_UPLOAD_COMMAND)
+        target_file = os.path.abspath(os.path.join(configuration.get_property(KEY_TEMPORARY_DIRECTORY), 'upload.txt'))
         if os.path.exists(target_file):
             os.remove(target_file)
-        cmd_file = os.path.abspath(os.path.join(configuration.get_property('temp_dir'), 'upload.sh'))
+        cmd_file = os.path.abspath(os.path.join(configuration.get_property(KEY_TEMPORARY_DIRECTORY), 'upload.sh'))
         with open(cmd_file, 'w') as f:
             f.write('#!/bin/bash\ndest=$1 ; shift ; echo "${#@} $@" >> "$dest"')
 
         os.chmod(cmd_file, 0755)
         cmd = '%s %s' % (cmd_file, target_file)
-        configuration.set_property('rpm_upload_cmd', cmd)
+        configuration.set_property(KEY_RPM_UPLOAD_COMMAND, cmd)
         try:
             ConfigRpmMaker(None, None)._upload_rpms(['a' for x in range(25)])
         finally:
-            configuration.set_property('rpm_upload_cmd', old_config)
+            configuration.set_property(KEY_RPM_UPLOAD_COMMAND, old_config)
 
         self.assertTrue(os.path.exists(target_file))
         with open(target_file) as f:
@@ -181,7 +190,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)
-            if name.startswith(config_dev.get_property('config_rpm_prefix') + hostname) and 'noarch' in name and not 'repos' in name:
+            if name.startswith(config_dev.get_property(KEY_CONFIG_RPM_PREFIX) + hostname) and 'noarch' in name and not 'repos' in name:
                 path = rpm_name
                 break
 
@@ -235,7 +244,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assertEqual(expected, actual, "Lists are different.\nExpected: %s\n     Got: %s\ndifference is: %s" % (str(expected), str(actual), str(difference)))
 
     def extractRpmFiles(self, path, hostname):
-        extract_path = os.path.join(config_dev.get_property('temp_dir'), hostname + '.extract')
+        extract_path = os.path.join(config_dev.get_property(KEY_TEMPORARY_DIRECTORY), hostname + '.extract')
         os.mkdir(extract_path)
 
         command_with_arguments = 'rpm2cpio ' + os.path.abspath(path) + ' | cpio  -idmv'

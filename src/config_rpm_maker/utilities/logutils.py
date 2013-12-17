@@ -18,7 +18,7 @@ from logging import DEBUG, Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
-from config_rpm_maker.configuration import DEFAULT_LOG_FORMAT, KEY_VERBOSE
+from config_rpm_maker.configuration import KEY_LOG_FORMAT, KEY_VERBOSE
 from config_rpm_maker.configuration import get_property, get_properties, get_file_path_of_loaded_configuration
 
 
@@ -58,7 +58,7 @@ def verbose(logger):
 
 def create_console_handler(log_level):
     """ Returnes a root_logger which logs to the console using the given log_level. """
-    formatter = Formatter(DEFAULT_LOG_FORMAT)
+    formatter = Formatter(KEY_LOG_FORMAT.default)
 
     console_handler = StreamHandler()
     console_handler.setFormatter(formatter)
@@ -84,17 +84,17 @@ def log_configuration(logging_function, configuration, path):
 
     logging_function('Loaded configuration file "%s"', path)
 
-    keys = sorted(configuration.keys())
-    if len(keys) == 0:
+    properties = sorted(configuration.keys())
+    if len(properties) == 0:
         logging_function('Configuration file was empty!')
         return
 
-    max_length = len(max(keys, key=len)) + 2  # two is for quotes on left and right side
+    max_length = len(max(properties, key=lambda property: len(property.key)).key) + 2  # two is for quotes on left and right side
 
-    for key in keys:
-        indentet_key = ('"%s"' % key).ljust(max_length)
-        value = configuration[key]
-        logging_function('Configuration property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
+    for property in properties:
+        indented_key = ('"%s"' % property.key).ljust(max_length)
+        value = configuration[property]
+        logging_function('Configuration property %s = "%s" (%s)', indented_key, value, type(value).__name__)
 
 
 def log_elements_of_list(logging_function, summary_message, unsorted_list):

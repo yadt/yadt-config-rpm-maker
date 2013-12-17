@@ -30,6 +30,7 @@ from tempfile import mkdtemp
 
 import configuration
 from config_rpm_maker.configuration import (KEY_ERROR_LOG_URL,
+                                            KEY_ERROR_LOG_DIRECTORY,
                                             KEY_MAX_FAILED_HOSTS,
                                             KEY_NO_CLEAN_UP,
                                             KEY_RPM_UPLOAD_COMMAND,
@@ -184,7 +185,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         return configuration.get_property(KEY_NO_CLEAN_UP)
 
     def _move_error_log_for_public_access(self):
-        error_log_dir = os.path.join(configuration.get_property('error_log_dir'))
+        error_log_dir = os.path.join(configuration.get_property(KEY_ERROR_LOG_DIRECTORY))
         if error_log_dir:
             if not os.path.exists(error_log_dir):
                 os.makedirs(error_log_dir)

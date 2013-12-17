@@ -21,6 +21,8 @@ from unittest import TestCase
 
 from mock import Mock, call, patch
 
+from config_rpm_maker.configuration.properties import KEY_VERBOSE
+from config_rpm_maker.configuration import ConfigurationProperty
 from config_rpm_maker.utilities.logutils import (SYS_LOG_LEVEL,
                                                  MutedLogger,
                                                  append_console_logger,
@@ -105,6 +107,7 @@ class CreateSysLogHandlerTests(TestCase):
 class LogConfigurationTests(TestCase):
 
     def setUp(self):
+        self.configuration_property = ConfigurationProperty(key='property', default='default')
         self.mock_log = Mock()
 
     def test_should_log_given_path(self):
@@ -121,35 +124,38 @@ class LogConfigurationTests(TestCase):
 
     def test_should_log_given_string_configuration_property(self):
 
-        log_configuration(self.mock_log, {'property': '123'}, 'configuration_file.yaml')
+        log_configuration(self.mock_log, {self.configuration_property: '123'}, 'configuration_file.yaml')
 
         self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', '123', 'str')
 
     def test_should_log_given_boolean_configuration_property(self):
 
-        log_configuration(self.mock_log, {'property': True}, 'configuration_file.yaml')
+        log_configuration(self.mock_log, {self.configuration_property: True}, 'configuration_file.yaml')
 
         self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', True, 'bool')
 
     def test_should_log_given_integer_configuration_property(self):
 
-        log_configuration(self.mock_log, {'property': 123}, 'configuration_file.yaml')
+        log_configuration(self.mock_log, {self.configuration_property: 123}, 'configuration_file.yaml')
 
         self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', 123, 'int')
 
     def test_should_log_given_configuration_properties_in_alphabetical_order(self):
 
-        configuration = {'a_property': 123,
-                         'b_property': False,
-                         'c_property': 'hello world'}
+        property_a = ConfigurationProperty(key='a_property', default=123)
+        property_b = ConfigurationProperty(key='b_property', default=123)
+        property_c = ConfigurationProperty(key='c_property', default=123)
+
+        configuration = {property_a: 123,
+                         property_b: False,
+                         property_c: 'hello world'}
 
         log_configuration(self.mock_log, configuration, 'configuration_file.yaml')
 
-        self.assertEqual([call('Loaded configuration file "%s"', 'configuration_file.yaml'),
-                          call('Configuration property %s = "%s" (%s)', '"a_property"', 123, 'int'),
-                          call('Configuration property %s = "%s" (%s)', '"b_property"', False, 'bool'),
-                          call('Configuration property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')],
-                         self.mock_log.call_args_list)
+        self.mock_log.assert_any_call('Loaded configuration file "%s"', 'configuration_file.yaml')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"a_property"', 123, 'int')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"b_property"', False, 'bool')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')
 
 
 class LogElementsOfListTests(TestCase):
@@ -264,7 +270,7 @@ class VerboseTests(TestCase):
         verbose(mock_logger).info("Hello")
 
         mock_logger.info.assert_called_with("Hello")
-        mock_get.assert_called_with('verbose')
+        mock_get.assert_called_with(KEY_VERBOSE)
 
     @patch('config_rpm_maker.utilities.logutils._muted_logger')
     @patch('config_rpm_maker.utilities.logutils.get_property')
@@ -276,7 +282,7 @@ class VerboseTests(TestCase):
         verbose(mock_logger).info("Hello")
 
         mock_muted_logger.info.assert_called_with("Hello")
-        mock_get.assert_called_with('verbose')
+        mock_get.assert_called_with(KEY_VERBOSE)
 
 
 class AppendConsoleLoggerTests(TestCase):

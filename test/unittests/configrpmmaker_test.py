@@ -19,6 +19,7 @@ from mock import Mock, call, patch
 from Queue import Queue
 
 from unittest_support import UnitTests
+from config_rpm_maker.configuration import KEY_MAX_FAILED_HOSTS
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 
 
@@ -469,7 +470,7 @@ class NotifyThatHostBuildFailedTest(UnitTests):
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         self.assert_mock_never_called(mock_config_rpm_maker.host_queue.queue.clear)
-        mock_config.get_property.assert_called_with('max_failed_hosts')
+        mock_config.get_property.assert_called_with(KEY_MAX_FAILED_HOSTS)
 
     @patch('config_rpm_maker.configrpmmaker.configuration')
     def test_should_clear_hosts_queue_when_more_than_maximum_hosts_maximum_of_failed_hosts(self, mock_config):
@@ -486,7 +487,7 @@ class NotifyThatHostBuildFailedTest(UnitTests):
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
-        mock_config.get_property.assert_called_with('max_failed_hosts')
+        mock_config.get_property.assert_called_with(KEY_MAX_FAILED_HOSTS)
 
     @patch('config_rpm_maker.configrpmmaker.configuration')
     def test_should_clear_hosts_queue_when_maximum_of_failed_hosts_reached(self, mock_config):
@@ -502,4 +503,4 @@ class NotifyThatHostBuildFailedTest(UnitTests):
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
-        mock_config.get_property.assert_called_with('max_failed_hosts')
+        mock_config.get_property.assert_called_with(KEY_MAX_FAILED_HOSTS)
