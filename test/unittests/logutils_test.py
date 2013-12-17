@@ -22,13 +22,14 @@ from unittest import TestCase
 from mock import Mock, call, patch
 
 from config_rpm_maker.utilities.logutils import (SYS_LOG_LEVEL,
-                                       MutedLogger,
-                                       create_console_handler,
-                                       create_sys_log_handler,
-                                       log_configuration,
-                                       log_elements_of_list,
-                                       log_process_id,
-                                       verbose)
+                                                 MutedLogger,
+                                                 append_console_logger,
+                                                 create_console_handler,
+                                                 create_sys_log_handler,
+                                                 log_configuration,
+                                                 log_elements_of_list,
+                                                 log_process_id,
+                                                 verbose)
 
 
 @patch('config_rpm_maker.utilities.logutils.StreamHandler')
@@ -276,3 +277,25 @@ class VerboseTests(TestCase):
 
         mock_muted_logger.info.assert_called_with("Hello")
         mock_get.assert_called_with('verbose')
+
+class AppendConsoleLoggerTests(TestCase):
+
+    @patch('config_rpm_maker.utilities.logutils.create_console_handler')
+    def test_should_create_console_logger_using_the_given_log_level(self, mock_create_console_handler):
+
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_create_console_handler.assert_called_with('log level')
+
+    @patch('config_rpm_maker.utilities.logutils.create_console_handler')
+    def test_should_append_created_log_handler_to_given_logger(self, mock_create_console_handler):
+
+        mock_handler = Mock()
+        mock_create_console_handler.return_value = mock_handler
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_logger.addHandler(mock_handler)

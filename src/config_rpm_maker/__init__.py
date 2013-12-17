@@ -33,16 +33,20 @@ from config_rpm_maker.cli.parsearguments import (ARGUMENT_REPOSITORY,
                                                  ARGUMENT_REVISION,
                                                  OPTION_DEBUG,
                                                  OPTION_NO_SYSLOG,
-                                                 parse_arguments,
-                                                 apply_arguments_to_config)
+                                                 apply_arguments_to_config,
+                                                 determine_console_log_level,
+                                                 parse_arguments)
 from config_rpm_maker.configuration import KEY_SVN_PATH_TO_CONFIG, ConfigurationException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.utilities.logutils import (create_console_handler,
-                                       create_sys_log_handler,
-                                       log_configuration,
-                                       log_process_id)
+from config_rpm_maker.utilities.logutils import (append_console_logger,
+                                                 create_console_handler,
+                                                 create_sys_log_handler,
+                                                 log_configuration,
+                                                 log_process_id,
+                                                 log_additional_information,
+                                                 log_exception_message)
 from config_rpm_maker.svnservice import SvnService
 
 LOGGER = getLogger(__name__)
@@ -124,32 +128,3 @@ def building_configuration_rpms_and_clean_host_directories(repository, revision)
     svn_service.log_change_set_meta_information(revision)
     ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
     clean_up_deleted_hosts_data(svn_service, revision)
-
-
-def determine_console_log_level(arguments):
-    """ Determines the log level based on arguments and configuration """
-    if arguments[OPTION_DEBUG]:
-        return DEBUG
-
-    return INFO
-
-
-def append_console_logger(logger, console_log_level):
-    """ Creates and appends a console log handler with the given log level """
-    console_handler = create_console_handler(console_log_level)
-    logger.addHandler(console_handler)
-
-    if console_log_level == DEBUG:
-        logger.debug("DEBUG logging is enabled")
-
-
-def log_additional_information():
-    """ Logs additional information as the process id and the configuration. """
-    log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, configuration.get_properties(), configuration.get_file_path_of_loaded_configuration())
-
-
-def log_exception_message(message):
-    """ Logs the given multiline message line by line. """
-    for line in str(message).split("\n"):
-        LOGGER.error(line)

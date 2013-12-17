@@ -16,12 +16,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from logging import DEBUG, INFO
 from mock import patch, Mock
 from unittest import TestCase
 
 from config_rpm_maker.configuration import KEY_CONFIG_VIEWER_ONLY, KEY_RPM_UPLOAD_COMMAND, KEY_VERBOSE, KEY_NO_CLEAN_UP
 from config_rpm_maker.cli.parsearguments import USAGE_INFORMATION, OPTION_CONFIG_VIEWER_ONLY, OPTION_RPM_UPLOAD_CMD, OPTION_VERBOSE, OPTION_NO_CLEAN_UP
-from config_rpm_maker.cli.parsearguments import apply_arguments_to_config, parse_arguments
+from config_rpm_maker.cli.parsearguments import apply_arguments_to_config, parse_arguments, determine_console_log_level
 
 
 class ParseArgumentsTests(TestCase):
@@ -174,3 +175,22 @@ class ApplyArgumentsToConfiguration(TestCase):
         apply_arguments_to_config(self.arguments)
 
         mock_set_property.assert_any_call(KEY_NO_CLEAN_UP, True)
+
+
+class DetermineConsoleLogLevelTests(TestCase):
+
+    def test_should_return_debug_when_debug_option_is_given(self):
+
+        fake_arguments = {'--debug': True}
+
+        actual = determine_console_log_level(fake_arguments)
+
+        self.assertEqual(DEBUG, actual)
+
+    def test_should_return_info_when_no_debug_option_is_given(self):
+
+        fake_arguments = {'--debug': False}
+
+        actual = determine_console_log_level(fake_arguments)
+
+        self.assertEqual(INFO, actual)

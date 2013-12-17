@@ -18,7 +18,8 @@ from logging import DEBUG, Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
-from config_rpm_maker.configuration import DEFAULT_LOG_FORMAT, KEY_VERBOSE, get_property
+from config_rpm_maker.configuration import DEFAULT_LOG_FORMAT, KEY_VERBOSE
+from config_rpm_maker.configuration import get_property, get_properties, get_file_path_of_loaded_configuration
 
 
 LOGGER = getLogger(__name__)
@@ -116,3 +117,24 @@ def log_process_id(logging_function):
     """ Calls the given logging function to log the current process id """
     process_id = getpid()
     logging_function("Process ID is %s", process_id)
+
+
+def append_console_logger(logger, console_log_level):
+    """ Creates and appends a console log handler with the given log level """
+    console_handler = create_console_handler(console_log_level)
+    logger.addHandler(console_handler)
+
+    if console_log_level == DEBUG:
+        logger.debug("DEBUG logging is enabled")
+
+
+def log_additional_information():
+    """ Logs additional information as the process id and the configuration. """
+    log_process_id(LOGGER.info)
+    log_configuration(LOGGER.debug, get_properties(), get_file_path_of_loaded_configuration())
+
+
+def log_exception_message(message):
+    """ Logs the given multiline message line by line. """
+    for line in str(message).split("\n"):
+        LOGGER.error(line)

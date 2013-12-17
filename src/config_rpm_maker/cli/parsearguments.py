@@ -16,6 +16,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from logging import DEBUG, INFO
 from optparse import OptionParser
 from sys import stdout, exit
 
@@ -128,3 +129,13 @@ def apply_arguments_to_config(arguments):
 
     if arguments[OPTION_VERBOSE]:
         set_property(KEY_VERBOSE, arguments[OPTION_VERBOSE])
+
+
+def determine_console_log_level(arguments):
+    """ Determines the log level based on arguments and configuration """
+    if arguments[OPTION_DEBUG]:
+        return DEBUG
+
+    return INFO
+
+
