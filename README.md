@@ -104,9 +104,10 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 `yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
 
-We recommend to develop in a vagrant box. Read our tutorial "[How to develop in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
+We recommend to develop in a vagrant box. Read our tutorial
+"[Build and install in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
 
-But of course you can set up a development environment on other platforms as well:
+Of course you can set up a development environment on other platforms too:
 * [How to develop under CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
 * [How to develop under OpenSUSE](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
 * [How to develop under Debian / Mint / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
@@ -119,7 +120,7 @@ python setup.py test
 ```
 
 The feedback of the test loader is not helping if the imports fail.
-This is a known bug [issue7559](http://bugs.python.org/issue7559).
+This is a known issue (see [7559](http://bugs.python.org/issue7559)).
 But there are import checks in [`test/__init__.py`](https://github.com/yadt/yadt-config-rpm-maker/blob/master/test/__init__.py)
 
 Run the checks to see if you have import errors by executing:
@@ -127,12 +128,12 @@ Run the checks to see if you have import errors by executing:
 PYTHONPATH=src python test/__init__.py
 ```
 
-When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
+When you run the integration tests `yadt-config-rpm-maker` will build test RPMs.
 
 
 Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
 ```bash
-coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setup.py,src/config_rpm_maker/magic.py
+coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setup.py,src/config_rpm_maker/utilities/magic.py
 ```
 
 ### Execution in the working directory
@@ -140,7 +141,7 @@ coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setu
 ```bash
 ./config-rpm-maker
 ```
-The `config-rpm-maker` script allows you to execute config-rpm-maker in your working directory.
+The `config-rpm-maker` script allows you to execute yadt-config-rpm-maker in your working directory.
 
 ### Build yadt-config-rpm-maker RPM
 
