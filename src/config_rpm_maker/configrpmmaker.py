@@ -14,7 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import os
 import shutil
 import subprocess
@@ -44,7 +43,6 @@ from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.utilities.logutils import log_elements_of_list
 from config_rpm_maker.utilities.profiler import measure_execution_time, log_directories_summary
 from config_rpm_maker.segment import OVERLAY_ORDER
-
 
 LOGGER = getLogger(__name__)
 
