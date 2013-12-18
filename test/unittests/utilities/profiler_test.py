@@ -1,3 +1,5 @@
+# coding=utf-8
+#
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
@@ -14,16 +16,23 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+from unittest import TestCase
+from mock import patch
 
-from config_rpm_maker.hostresolver import HostResolver
+from config_rpm_maker.utilities.profiler import measure_execution_time
 
 
-class HostResolverIntegrationTest(unittest.TestCase):
+class ProfilerTests(TestCase):
 
-    def test_should_resolve_localhost(self):
+    @patch('config_rpm_maker.utilities.profiler.LOGGER')
+    def test_should_wrap_function(self, mock_LOGGER):
 
-        ip, fqdn, aliases = HostResolver().resolve('localhost')
+        self.dummy_function_has_been_executed = False
 
-        self.assertTrue(ip == '127.0.0.1' or ip == '::1')
-        self.assertTrue(fqdn in ['localhost', 'localhost.localdomain'])
+        def dummy_function():
+            self.dummy_function_has_been_executed = True
+
+        actual_function = measure_execution_time(dummy_function)
+        actual_function()
+
+        self.assertTrue(self.dummy_function_has_been_executed)

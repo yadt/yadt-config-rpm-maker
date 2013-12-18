@@ -19,6 +19,7 @@ from mock import Mock, call, patch
 from Queue import Queue
 
 from unittest_support import UnitTests
+from config_rpm_maker.configuration import get_max_failed_hosts
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 
 
@@ -454,10 +455,10 @@ class NotifyThatHostBuildFailedTest(UnitTests):
 
         mock_config_rpm_maker.failed_host_queue.put.assert_called_with(('devabc123', 'Stacktrace'))
 
-    @patch('config_rpm_maker.configrpmmaker.config')
+    @patch('config_rpm_maker.configrpmmaker.get_max_failed_hosts')
     def test_should_not_clear_hosts_queue_when_failed_hosts_under_maximum(self, mock_config):
 
-        mock_config.get.return_value = 100
+        mock_config.return_value = 100
         mock_config_rpm_maker = Mock(ConfigRpmMaker)
         fake_queue = Queue()
         fake_queue.put(('hostname1', 'stacktrace1'))
@@ -469,12 +470,12 @@ class NotifyThatHostBuildFailedTest(UnitTests):
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         self.assert_mock_never_called(mock_config_rpm_maker.host_queue.queue.clear)
-        mock_config.get.assert_called_with('max_failed_hosts')
+        mock_config.assert_called_with()
 
-    @patch('config_rpm_maker.configrpmmaker.config')
+    @patch('config_rpm_maker.configrpmmaker.get_max_failed_hosts')
     def test_should_clear_hosts_queue_when_more_than_maximum_hosts_maximum_of_failed_hosts(self, mock_config):
 
-        mock_config.get.return_value = 3
+        mock_config.return_value = 3
         mock_config_rpm_maker = Mock(ConfigRpmMaker)
         fake_queue = Queue()
         fake_queue.put(('hostname1', 'stacktrace1'))
@@ -486,12 +487,12 @@ class NotifyThatHostBuildFailedTest(UnitTests):
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
-        mock_config.get.assert_called_with('max_failed_hosts')
+        mock_config.assert_called_with()
 
-    @patch('config_rpm_maker.configrpmmaker.config')
+    @patch('config_rpm_maker.configrpmmaker.get_max_failed_hosts')
     def test_should_clear_hosts_queue_when_maximum_of_failed_hosts_reached(self, mock_config):
 
-        mock_config.get.return_value = 3
+        mock_config.return_value = 3
         mock_config_rpm_maker = Mock(ConfigRpmMaker)
         fake_queue = Queue()
         fake_queue.put(('hostname1', 'stacktrace1'))
@@ -502,4 +503,4 @@ class NotifyThatHostBuildFailedTest(UnitTests):
         ConfigRpmMaker._notify_that_host_failed(mock_config_rpm_maker, 'devabc123', 'Stacktrace')
 
         mock_config_rpm_maker.host_queue.queue.clear.assert_called_with()
-        mock_config.get.assert_called_with('max_failed_hosts')
+        mock_config.assert_called_with()

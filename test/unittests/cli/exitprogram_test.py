@@ -19,21 +19,21 @@
 from unittest import TestCase
 from mock import patch
 
-from config_rpm_maker.exitprogram import exit_program, get_timestamp_from_start
+from config_rpm_maker.cli.exitprogram import exit_program, get_timestamp_from_start
 
 
 class ExitProgramTests(TestCase):
 
-    @patch('config_rpm_maker.exitprogram.LOGGER')
-    @patch('config_rpm_maker.exitprogram.exit')
+    @patch('config_rpm_maker.cli.exitprogram.LOGGER')
+    @patch('config_rpm_maker.cli.exitprogram.exit')
     def test_should_exit_with_given_return_code(self, mock_exit, mock_logger):
 
         exit_program('Some message.', 123)
 
         mock_exit.assert_called_once_with(123)
 
-    @patch('config_rpm_maker.exitprogram.exit')
-    @patch('config_rpm_maker.exitprogram.LOGGER')
+    @patch('config_rpm_maker.cli.exitprogram.exit')
+    @patch('config_rpm_maker.cli.exitprogram.LOGGER')
     def test_should_log_message_as_info_if_return_code_is_zero(self, mock_logger, mock_exit):
 
         exit_program('Success.', 0)
@@ -41,17 +41,17 @@ class ExitProgramTests(TestCase):
         mock_logger.info.assert_called_with('Success.')
         self.assertEqual(0, mock_logger.error.call_count)
 
-    @patch('config_rpm_maker.exitprogram.exit')
-    @patch('config_rpm_maker.exitprogram.LOGGER')
+    @patch('config_rpm_maker.cli.exitprogram.exit')
+    @patch('config_rpm_maker.cli.exitprogram.LOGGER')
     def test_should_log_message_as_error_if_return_code_is_not_zero(self, mock_logger, mock_exit):
 
         exit_program('Failed.', 1)
 
         mock_logger.error.assert_called_with('Failed.')
 
-    @patch('config_rpm_maker.exitprogram.time')
-    @patch('config_rpm_maker.exitprogram.exit')
-    @patch('config_rpm_maker.exitprogram.LOGGER')
+    @patch('config_rpm_maker.cli.exitprogram.time')
+    @patch('config_rpm_maker.cli.exitprogram.exit')
+    @patch('config_rpm_maker.cli.exitprogram.LOGGER')
     def test_should_not_log_elapsed_time_when_we_did_not_start_to_measure_the_time(self, mock_logger, mock_exit, mock_time):
 
         mock_time.return_value = 1
@@ -60,10 +60,10 @@ class ExitProgramTests(TestCase):
 
         self.assertEqual(1, len(mock_logger.info.call_args_list))
 
-    @patch('config_rpm_maker.exitprogram.get_timestamp_from_start')
-    @patch('config_rpm_maker.exitprogram.time')
-    @patch('config_rpm_maker.exitprogram.exit')
-    @patch('config_rpm_maker.exitprogram.LOGGER')
+    @patch('config_rpm_maker.cli.exitprogram.get_timestamp_from_start')
+    @patch('config_rpm_maker.cli.exitprogram.time')
+    @patch('config_rpm_maker.cli.exitprogram.exit')
+    @patch('config_rpm_maker.cli.exitprogram.LOGGER')
     def test_should_log_elapsed_time(self, mock_logger, mock_exit, mock_time, mock_get_timestamp_from_start):
 
         mock_get_timestamp_from_start.return_value = 0
@@ -73,10 +73,10 @@ class ExitProgramTests(TestCase):
 
         mock_logger.info.assert_any_call('Elapsed time: 1.0s')
 
-    @patch('config_rpm_maker.exitprogram.get_timestamp_from_start')
-    @patch('config_rpm_maker.exitprogram.time')
-    @patch('config_rpm_maker.exitprogram.exit')
-    @patch('config_rpm_maker.exitprogram.LOGGER')
+    @patch('config_rpm_maker.cli.exitprogram.get_timestamp_from_start')
+    @patch('config_rpm_maker.cli.exitprogram.time')
+    @patch('config_rpm_maker.cli.exitprogram.exit')
+    @patch('config_rpm_maker.cli.exitprogram.LOGGER')
     def test_should_round_elapsed_time_down_to_two_decimals_after_dot(self, mock_logger, mock_exit, mock_time, mock_get_timestamp_from_start):
 
         mock_get_timestamp_from_start.return_value = 0
@@ -89,7 +89,7 @@ class ExitProgramTests(TestCase):
 
 class GetTimeStampFromStart(TestCase):
 
-    @patch('config_rpm_maker.exitprogram._timestamp_at_start')
+    @patch('config_rpm_maker.cli.exitprogram._timestamp_at_start')
     def test_should_return_time_stamp_from_start(self, mock_timestamp):
 
         actual_time_stamp = get_timestamp_from_start()

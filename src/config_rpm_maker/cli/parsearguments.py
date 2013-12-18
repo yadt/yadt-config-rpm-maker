@@ -16,11 +16,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from logging import DEBUG, INFO
 from optparse import OptionParser
 from sys import stdout, exit
 
-from config_rpm_maker.returncodes import RETURN_CODE_NOT_ENOUGH_ARGUMENTS, RETURN_CODE_VERSION
-from config_rpm_maker.config import KEY_RPM_UPLOAD_COMMAND, KEY_CONFIG_VIEWER_ONLY, KEY_VERBOSE, KEY_NO_CLEAN_UP, set_property
+from config_rpm_maker.configuration import get_rpm_upload_command, is_config_viewer_only_enabled, is_verbose_enabled, is_no_clean_up_enabled, set_property
+from config_rpm_maker.cli.returncodes import RETURN_CODE_NOT_ENOUGH_ARGUMENTS, RETURN_CODE_VERSION
 
 
 ARGUMENT_REPOSITORY = '<repository-url>'
@@ -118,13 +119,21 @@ def apply_arguments_to_config(arguments):
     """ Overrides configuration properties if command line options are specified. """
 
     if arguments[OPTION_RPM_UPLOAD_CMD]:
-        set_property(KEY_RPM_UPLOAD_COMMAND, arguments[OPTION_RPM_UPLOAD_CMD])
+        set_property(get_rpm_upload_command, arguments[OPTION_RPM_UPLOAD_CMD])
 
     if arguments[OPTION_CONFIG_VIEWER_ONLY]:
-        set_property(KEY_CONFIG_VIEWER_ONLY, arguments[OPTION_CONFIG_VIEWER_ONLY])
+        set_property(is_config_viewer_only_enabled, arguments[OPTION_CONFIG_VIEWER_ONLY])
 
     if arguments[OPTION_NO_CLEAN_UP]:
-        set_property(KEY_NO_CLEAN_UP, arguments[OPTION_NO_CLEAN_UP])
+        set_property(is_no_clean_up_enabled, arguments[OPTION_NO_CLEAN_UP])
 
     if arguments[OPTION_VERBOSE]:
-        set_property(KEY_VERBOSE, arguments[OPTION_VERBOSE])
+        set_property(is_verbose_enabled, arguments[OPTION_VERBOSE])
+
+
+def determine_console_log_level(arguments):
+    """ Determines the log level based on arguments and configuration """
+    if arguments[OPTION_DEBUG]:
+        return DEBUG
+
+    return INFO

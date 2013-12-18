@@ -17,10 +17,10 @@
 from unittest import TestCase
 from mock import patch
 
-from config_rpm_maker.argumentvalidation import ensure_valid_revision, ensure_valid_repository_url
+from config_rpm_maker.cli.argumentvalidation import ensure_valid_revision, ensure_valid_repository_url
 
 
-@patch('config_rpm_maker.argumentvalidation.exit_program')
+@patch('config_rpm_maker.cli.argumentvalidation.exit_program')
 class EnsureValidRevisionTests(TestCase):
 
     def test_should_exit_if_a_non_integer_string_is_given(self, mock_exit_program):
@@ -42,7 +42,7 @@ class EnsureValidRevisionTests(TestCase):
         self.assertEqual('123', actual_revision)
 
 
-@patch('config_rpm_maker.argumentvalidation.exit_program')
+@patch('config_rpm_maker.cli.argumentvalidation.exit_program')
 class EnsureValidRepositoryUrlTests(TestCase):
 
     def test_should_exit_program_when_strange_url_is_given(self, mock_exit_program):

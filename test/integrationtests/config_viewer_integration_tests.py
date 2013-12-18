@@ -19,8 +19,8 @@ from os.path import join
 
 from integration_test_support import IntegrationTest
 
-from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_SVN_PATH_TO_CONFIG
-from config_rpm_maker.configrpmmaker import ConfigRpmMaker, config
+from config_rpm_maker.configuration.properties import is_no_clean_up_enabled, get_svn_path_to_config
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker, configuration
 from config_rpm_maker.svnservice import SvnService
 
 
@@ -28,8 +28,8 @@ class ConfigViewerIntegrationTests(IntegrationTest):
 
     def test_should_create_files_for_hosts(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, True)
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+        configuration.set_property(is_no_clean_up_enabled, True)
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
 
         ConfigRpmMaker('2', svn_service).build()
 
@@ -55,10 +55,10 @@ loctyp/berweb:/vars/var_in_var
 
         self.assert_config_viewer_file('berweb01', 'berweb01.variables', """<!DOCTYPE html><html><head><title>berweb01.variables</title></head><body><pre>                                 ALIASES :
                                      ALL : all
-                                    FQDN : localhost.localdomain
+                                    FQDN : .*
                                     HOST : berweb01
                                   HOSTNR : 01
-                                      IP : 127.0.0.1
+                                      IP : .*
                                      LOC : ber
                                   LOCTYP : berweb
                                 OVERRIDE : berweb
@@ -119,10 +119,10 @@ all:/vars/override
         self.assert_config_viewer_file('devweb01', 'devweb01.variables', """<!DOCTYPE html><html><head><title>devweb01.variables</title></head><body><pre>                                 ALIASES :
                                      ALL : all
                               DUMMY_VAR1 :
-                                    FQDN : localhost.localdomain
+                                    FQDN : .*
                                     HOST : devweb01
                                   HOSTNR : 01
-                                      IP : 127.0.0.1
+                                      IP : .*
                                      LOC : dev
                                   LOCTYP : devweb
                                 OVERRIDE : all
@@ -157,10 +157,10 @@ all:/vars/override
         self.assert_config_viewer_file('tuvweb01', 'tuvweb01.variables', """<!DOCTYPE html><html><head><title>tuvweb01.variables</title></head><body><pre>                                 ALIASES :
                                      ALL : all
                               DUMMY_VAR2 :
-                                    FQDN : localhost.localdomain
+                                    FQDN : .*
                                     HOST : tuvweb01
                                   HOSTNR : 01
-                                      IP : 127.0.0.1
+                                      IP : .*
                                      LOC : tuv
                                   LOCTYP : tuvweb
                                 OVERRIDE : all
@@ -184,39 +184,37 @@ all:/vars/override
         self.assert_config_viewer_file('tuvweb01', join('vars', 'override'), '''<!DOCTYPE html><html><head><title>override</title></head><body><pre><strong title="OVERRIDE">all</strong></pre></body></html>''')
 
     def assert_host_files_are_there(self, host_name):
-        self.assert_config_viewer_path_exists(host_name, 'data', 'file-with-special-character')
+        self.assert_config_viewer_file_exactly(host_name, join('VARIABLES', 'SHORT_HOSTNR'), "1")
 
         self.assert_config_viewer_file(host_name, join('data', 'index.html'), "<!DOCTYPE html><html><head><title>index.html</title></head><body><pre>&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;/html&gt;")
         self.assert_config_viewer_file(host_name, join('data', 'other.html'), "<!DOCTYPE html><html><head><title>other.html</title></head><body><pre>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;")
-
-        self.assert_config_viewer_path_exists(host_name, 'files', 'binary.zip')
         self.assert_config_viewer_file(host_name, join('files', 'file_from_all'), "")
-
         self.assert_config_viewer_file(host_name, 'unused_variables.txt', "<!DOCTYPE html><html><head><title>unused_variables.txt</title></head><body><pre>ALIASES")
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'ALIASES'), "")
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'ALL'), "<!DOCTYPE html><html><head><title>ALL</title></head><body><pre>all</pre></body></html>")
-        self.assert_config_viewer_file(host_name, join('VARIABLES', 'FQDN'), "<!DOCTYPE html><html><head><title>FQDN</title></head><body><pre>localhost.localdomain</pre></body></html>")
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'HOST'), "<!DOCTYPE html><html><head><title>HOST</title></head><body><pre>%s</pre></body></html>" % host_name)
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'HOSTNR'), "<!DOCTYPE html><html><head><title>HOSTNR</title></head><body><pre>01</pre></body></html>")
-        self.assert_config_viewer_file(host_name, join('VARIABLES', 'IP'), "<!DOCTYPE html><html><head><title>IP</title></head><body><pre>127.0.0.1</pre></body></html>")
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'OVERLAYING'), "<!DOCTYPE html><html><head><title>OVERLAYING</title></head><body><pre>            host/%s : /VARIABLES" % host_name)
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'REVISION'), "2")
-        self.assert_config_viewer_file_exactly(host_name, join('VARIABLES', 'SHORT_HOSTNR'), "1")
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'SVNLOG'), "<!DOCTYPE html><html><head><title>SVNLOG</title></head><body><pre>")
         self.assert_config_viewer_file(host_name, join('VARIABLES', 'TYP'), "<!DOCTYPE html><html><head><title>TYP</title></head><body><pre>web</pre></body></html>")
 
+        self.assert_config_viewer_path_exists(host_name, 'data', 'file-with-special-character')
+        self.assert_config_viewer_path_exists(host_name, 'files', 'binary.zip')
+        self.assert_config_viewer_path_exists(host_name, join('VARIABLES', 'FQDN'))
+        self.assert_config_viewer_path_exists(host_name, join('VARIABLES', 'IP'))
         self.assert_config_viewer_path_exists(host_name, 'yadt-config-%s.spec' % host_name)
 
     def assert_config_viewer_file_exactly(self, host_name, file_path, content):
-        host_directory = config.build_config_viewer_host_directory(host_name)
+        host_directory = configuration.build_config_viewer_host_directory(host_name)
         overlaying_path = join(host_directory, file_path)
         self.assert_file_content(overlaying_path, content)
 
     def assert_config_viewer_file(self, host_name, file_path, content):
-        host_directory = config.build_config_viewer_host_directory(host_name)
+        host_directory = configuration.build_config_viewer_host_directory(host_name)
         overlaying_path = join(host_directory, file_path)
-        self.assert_file_content_line_by_line(overlaying_path, content)
+        self.assert_file_matches_content_line_by_line(overlaying_path, content)
 
     def assert_config_viewer_path_exists(self, host_name, *path):
-        path_to_check = join(config.build_config_viewer_host_directory(host_name), *path)
+        path_to_check = join(configuration.build_config_viewer_host_directory(host_name), *path)
         self.assert_path_exists(path_to_check)

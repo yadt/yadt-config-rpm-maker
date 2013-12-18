@@ -17,21 +17,25 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from logging import ERROR, Logger
-from mock import Mock, call, patch
 from unittest import TestCase
 
-from config_rpm_maker.config import DEFAULT_LOG_LEVEL, DEFAULT_SYS_LOG_LEVEL
-from config_rpm_maker.logutils import (MutedLogger,
-                                       create_console_handler,
-                                       create_sys_log_handler,
-                                       log_configuration,
-                                       log_elements_of_list,
-                                       log_process_id,
-                                       verbose)
+from mock import Mock, call, patch
+
+from config_rpm_maker.configuration.properties import is_verbose_enabled
+from config_rpm_maker.configuration import ConfigurationProperty
+from config_rpm_maker.utilities.logutils import (SYS_LOG_LEVEL,
+                                                 MutedLogger,
+                                                 append_console_logger,
+                                                 create_console_handler,
+                                                 create_sys_log_handler,
+                                                 log_configuration,
+                                                 log_elements_of_list,
+                                                 log_process_id,
+                                                 verbose)
 
 
-@patch('config_rpm_maker.logutils.StreamHandler')
-@patch('config_rpm_maker.logutils.Formatter')
+@patch('config_rpm_maker.utilities.logutils.StreamHandler')
+@patch('config_rpm_maker.utilities.logutils.Formatter')
 class CreateConsoleHandlerTests(TestCase):
 
     def test_should_initialze_formatter_and_use_it(self, mock_formatter_class, mock_stream_handler_class):
@@ -41,26 +45,17 @@ class CreateConsoleHandlerTests(TestCase):
         mock_handler = Mock()
         mock_stream_handler_class.return_value = mock_handler
 
-        create_console_handler()
+        create_console_handler(ERROR)
 
         mock_formatter_class.assert_called_with('[%(levelname)5s] %(message)s')
         mock_handler.setFormatter.assert_called_with(mock_formatter)
-
-    def test_should_set_default_log_level_if_no_log_level_given(self, mock_formatter_class, mock_stream_handler_class):
-
-        mock_handler = Mock()
-        mock_stream_handler_class.return_value = mock_handler
-
-        create_console_handler()
-
-        mock_handler.setLevel.assert_called_with(DEFAULT_LOG_LEVEL)
 
     def test_should_set_given_log_level(self, mock_formatter_class, mock_stream_handler_class):
 
         mock_handler = Mock()
         mock_stream_handler_class.return_value = mock_handler
 
-        create_console_handler(log_level=ERROR)
+        create_console_handler(ERROR)
 
         mock_handler.setLevel.assert_called_with(ERROR)
 
@@ -69,13 +64,13 @@ class CreateConsoleHandlerTests(TestCase):
         mock_handler = Mock()
         mock_stream_handler_class.return_value = mock_handler
 
-        actual_handler = create_console_handler()
+        actual_handler = create_console_handler(ERROR)
 
         self.assertEqual(mock_handler, actual_handler)
 
 
-@patch('config_rpm_maker.logutils.SysLogHandler')
-@patch('config_rpm_maker.logutils.Formatter')
+@patch('config_rpm_maker.utilities.logutils.SysLogHandler')
+@patch('config_rpm_maker.utilities.logutils.Formatter')
 class CreateSysLogHandlerTests(TestCase):
 
     def test_should_initialze_formatter_using_the_revision_number_in_the_format(self, mock_formatter_class, mock_sys_log_handler_class):
@@ -97,7 +92,7 @@ class CreateSysLogHandlerTests(TestCase):
 
         create_sys_log_handler(123)
 
-        mock_handler.setLevel.assert_called_with(DEFAULT_SYS_LOG_LEVEL)
+        mock_handler.setLevel.assert_called_with(SYS_LOG_LEVEL)
 
     def test_should_return_created_console_handler(self, mock_formatter_class, mock_sys_log_handler_class):
 
@@ -112,6 +107,7 @@ class CreateSysLogHandlerTests(TestCase):
 class LogConfigurationTests(TestCase):
 
     def setUp(self):
+        self.configuration_property = ConfigurationProperty(key='property', default='default')
         self.mock_log = Mock()
 
     def test_should_log_given_path(self):
@@ -128,35 +124,38 @@ class LogConfigurationTests(TestCase):
 
     def test_should_log_given_string_configuration_property(self):
 
-        log_configuration(self.mock_log, {'property': '123'}, 'configuration_file.yaml')
+        log_configuration(self.mock_log, {self.configuration_property: '123'}, 'configuration_file.yaml')
 
         self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', '123', 'str')
 
     def test_should_log_given_boolean_configuration_property(self):
 
-        log_configuration(self.mock_log, {'property': True}, 'configuration_file.yaml')
+        log_configuration(self.mock_log, {self.configuration_property: True}, 'configuration_file.yaml')
 
         self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', True, 'bool')
 
     def test_should_log_given_integer_configuration_property(self):
 
-        log_configuration(self.mock_log, {'property': 123}, 'configuration_file.yaml')
+        log_configuration(self.mock_log, {self.configuration_property: 123}, 'configuration_file.yaml')
 
         self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"property"', 123, 'int')
 
     def test_should_log_given_configuration_properties_in_alphabetical_order(self):
 
-        configuration = {'a_property': 123,
-                         'b_property': False,
-                         'c_property': 'hello world'}
+        property_a = ConfigurationProperty(key='a_property', default=123)
+        property_b = ConfigurationProperty(key='b_property', default=123)
+        property_c = ConfigurationProperty(key='c_property', default=123)
+
+        configuration = {property_a: 123,
+                         property_b: False,
+                         property_c: 'hello world'}
 
         log_configuration(self.mock_log, configuration, 'configuration_file.yaml')
 
-        self.assertEqual([call('Loaded configuration file "%s"', 'configuration_file.yaml'),
-                          call('Configuration property %s = "%s" (%s)', '"a_property"', 123, 'int'),
-                          call('Configuration property %s = "%s" (%s)', '"b_property"', False, 'bool'),
-                          call('Configuration property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')],
-                         self.mock_log.call_args_list)
+        self.mock_log.assert_any_call('Loaded configuration file "%s"', 'configuration_file.yaml')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"a_property"', 123, 'int')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"b_property"', False, 'bool')
+        self.mock_log.assert_any_call('Configuration property %s = "%s" (%s)', '"c_property"', 'hello world', 'str')
 
 
 class LogElementsOfListTests(TestCase):
@@ -196,7 +195,7 @@ class LogElementsOfListTests(TestCase):
                          self.mock_log.call_args_list)
 
 
-@patch('config_rpm_maker.logutils.getpid')
+@patch('config_rpm_maker.utilities.logutils.getpid')
 class LogProcessId(TestCase):
 
     def test_should_log_process_id(self, mock_getpid):
@@ -262,7 +261,7 @@ class MutedLoggerTests(TestCase):
 
 class VerboseTests(TestCase):
 
-    @patch('config_rpm_maker.logutils.get')
+    @patch('config_rpm_maker.utilities.logutils.is_verbose_enabled')
     def test_should_return_given_logger_when_configuration_value_for_verbose_is_true(self, mock_get):
 
         mock_logger = Mock(Logger)
@@ -271,10 +270,10 @@ class VerboseTests(TestCase):
         verbose(mock_logger).info("Hello")
 
         mock_logger.info.assert_called_with("Hello")
-        mock_get.assert_called_with('verbose')
+        mock_get.assert_called_with()
 
-    @patch('config_rpm_maker.logutils._muted_logger')
-    @patch('config_rpm_maker.logutils.get')
+    @patch('config_rpm_maker.utilities.logutils._muted_logger')
+    @patch('config_rpm_maker.utilities.logutils.is_verbose_enabled')
     def test_should_not_return_muted_logger_when_configuration_value_for_verbose_is_false(self, mock_get, mock_muted_logger):
 
         mock_logger = Mock(Logger)
@@ -283,4 +282,27 @@ class VerboseTests(TestCase):
         verbose(mock_logger).info("Hello")
 
         mock_muted_logger.info.assert_called_with("Hello")
-        mock_get.assert_called_with('verbose')
+        mock_get.assert_called_with()
+
+
+class AppendConsoleLoggerTests(TestCase):
+
+    @patch('config_rpm_maker.utilities.logutils.create_console_handler')
+    def test_should_create_console_logger_using_the_given_log_level(self, mock_create_console_handler):
+
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_create_console_handler.assert_called_with('log level')
+
+    @patch('config_rpm_maker.utilities.logutils.create_console_handler')
+    def test_should_append_created_log_handler_to_given_logger(self, mock_create_console_handler):
+
+        mock_handler = Mock()
+        mock_create_console_handler.return_value = mock_handler
+        mock_logger = Mock()
+
+        append_console_logger(mock_logger, 'log level')
+
+        mock_logger.addHandler(mock_handler)

@@ -22,14 +22,14 @@ from time import time
 from os import walk
 from os.path import join, getsize
 
-from config_rpm_maker.config import KEY_THREAD_COUNT, KEY_VERBOSE, get
+from config_rpm_maker.configuration import get_thread_count
 
 LOGGER = getLogger(__name__)
 
 NUMBER_OF_LARGEST_FILES_TO_LOG = 10
 LOG_EACH_MEASUREMENT = False
 
-_summary = {}
+_execution_time_summary = {}
 
 
 def round_to_two_decimals_after_dot(elapsed_time_in_seconds):
@@ -51,11 +51,11 @@ def measure_execution_time(original_function):
         else:
             function_name = original_function.__name__
 
-        if function_name not in _summary.keys():
-            _summary[function_name] = [elapsed_time_in_seconds, 1]
+        if function_name not in _execution_time_summary.keys():
+            _execution_time_summary[function_name] = [elapsed_time_in_seconds, 1]
         else:
-            _summary[function_name][0] += elapsed_time_in_seconds
-            _summary[function_name][1] += 1
+            _execution_time_summary[function_name][0] += elapsed_time_in_seconds
+            _execution_time_summary[function_name][1] += 1
 
         if LOG_EACH_MEASUREMENT:
             function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
@@ -80,10 +80,10 @@ def measure_execution_time(original_function):
 
 
 def log_execution_time_summaries(logging_function):
-    logging_function('Execution times summary (keep in mind thread_count was set to %s):', get(KEY_THREAD_COUNT))
+    logging_function('Execution times summary (keep in mind thread_count was set to %s):', get_thread_count())
 
-    for function_name in sorted(_summary.keys()):
-        summary_of_function = _summary[function_name]
+    for function_name in sorted(_execution_time_summary.keys()):
+        summary_of_function = _execution_time_summary[function_name]
         rounded_elapsed_time = round_to_two_decimals_after_dot(summary_of_function[0])
         average_time = round_to_two_decimals_after_dot(summary_of_function[0] / summary_of_function[1])
 
@@ -91,36 +91,7 @@ def log_execution_time_summaries(logging_function):
                          summary_of_function[1], average_time, rounded_elapsed_time, function_name)
 
 
-def log_directory_size_summary(logging_function, start_path):
-
-    if not get(KEY_VERBOSE):
-        return
-
-    file_and_size = {}
-    total_size = 0
-    count_of_files = 0
-    for dirpath, dirnames, filenames in walk(start_path):
-        for file_name in filenames:
-            file_path = join(dirpath, file_name)
-            file_size = getsize(file_path)
-            file_and_size[file_path] = file_size
-            total_size += file_size
-            count_of_files += 1
-
-    sorted_files_sizes = sorted(file_and_size.values())
-
-    logging_function('Found %d files in directory "%s" with a total size of %d bytes', count_of_files, start_path, total_size)
-    logging_function("The %d largest files are (size in bytes):", NUMBER_OF_LARGEST_FILES_TO_LOG)
-    for file_size in sorted_files_sizes[-NUMBER_OF_LARGEST_FILES_TO_LOG:]:
-        for file_path in file_and_size.keys():
-            if file_size == file_and_size[file_path]:
-                logging_function('    %10d %s', file_size, file_path)
-
-
 def log_directories_summary(logging_function, start_path):
-
-    if not get(KEY_VERBOSE):
-        return
 
     directories_summary = {}
     directories = walk(start_path).next()[1]

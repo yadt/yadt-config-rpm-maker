@@ -21,11 +21,15 @@ import unittest
 from Queue import Queue
 from os import makedirs
 from os.path import abspath, exists, join
+from re import compile
 from shutil import rmtree
 
-from config_rpm_maker import config
-from config_rpm_maker.config import KEY_NO_CLEAN_UP, KEY_TEMPORARY_DIRECTORY, KEY_SVN_PATH_TO_CONFIG, build_config_viewer_host_directory
+from config_rpm_maker import configuration
 from config_rpm_maker.svnservice import SvnService
+from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
+                                                       get_temporary_directory,
+                                                       get_svn_path_to_config)
+from config_rpm_maker.configuration import build_config_viewer_host_directory
 
 # This constant exists for debugging purposes.
 # Switch this to True if you want to see the generated files after executing a test.
@@ -40,9 +44,9 @@ class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
 
-        config.set_property(KEY_NO_CLEAN_UP, KEEP_TEMPORARY_DIRECTORY)
+        configuration.set_property(is_no_clean_up_enabled, KEEP_TEMPORARY_DIRECTORY)
 
-        temporary_directory = config.get(KEY_TEMPORARY_DIRECTORY)
+        temporary_directory = get_temporary_directory()
 
         self.clean_up_temporary_directory(temporary_directory)
 
@@ -111,7 +115,7 @@ Expected: "{expected}"
 
             self.assertEqual(expected_content, actual_content, error_message)
 
-    def assert_file_content_line_by_line(self, path_to_file, expected_content):
+    def assert_file_matches_content_line_by_line(self, path_to_file, expected_content):
 
         self.assert_path_exists(path_to_file)
 
@@ -129,12 +133,17 @@ Expected: "{expected}"
  but was: "{actual}"
 """.format(path_to_file=path_to_file, expected=expected_line, actual=actual_line, line_number=line_number + 1)
 
-                self.assertEqual(expected_line.strip(), actual_line.strip(), error_message)
+                pattern = expected_line.strip()
+                string = actual_line.strip()
+
+                regular_expression = compile(pattern)
+
+                self.assertTrue(regular_expression.match(string), error_message)
                 line_number += 1
 
     def create_svn_service_queue(self):
         svn_service = SvnService(base_url=self.repo_url, username=None, password=None,
-                                 path_to_config=config.get(KEY_SVN_PATH_TO_CONFIG))
+                                 path_to_config=get_svn_path_to_config())
         svn_service_queue = Queue()
         svn_service_queue.put(svn_service)
         return svn_service_queue

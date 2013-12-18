@@ -18,19 +18,16 @@
 
 from unittest import TestCase
 
-from logging import DEBUG, INFO
 from mock import Mock, patch
 
-from config_rpm_maker import (append_console_logger,
-                              determine_console_log_level,
-                              extract_repository_url_and_revision_from_arguments,
+from config_rpm_maker import (extract_repository_url_and_revision_from_arguments,
                               initialize_configuration,
                               initialize_logging_to_console,
                               initialize_logging_to_syslog,
                               main,
                               building_configuration_rpms_and_clean_host_directories)
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.config import ConfigException
+from config_rpm_maker.configuration import ConfigurationException
 
 
 class MainTests(TestCase):
@@ -66,7 +63,7 @@ class MainTests(TestCase):
     @patch('config_rpm_maker.exit_program')
     def test_should_return_with_error_message_and_error_code_when_configuration_exception_occurrs(self, mock_exit_program, mock_parse_arguments):
 
-        mock_parse_arguments.side_effect = ConfigException("We knew this could happen!")
+        mock_parse_arguments.side_effect = ConfigurationException("We knew this could happen!")
 
         main()
 
@@ -108,26 +105,26 @@ class MainTests(TestCase):
 class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
     def test_should_pass_when_everything_works_as_expected(self, mock_config_rpm_maker_class, mock_svn_service_class, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
-        mock_config.get.return_value = '/path-to-configuration'
+        mock_config.return_value = '/path-to-configuration'
         mock_svn_service_class.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
         building_configuration_rpms_and_clean_host_directories('file:///path_to/testdata/repository', 1)
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
     def test_should_initialize_svn_service_with_given_repository_url(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
-        mock_config.get.return_value = '/path-to-configuration'
+        mock_config.return_value = '/path-to-configuration'
         mock_svn_service_constructor.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
@@ -137,13 +134,13 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
                                                         base_url='file:///path_to/testdata/repository')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
     def test_should_initialize_svn_service_with_path_to_config_from_configuration(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
-        mock_config.get.return_value = '/path-to-configuration'
+        mock_config.return_value = '/path-to-configuration'
         mock_svn_service_constructor.return_value = Mock()
         mock_config_rpm_maker_class.return_value = Mock()
 
@@ -153,13 +150,13 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
                                                         base_url='file:///path_to/testdata/repository')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
     def test_should_initialize_config_rpm_maker_with_given_revision_and_svn_service(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
-        mock_config.get.return_value = '/path-to-configuration'
+        mock_config.return_value = '/path-to-configuration'
         mock_svn_service = Mock()
         mock_svn_service_constructor.return_value = mock_svn_service
         mock_config_rpm_maker_class.return_value = Mock()
@@ -169,13 +166,13 @@ class BuildingConfigurationRpmsAndCleanHostDirectoriesTests(TestCase):
         mock_config_rpm_maker_class.assert_called_with(svn_service=mock_svn_service, revision='1980')
 
     @patch('config_rpm_maker.clean_up_deleted_hosts_data')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.get_svn_path_to_config')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.SvnService')
     @patch('config_rpm_maker.ConfigRpmMaker')
     def test_should_clean_up_directories_of_hosts_which_have_been_deleted(self, mock_config_rpm_maker_class, mock_svn_service_constructor, mock_exit_program, mock_config, mock_clean_up_deleted_hosts_data):
 
-        mock_config.get.return_value = '/path-to-configuration'
+        mock_config.return_value = '/path-to-configuration'
         mock_svn_service = Mock()
         mock_svn_service_constructor.return_value = mock_svn_service
         mock_config_rpm_maker_class.return_value = Mock()
@@ -204,7 +201,7 @@ class InitializeLoggingToConsoleTests(TestCase):
 class InitializeConfigurationTest(TestCase):
 
     @patch('config_rpm_maker.apply_arguments_to_config')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config):
 
         mock_arguments = Mock()
@@ -214,7 +211,7 @@ class InitializeConfigurationTest(TestCase):
         mock_config.load_configuration_file.assert_called_with()
 
     @patch('config_rpm_maker.apply_arguments_to_config')
-    @patch('config_rpm_maker.config')
+    @patch('config_rpm_maker.configuration')
     def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config):
 
         mock_arguments = Mock()
@@ -274,45 +271,3 @@ class InitializeLoggingToSysLogTests(TestCase):
 
         self.assertEqual(0, mock_create_sys_log_handler.call_count)
         self.assertEqual(0, mock_logger.addHandler.call_count)
-
-
-class DetermineConsoleLogLevelTests(TestCase):
-
-    def test_should_return_debug_when_debug_option_is_given(self):
-
-        fake_arguments = {'--debug': True}
-
-        actual = determine_console_log_level(fake_arguments)
-
-        self.assertEqual(DEBUG, actual)
-
-    def test_should_return_info_when_no_debug_option_is_given(self):
-
-        fake_arguments = {'--debug': False}
-
-        actual = determine_console_log_level(fake_arguments)
-
-        self.assertEqual(INFO, actual)
-
-
-class AppendConsoleLoggerTests(TestCase):
-
-    @patch('config_rpm_maker.create_console_handler')
-    def test_should_create_console_logger_using_the_given_log_level(self, mock_create_console_handler):
-
-        mock_logger = Mock()
-
-        append_console_logger(mock_logger, 'log level')
-
-        mock_create_console_handler.assert_called_with('log level')
-
-    @patch('config_rpm_maker.create_console_handler')
-    def test_should_append_created_log_handler_to_given_logger(self, mock_create_console_handler):
-
-        mock_handler = Mock()
-        mock_create_console_handler.return_value = mock_handler
-        mock_logger = Mock()
-
-        append_console_logger(mock_logger, 'log level')
-
-        mock_logger.addHandler(mock_handler)

@@ -22,7 +22,7 @@ from os.path import join, exists
 
 from integration_test_support import IntegrationTest
 
-from config_rpm_maker.config import build_config_viewer_host_directory
+from config_rpm_maker.configuration import build_config_viewer_host_directory
 from config_rpm_maker.hostrpmbuilder import (CouldNotTarConfigurationDirectoryException,
                                              CouldNotBuildRpmException,
                                              ConfigDirAlreadyExistsException,

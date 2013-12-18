@@ -23,7 +23,7 @@ from subprocess import PIPE, Popen
 
 from integration_test_support import IntegrationTest
 
-from config_rpm_maker.config import ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE
+from config_rpm_maker.configuration import ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE
 
 
 class CommandLineInterfaceIntegrationTest(IntegrationTest):

@@ -18,28 +18,32 @@ __version__ = '2.0'
 
 import traceback
 
-from logging import DEBUG, INFO, getLogger
+from logging import DEBUG, getLogger
 from sys import argv
 
-from config_rpm_maker import config
-from config_rpm_maker.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
-from config_rpm_maker.config import KEY_SVN_PATH_TO_CONFIG, ConfigException
+from config_rpm_maker.configuration.properties import get_svn_path_to_config
+from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
+from config_rpm_maker.cli.exitprogram import start_measuring_time, exit_program
+from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
+                                              RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
+                                              RETURN_CODE_EXCEPTION_OCCURRED,
+                                              RETURN_CODE_SUCCESS,
+                                              RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
+from config_rpm_maker.cli.parsearguments import (ARGUMENT_REPOSITORY,
+                                                 ARGUMENT_REVISION,
+                                                 OPTION_NO_SYSLOG,
+                                                 apply_arguments_to_config,
+                                                 determine_console_log_level,
+                                                 parse_arguments)
+from config_rpm_maker.configuration import get_svn_path_to_config, ConfigurationException
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
-from config_rpm_maker.exitprogram import start_measuring_time, exit_program
-from config_rpm_maker.logutils import (create_console_handler,
-                                       create_sys_log_handler,
-                                       log_configuration,
-                                       log_process_id)
+from config_rpm_maker.utilities.logutils import (append_console_logger,
+                                                 create_sys_log_handler,
+                                                 log_additional_information,
+                                                 log_exception_message)
 from config_rpm_maker.svnservice import SvnService
-from config_rpm_maker.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
-                                          RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
-                                          RETURN_CODE_EXCEPTION_OCCURRED,
-                                          RETURN_CODE_SUCCESS,
-                                          RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
-from config_rpm_maker.parsearguments import ARGUMENT_REPOSITORY, ARGUMENT_REVISION, OPTION_DEBUG, OPTION_NO_SYSLOG,\
-    parse_arguments, apply_arguments_to_config
 
 LOGGER = getLogger(__name__)
 
@@ -64,7 +68,7 @@ def main():
         log_additional_information()
         building_configuration_rpms_and_clean_host_directories(repository_url, revision)
 
-    except ConfigException as e:
+    except ConfigurationException as e:
         log_exception_message(e)
         return exit_program('Configuration error!', return_code=RETURN_CODE_CONFIGURATION_ERROR)
 
@@ -91,7 +95,7 @@ def initialize_logging_to_console(arguments):
 
 def initialize_configuration(arguments):
     """ Load the configuration file and applies the given arguments to the configuration. """
-    config.load_configuration_file()
+    configuration.load_configuration_file()
     apply_arguments_to_config(arguments)
 
 
@@ -115,39 +119,8 @@ def building_configuration_rpms_and_clean_host_directories(repository, revision)
     """ This function will start the process of building configuration rpms
         for the given configuration repository and the revision. """
 
-    path_to_config = config.get(KEY_SVN_PATH_TO_CONFIG)
+    path_to_config = get_svn_path_to_config()
     svn_service = SvnService(base_url=repository, path_to_config=path_to_config)
     svn_service.log_change_set_meta_information(revision)
     ConfigRpmMaker(revision=revision, svn_service=svn_service).build()
     clean_up_deleted_hosts_data(svn_service, revision)
-
-
-def determine_console_log_level(arguments):
-    """ Determines the log level based on arguments and configuration """
-    if arguments[OPTION_DEBUG]:
-        log_level = DEBUG
-    else:
-        log_level = INFO
-
-    return log_level
-
-
-def append_console_logger(logger, console_log_level):
-    """ Creates and appends a console log handler with the given log level """
-    console_handler = create_console_handler(console_log_level)
-    logger.addHandler(console_handler)
-
-    if console_log_level == DEBUG:
-        logger.debug("DEBUG logging is enabled")
-
-
-def log_additional_information():
-    """ Logs additional information as the process id and the configuration. """
-    log_process_id(LOGGER.info)
-    log_configuration(LOGGER.debug, config.get_properties(), config.get_file_path_of_loaded_configuration())
-
-
-def log_exception_message(message):
-    """ Logs the given multiline message line by line. """
-    for line in str(message).split("\n"):
-        LOGGER.error(line)

@@ -25,25 +25,25 @@ class Dependency:
         so the first/gerneral ones get overwritten by the later/specific ones
     """
 
-    def __init__(self, collapseDependencies=False, filterRegex=".*", positiveFilter=True):
+    def __init__(self, collapse_dependencies=False, filter_regex=".*", positive_filter=True):
         self.dependencies = dict([])
-        self.collapseDependencies = collapseDependencies
-        self.filterRegex = filterRegex
-        self.positiveFilter = positiveFilter
+        self.collapse_dependencies = collapse_dependencies
+        self.filter_regex = filter_regex
+        self.positive_filter = positive_filter
 
-    def _filterDeps(self):
-        filteredDependencies = dict([])
+    def _filter_dependencies(self):
+        filtered_dependencies = dict([])
         for package, dependency in self.dependencies.items():
-            if re.match(self.filterRegex, package):
-                if self.positiveFilter:
-                    filteredDependencies[package] = dependency
+            if re.match(self.filter_regex, package):
+                if self.positive_filter:
+                    filtered_dependencies[package] = dependency
             else:
-                if not self.positiveFilter:
-                    filteredDependencies[package] = dependency
-        self.dependencies = filteredDependencies
+                if not self.positive_filter:
+                    filtered_dependencies[package] = dependency
+        self.dependencies = filtered_dependencies
 
-    def _add(self, rawDependencyString):
-        dependency = re.sub("\s*([<>=]+)\s*", "\\1", rawDependencyString)  # remove spaces around <>=
+    def _add(self, raw_dependency_string):
+        dependency = re.sub("\s*([<>=]+)\s*", "\\1", raw_dependency_string)  # remove spaces around <>=
         dependency = re.sub("\s*,\s*", "\n", dependency)         # change , spearator into newline
         dependency = re.sub("\s+", "\n", dependency)             # all spaces left are separators now, change into newline
         dependency = re.sub("([<>=]+)", " \\1", dependency)      # add a space in front of <>= so we have tuples now
@@ -56,19 +56,19 @@ class Dependency:
                 else:
                     package = dependency
 
-                if (package in self.dependencies) and not self.collapseDependencies:
+                if (package in self.dependencies) and not self.collapse_dependencies:
                     if self.dependencies[package] != dependency:
                         self.dependencies[package] = self.dependencies[package] + ", " + dependency
                 else:
                     self.dependencies[package] = dependency
 
-    def add(self, rawDependencies):
-        if isinstance(rawDependencies, ListType):
-            for item in rawDependencies:
+    def add(self, raw_dependencies):
+        if isinstance(raw_dependencies, ListType):
+            for item in raw_dependencies:
                 self._add(item)
         else:
-            self._add(rawDependencies)
-        self._filterDeps()
+            self._add(raw_dependencies)
+        self._filter_dependencies()
 
     def __repr__(self):
         """ nicely prints the previously added RPM dependencies """

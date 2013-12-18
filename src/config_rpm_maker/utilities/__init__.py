@@ -13,17 +13,3 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import unittest
-
-from config_rpm_maker.hostresolver import HostResolver
-
-
-class HostResolverIntegrationTest(unittest.TestCase):
-
-    def test_should_resolve_localhost(self):
-
-        ip, fqdn, aliases = HostResolver().resolve('localhost')
-
-        self.assertTrue(ip == '127.0.0.1' or ip == '::1')
-        self.assertTrue(fqdn in ['localhost', 'localhost.localdomain'])

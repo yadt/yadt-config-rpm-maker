@@ -14,19 +14,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from logging import Formatter, StreamHandler, getLogger
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 from logging.handlers import SysLogHandler
 from os import getpid
 
-from config_rpm_maker.config import (DEFAULT_LOG_FORMAT,
-                                     DEFAULT_LOG_LEVEL,
-                                     DEFAULT_SYS_LOG_ADDRESS,
-                                     DEFAULT_SYS_LOG_FORMAT,
-                                     DEFAULT_SYS_LOG_LEVEL,
-                                     KEY_VERBOSE,
-                                     get)
+from config_rpm_maker.configuration.properties import get_log_format, is_verbose_enabled
+from config_rpm_maker.configuration import get_properties, get_file_path_of_loaded_configuration
+
 
 LOGGER = getLogger(__name__)
+
+SYS_LOG_ADDRESS = "/dev/log"
+SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
+SYS_LOG_LEVEL = DEBUG
 
 
 class MutedLogger(object):
@@ -50,15 +50,15 @@ _muted_logger = MutedLogger()
 def verbose(logger):
     """ Returns the given logger if verbose is configured or it will return _muted_logger """
 
-    if get(KEY_VERBOSE):
+    if is_verbose_enabled():
         return logger
 
     return _muted_logger
 
 
-def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
+def create_console_handler(log_level):
     """ Returnes a root_logger which logs to the console using the given log_level. """
-    formatter = Formatter(DEFAULT_LOG_FORMAT)
+    formatter = Formatter(get_log_format.default)
 
     console_handler = StreamHandler()
     console_handler.setFormatter(formatter)
@@ -69,12 +69,12 @@ def create_console_handler(log_level=DEFAULT_LOG_LEVEL):
 
 def create_sys_log_handler(revision):
     """ Create a logger handler which logs to sys log and uses the given revision within the format """
-    format = DEFAULT_SYS_LOG_FORMAT.format(revision)
+    format = SYS_LOG_FORMAT.format(revision)
     formatter = Formatter(format)
 
-    sys_log_handler = SysLogHandler(address=DEFAULT_SYS_LOG_ADDRESS)
+    sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS)
     sys_log_handler.setFormatter(formatter)
-    sys_log_handler.setLevel(DEFAULT_SYS_LOG_LEVEL)
+    sys_log_handler.setLevel(SYS_LOG_LEVEL)
 
     return sys_log_handler
 
@@ -84,17 +84,17 @@ def log_configuration(logging_function, configuration, path):
 
     logging_function('Loaded configuration file "%s"', path)
 
-    keys = sorted(configuration.keys())
-    if len(keys) == 0:
+    properties = sorted(configuration.keys())
+    if len(properties) == 0:
         logging_function('Configuration file was empty!')
         return
 
-    max_length = len(max(keys, key=len)) + 2  # two is for quotes on left and right side
+    max_length = len(max(properties, key=lambda property: len(property.key)).key) + 2  # two is for quotes on left and right side
 
-    for key in keys:
-        indentet_key = ('"%s"' % key).ljust(max_length)
-        value = configuration[key]
-        logging_function('Configuration property %s = "%s" (%s)', indentet_key, value, type(value).__name__)
+    for property in properties:
+        indented_key = ('"%s"' % property.key).ljust(max_length)
+        value = configuration[property]
+        logging_function('Configuration property %s = "%s" (%s)', indented_key, value, type(value).__name__)
 
 
 def log_elements_of_list(logging_function, summary_message, unsorted_list):
@@ -117,3 +117,24 @@ def log_process_id(logging_function):
     """ Calls the given logging function to log the current process id """
     process_id = getpid()
     logging_function("Process ID is %s", process_id)
+
+
+def append_console_logger(logger, console_log_level):
+    """ Creates and appends a console log handler with the given log level """
+    console_handler = create_console_handler(console_log_level)
+    logger.addHandler(console_handler)
+
+    if console_log_level == DEBUG:
+        logger.debug("DEBUG logging is enabled")
+
+
+def log_additional_information():
+    """ Logs additional information as the process id and the configuration. """
+    log_process_id(LOGGER.info)
+    log_configuration(LOGGER.debug, get_properties(), get_file_path_of_loaded_configuration())
+
+
+def log_exception_message(message):
+    """ Logs the given multiline message line by line. """
+    for line in str(message).split("\n"):
+        LOGGER.error(line)
