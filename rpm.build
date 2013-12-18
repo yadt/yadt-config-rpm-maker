@@ -16,7 +16,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-echo "First running unit tests"
 set -e
+
+echo "Running unit and integration tests ..."
 python setup.py test
+
+echo "Building package ..."
 python setup.py build
