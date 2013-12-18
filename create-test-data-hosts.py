@@ -3,6 +3,7 @@
 from os.path import exists
 from shutil import copytree
 from random import choice, randint
+from string import ascii_letters
 
 MAX_TYPE1_HOSTS = 5
 MAX_TYPE2_HOSTS = 5
@@ -71,13 +72,9 @@ def create_type(abbreviation):
 def main():
     min_count_of_hosts = 1000
 
-    first_character = 'abcdefghijklmnopqrstuvxyz'
-    second_character = 'abcdefghijklmnopqrstuvwxyz'
-    third_character = 'abcdefghijklmnopqrstuvwxyz'
-
     count_of_hosts = 0
     while count_of_hosts < min_count_of_hosts:
-        abbreviation = choice(first_character) + choice(second_character) + choice(third_character)
+        abbreviation = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
         count_of_hosts += create_type(abbreviation)
 
     print "Created %d hosts" % count_of_hosts
