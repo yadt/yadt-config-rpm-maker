@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from os.path import exists
+from os.path import exists, join
 from shutil import copytree
 from random import choice, randint
 from string import ascii_letters
@@ -15,9 +15,9 @@ MIN_LOCATION3_HOSTS = 5
 
 CONFIGURATION_DIRECTORY = 'testdata/svn_repo/config'
 
-BASE_LOCATION1_HOST = '{configuration_directory}/host/devweb01'.format(configuration_directory=CONFIGURATION_DIRECTORY)
-BASE_LOCATION2_HOST = '{configuration_directory}/host/tuvweb01'.format(configuration_directory=CONFIGURATION_DIRECTORY)
-BASE_LOCATION3_HOST = '{configuration_directory}/host/berweb01'.format(configuration_directory=CONFIGURATION_DIRECTORY)
+BASE_LOCATION1_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'devweb01')
+BASE_LOCATION2_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'tuvweb01')
+BASE_LOCATION3_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'berweb01')
 
 LOCATION1_HOST_DESTINATION = '{configuration_directory}/host/dev{abbreviation}%02d'
 LOCATION2_HOST_DESTINATION = '{configuration_directory}/host/tuv{abbreviation}%02d'
