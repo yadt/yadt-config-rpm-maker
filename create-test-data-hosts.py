@@ -24,7 +24,7 @@ TYPE2_HOST_DESTINATION = '{configuration_directory}/host/tuv{abbreviation}%02d'
 TYPE3_HOST_DESTINATION = '{configuration_directory}/host/ber{abbreviation}%02d'
 
 
-def create_development_host(abbreviation, host_number):
+def create_type1_host(abbreviation, host_number):
     dev_format = TYPE1_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
                                                abbreviation=abbreviation)
     host_dir = dev_format % host_number
@@ -32,7 +32,7 @@ def create_development_host(abbreviation, host_number):
         copytree(BASE_TYPE1_HOST, host_dir)
 
 
-def create_test_host(abbreviation, host_number):
+def create_type2_host(abbreviation, host_number):
     tuv_format = TYPE2_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
                                                abbreviation=abbreviation)
     host_dir = tuv_format % host_number
@@ -40,7 +40,7 @@ def create_test_host(abbreviation, host_number):
         copytree(BASE_TYPE2_HOST, host_dir)
 
 
-def create_production_host(abbreviation, host_number):
+def create_type3_host(abbreviation, host_number):
     prod_format = TYPE3_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
                                                 abbreviation=abbreviation)
     host_dir = prod_format % host_number
@@ -49,17 +49,18 @@ def create_production_host(abbreviation, host_number):
 
 
 def create_type(abbreviation):
+
     count_of_development_hosts = randint(MIN_TYPE1_HOSTS, MAX_TYPE1_HOSTS)
     for host_number in range(1, count_of_development_hosts):
-        create_development_host(abbreviation, host_number)
+        create_type1_host(abbreviation, host_number)
 
     count_of_test_hosts = randint(MIN_TYPE2_HOSTS, MAX_TYPE2_HOSTS)
     for host_number in range(1, count_of_test_hosts):
-        create_test_host(abbreviation, host_number)
+        create_type2_host(abbreviation, host_number)
 
     count_of_production_hosts = randint(MIN_TYPE3_HOSTS, MAX_TYPE3_HOSTS)
     for host_number in range(1, count_of_production_hosts):
-        create_production_host(abbreviation, host_number)
+        create_type3_host(abbreviation, host_number)
 
     print 'type "%s": %02d dev   %02d tuv   %02d ber' % (abbreviation,
                                                          count_of_development_hosts,
