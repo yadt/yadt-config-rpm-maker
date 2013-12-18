@@ -50,24 +50,24 @@ def create_type3_host(abbreviation, host_number):
 
 def create_type(abbreviation):
 
-    count_of_development_hosts = randint(MIN_LOCATION1_HOSTS, MAX_LOCATION1_HOSTS)
-    for host_number in range(1, count_of_development_hosts):
+    count_of_location1_hosts = randint(MIN_LOCATION1_HOSTS, MAX_LOCATION1_HOSTS)
+    for host_number in range(1, count_of_location1_hosts):
         create_type1_host(abbreviation, host_number)
 
-    count_of_test_hosts = randint(MIN_LOCATION2_HOSTS, MAX_LOCATION2_HOSTS)
-    for host_number in range(1, count_of_test_hosts):
+    count_of_location2_hosts = randint(MIN_LOCATION2_HOSTS, MAX_LOCATION2_HOSTS)
+    for host_number in range(1, count_of_location2_hosts):
         create_type2_host(abbreviation, host_number)
 
-    count_of_production_hosts = randint(MIN_LOCATION3_HOSTS, MAX_LOCATION3_HOSTS)
-    for host_number in range(1, count_of_production_hosts):
+    count_of_location3_hosts = randint(MIN_LOCATION3_HOSTS, MAX_LOCATION3_HOSTS)
+    for host_number in range(1, count_of_location3_hosts):
         create_type3_host(abbreviation, host_number)
 
     print 'type "%s": %02d location1   %02d location2   %02d location3' % (abbreviation,
-                                                                           count_of_development_hosts,
-                                                                           count_of_test_hosts,
-                                                                           count_of_production_hosts)
+                                                                           count_of_location1_hosts,
+                                                                           count_of_location2_hosts,
+                                                                           count_of_location3_hosts)
 
-    return count_of_development_hosts + count_of_test_hosts + count_of_production_hosts
+    return count_of_location1_hosts + count_of_location2_hosts + count_of_location3_hosts
 
 
 def main():
