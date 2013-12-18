@@ -201,18 +201,18 @@ class InitializeLoggingToConsoleTests(TestCase):
 class InitializeConfigurationTest(TestCase):
 
     @patch('config_rpm_maker.apply_arguments_to_config')
-    @patch('config_rpm_maker.configuration')
-    def test_should_load_configuration_file(self, mock_config, mock_apply_arguments_to_config):
+    @patch('config_rpm_maker.load_configuration_file')
+    def test_should_load_configuration_file(self, mock_load_configuration_file, mock_apply_arguments_to_config):
 
         mock_arguments = Mock()
 
         initialize_configuration(mock_arguments)
 
-        mock_config.load_configuration_file.assert_called_with()
+        mock_load_configuration_file.assert_called_with()
 
     @patch('config_rpm_maker.apply_arguments_to_config')
-    @patch('config_rpm_maker.configuration')
-    def test_should_apply_arguments_to_configuration(self, mock_config, mock_apply_arguments_to_config):
+    @patch('config_rpm_maker.load_configuration_file')
+    def test_should_apply_arguments_to_configuration(self, mock_load_configuration_file, mock_apply_arguments_to_config):
 
         mock_arguments = Mock()
 

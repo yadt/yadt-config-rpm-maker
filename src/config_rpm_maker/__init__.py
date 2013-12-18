@@ -34,7 +34,7 @@ from config_rpm_maker.cli.parsearguments import (ARGUMENT_REPOSITORY,
                                                  apply_arguments_to_config,
                                                  determine_console_log_level,
                                                  parse_arguments)
-from config_rpm_maker.configuration import get_svn_path_to_config, ConfigurationException
+from config_rpm_maker.configuration import get_svn_path_to_config, ConfigurationException, load_configuration_file
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -94,7 +94,7 @@ def initialize_logging_to_console(arguments):
 
 def initialize_configuration(arguments):
     """ Load the configuration file and applies the given arguments to the configuration. """
-    configuration.load_configuration_file()
+    load_configuration_file()
     apply_arguments_to_config(arguments)
 
 
