@@ -55,10 +55,10 @@ loctyp/berweb:/vars/var_in_var
 
         self.assert_config_viewer_file('berweb01', 'berweb01.variables', """<!DOCTYPE html><html><head><title>berweb01.variables</title></head><body><pre>                                 ALIASES :
                                      ALL : all
-                                    FQDN : .*
+                                    FQDN : .+
                                     HOST : berweb01
                                   HOSTNR : 01
-                                      IP : .*
+                                      IP : .+
                                      LOC : ber
                                   LOCTYP : berweb
                                 OVERRIDE : berweb
@@ -119,10 +119,10 @@ all:/vars/override
         self.assert_config_viewer_file('devweb01', 'devweb01.variables', """<!DOCTYPE html><html><head><title>devweb01.variables</title></head><body><pre>                                 ALIASES :
                                      ALL : all
                               DUMMY_VAR1 :
-                                    FQDN : .*
+                                    FQDN : .+
                                     HOST : devweb01
                                   HOSTNR : 01
-                                      IP : .*
+                                      IP : .+
                                      LOC : dev
                                   LOCTYP : devweb
                                 OVERRIDE : all
@@ -157,10 +157,10 @@ all:/vars/override
         self.assert_config_viewer_file('tuvweb01', 'tuvweb01.variables', """<!DOCTYPE html><html><head><title>tuvweb01.variables</title></head><body><pre>                                 ALIASES :
                                      ALL : all
                               DUMMY_VAR2 :
-                                    FQDN : .*
+                                    FQDN : .+
                                     HOST : tuvweb01
                                   HOSTNR : 01
-                                      IP : .*
+                                      IP : .+
                                      LOC : tuv
                                   LOCTYP : tuvweb
                                 OVERRIDE : all
