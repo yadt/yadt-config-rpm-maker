@@ -5,6 +5,8 @@ from shutil import copytree
 from random import choice, randint
 from string import ascii_letters
 
+DEFAULT_MIN_COUNT_OF_HOSTS = 1000
+
 MAX_LOCATION1_HOSTS = 5
 MAX_LOCATION2_HOSTS = 5
 MAX_LOCATION3_HOSTS = 20
@@ -71,10 +73,8 @@ def create_type(abbreviation):
 
 
 def main():
-    min_count_of_hosts = 1000
-
     count_of_hosts = 0
-    while count_of_hosts < min_count_of_hosts:
+    while count_of_hosts < DEFAULT_MIN_COUNT_OF_HOSTS:
         abbreviation = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
         count_of_hosts += create_type(abbreviation)
 
