@@ -62,10 +62,10 @@ def create_type(abbreviation):
     for host_number in range(1, count_of_production_hosts):
         create_type3_host(abbreviation, host_number)
 
-    print 'type "%s": %02d dev   %02d tuv   %02d ber' % (abbreviation,
-                                                         count_of_development_hosts,
-                                                         count_of_test_hosts,
-                                                         count_of_production_hosts)
+    print 'type "%s": %02d location1   %02d location2   %02d location3' % (abbreviation,
+                                                                           count_of_development_hosts,
+                                                                           count_of_test_hosts,
+                                                                           count_of_production_hosts)
 
     return count_of_development_hosts + count_of_test_hosts + count_of_production_hosts
 
