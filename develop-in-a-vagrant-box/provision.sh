@@ -22,7 +22,7 @@ source "configuration.sh"
 source "library.sh"
 
 if [[ -e ${ALREADY_PROVISIONED} ]]; then
-  echo ""
+  echo
   echo "This VM has already been provisioned successfully."
   echo "Exiting without doing anything ..."
   exit 0
@@ -32,10 +32,10 @@ install_dependencies
 build_and_install_config_rpm_maker
 setup_svn_server_with_test_data_and_start_it
 
-echo ""
+echo
 echo "Touching file ${ALREADY_PROVISIONED}"
 echo "to mark this VM as already provisioned."
 touch ${ALREADY_PROVISIONED}
 
-echo ""
+echo
 echo "Provisioning was successful."
