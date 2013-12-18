@@ -24,7 +24,6 @@ from unittest_support import UnitTests
 
 import config_rpm_maker
 
-from config_rpm_maker.configuration import is_config_viewer_only_enabled, is_no_clean_up_enabled
 from config_rpm_maker.hostrpmbuilder import CouldNotBuildRpmException, ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 

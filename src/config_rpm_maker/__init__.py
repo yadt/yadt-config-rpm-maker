@@ -21,7 +21,6 @@ import traceback
 from logging import DEBUG, getLogger
 from sys import argv
 
-from config_rpm_maker.configuration.properties import get_svn_path_to_config
 from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
 from config_rpm_maker.cli.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,

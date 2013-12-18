@@ -21,7 +21,6 @@ from unittest import TestCase
 
 from mock import Mock, call, patch
 
-from config_rpm_maker.configuration.properties import is_verbose_enabled
 from config_rpm_maker.configuration import ConfigurationProperty
 from config_rpm_maker.utilities.logutils import (SYS_LOG_LEVEL,
                                                  MutedLogger,

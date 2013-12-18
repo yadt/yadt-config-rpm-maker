@@ -23,7 +23,6 @@ from os.path import getsize
 
 import config_rpm_maker.utilities.magic
 
-from config_rpm_maker import configuration
 from config_rpm_maker.configuration.properties import get_max_file_size
 from config_rpm_maker.utilities.logutils import verbose
 from config_rpm_maker.token.cycle import TokenCycleChecking
