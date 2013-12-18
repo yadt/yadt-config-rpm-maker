@@ -21,13 +21,15 @@ BASE_LOCATION1_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'devweb01')
 BASE_LOCATION2_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'tuvweb01')
 BASE_LOCATION3_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'berweb01')
 
-LOCATION1_HOST_DESTINATION = '{configuration_directory}/host/dev{abbreviation}%02d'
-LOCATION2_HOST_DESTINATION = '{configuration_directory}/host/tuv{abbreviation}%02d'
-LOCATION3_HOST_DESTINATION = '{configuration_directory}/host/ber{abbreviation}%02d'
+HOST_DIRECTORY = join(CONFIGURATION_DIRECTORY, 'host')
+
+LOCATION1_HOST_DESTINATION = '{host_directory}/dev{abbreviation}%02d'
+LOCATION2_HOST_DESTINATION = '{host_directory}/tuv{abbreviation}%02d'
+LOCATION3_HOST_DESTINATION = '{host_directory}/ber{abbreviation}%02d'
 
 
 def create_type1_host(abbreviation, host_number):
-    dev_format = LOCATION1_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
+    dev_format = LOCATION1_HOST_DESTINATION.format(host_directory=HOST_DIRECTORY,
                                                    abbreviation=abbreviation)
     host_dir = dev_format % host_number
     if not exists(host_dir):
@@ -35,7 +37,7 @@ def create_type1_host(abbreviation, host_number):
 
 
 def create_type2_host(abbreviation, host_number):
-    tuv_format = LOCATION2_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
+    tuv_format = LOCATION2_HOST_DESTINATION.format(host_directory=HOST_DIRECTORY,
                                                    abbreviation=abbreviation)
     host_dir = tuv_format % host_number
     if not exists(host_dir):
@@ -43,7 +45,7 @@ def create_type2_host(abbreviation, host_number):
 
 
 def create_type3_host(abbreviation, host_number):
-    prod_format = LOCATION3_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
+    prod_format = LOCATION3_HOST_DESTINATION.format(host_directory=HOST_DIRECTORY,
                                                     abbreviation=abbreviation)
     host_dir = prod_format % host_number
     if not exists(host_dir):
