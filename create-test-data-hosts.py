@@ -34,11 +34,11 @@ LOCATION3_HOSTS_COUNT = 20
 
 CONFIGURATION_DIRECTORY = join('testdata', 'svn_repo', 'config')
 
-BASE_LOCATION1_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'devweb01')
-BASE_LOCATION2_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'tuvweb01')
-BASE_LOCATION3_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'berweb01')
-
 HOST_DIRECTORY = join(CONFIGURATION_DIRECTORY, 'host')
+
+BASE_LOCATION1_HOST = 'devweb01'
+BASE_LOCATION2_HOST = 'tuvweb01'
+BASE_LOCATION3_HOST = 'berweb01'
 
 LOCATION1_NAME = 'dev'
 LOCATION2_NAME = 'tuv'
@@ -48,14 +48,15 @@ LOCATION3_NAME = 'ber'
 total_count_of_created_hosts = 0
 
 
-def create_host(location_name, abbreviation, host_number):
+def create_host(location_name, abbreviation, host_number, base_host_name):
 
     global total_count_of_created_hosts
 
     host_name = "%s%s%02d" % (location_name, abbreviation, host_number)
-    host_dir = join(HOST_DIRECTORY, host_name)
-    if not exists(host_dir):
-        copytree(BASE_LOCATION1_HOST, host_dir)
+    destination_host_directory = join(HOST_DIRECTORY, host_name)
+    if not exists(destination_host_directory):
+        source_host_directory = join(HOST_DIRECTORY, base_host_name)
+        copytree(source_host_directory, destination_host_directory)
         total_count_of_created_hosts += 1
 
 
@@ -67,9 +68,9 @@ def create_hosts_in_location(location_name, type_name, count_of_hosts):
 
 def create_hosts_for_type(type_name):
 
-    create_hosts_in_location(LOCATION1_NAME, type_name, LOCATION1_HOSTS_COUNT)
-    create_hosts_in_location(LOCATION2_NAME, type_name, LOCATION2_HOSTS_COUNT)
-    create_hosts_in_location(LOCATION3_NAME, type_name, LOCATION3_HOSTS_COUNT)
+    create_hosts_in_location(LOCATION1_NAME, type_name, LOCATION1_HOSTS_COUNT, BASE_LOCATION1_HOST)
+    create_hosts_in_location(LOCATION2_NAME, type_name, LOCATION2_HOSTS_COUNT, BASE_LOCATION2_HOST)
+    create_hosts_in_location(LOCATION3_NAME, type_name, LOCATION3_HOSTS_COUNT, BASE_LOCATION3_HOST)
 
 
 def main():
