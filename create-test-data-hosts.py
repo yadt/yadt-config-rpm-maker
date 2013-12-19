@@ -28,20 +28,19 @@ from string import ascii_letters
 
 DEFAULT_MIN_COUNT_OF_HOSTS = 1000
 
-LOCATION1_HOSTS_COUNT = 5
-LOCATION2_HOSTS_COUNT = 5
-LOCATION3_HOSTS_COUNT = 20
-
 HOST_DIRECTORY = join(join('testdata', 'svn_repo', 'config'), 'host')
 
-BASE_LOCATION1_HOST = 'devweb01'
-BASE_LOCATION2_HOST = 'tuvweb01'
-BASE_LOCATION3_HOST = 'berweb01'
-
 LOCATION1_NAME = 'dev'
-LOCATION2_NAME = 'tuv'
-LOCATION3_NAME = 'ber'
+LOCATION1_HOSTS_COUNT = 5
+LOCATION1_BASE_HOST = 'devweb01'
 
+LOCATION2_NAME = 'tuv'
+LOCATION2_HOSTS_COUNT = 5
+LOCATION2_BASE_HOST = 'tuvweb01'
+
+LOCATION3_NAME = 'ber'
+LOCATION3_HOSTS_COUNT = 20
+LOCATION3_BASE_HOST = 'berweb01'
 
 total_count_of_created_hosts = 0
 
@@ -66,9 +65,9 @@ def create_hosts_in_location(type_name, location_name, count_of_hosts):
 
 def create_hosts_for_type(type_name):
 
-    create_hosts_in_location(type_name, LOCATION1_NAME, LOCATION1_HOSTS_COUNT, BASE_LOCATION1_HOST)
-    create_hosts_in_location(type_name, LOCATION2_NAME, LOCATION2_HOSTS_COUNT, BASE_LOCATION2_HOST)
-    create_hosts_in_location(type_name, LOCATION3_NAME, LOCATION3_HOSTS_COUNT, BASE_LOCATION3_HOST)
+    create_hosts_in_location(type_name, LOCATION1_NAME, LOCATION1_HOSTS_COUNT, LOCATION1_BASE_HOST)
+    create_hosts_in_location(type_name, LOCATION2_NAME, LOCATION2_HOSTS_COUNT, LOCATION2_BASE_HOST)
+    create_hosts_in_location(type_name, LOCATION3_NAME, LOCATION3_HOSTS_COUNT, LOCATION3_BASE_HOST)
 
 
 def main():
