@@ -23,8 +23,6 @@
 
 from os.path import exists, join
 from shutil import copytree
-from random import choice
-from string import ascii_letters
 
 HOST_DIRECTORY = join('testdata', 'svn_repo', 'config', 'host')
 
