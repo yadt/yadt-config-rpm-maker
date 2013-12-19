@@ -137,7 +137,7 @@ class TokenReplacer(object):
             def replacer_function(token, replacement):
                 return replacement
         else:
-            LOGGER.debug("Using custom replacer_function %s", replacer_function.__name__)
+            verbose(LOGGER).debug("Using custom replacer_function %s", replacer_function.__name__)
 
         if not html_escape_function:
             def html_escape_function(filename, content):
@@ -175,6 +175,8 @@ class TokenReplacer(object):
         return file_content
 
     def _perform_filtering_on_file(self, filename, file_content, file_encoding, html_escape):
+
+        verbose(LOGGER).debug('Filtering file "%s" using encoding "%s"', filename, file_encoding)
         file_content = file_content.decode(file_encoding)
 
         if html_escape:
@@ -228,7 +230,7 @@ class TokenReplacer(object):
 
             # there are still invalid tokens and we could not replace any of them in the last loop cycle, so let's throw an error
             if tokens_with_sub_tokens_after_replace and not replace_count:
-                #maybe there is a cycle?
+                # maybe there is a cycle?
                 dependency_digraph = {}
                 for (variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
                     edge_source = variable
@@ -236,7 +238,7 @@ class TokenReplacer(object):
                     dependency_digraph[edge_source] = edge_target
                 token_graph = TokenCycleChecking(dependency_digraph)
                 token_graph.assert_no_cycles_present()
-                #no cycle => variable undefined
+                # no cycle => variable undefined
                 unreplaced_variables = []
                 for(variable, variable_contents) in tokens_with_sub_tokens_after_replace.iteritems():
                     unreplaced = TokenReplacer.TOKEN_PATTERN.findall(variable_contents)
