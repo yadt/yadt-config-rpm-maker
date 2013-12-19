@@ -38,9 +38,9 @@ class Location(object):
         self.base_host = base_host
         self.hosts_count = hosts_count
 
-LOCATION1 = Location('dev', 'devweb01', 5)
-LOCATION2 = Location('tuv', 'tuvweb01', 5)
-LOCATION3 = Location('ber', 'berweb01', 20)
+LOCATIONS = [Location('dev', 'devweb01', 5),
+             Location('tuv', 'tuvweb01', 5),
+             Location('ber', 'berweb01', 20)]
 
 total_count_of_created_hosts = 0
 
@@ -65,9 +65,8 @@ def create_hosts_in_location(type_name, location_name, count_of_hosts):
 
 def create_hosts_for_type(type_name):
 
-    create_hosts_in_location(type_name, LOCATION1)
-    create_hosts_in_location(type_name, LOCATION2)
-    create_hosts_in_location(type_name, LOCATION3)
+    for location in LOCATIONS:
+        create_hosts_in_location(type_name, location)
 
 
 def main():
