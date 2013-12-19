@@ -46,7 +46,7 @@ LOCATION3_NAME = 'ber'
 total_count_of_created_hosts = 0
 
 
-def create_host(location_name, type_name, host_number, base_host_name):
+def create_host(type_name, location_name, host_number, base_host_name):
 
     global total_count_of_created_hosts
 
@@ -58,7 +58,7 @@ def create_host(location_name, type_name, host_number, base_host_name):
         total_count_of_created_hosts += 1
 
 
-def create_hosts_in_location(location_name, type_name, count_of_hosts):
+def create_hosts_in_location(type_name, location_name, count_of_hosts):
 
     for host_number in range(1, count_of_hosts):
         create_host(location_name, type_name, host_number)
@@ -66,9 +66,9 @@ def create_hosts_in_location(location_name, type_name, count_of_hosts):
 
 def create_hosts_for_type(type_name):
 
-    create_hosts_in_location(LOCATION1_NAME, type_name, LOCATION1_HOSTS_COUNT, BASE_LOCATION1_HOST)
-    create_hosts_in_location(LOCATION2_NAME, type_name, LOCATION2_HOSTS_COUNT, BASE_LOCATION2_HOST)
-    create_hosts_in_location(LOCATION3_NAME, type_name, LOCATION3_HOSTS_COUNT, BASE_LOCATION3_HOST)
+    create_hosts_in_location(type_name, LOCATION1_NAME, LOCATION1_HOSTS_COUNT, BASE_LOCATION1_HOST)
+    create_hosts_in_location(type_name, LOCATION2_NAME, LOCATION2_HOSTS_COUNT, BASE_LOCATION2_HOST)
+    create_hosts_in_location(type_name, LOCATION3_NAME, LOCATION3_HOSTS_COUNT, BASE_LOCATION3_HOST)
 
 
 def main():
