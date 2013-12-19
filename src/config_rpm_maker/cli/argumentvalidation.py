@@ -18,7 +18,8 @@ from logging import getLogger
 from urlparse import urlparse
 
 from config_rpm_maker.cli.exitprogram import exit_program
-from config_rpm_maker.cli.returncodes import RETURN_CODE_REVISION_IS_NOT_AN_INTEGER, RETURN_CODE_REPOSITORY_URL_INVALID
+from config_rpm_maker.cli.returncodes import (RETURN_CODE_REVISION_IS_NOT_AN_INTEGER,
+                                              RETURN_CODE_REPOSITORY_URL_INVALID)
 
 LOGGER = getLogger(__name__)
 
@@ -29,7 +30,8 @@ def ensure_valid_revision(revision):
     """ Ensures that the given argument is a valid revision and exits the program if not """
 
     if not revision.isdigit():
-        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
+        exit_program('Given revision "%s" is not an integer.' % revision,
+                     return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
 
     LOGGER.debug('Accepting "%s" as a valid subversion revision.', revision)
     return revision
