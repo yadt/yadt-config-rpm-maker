@@ -49,45 +49,29 @@ LOCATION2_NAME = 'tuv'
 LOCATION3_NAME = 'ber'
 
 
-def create_type1_host(abbreviation, host_number):
+def create_host(location_name, abbreviation, host_number):
 
-    host_name = "%s%s%02d" % (LOCATION1_NAME, abbreviation, host_number)
+    host_name = "%s%s%02d" % (location_name, abbreviation, host_number)
     host_dir = join(HOST_DIRECTORY, host_name)
     if not exists(host_dir):
         copytree(BASE_LOCATION1_HOST, host_dir)
 
 
-def create_type2_host(abbreviation, host_number):
-
-    host_name = "%s%s%02d" % (LOCATION2_NAME, abbreviation, host_number)
-    host_dir = join(HOST_DIRECTORY, host_name)
-    if not exists(host_dir):
-        copytree(BASE_LOCATION2_HOST, host_dir)
-
-
-def create_type3_host(abbreviation, host_number):
-
-    host_name = "%s%s%02d" % (LOCATION3_NAME, abbreviation, host_number)
-    host_dir = join(HOST_DIRECTORY, host_name)
-    if not exists(host_dir):
-        copytree(BASE_LOCATION3_HOST, host_dir)
-
-
-def create_type(abbreviation):
+def create_type(type_name):
 
     count_of_location1_hosts = randint(MIN_LOCATION1_HOSTS, MAX_LOCATION1_HOSTS)
     for host_number in range(1, count_of_location1_hosts):
-        create_type1_host(abbreviation, host_number)
+        create_host(LOCATION1_NAME, type_name, host_number)
 
     count_of_location2_hosts = randint(MIN_LOCATION2_HOSTS, MAX_LOCATION2_HOSTS)
     for host_number in range(1, count_of_location2_hosts):
-        create_type2_host(abbreviation, host_number)
+        create_host(LOCATION2_NAME, type_name, host_number)
 
     count_of_location3_hosts = randint(MIN_LOCATION3_HOSTS, MAX_LOCATION3_HOSTS)
     for host_number in range(1, count_of_location3_hosts):
-        create_type3_host(abbreviation, host_number)
+        create_host(LOCATION3_NAME, type_name, host_number)
 
-    print 'type "%s": %02d location1   %02d location2   %02d location3' % (abbreviation,
+    print 'type "%s": %02d location1   %02d location2   %02d location3' % (type_name,
                                                                            count_of_location1_hosts,
                                                                            count_of_location2_hosts,
                                                                            count_of_location3_hosts)
@@ -98,8 +82,8 @@ def create_type(abbreviation):
 def main():
     count_of_hosts = 0
     while count_of_hosts < DEFAULT_MIN_COUNT_OF_HOSTS:
-        abbreviation = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
-        count_of_hosts += create_type(abbreviation)
+        random_type_name = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
+        count_of_hosts += create_type(random_type_name)
 
     print "Created %d hosts" % count_of_hosts
 
