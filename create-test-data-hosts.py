@@ -23,7 +23,7 @@
 
 from os.path import exists, join
 from shutil import copytree
-from random import choice, randint
+from random import choice
 from string import ascii_letters
 
 DEFAULT_MIN_COUNT_OF_HOSTS = 1000
