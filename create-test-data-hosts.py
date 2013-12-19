@@ -32,9 +32,7 @@ LOCATION1_HOSTS_COUNT = 5
 LOCATION2_HOSTS_COUNT = 5
 LOCATION3_HOSTS_COUNT = 20
 
-CONFIGURATION_DIRECTORY = join('testdata', 'svn_repo', 'config')
-
-HOST_DIRECTORY = join(CONFIGURATION_DIRECTORY, 'host')
+HOST_DIRECTORY = join(join('testdata', 'svn_repo', 'config'), 'host')
 
 BASE_LOCATION1_HOST = 'devweb01'
 BASE_LOCATION2_HOST = 'tuvweb01'
