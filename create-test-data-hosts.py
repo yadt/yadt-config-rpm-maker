@@ -46,11 +46,11 @@ LOCATION3_NAME = 'ber'
 total_count_of_created_hosts = 0
 
 
-def create_host(location_name, abbreviation, host_number, base_host_name):
+def create_host(location_name, type_name, host_number, base_host_name):
 
     global total_count_of_created_hosts
 
-    host_name = "%s%s%02d" % (location_name, abbreviation, host_number)
+    host_name = "%s%s%02d" % (location_name, type_name, host_number)
     destination_host_directory = join(HOST_DIRECTORY, host_name)
     if not exists(destination_host_directory):
         source_host_directory = join(HOST_DIRECTORY, base_host_name)
