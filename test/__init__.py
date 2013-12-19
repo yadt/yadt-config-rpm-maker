@@ -18,6 +18,9 @@
     This module contains imports to ensure that the user gets useful
     feedback when executing "python setup.py test" and some system
     dependencies are missing.
+
+    Unfortunately the feedback from the test loader is insufficient.
+    This is a known bug. See http://bugs.python.org/issue7559
 """
 
 at_least_one_import_failed = False
