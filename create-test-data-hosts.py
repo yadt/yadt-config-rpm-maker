@@ -57,33 +57,29 @@ def create_host(location_name, abbreviation, host_number):
         copytree(BASE_LOCATION1_HOST, host_dir)
 
 
-def create_type(type_name):
+def create_hosts_in_location(location_name, type_name, min, max):
+    count_of_hosts = randint(min, max)
+    for host_number in range(1, count_of_hosts):
+        create_host(location_name, type_name, host_number)
 
-    count_of_location1_hosts = randint(MIN_LOCATION1_HOSTS, MAX_LOCATION1_HOSTS)
-    for host_number in range(1, count_of_location1_hosts):
-        create_host(LOCATION1_NAME, type_name, host_number)
+    print 'Created %d hosts in %s%s' % (count_of_hosts, location_name, type_name)
+    return count_of_hosts
 
-    count_of_location2_hosts = randint(MIN_LOCATION2_HOSTS, MAX_LOCATION2_HOSTS)
-    for host_number in range(1, count_of_location2_hosts):
-        create_host(LOCATION2_NAME, type_name, host_number)
 
-    count_of_location3_hosts = randint(MIN_LOCATION3_HOSTS, MAX_LOCATION3_HOSTS)
-    for host_number in range(1, count_of_location3_hosts):
-        create_host(LOCATION3_NAME, type_name, host_number)
+def create_hosts_for_type(type_name):
 
-    print 'type "%s": %02d location1   %02d location2   %02d location3' % (type_name,
-                                                                           count_of_location1_hosts,
-                                                                           count_of_location2_hosts,
-                                                                           count_of_location3_hosts)
+    total = create_hosts_in_location(LOCATION1_NAME, type_name, MIN_LOCATION1_HOSTS, MAX_LOCATION1_HOSTS)
+    total += create_hosts_in_location(LOCATION2_NAME, type_name, MIN_LOCATION2_HOSTS, MAX_LOCATION2_HOSTS)
+    total += create_hosts_in_location(LOCATION3_NAME, type_name, MIN_LOCATION3_HOSTS, MAX_LOCATION3_HOSTS)
 
-    return count_of_location1_hosts + count_of_location2_hosts + count_of_location3_hosts
+    return total
 
 
 def main():
     count_of_hosts = 0
     while count_of_hosts < DEFAULT_MIN_COUNT_OF_HOSTS:
         random_type_name = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
-        count_of_hosts += create_type(random_type_name)
+        count_of_hosts += create_hosts_for_type(random_type_name)
 
     print "Created %d hosts" % count_of_hosts
 
