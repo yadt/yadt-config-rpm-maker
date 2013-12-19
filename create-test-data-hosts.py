@@ -34,9 +34,28 @@ class Location(object):
         self.base_host = base_host
         self.hosts_count = hosts_count
 
-LOCATIONS = [Location('prd', 'devweb01', 5),
-             Location('pre', 'tuvweb01', 5),
-             Location('tst', 'berweb01', 20)]
+
+class ProductionLocation(Location):
+
+    def __init__(self, hosts_count):
+        Location.__init__(self, 'prd', 'tuvweb01', hosts_count)
+
+
+class PreProductionLocation(Location):
+
+    def __init__(self, hosts_count):
+        Location.__init__(self, 'pre', 'devweb01', hosts_count)
+
+
+class TestLocation(Location):
+
+    def __init__(self, hosts_count):
+        Location.__init__(self, 'tst', 'berweb01', hosts_count)
+
+
+LOCATIONS = [ProductionLocation(5),
+             PreProductionLocation(5),
+             TestLocation(20)]
 
 TYPE_NAMES = ['app', 'fun', 'foo', 'bar', 'srv', 'sta']
 
