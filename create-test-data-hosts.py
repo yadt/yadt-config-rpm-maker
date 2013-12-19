@@ -44,31 +44,31 @@ BASE_LOCATION3_HOST = join(CONFIGURATION_DIRECTORY, 'host', 'berweb01')
 
 HOST_DIRECTORY = join(CONFIGURATION_DIRECTORY, 'host')
 
-LOCATION1_HOST_DESTINATION = '{host_directory}/dev{abbreviation}%02d'
-LOCATION2_HOST_DESTINATION = '{host_directory}/tuv{abbreviation}%02d'
-LOCATION3_HOST_DESTINATION = '{host_directory}/ber{abbreviation}%02d'
+LOCATION1_NAME = 'dev'
+LOCATION2_NAME = 'tuv'
+LOCATION3_NAME = 'ber'
 
 
 def create_type1_host(abbreviation, host_number):
-    dev_format = LOCATION1_HOST_DESTINATION.format(host_directory=HOST_DIRECTORY,
-                                                   abbreviation=abbreviation)
-    host_dir = dev_format % host_number
+
+    host_name = "%s%s%02d" % (LOCATION1_NAME, abbreviation, host_number)
+    host_dir = join(HOST_DIRECTORY, host_name)
     if not exists(host_dir):
         copytree(BASE_LOCATION1_HOST, host_dir)
 
 
 def create_type2_host(abbreviation, host_number):
-    tuv_format = LOCATION2_HOST_DESTINATION.format(host_directory=HOST_DIRECTORY,
-                                                   abbreviation=abbreviation)
-    host_dir = tuv_format % host_number
+
+    host_name = "%s%s%02d" % (LOCATION2_NAME, abbreviation, host_number)
+    host_dir = join(HOST_DIRECTORY, host_name)
     if not exists(host_dir):
         copytree(BASE_LOCATION2_HOST, host_dir)
 
 
 def create_type3_host(abbreviation, host_number):
-    prod_format = LOCATION3_HOST_DESTINATION.format(host_directory=HOST_DIRECTORY,
-                                                    abbreviation=abbreviation)
-    host_dir = prod_format % host_number
+
+    host_name = "%s%s%02d" % (LOCATION3_NAME, abbreviation, host_number)
+    host_dir = join(HOST_DIRECTORY, host_name)
     if not exists(host_dir):
         copytree(BASE_LOCATION3_HOST, host_dir)
 
