@@ -30,29 +30,29 @@ DEFAULT_MIN_COUNT_OF_HOSTS = 1000
 
 HOST_DIRECTORY = join(join('testdata', 'svn_repo', 'config'), 'host')
 
-LOCATION1_NAME = 'dev'
-LOCATION1_HOSTS_COUNT = 5
-LOCATION1_BASE_HOST = 'devweb01'
 
-LOCATION2_NAME = 'tuv'
-LOCATION2_HOSTS_COUNT = 5
-LOCATION2_BASE_HOST = 'tuvweb01'
+class Location(object):
 
-LOCATION3_NAME = 'ber'
-LOCATION3_HOSTS_COUNT = 20
-LOCATION3_BASE_HOST = 'berweb01'
+    def __init__(self, name, base_host, hosts_count):
+        self.name = name
+        self.base_host = base_host
+        self.hosts_count = hosts_count
+
+LOCATION1 = Location('dev', 'devweb01', 5)
+LOCATION2 = Location('tuv', 'tuvweb01', 5)
+LOCATION3 = Location('ber', 'berweb01', 20)
 
 total_count_of_created_hosts = 0
 
 
-def create_host(type_name, location_name, host_number, base_host_name):
+def create_host(type_name, location):
 
     global total_count_of_created_hosts
 
-    host_name = "%s%s%02d" % (location_name, type_name, host_number)
+    host_name = "%s%s%02d" % (location.name, type_name, location.hosts_count)
     destination_host_directory = join(HOST_DIRECTORY, host_name)
     if not exists(destination_host_directory):
-        source_host_directory = join(HOST_DIRECTORY, base_host_name)
+        source_host_directory = join(HOST_DIRECTORY, location.base_host)
         copytree(source_host_directory, destination_host_directory)
         total_count_of_created_hosts += 1
 
@@ -65,9 +65,9 @@ def create_hosts_in_location(type_name, location_name, count_of_hosts):
 
 def create_hosts_for_type(type_name):
 
-    create_hosts_in_location(type_name, LOCATION1_NAME, LOCATION1_HOSTS_COUNT, LOCATION1_BASE_HOST)
-    create_hosts_in_location(type_name, LOCATION2_NAME, LOCATION2_HOSTS_COUNT, LOCATION2_BASE_HOST)
-    create_hosts_in_location(type_name, LOCATION3_NAME, LOCATION3_HOSTS_COUNT, LOCATION3_BASE_HOST)
+    create_hosts_in_location(type_name, LOCATION1)
+    create_hosts_in_location(type_name, LOCATION2)
+    create_hosts_in_location(type_name, LOCATION3)
 
 
 def main():
