@@ -28,7 +28,7 @@ from string import ascii_letters
 
 DEFAULT_MIN_COUNT_OF_HOSTS = 1000
 
-HOST_DIRECTORY = join(join('testdata', 'svn_repo', 'config'), 'host')
+HOST_DIRECTORY = join('testdata', 'svn_repo', 'config', 'host')
 
 
 class Location(object):
