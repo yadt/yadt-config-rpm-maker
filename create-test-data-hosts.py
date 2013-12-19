@@ -63,9 +63,9 @@ def create_hosts_in_location(type_name, location):
         create_host(type_name, location, host_number)
 
 
-def create_hosts_for_type(type_name):
+def create_hosts_for_type(type_name, locations):
 
-    for location in LOCATIONS:
+    for location in locations:
         create_hosts_in_location(type_name, location)
 
 
@@ -74,7 +74,7 @@ def main():
     global total_count_of_created_hosts
 
     for type_name in TYPE_NAMES:
-        create_hosts_for_type(type_name)
+        create_hosts_for_type(type_name, LOCATIONS)
 
     print "Created %d hosts." % total_count_of_created_hosts
 
