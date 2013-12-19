@@ -26,8 +26,6 @@ from shutil import copytree
 from random import choice
 from string import ascii_letters
 
-DEFAULT_MIN_COUNT_OF_HOSTS = 1000
-
 HOST_DIRECTORY = join('testdata', 'svn_repo', 'config', 'host')
 
 
@@ -42,14 +40,16 @@ LOCATIONS = [Location('dev', 'devweb01', 5),
              Location('tuv', 'tuvweb01', 5),
              Location('ber', 'berweb01', 20)]
 
+TYPE_NAMES = ['app', 'fun', 'foo', 'bar', 'srv', 'sta']
+
 total_count_of_created_hosts = 0
 
 
-def create_host(type_name, location):
+def create_host(type_name, location, host_number):
 
     global total_count_of_created_hosts
 
-    host_name = "%s%s%02d" % (location.name, type_name, location.hosts_count)
+    host_name = "%s%s%02d" % (location.name, type_name, host_number)
     destination_host_directory = join(HOST_DIRECTORY, host_name)
     if not exists(destination_host_directory):
         source_host_directory = join(HOST_DIRECTORY, location.base_host)
@@ -57,10 +57,10 @@ def create_host(type_name, location):
         total_count_of_created_hosts += 1
 
 
-def create_hosts_in_location(type_name, location_name, count_of_hosts):
+def create_hosts_in_location(type_name, location):
 
-    for host_number in range(1, count_of_hosts):
-        create_host(location_name, type_name, host_number)
+    for host_number in range(1, location.hosts_count):
+        create_host(type_name, location, host_number)
 
 
 def create_hosts_for_type(type_name):
@@ -73,9 +73,8 @@ def main():
 
     global total_count_of_created_hosts
 
-    while total_count_of_created_hosts < DEFAULT_MIN_COUNT_OF_HOSTS:
-        random_type_name = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
-        create_hosts_for_type(random_type_name)
+    for type_name in TYPE_NAMES:
+        create_hosts_for_type(type_name)
 
     print "Created %d hosts." % total_count_of_created_hosts
 
