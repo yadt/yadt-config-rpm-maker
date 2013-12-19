@@ -53,11 +53,67 @@ class TestLocation(Location):
         Location.__init__(self, 'tst', 'berweb01', hosts_count)
 
 
-LOCATIONS = [ProductionLocation(5),
-             PreProductionLocation(5),
-             TestLocation(20)]
+#  Please adapt the TEST_DATA list to generate test data which
+#  might look like the host structure in your datacenter.
+#
+#  First entry explained:
+#     a host group type called "app".
+#     For example a host group serving a web application.
 
-TYPE_NAMES = ['app', 'fun', 'foo', 'bar', 'srv', 'sta']
+TEST_DATA = [('app', [ProductionLocation(20),    # 20 hosts in production
+                                                 # this will generate host names from: prdapp01 to prdapp20
+
+                      PreProductionLocation(5),  # 5 hosts in pre-production
+                                                 # this will generate host names from: preapp01 to preapp05
+
+                      TestLocation(3)]),         # 3 hosts in test
+                                                 # this will generate host names from: tstapp01 to tstapp03
+
+             ('cld', [ProductionLocation(3),
+                      PreProductionLocation(1),
+                      TestLocation(1)]),
+             ('mem', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('bet', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('bus', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('cor', [ProductionLocation(99),
+                      PreProductionLocation(10),
+                      TestLocation(10)]),
+             ('cit', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('def', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('int', [ProductionLocation(65),
+                      PreProductionLocation(45),
+                      TestLocation(20)]),
+             ('mgo', [ProductionLocation(30),
+                      PreProductionLocation(25),
+                      TestLocation(56)]),
+             ('www', [ProductionLocation(99),
+                      PreProductionLocation(20),
+                      TestLocation(17)]),
+             ('wik', [ProductionLocation(1),
+                      PreProductionLocation(1),
+                      TestLocation(1)]),
+             ('med', [ProductionLocation(80),
+                      PreProductionLocation(10),
+                      TestLocation(10)]),
+             ('dns', [ProductionLocation(10),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('dbs', [ProductionLocation(75),
+                      PreProductionLocation(50),
+                      TestLocation(50)]),
+             ('dev', [ProductionLocation(5),
+                      PreProductionLocation(36),
+                      TestLocation(80)])]
 
 total_count_of_created_hosts = 0
 
@@ -90,8 +146,8 @@ def main():
 
     global total_count_of_created_hosts
 
-    for type_name in TYPE_NAMES:
-        create_hosts_for_type(type_name, LOCATIONS)
+    for type_name, locations in TEST_DATA:
+        create_hosts_for_type(type_name, locations)
 
     print "Created %d hosts." % total_count_of_created_hosts
 
