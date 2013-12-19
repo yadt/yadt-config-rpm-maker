@@ -132,7 +132,7 @@ def create_host(type_name, location, host_number):
 
 def create_hosts_in_location(type_name, location):
 
-    for host_number in range(1, location.hosts_count):
+    for host_number in range(1, location.hosts_count + 1):
         create_host(type_name, location, host_number)
 
 
