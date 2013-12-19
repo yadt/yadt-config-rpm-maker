@@ -25,7 +25,6 @@ from config_rpm_maker.configuration import get_thread_count
 
 LOGGER = getLogger(__name__)
 
-NUMBER_OF_LARGEST_FILES_TO_LOG = 10
 LOG_EACH_MEASUREMENT = False
 
 _execution_time_summary = {}
