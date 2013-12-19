@@ -51,28 +51,28 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
         self.config_rpm_maker(self.repository_directory, '1')
 
         self.assert_exit_code_was(0)
-        self.assert_stderr_ends_with('[ INFO] Success.')
+        self.assert_stderr_ends_with('[ INFO] Success.\n')
 
     def test_should_return_with_exit_code_zero_when_valid_repository_url_and_verbose_option_given(self):
 
         self.config_rpm_maker(self.repository_directory, '1', '--verbose')
 
         self.assert_exit_code_was(0)
-        self.assert_stderr_ends_with('[ INFO] Success.')
+        self.assert_stderr_ends_with('[ INFO] Success.\n')
 
     def test_should_return_with_exit_code_zero_when_valid_repository_url_and_debug_option_given(self):
 
         self.config_rpm_maker(self.repository_directory, '1', '--debug')
 
         self.assert_exit_code_was(0)
-        self.assert_stderr_ends_with('[ INFO] Success.')
+        self.assert_stderr_ends_with('[ INFO] Success.\n')
 
     def test_should_return_with_exit_code_zero_when_valid_repository_url_and_debug_and_verbose_option_given(self):
 
         self.config_rpm_maker(self.repository_directory, '1', '--debug', '--verbose')
 
         self.assert_exit_code_was(0)
-        self.assert_stderr_ends_with('[ INFO] Success.')
+        self.assert_stderr_ends_with('[ INFO] Success.\n')
 
     def test_should_return_with_exit_code_one_when_not_enough_arguments_are_given(self):
 
@@ -85,7 +85,7 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
         self.config_rpm_maker('--foo-bar')
 
         self.assert_exit_code_was(2)
-        self.assert_stderr_ends_with('error: no such option: --foo-bar')
+        self.assert_stderr_ends_with('error: no such option: --foo-bar\n')
 
     def test_should_return_with_exit_code_three_when_a_bad_configuration_parameter_is_given(self):
 
@@ -94,42 +94,61 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
         self.config_rpm_maker(self.repository_directory, '1')
 
         self.assert_exit_code_was(3)
-        self.assert_stderr_ends_with('[ERROR] Configuration error!')
+        self.assert_stderr_ends_with("""[ERROR] Invalid log level "1". Log level has to be a string (DEBUG, ERROR or INFO).
+[ERROR] Configuration error!
+[DEBUG] Error code is 3
+[ERROR] Failed.
+""")
 
     def test_should_return_with_exit_code_four_when_svn_client_throws_error_because_host_in_strange_repository_url_is_not_reachable(self):
 
         self.config_rpm_maker('file://spam/eggs', '1')
 
         self.assert_exit_code_was(4)
-        self.assert_stderr_ends_with('[ERROR] An exception occurred!')
+        self.assert_stderr_ends_with("""[ERROR] An exception occurred!
+[DEBUG] Error code is 4
+[ERROR] Failed.
+""")
 
     def test_should_return_with_exit_code_four_when_invalid_revision_number_is_given(self):
 
         self.config_rpm_maker(self.repository_directory, '213')
 
         self.assert_exit_code_was(4)
-        self.assert_stderr_ends_with('[ERROR] An exception occurred!')
+        self.assert_stderr_ends_with("""[ERROR] An exception occurred!
+[DEBUG] Error code is 4
+[ERROR] Failed.
+""")
 
     def test_should_return_with_exit_code_four_when_invalid_revision_number_and_debug_option_are_given(self):
 
         self.config_rpm_maker(self.repository_directory, '213', '--debug')
 
         self.assert_exit_code_was(4)
-        self.assert_stderr_ends_with('[ERROR] An exception occurred!')
+        self.assert_stderr_ends_with("""[ERROR] An exception occurred!
+[DEBUG] Error code is 4
+[ERROR] Failed.
+""")
 
     def test_should_return_with_exit_code_four_when_invalid_revision_number_and_debug_and_verbose_option_are_given(self):
 
         self.config_rpm_maker(self.repository_directory, '213', '--debug', '--verbose')
 
         self.assert_exit_code_was(4)
-        self.assert_stderr_ends_with('[ERROR] An exception occurred!')
+        self.assert_stderr_ends_with("""[ERROR] An exception occurred!
+[DEBUG] Error code is 4
+[ERROR] Failed.
+""")
 
     def test_should_return_with_exit_code_six_when_invalid_repository_url_is_given(self):
 
         self.config_rpm_maker('rss://spam/eggs', '1')
 
         self.assert_exit_code_was(6)
-        self.assert_stderr_ends_with('[ERROR] Given repository url "rss://spam/eggs" is invalid.')
+        self.assert_stderr_ends_with("""[ERROR] Given repository url "rss://spam/eggs" is invalid.
+[DEBUG] Error code is 6
+[ERROR] Failed.
+""")
 
     def config_rpm_maker(self, *args):
         process = Popen(['python', 'src/config_rpm_maker'] + list(args) + ['--debug', '--no-syslog'],
@@ -155,11 +174,11 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
     def assert_stderr_ends_with(self, expected_postfix):
         error_message = 'stderr was "%s" and did not end with "%s"' % (self.stderr, expected_postfix)
-        self.assertTrue(self.stderr.endswith(expected_postfix + "\n"), error_message)
+        self.assertTrue(self.stderr.endswith(expected_postfix), error_message)
 
     def assert_stdout_ends_with(self, expected_postfix):
         error_message = 'stdout was "%s" and did not end with "%s"' % (self.stdout, expected_postfix)
-        self.assertTrue(self.stdout.endswith(expected_postfix + "\n"), error_message)
+        self.assertTrue(self.stdout.endswith(expected_postfix), error_message)
 
     def assert_exit_code_was(self, expected_exit_code):
         error_message = "Expected error code was %s but got %s.\n" % (expected_exit_code, self.exit_code)
