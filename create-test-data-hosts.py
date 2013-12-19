@@ -28,13 +28,9 @@ from string import ascii_letters
 
 DEFAULT_MIN_COUNT_OF_HOSTS = 1000
 
-MAX_LOCATION1_HOSTS = 5
-MAX_LOCATION2_HOSTS = 5
-MAX_LOCATION3_HOSTS = 20
-
-MIN_LOCATION1_HOSTS = 3
-MIN_LOCATION2_HOSTS = 1
-MIN_LOCATION3_HOSTS = 5
+LOCATION1_HOSTS_COUNT = 5
+LOCATION2_HOSTS_COUNT = 5
+LOCATION3_HOSTS_COUNT = 20
 
 CONFIGURATION_DIRECTORY = join('testdata', 'svn_repo', 'config')
 
@@ -49,39 +45,42 @@ LOCATION2_NAME = 'tuv'
 LOCATION3_NAME = 'ber'
 
 
+total_count_of_created_hosts = 0
+
+
 def create_host(location_name, abbreviation, host_number):
+
+    global total_count_of_created_hosts
 
     host_name = "%s%s%02d" % (location_name, abbreviation, host_number)
     host_dir = join(HOST_DIRECTORY, host_name)
     if not exists(host_dir):
         copytree(BASE_LOCATION1_HOST, host_dir)
+        total_count_of_created_hosts += 1
 
 
-def create_hosts_in_location(location_name, type_name, min, max):
-    count_of_hosts = randint(min, max)
+def create_hosts_in_location(location_name, type_name, count_of_hosts):
+
     for host_number in range(1, count_of_hosts):
         create_host(location_name, type_name, host_number)
-
-    print 'Created %d hosts in %s%s' % (count_of_hosts, location_name, type_name)
-    return count_of_hosts
 
 
 def create_hosts_for_type(type_name):
 
-    total = create_hosts_in_location(LOCATION1_NAME, type_name, MIN_LOCATION1_HOSTS, MAX_LOCATION1_HOSTS)
-    total += create_hosts_in_location(LOCATION2_NAME, type_name, MIN_LOCATION2_HOSTS, MAX_LOCATION2_HOSTS)
-    total += create_hosts_in_location(LOCATION3_NAME, type_name, MIN_LOCATION3_HOSTS, MAX_LOCATION3_HOSTS)
-
-    return total
+    create_hosts_in_location(LOCATION1_NAME, type_name, LOCATION1_HOSTS_COUNT)
+    create_hosts_in_location(LOCATION2_NAME, type_name, LOCATION2_HOSTS_COUNT)
+    create_hosts_in_location(LOCATION3_NAME, type_name, LOCATION3_HOSTS_COUNT)
 
 
 def main():
-    count_of_hosts = 0
-    while count_of_hosts < DEFAULT_MIN_COUNT_OF_HOSTS:
-        random_type_name = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
-        count_of_hosts += create_hosts_for_type(random_type_name)
 
-    print "Created %d hosts" % count_of_hosts
+    global total_count_of_created_hosts
+
+    while total_count_of_created_hosts < DEFAULT_MIN_COUNT_OF_HOSTS:
+        random_type_name = choice(ascii_letters) + choice(ascii_letters) + choice(ascii_letters)
+        create_hosts_for_type(random_type_name)
+
+    print "Created %d hosts." % total_count_of_created_hosts
 
 
 if __name__ == '__main__':
