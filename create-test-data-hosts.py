@@ -36,9 +36,9 @@ class Location(object):
         self.base_host = base_host
         self.hosts_count = hosts_count
 
-LOCATIONS = [Location('dev', 'devweb01', 5),
-             Location('tuv', 'tuvweb01', 5),
-             Location('ber', 'berweb01', 20)]
+LOCATIONS = [Location('prd', 'devweb01', 5),
+             Location('pre', 'tuvweb01', 5),
+             Location('tst', 'berweb01', 20)]
 
 TYPE_NAMES = ['app', 'fun', 'foo', 'bar', 'srv', 'sta']
 
