@@ -13,7 +13,7 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 
 | Property Name           | Fallback Value   | Description                             |
 |-----------------------  |------------------|-----------------------------------------|
-| log_level               | DEBUG            | Defines the log level of the written files. The log level for syslog is by default DEBUG and the log level for the console is by default INFO (see usage info how to change the loglevel of console) Has to be one of DEBUG, ERROR or INFO
+| log_level               | DEBUG            | Defines the log level of the written files. The log level for syslog is by default DEBUG (see [Syslog](#Syslog) for more information) and the log level for the console is by default INFO (see usage info how to change the loglevel of console) Has to be one of DEBUG, ERROR or INFO
 | thread_count            | 1                | Defines how many threads will be start to build your rpms. Use 0 if you want to start exactly one thread for each affected host.
 | allow_unknown_hosts     | True             | config-rpm-maker will try to resolve the hosts it builds configuration rpms for. If this property is set to "true" config-rpm-maker will not fail when it can not resolve the host.
 | config_rpm_prefix       | yadt-config-     | A prefix which will be prepended to the configuration rpms file names.
@@ -29,3 +29,10 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 | svn_path_to_config      | /config          | The path within the configuration subversion repository where to find the configuration directory structure.
 | thread_count            | 1                | Number of threads building the rpms at the same time.
 | temp_dir                | /tmp             | This directory is used as a working directory when building rpms. You will find the error log files here.
+
+## Syslog
+
+The logging of yadt-config-rpm-maker's `SysLogHandler` is set to `DEBUG`.
+On most systems the log level for `/var/log/messages` will be `*.info` by default.
+If you want to see more logging details you will have to configure the log level within
+`/etc/syslog.conf` or `/etc/rsyslog.conf`.
