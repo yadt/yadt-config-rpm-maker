@@ -24,7 +24,7 @@ from sys import argv
 from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
 from config_rpm_maker.cli.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
-                                              RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
+                                              RETURN_CODE_UNKNOWN_EXCEPTION_OCCURRED,
                                               RETURN_CODE_EXCEPTION_OCCURRED,
                                               RETURN_CODE_SUCCESS,
                                               RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
@@ -79,7 +79,7 @@ def main():
         stack_trace = traceback.format_exc(5)
         for line in stack_trace.split('\n'):
             LOGGER.error(line)
-        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKNOWN_EXCEPTION_OCCURRED)
 
     except KeyboardInterrupt:
         return exit_program('Execution interrupted by user!', return_code=RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
