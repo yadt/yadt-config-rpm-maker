@@ -150,12 +150,12 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             self._upload_rpms(rpms)
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
 
-        except BaseConfigRpmMakerException, e:
-            self.logger.error('Last error during build:\n%s' % str(e))
+        except BaseConfigRpmMakerException as exception:
+            self.logger.error('Last error during build:\n%s' % str(exception))
             self.__build_error_msg_and_move_to_public_access(self.revision)
-            raise e
+            raise exception
 
-        except Exception, e:
+        except Exception as exception:
             self.logger.exception('Last error during build:')
             error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
             raise Exception('Unexpected error occurred, stacktrace will follow.\n%s\n\n%s' % (traceback.format_exc(), error_msg))
