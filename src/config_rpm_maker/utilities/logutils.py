@@ -27,6 +27,7 @@ LOGGER = getLogger(__name__)
 SYS_LOG_ADDRESS = "/dev/log"
 SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 SYS_LOG_LEVEL = DEBUG
+SYS_LOG_FACILITY = SysLogHandler.LOG_USER
 
 
 class MutedLogger(object):
@@ -72,7 +73,7 @@ def create_sys_log_handler(revision):
     format = SYS_LOG_FORMAT.format(revision)
     formatter = Formatter(format)
 
-    sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS)
+    sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS, facility=SYS_LOG_FACILITY)
     sys_log_handler.setFormatter(formatter)
     sys_log_handler.setLevel(SYS_LOG_LEVEL)
 
