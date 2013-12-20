@@ -18,7 +18,7 @@
 
 from unittest import TestCase
 
-from mock import Mock, patch
+from mock import Mock, call, patch
 
 from config_rpm_maker import (extract_repository_url_and_revision_from_arguments,
                               initialize_configuration,
@@ -79,16 +79,23 @@ class MainTests(TestCase):
 
         mock_exit_program.assert_called_with('Execution interrupted by user!', return_code=7)
 
+    @patch('config_rpm_maker.LOGGER')
     @patch('config_rpm_maker.parse_arguments')
     @patch('config_rpm_maker.exit_program')
     @patch('config_rpm_maker.traceback')
-    def test_should_print_traceback_when_completly_unexpected_exception_occurrs(self, mock_traceback, mock_exit_program, mock_parse_arguments):
+    def test_should_print_traceback_when_completly_unexpected_exception_occurrs(self, mock_traceback, mock_exit_program, mock_parse_arguments, mock_logger):
 
+        mock_traceback.format_exc.return_value = 'stacktrace line1\nline2\nline3\n'
         mock_parse_arguments.side_effect = Exception("WTF!")
 
         main()
 
-        mock_traceback.print_exc.assert_called_with(5)
+        mock_traceback.format_exc.assert_called_with(5)
+        self.assertEqual([call('stacktrace line1'),
+                          call('line2'),
+                          call('line3'),
+                          call('')],
+                         mock_logger.error.call_args_list)
 
     @patch('config_rpm_maker.parse_arguments')
     @patch('config_rpm_maker.exit_program')

@@ -76,7 +76,9 @@ def main():
         return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:
-        traceback.print_exc(5)
+        stack_trace = traceback.format_exc(5)
+        for line in stack_trace.split('\n'):
+            LOGGER.error(line)
         return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
 
     except KeyboardInterrupt:
