@@ -219,7 +219,8 @@ def _ensure_properties_are_valid(raw_properties):
         is_verbose_enabled: is_verbose_enabled.default
     }
 
-    unknown_configuration_properties = set(raw_properties.keys()) - set(valid_properties.keys())
+    valid_property_keys = set(map(lambda configuration_property: configuration_property.key, valid_properties.keys()))
+    unknown_configuration_properties = set(raw_properties.keys()) - valid_property_keys
 
     if len(unknown_configuration_properties) > 0:
         LOGGER.warn('Unknown configuration propertie(s) found: %s' % ', '.join(unknown_configuration_properties))
