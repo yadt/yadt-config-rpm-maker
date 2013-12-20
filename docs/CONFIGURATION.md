@@ -13,7 +13,7 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 
 | Property Name           | Fallback Value   | Description                             |
 |-----------------------  |------------------|-----------------------------------------|
-| log_level               | DEBUG            | Defines the log level of the written files. The log level for syslog is by default DEBUG (see [Syslog](#Syslog) for more information) and the log level for the console is by default INFO (see usage info how to change the loglevel of console) Has to be one of DEBUG, ERROR or INFO
+| log_level               | DEBUG            | Defines the log level of the written files. The log level for syslog is by default DEBUG (see [Syslog](#syslog) for more information) and the log level for the console is by default INFO (see usage info how to change the loglevel of console) Has to be one of DEBUG, ERROR or INFO
 | thread_count            | 1                | Defines how many threads will be start to build your rpms. Use 0 if you want to start exactly one thread for each affected host.
 | allow_unknown_hosts     | True             | config-rpm-maker will try to resolve the hosts it builds configuration rpms for. If this property is set to "true" config-rpm-maker will not fail when it can not resolve the host.
 | config_rpm_prefix       | yadt-config-     | A prefix which will be prepended to the configuration rpms file names.
