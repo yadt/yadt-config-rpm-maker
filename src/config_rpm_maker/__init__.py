@@ -18,7 +18,7 @@ __version__ = '2.0'
 
 import traceback
 
-from logging import DEBUG, getLogger
+from logging import DEBUG, getLogger, getLevelName
 from sys import argv
 
 from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
@@ -112,6 +112,7 @@ def initialize_logging_to_syslog(arguments, revision):
     if not arguments[OPTION_NO_SYSLOG]:
         sys_log_handler = create_sys_log_handler(revision)
         LOGGER.addHandler(sys_log_handler)
+        LOGGER.info("Logging to syslog on level %s", getLevelName(sys_log_handler.level))
 
 
 def building_configuration_rpms_and_clean_host_directories(repository, revision):
