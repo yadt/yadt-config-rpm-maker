@@ -278,6 +278,7 @@ def _ensure_is_an_integer(key, value):
 
 
 def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
+    """ returns the given value if it is valid """
 
     value_type = type(value)
     if value_type is not str:
@@ -293,6 +294,7 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
 
 def _ensure_is_a_string_or_none(key, value):
+    """ returns the given value if it is valid """
 
     if value is None:
         return None
@@ -306,6 +308,7 @@ def _ensure_is_a_string_or_none(key, value):
 
 
 def _ensure_is_a_list_of_strings(key, value):
+    """ returns the given value if it is valid """
 
     value_type = type(value)
     if value_type is not list:
