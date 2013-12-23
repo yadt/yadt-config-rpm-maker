@@ -37,7 +37,7 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
         self.config_rpm_maker('--version')
 
-        self.assert_stdout_equal('yadt-config-rpm-maker 2.0\n')
+        self.assert_stdout_equal('yadt-config-rpm-maker 3.2\n')
         self.assert_exit_code_was(0)
 
     def test_should_return_with_exit_code_zero_when_displaying_help_screen(self):

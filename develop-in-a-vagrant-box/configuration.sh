@@ -25,8 +25,8 @@ readonly ALREADY_PROVISIONED="${WORKING_DIRECTORY}/.provisioning_was_successful"
 readonly SOURCE_REPOSITORY="https://github.com/yadt/yadt-config-rpm-maker"
 readonly SOURCE_DIRECTORY="${WORKING_DIRECTORY}/yadt-config-rpm-maker"
 
-readonly SOURCE_RPM="yadt-config-rpm-maker-2.0-1.src.rpm"
-readonly RESULT_RPM="yadt-config-rpm-maker-2.0-1.noarch.rpm"
+readonly SOURCE_RPM="yadt-config-rpm-maker-3.2-1.src.rpm"
+readonly RESULT_RPM="yadt-config-rpm-maker-3.2-1.noarch.rpm"
 
 readonly CONFIGURATION_REPOSITORY="${WORKING_DIRECTORY}/configuration-repository"
 readonly HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
