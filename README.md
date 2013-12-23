@@ -46,7 +46,7 @@ config-rpm-maker svn://host/repository/ 123
 ## Features
 
   * Creates data for configviewer (visualises the configuration of your hosts)
-  * Templateing for your configuration files.
+  * Templating for your configuration files.
   * Preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/yadt/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
 
 ## Getting Started
