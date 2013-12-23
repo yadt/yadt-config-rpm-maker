@@ -48,6 +48,9 @@ class ConfigurationException(BaseConfigRpmMakerException):
 
 
 class ConfigurationProperty(object):
+    """ A callable configuration property. Using this class one can define
+        configuration properties which have a readable name and return the
+        configuration value. """
 
     def __init__(self, key, default, validator=None):
         self.key = key
@@ -75,10 +78,9 @@ from config_rpm_maker.configuration.properties import *
 
 
 def load_configuration_file():
-    """
-        Determines where the configuration file to load might be,
-        loads it and ensures the loaded properties are valid.
-    """
+    """ Determines where to find the configuration file,
+        loads it and ensures the loaded properties are valid. """
+
     configuration_file_path = _determine_configuration_file_path()
 
     if not exists(configuration_file_path):
@@ -93,10 +95,13 @@ def load_configuration_file():
     set_properties(valid_properties)
 
 
-def build_config_viewer_host_directory(hostname, revision=False):
-    """ Returns a path to the config viewer host directory"""
+def build_config_viewer_host_directory(host_name, revision=False):
+    """ Returns the path to the config viewer host directory for the given host_name
+
+        If revision is given it will append the revision to the path name """
+
     config_viewer_hosts_directory = get_config_viewer_host_directory()
-    path = join(config_viewer_hosts_directory, hostname)
+    path = join(config_viewer_hosts_directory, host_name)
 
     if revision:
         path += ".new-revision-" + revision
@@ -105,12 +110,11 @@ def build_config_viewer_host_directory(hostname, revision=False):
 
 
 def set_property(name, value):
-    """
-        set the configuration property identied by the given name to the given value.
+    """ set the configuration property identified by the given name to the given value.
 
         Before setting the property it will check if the configuration file has already been loaded.
-        If this is not the case it will load the configuration file.
-    """
+        If this is not the case it will load the configuration file. """
+
     if not name:
         raise ConfigurationException("No configuration property name given")
 
@@ -124,39 +128,41 @@ def set_property(name, value):
 
 
 def get_properties():
-    """ Returns the application configuration properties if they have already been loaded"""
+    """ Returns the application configuration properties if they have already been loaded """
+
     return _properties
 
 
 def set_properties(new_properties):
     """ Sets the application configuration properties (a dictionary) """
+
     global _properties
     _properties = new_properties
 
 
 def get_file_path_of_loaded_configuration():
     """ Returns the path to the loaded configuration file (if it has been loaded) """
+
     return _file_path_of_loaded_configuration
 
 
 def _set_file_path_of_loaded_configuration(new_file_path):
-    """ Use this function after load a configuration file to declare which file has been loaded """
+    """ Use this function after loading a configuration file
+        to declare which file has been loaded """
+
     global _file_path_of_loaded_configuration
     _file_path_of_loaded_configuration = new_file_path
 
 
 def _determine_configuration_file_path():
-    """
-        Decides which configuration file to load and returns the path to the file.
+    """ Checks if the environment variable has been set. """
 
-        It will try to read the environment variable and
-        if this is not available it will fall back to the default file path.
-    """
     return environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, CONFIGURATION_FILE_PATH)
 
 
 def _load_configuration_properties_from_yaml_file(configuration_file_path):
     """ Load the configuration properties from the given path to a yaml file. """
+
     try:
         with open(configuration_file_path) as configuration_file:
             properties = yaml.load(configuration_file)
@@ -169,13 +175,12 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
 
 
 def _ensure_properties_are_valid(raw_properties):
-    """
-        Ensures that the configuration properties are valid by parsing them.
+    """ Ensures that the configuration properties are valid by parsing them.
         If there is a default defined for a property it will return the default value.
 
         Returns a dictionary containing valid application configuration properties.
-        Throws a exception if some parameters are invalid.
-    """
+        Throws a exception if some parameters are invalid. """
+
     if raw_properties is None:
         LOGGER.warn("Loaded configuration properties are empty.")
         raw_properties = {}
@@ -256,7 +261,7 @@ def _ensure_valid_log_level(log_level_name):
 
 
 def _ensure_is_a_string(key, value):
-    """ Retuns the given string """
+    """ Retuns the given string or raises an exception if the given value is not a string """
 
     value_type = type(value)
     if value_type is not str:
@@ -267,7 +272,7 @@ def _ensure_is_a_string(key, value):
 
 
 def _ensure_is_an_integer(key, value):
-    """ Returns the given int """
+    """ Returns the given int or raises an exception if the given value is not an integer"""
 
     value_type = type(value)
     if value_type is not int:
@@ -278,7 +283,7 @@ def _ensure_is_an_integer(key, value):
 
 
 def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
-    """ returns the given value if it is valid """
+    """ returns the given value if it is a valid regular expression or raises an exception if not """
 
     value_type = type(value)
     if value_type is not str:
@@ -294,7 +299,7 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
 
 def _ensure_is_a_string_or_none(key, value):
-    """ returns the given value if it is valid """
+    """ returns the given value if it is valid string or none. Raises an exception otherwise. """
 
     if value is None:
         return None
@@ -308,7 +313,7 @@ def _ensure_is_a_string_or_none(key, value):
 
 
 def _ensure_is_a_list_of_strings(key, value):
-    """ returns the given value if it is valid """
+    """ returns the given value if the value is a list of string or raises an expcetion """
 
     value_type = type(value)
     if value_type is not list:

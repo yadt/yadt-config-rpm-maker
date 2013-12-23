@@ -14,6 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+    This module contains all configuration properties for
+    yadt-config-rpm-maker. The configuration property values will be read
+    from the configuration file.
+"""
+
 from config_rpm_maker.configuration import ConfigurationProperty
 
 get_config_viewer_host_directory = ConfigurationProperty(key='config_viewer_hosts_dir', default='/tmp')

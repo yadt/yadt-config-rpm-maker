@@ -11,22 +11,20 @@
 #   http://docs.python.org/2/license.html
 
 """
-magic is a wrapper around the libmagic file identification library.
+    magic is a wrapper around the libmagic file identification library.
 
-See README for more information.
+    See README for more information.
 
-Usage:
+    Usage:
 
->>> import magic
->>> magic.from_file("testdata/test.pdf")
-'PDF document, version 1.2'
->>> magic.from_file("testdata/test.pdf", mime=True)
-'application/pdf'
->>> magic.from_buffer(open("testdata/test.pdf").read(1024))
-'PDF document, version 1.2'
->>>
-
-
+    >>> import magic
+    >>> magic.from_file("testdata/test.pdf")
+    'PDF document, version 1.2'
+    >>> magic.from_file("testdata/test.pdf", mime=True)
+    'application/pdf'
+    >>> magic.from_buffer(open("testdata/test.pdf").read(1024))
+    'PDF document, version 1.2'
+    >>>
 """
 
 import os.path

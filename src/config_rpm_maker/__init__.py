@@ -50,9 +50,8 @@ MESSAGE_SUCCESS = "Success."
 
 
 def main():
-    """
-        This function will be called by the command line interface.
-    """
+    """ This function will be called by the command line interface. """
+
     LOGGER.setLevel(DEBUG)
 
     try:
@@ -90,12 +89,14 @@ def main():
 def initialize_logging_to_console(arguments):
     """ Initializes the logging to console and
         appends the console handler to the root logger """
+
     console_log_level = determine_console_log_level(arguments)
     append_console_logger(LOGGER, console_log_level)
 
 
 def initialize_configuration(arguments):
     """ Load the configuration file and applies the given arguments to the configuration. """
+
     load_configuration_file()
     apply_arguments_to_config(arguments)
 
@@ -103,14 +104,16 @@ def initialize_configuration(arguments):
 def extract_repository_url_and_revision_from_arguments(arguments):
     """ Extracts the repository url and the revision from the given
         arguments ensuring that they have valid values. """
+
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
     return repository_url, revision
 
 
 def initialize_logging_to_syslog(arguments, revision):
-    """ Initializes the logging to syslog and
-        appends the syslog handler to the root logger if not omitted by the --no-syslog option """
+    """ Initializes the logging to syslog and appends the syslog handler to
+        the root logger if not omitted by the --no-syslog option """
+
     if not arguments[OPTION_NO_SYSLOG]:
         sys_log_handler = create_sys_log_handler(revision)
         LOGGER.addHandler(sys_log_handler)

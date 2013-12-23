@@ -27,7 +27,10 @@ VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
 
 
 def ensure_valid_revision(revision):
-    """ Ensures that the given argument is a valid revision and exits the program if not """
+    """ Ensures that the given argument is a valid revision (a string of digits)
+        and exits the program if not.
+
+        returns: the given revision """
 
     if not revision.isdigit():
         exit_program('Given revision "%s" is not an integer.' % revision,
@@ -38,7 +41,9 @@ def ensure_valid_revision(revision):
 
 
 def ensure_valid_repository_url(repository_url):
-    """ Ensures that the given url is a valid repository url """
+    """ Ensures that the given url is a valid repository url
+
+        returns: the given repository_url """
 
     parsed_url = urlparse(repository_url)
     scheme = parsed_url.scheme

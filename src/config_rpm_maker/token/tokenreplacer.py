@@ -47,10 +47,8 @@ class CannotFilterFileException (BaseConfigRpmMakerException):
 
 
 class MissingTokenException (BaseConfigRpmMakerException):
-    """
-        Exception stating that a value for a given token
-        has not been found in the token definition.
-    """
+    """ Exception stating that a value for a given token
+        has not been found in the token definition. """
 
     error_info = "Could not replace variable in file :\n"
 
@@ -81,12 +79,10 @@ class FileLimitExceededException(BaseConfigRpmMakerException):
 
 
 class TokenReplacer(object):
-    """
-    Class that replaces tokens in strings.
+    """ Class that replaces tokens in strings.
 
-    The general syntax is
-        @@@TOKEN@@@
-    """
+        The general syntax is
+            @@@TOKEN@@@ """
 
     TOKEN_PATTERN = re.compile(r"@@@([A-Za-z0-9_-]*)@@@")
 

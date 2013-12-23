@@ -33,7 +33,8 @@ _timestamp_at_start = None
 
 
 def start_measuring_time():
-    """ Start measuring the time. This is required to calculate the elapsed time. """
+    """ Start measuring the time. This is required to calculate the overall
+        elapsed time. """
 
     LOGGER.info("Starting to measure time at %s", strftime(DATE_FORMAT))
 
@@ -43,11 +44,13 @@ def start_measuring_time():
 
 def get_timestamp_from_start():
     """ Returns the timestamp which has been set by start_measuring_time. """
+
     return _timestamp_at_start
 
 
 def exit_program(message, return_code):
-    """ Logs the given message and exits with given return code. """
+    """ Logs the given message (to info or error depending on the return_code)
+        and exits with the given return code. """
 
     timestamp_from_start = get_timestamp_from_start()
     if timestamp_from_start is not None:

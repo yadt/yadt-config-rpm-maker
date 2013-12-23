@@ -20,10 +20,8 @@ from types import ListType
 
 
 class Dependency:
-    """
-        Consumes raw formatted RPM dependencies. Either accumulates them or collapses them
-        so the first/gerneral ones get overwritten by the later/specific ones
-    """
+    """ Consumes raw formatted RPM dependencies. Either accumulates them or collapses them
+        so the first/gerneral ones get overwritten by the later/specific ones """
 
     def __init__(self, collapse_dependencies=False, filter_regex=".*", positive_filter=True):
         self.dependencies = dict([])
@@ -72,4 +70,5 @@ class Dependency:
 
     def __repr__(self):
         """ nicely prints the previously added RPM dependencies """
+
         return ", ".join(self.dependencies.values())

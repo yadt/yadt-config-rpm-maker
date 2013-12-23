@@ -16,6 +16,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+    This module contains all return codes used by the command line
+    interface.
+"""
 
 RETURN_CODE_SUCCESS = 0
 RETURN_CODE_VERSION = RETURN_CODE_SUCCESS

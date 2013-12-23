@@ -14,6 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+    This module contains functions which were created for performance
+    tweaking. The test coverage of this module is low since it's main
+    purpose is to add logging information.
+"""
+
 from functools import wraps
 from logging import getLogger
 from math import ceil

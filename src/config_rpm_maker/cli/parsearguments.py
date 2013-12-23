@@ -57,18 +57,21 @@ OPTION_VERSION_HELP = "show version"
 
 
 def parse_arguments(argv, version):
-    """
-        Parses the given command line arguments.
+    """ Parses the given command line arguments.
 
         if -h or --help is given it will display the print the help screen and exit
-        if OPTION_VERSION is given it will display the version information and exit
+        if --version is given it will display the version information and exit
 
         Otherwise it will return a dictionary containing the keys and values for
-            OPTION_DEBUG: boolean, True if option --debug is given
-            OPTION_NO_SYSLOG: boolean, True if option --no-syslog is given
-            ARGUMENT_REPOSITORY: string, the first argument
-            ARGUMENT_REVISION: string, the second argument
-    """
+            --debug: boolean, True if option is given
+            --no-syslog: boolean, True if option is given
+            --config-viewer-only: boolean, True if option is given
+            --no-clean-up: boolean, True if option is given
+            --rpm-upload-cmd: string, sets the configuration property
+                                      rpm_upload_cmd to the given value
+            --verbose: boolean, True if option is given
+            <repository-url>: string, the first argument
+            <revision>: string, the second argument """
 
     parser = OptionParser(usage=USAGE_INFORMATION)
 
@@ -132,7 +135,8 @@ def apply_arguments_to_config(arguments):
 
 
 def determine_console_log_level(arguments):
-    """ Determines the log level based on arguments and configuration """
+    """ Determines the log level based on arguments and configuration. """
+
     if arguments[OPTION_DEBUG]:
         return DEBUG
 

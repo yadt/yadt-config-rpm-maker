@@ -31,13 +31,15 @@ class TokenCycleChecking(object):
         Checks for cycles in a graph. The graph is represented using a dictionary.
         Examples: a graph with a cycle: {'foo': ['bar'],
                                          'bar': ['foo']}
-                  a cyclefree graph:    {'foo': ['bar'],
+                  a cycle free graph:   {'foo': ['bar'],
                                          'a': ['b'],
                                          'baz': ['bar'],
                                          'hello': ['foo']}
     """
+
     def __init__(self, edges):
         """ edges should be a dictionary defining the graph to check for cycles. """
+
         self.edges = edges
 
     def assert_no_cycles_present(self):
