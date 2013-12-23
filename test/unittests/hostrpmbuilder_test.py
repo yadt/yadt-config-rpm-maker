@@ -165,8 +165,8 @@ class BuildTests(TestCase):
         return mock_overlay_segment
 
     def setUp(self):
-        self.VARIABLES_DIRECTORY = 'variables-directory'
-        self.RPM_REQUIRES_PATH = 'rpm-requires-path'
+        self.variables_directory = '/path/to/variables-directory'
+        self.rpm_requires_path = '/path/to/rpm-requires'
 
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.thread_name = 'Mock-Thread'
@@ -174,8 +174,8 @@ class BuildTests(TestCase):
         mock_host_rpm_builder.logger = Mock()
         mock_host_rpm_builder.revision = '123'
         mock_host_rpm_builder.host_config_dir = '/foo/bar'
-        mock_host_rpm_builder.variables_dir = self.VARIABLES_DIRECTORY
-        mock_host_rpm_builder.rpm_requires_path = self.RPM_REQUIRES_PATH
+        mock_host_rpm_builder.variables_dir = self.variables_directory
+        mock_host_rpm_builder.rpm_requires_path = self.rpm_requires_path
         mock_host_rpm_builder.rpm_provides_path = 'rpm-provides-path'
         mock_host_rpm_builder.config_viewer_host_dir = 'config_viewer_host_dir'
 
@@ -226,7 +226,7 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        mock_mkdir.assert_any_call('variables-directory')
+        mock_mkdir.assert_any_call('/path/to/variables-directory')
 
     @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
@@ -377,7 +377,7 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        self.mock_host_rpm_builder._write_file.assert_any_call('variables-directory/VARIABLES', 'patchinfo1\npatchinfo2\npatchinfo3\n')
+        self.mock_host_rpm_builder._write_file.assert_any_call('/path/to/variables-directory/VARIABLES', 'patchinfo1\npatchinfo2\npatchinfo3\n')
         self.mock_host_rpm_builder._write_file.assert_any_call('config_viewer_host_dir/devweb01.variables', 'patchinfo1\npatchinfo2\npatchinfo3\n')
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
