@@ -51,7 +51,7 @@ config-rpm-maker svn://host/repository/ 123
 
 ## Getting Started
 
-If you simply want to try and understand how `yadt-config-rpm-maker` works we recommend to "[setup a devlopment enviroment](https://github.com/yadt/yadt-config-rpm-maker#setup-a-devlopment-enviroment)".
+If you simply want to try and understand how _yadt-config-rpm-maker_ works we recommend to "[setup a devlopment enviroment](https://github.com/yadt/yadt-config-rpm-maker#setup-a-devlopment-enviroment)".
 
 #### Step by Step Installation
 
@@ -89,7 +89,7 @@ and run `config-rpm-maker` in a `post-commit` hook.
 
 #### Configuration
 
-`yadt-config-rpm-maker` is configured using a yaml file. Read more in
+_yadt-config-rpm-maker_ is configured using a yaml file. Read more in
 "[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)".
 
 ### Example Content for Configuration Repository
@@ -103,7 +103,7 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ### Setup a Development Environment
 
-`yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
+_yadt-config-rpm-maker_ is created for Red Hat Linux Distributions.
 
 We recommend to develop in a vagrant box. Read our tutorial
 "[Build and install in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
@@ -129,7 +129,7 @@ Run the checks to see if you have import errors by executing:
 PYTHONPATH=src python test/__init__.py
 ```
 
-When you run the integration tests `yadt-config-rpm-maker` will build test RPMs.
+When you run the integration tests _yadt-config-rpm-maker_ will build test RPMs.
 
 
 Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)

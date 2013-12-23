@@ -19,7 +19,7 @@ Install python development dependencies.
 zypper python-mock
 ```
 
-Install `yadt-config-rpm-maker` runtime dependencies.
+Install _yadt-config-rpm-maker_ runtime dependencies.
 ```bash
 zypper install python-yaml rpm-python python-pysvn rpm-build
 ```

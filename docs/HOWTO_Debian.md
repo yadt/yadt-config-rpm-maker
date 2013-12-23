@@ -19,7 +19,7 @@ Install python development dependencies.
 sudo apt-get install python-setuptools python-pip python-mock
 ```
 
-Install `yadt-config-rpm-maker` runtime dependencies.
+Install _yadt-config-rpm-maker_ runtime dependencies.
 ```bash
 sudo apt-get install python-svn rpm python-rpm python-yaml subversion
 ```

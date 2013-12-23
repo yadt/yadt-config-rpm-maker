@@ -1,13 +1,13 @@
 # Performance tweaking / Troubleshooting
 
-While building RPMs `yadt-config-rpm-maker` will have to create a lot of files.
+While building RPMs _yadt-config-rpm-maker_ will have to create a lot of files.
 You can reduce the amount of created files by making sure your spec file cleans up after the build process is finished.
 If you have a lot of hosts in your datacenter, triggering the build on a normal machine might end up in a "out of disk
 space" error. The disk space itself might not be the problem, but since each created file will consumes at least one
 inode, your file system might be out of inodes. Try `df -iH` to get an overview.
 
 Adding options `--verbose` and `--debug` will give you more information about the disk usage just before the
-working directory will be clean up. During the build process yadt-config-rpm-maker will have to consume even more disk
+working directory will be clean up. During the build process _yadt-config-rpm-maker_ will have to consume even more disk
 space.
 
 Some example output

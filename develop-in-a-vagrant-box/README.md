@@ -1,7 +1,7 @@
 # Build and install in a vagrant box
 
 In this tutorial we will use a [vagrant](http://www.vagrantup.com/) box from [vagrantbox.es](http://vagrantbox.es/) to
-build and install `yadt-config-rpm-maker` on the destination distribution regardless of your developer machine.
+build and install _yadt-config-rpm-maker_ on the destination distribution regardless of your developer machine.
 
 ## Setup a vagrant box
 
@@ -41,7 +41,7 @@ svn commit -m "We will need httpd since we are building a web application."
 
 ## Reinstalling
 
-After you made code changes and committed them to your fork you might want to reinstall `yadt-config-rpm-maker` to
+After you made code changes and committed them to your fork you might want to reinstall _yadt-config-rpm-maker_ to
 your vagrant box to verify your changes are working as expected. Please adapt the constant `SOURCE_REPOSITORY` within
 the `configuration.sh` to point to your fork. Afterwards execute the reinstall script in your vm.
 ```bash
@@ -51,7 +51,7 @@ cd /vagrant
 Of course you can modify your vagrant box in such a way that you can access the local clone of your repository too.
 We use this quite complicated way to omit working in the vagrant directory (which can be accessed by the vagrant box).
 
-## Manual execution of `config-rpm-maker`
+## Manual execution
 
 If you want to execute `config-rpm-maker` for a specific revision, please set the environment variable
 `YADT_CONFIG_RPM_MAKER_CONFIG_FILE` to the destination of the configuration file.
