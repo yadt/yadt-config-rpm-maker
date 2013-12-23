@@ -54,7 +54,7 @@ class TestLocation(Location):
 
 
 #  Please adapt the TEST_DATA list to generate test data which
-#  might look like the host structure in your datacenter.
+#  might look like the host structure in your data center.
 #
 #  First entry explained:
 #     a host group type called "app".

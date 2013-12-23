@@ -1,7 +1,7 @@
 yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rpm-maker.png?branch=master)](https://travis-ci.org/yadt/yadt-config-rpm-maker)
 =====================
 
-* Organize the configuration of your datacenter hosts in a subversion repository.
+* Organize the configuration of your data center hosts in a subversion repository.
 * Run `config-rpm-maker` as post-commit hook of your configuration repository:
   * Builds RPMs containing the configuration for each host.
   * Builds only the configuration RPMs for the affected hosts.
@@ -46,7 +46,7 @@ config-rpm-maker svn://host/repository/ 123
 ## Features
 
   * Creates data for configviewer (visualises the configuration of your hosts)
-  * Templating for your configuration files.
+  * Templateing for your configuration files.
   * Preserves encoding and will not replace tokens within binary files [see TokenReplace.filter_file](https://github.com/yadt/yadt-config-rpm-maker/blob/master/src/config_rpm_maker/token/tokenreplacer.py#L172)
 
 ## Getting Started
@@ -89,7 +89,8 @@ and run `config-rpm-maker` in a `post-commit` hook.
 
 #### Configuration
 
-`yadt-config-rpm-maker` is configured using a yaml file. Read more in our "[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)".
+`yadt-config-rpm-maker` is configured using a yaml file. Read more in
+"[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)".
 
 ### Example Content for Configuration Repository
 
