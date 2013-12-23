@@ -31,3 +31,4 @@ rpm_upload_cmd: /bin/true
 svn_path_to_config: '/config'
 thread_count: 4
 temp_dir: target/tmp
+max_failed_hosts: 5
