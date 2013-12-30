@@ -68,3 +68,5 @@ and execute `config-rpm-maker`
 ```bash
 config-rpm-maker /home/vagrant/configuration-repository 1
 ```
+Here `/home/vagrant/configuration-repository` is the directory where the `provision.sh` created the subversion
+repository and `1` is the revision.
