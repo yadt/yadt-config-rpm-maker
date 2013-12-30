@@ -14,8 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = '3.2'
-
 import traceback
 
 from logging import DEBUG, getLogger, getLevelName
@@ -43,6 +41,8 @@ from config_rpm_maker.utilities.logutils import (append_console_logger,
                                                  log_additional_information,
                                                  log_exception_message)
 from config_rpm_maker.svnservice import SvnService
+
+from config_rpm_maker.version import __version__
 
 LOGGER = getLogger(__name__)
 
