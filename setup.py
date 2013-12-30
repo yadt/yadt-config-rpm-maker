@@ -20,12 +20,18 @@ import sys
 
 from setuptools import setup, find_packages
 
-SRC_DIR = 'src'
+PATH_TO_VERSION_FILE = 'src/config_rpm_maker/version.py'
+SOURCE_DIRECTORY = 'src'
 
-sys.path.append(SRC_DIR)
+sys.path.append(SOURCE_DIRECTORY)
+
+with open(PATH_TO_VERSION_FILE) as version_file:
+    file_content = version_file.read()
+    code = compile(file_content, PATH_TO_VERSION_FILE, 'exec')
+    exec(code)
 
 setup(name="yadt-config-rpm-maker",
-      version="3.2",
+      version=__version__,
       license="GPL",
       url="https://github.com/yadt/yadt-config-rpm-maker",
       author="Sebastian Herold",
@@ -34,6 +40,6 @@ setup(name="yadt-config-rpm-maker",
       keywords="rpm config host svn hook",
 
       entry_points={'console_scripts': ['config-rpm-maker = config_rpm_maker:main']},
-      packages=find_packages(where=SRC_DIR),
-      package_dir={'': SRC_DIR},
+      packages=find_packages(where=SOURCE_DIRECTORY),
+      package_dir={'': SOURCE_DIRECTORY},
       test_suite='test')
