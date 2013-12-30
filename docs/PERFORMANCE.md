@@ -2,9 +2,9 @@
 
 While building RPMs _yadt-config-rpm-maker_ will have to create a lot of files.
 You can reduce the amount of created files by making sure your spec file cleans up after the build process is finished.
-If you have a lot of hosts in your datacenter, triggering the build on a normal machine might end up in a "out of disk
-space" error. The disk space itself might not be the problem, but since each created file will consumes at least one
-inode, your file system might be out of inodes. Try `df -iH` to get an overview.
+If you have a lot of hosts in your data center, triggering the build on a normal machine might end up in a "out of disk
+space" error. The disk space itself might not be the problem, but since each created file consumes at least one inode,
+your file system might be out of inodes. Try `df -iH` to get an overview.
 
 Adding options `--verbose` and `--debug` will give you more information about the disk usage just before the
 working directory will be clean up. During the build process _yadt-config-rpm-maker_ will have to consume even more disk
@@ -19,6 +19,8 @@ Some example output
 [DEBUG] Cleaning up working directory "target/tmp/yadt-config-rpm-maker.GbWhc_.1"
 [DEBUG] Removing error log "target/tmp/yadt-config-rpm-maker.1f_zap.revision-1.error.log"
 ```
+This ouput has been created on a developer machine running a debian linux. If you run _yadt-config-rpm-maker_ on a
+red hat machine the directory `.rpmdb` should not be there (or at least not in the working directory).
 Please keep in mind that calculating the data for the directory summary consumes additional computing time.
 Which means adding `--verbose` increases elapsed time a bit.
 
