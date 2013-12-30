@@ -7,7 +7,7 @@ We need `git` to clone the repository
 zypper install git
 ```
 
-Clone the yadt-config-rpm-maker repository
+Clone the _yadt-config-rpm-maker_ repository
 ```bash
 git clone https://github.com/yadt/yadt-config-rpm-maker
 ```
@@ -26,6 +26,7 @@ zypper install python-yaml rpm-python python-pysvn rpm-build
 
 ## Running Tests
 
+Change directory into the cloned repository
 ```bash
 cd yadt-config-rpm-maker
 ```

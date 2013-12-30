@@ -34,7 +34,7 @@ sudo ln -s /bin/bash /bin/sh
 ```
 You can set /bin/sh back to bash by running `sudo dpkg-reconfigure dash`
 
-Move to cloned repository
+Change directory into the cloned repository
 ```bash
 cd yadt-config-rpm-maker
 ```

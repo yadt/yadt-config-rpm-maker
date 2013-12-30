@@ -1,4 +1,4 @@
-# Developing on Centos 6
+# Developing on CentOS 6
 
 ## Get the sources
 
@@ -19,15 +19,15 @@ Install python development dependencies.
 sudo yum install python-devel python-setuptools python-mock
 ```
 
-Install _yadt-config-rpm-maker_ runtime dependencies.
-To install pysvn we need to [enable the RHEL EPEL repository](http://www.rackspace.com/knowledge_center/article/installing-rhel-epel-repo-on-centos-5x-or-6x).
+Install _yadt-config-rpm-maker_ runtime dependencies. To install pysvn we need to
+[enable the RHEL EPEL repository](http://www.rackspace.com/knowledge_center/article/installing-rhel-epel-repo-on-centos-5x-or-6x).
 ```bash
 sudo yum install subversion rpm-build install pysvn python-yaml
 ```
 
 ## Running Tests
 
-Move into the cloned repository
+Change directory into the cloned repository
 ```bash
 cd yadt-config-rpm-maker
 ```
