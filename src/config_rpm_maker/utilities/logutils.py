@@ -25,9 +25,11 @@ from config_rpm_maker.configuration import get_properties, get_file_path_of_load
 LOGGER = getLogger(__name__)
 
 SYS_LOG_ADDRESS = "/dev/log"
-SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
-SYS_LOG_LEVEL = DEBUG
 SYS_LOG_FACILITY = SysLogHandler.LOG_USER
+SYS_LOG_LEVEL = DEBUG
+
+# When initializing the syslog handler {0} will be replaced with the revision.
+SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 
 
 class MutedLogger(object):
