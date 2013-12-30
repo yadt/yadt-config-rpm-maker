@@ -24,7 +24,7 @@ error_log_dir: '/home/vagrant/target/configviewer/errors'
 error_log_url: 'http://localhost/errors'
 log_level: INFO
 path_to_spec_file: 'default.spec'
-repo_packages_regex: '^yadt-.*-repos?$'
+repo_packages_regex: '.*-repo.*'
 rpm_upload_chunk_size: 10
 rpm_upload_cmd: /bin/true
 svn_path_to_config: '/config'
