@@ -25,6 +25,7 @@ from integration_test_support import IntegrationTest
 from config_rpm_maker.configuration import ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE
 from config_rpm_maker.version import __version__ as VERSION
 
+
 class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
     def setUp(self):
