@@ -95,6 +95,7 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
         self.assert_exit_code_was(3)
         self.assert_stderr_ends_with("""[ERROR] Invalid log level "1". Log level has to be a string (DEBUG, ERROR or INFO).
+[DEBUG] Could not calculate elapsed time since the start timestamp has not been set.
 [ERROR] Configuration error!
 [DEBUG] Error code is 3
 [ERROR] Failed.

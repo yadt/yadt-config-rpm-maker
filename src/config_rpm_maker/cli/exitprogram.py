@@ -60,6 +60,8 @@ def exit_program(message, return_code):
         elapsed_time_in_seconds = ceil(elapsed_time_in_seconds * 100) / 100
 
         LOGGER.info('Elapsed time: {0}s'.format(elapsed_time_in_seconds))
+    else:
+        LOGGER.debug('Could not calculate elapsed time since the start timestamp has not been set.')
 
     if return_code == RETURN_CODE_SUCCESS:
         LOGGER.info(message)
