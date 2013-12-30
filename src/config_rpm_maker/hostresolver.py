@@ -30,8 +30,8 @@ class HostResolver(object):
         dns_searchlist = get_custom_dns_search_list()
 
         if dns_searchlist:
-            for dns_entry in dns_searchlist:
-                fqdn_hostname = hostname + '.' + dns_entry
+            for dns_suffix in dns_searchlist:
+                fqdn_hostname = hostname + '.' + dns_suffix
                 try:
                     result = self._resolve(fqdn_hostname)
                     verbose(LOGGER).debug('Host name "%s" resolved to %s', fqdn_hostname, result)
