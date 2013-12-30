@@ -18,7 +18,7 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 | allow_unknown_hosts     | True           | config-rpm-maker will try to resolve the hosts it builds configuration RPMs for. If this property is set to `true` config-rpm-maker will not fail (and therefore exit) when it can not resolve the host.
 | config_rpm_prefix       | yadt-config-   | A prefix which will be prepended to the configuration RPMs file names.
 | config_viewer_hosts_dir | /tmp           | The directory where to put the config viewer data.
-| custom_dns_searchlist   | []             | Helps to resolve the hosts. If your organisation has hosts in "*.datacenter.intern" and in "*.organisation.intern" you can set this to ['datacenter.intern', 'organisation.intern']
+| custom_dns_searchlist   | []             | Helps to resolve the hosts. If your organisation has hosts in `*.datacenter.intern` and in `*.organisation.intern` you can set this to `['datacenter.intern', 'organisation.intern']`
 | error_log_dir           |                | The directory from where your config viewer will serve the error files.
 | error_log_url           |                | The url under which the config viewer will be accessible.
 | path_to_spec_file       | default.spec   | The path within the configuration subversion repository where to find the template spec file for your configuration RPMs.
@@ -26,7 +26,7 @@ Please have a look at the [example configuration file.](https://github.com/yadt/
 | max_failed_hosts        | 3              | Maximum number of host builds that might fail. If the maximum is hit the build for all other RPMs will be stopped.
 | repo_packages_regex     | .\*-repo.\*    | This filter will be applied when writing the dependencies into the RPM.
 | rpm_upload_chunk_size   | 10             | Building the configuration RPMs will happen in chunks. The number you specify here will define how many RPMs will be built at the same time.
-| rpm_upload_cmd          |                | The command which will be used to upload the RPMs. The command will get the list RPMs to build as arguments. How many RPMs will be given is defined via 'rpm_upload_chunk_size'. If this is not defined no command will be executed. If None is given upload will not be executed.
+| rpm_upload_cmd          |                | The command which will be used to upload the RPMs. The command will get the list RPMs to build as arguments. How many RPMs will be given is defined via `rpm_upload_chunk_size`. If this is not defined no command will be executed. If None is given upload will not be executed.
 | svn_path_to_config      | /config        | The path within the configuration subversion repository where to find the configuration directory structure.
 | thread_count            | 1              | Number of threads building the RPMs at the same time.
 | temp_dir                | /tmp           | This directory is used as a working directory when building RPMs. You will find the error log files here.
