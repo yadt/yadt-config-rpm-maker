@@ -50,11 +50,11 @@ function build_and_install_config_rpm_maker() {
 
   # Build rpm from source rpm
   cd dist
-  sudo mock rebuild ${SOURCE_RPM} -v
+  sudo mock rebuild *.src.rpm -v
 
   # Install built rpm
   cd /var/lib/mock/epel-6-*/result
-  sudo rpm -ivH ${RESULT_RPM} --force
+  sudo rpm -ivH *.noarch.rpm --force
 }
 
 
