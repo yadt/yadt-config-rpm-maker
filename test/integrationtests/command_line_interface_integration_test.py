@@ -23,7 +23,7 @@ from subprocess import PIPE, Popen
 from integration_test_support import IntegrationTest
 
 from config_rpm_maker.configuration import ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE
-
+from config_rpm_maker.version import __version__ as VERSION
 
 class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
@@ -37,7 +37,7 @@ class CommandLineInterfaceIntegrationTest(IntegrationTest):
 
         self.config_rpm_maker('--version')
 
-        self.assert_stdout_equal('yadt-config-rpm-maker 3.2\n')
+        self.assert_stdout_equal('yadt-config-rpm-maker {version}\n'.format(version=VERSION))
         self.assert_exit_code_was(0)
 
     def test_should_return_with_exit_code_zero_when_displaying_help_screen(self):
