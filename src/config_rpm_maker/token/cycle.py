@@ -14,7 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from logging import getLogger
+
+from config_rpm_maker.utilities.logutils import verbose
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
+
+LOGGER = getLogger(__name__)
 
 
 class ContainsCyclesException(BaseConfigRpmMakerException):
@@ -26,23 +31,29 @@ class TokenCycleChecking(object):
         Checks for cycles in a graph. The graph is represented using a dictionary.
         Examples: a graph with a cycle: {'foo': ['bar'],
                                          'bar': ['foo']}
-                  a cyclefree graph:    {'foo': ['bar'],
+                  a cycle free graph:   {'foo': ['bar'],
                                          'a': ['b'],
                                          'baz': ['bar'],
                                          'hello': ['foo']}
     """
+
     def __init__(self, edges):
         """ edges should be a dictionary defining the graph to check for cycles. """
+
         self.edges = edges
 
     def assert_no_cycles_present(self):
+
+        verbose(LOGGER).debug('Checking that graph %s has no cycles.', self.edges)
+
         cycles = []
         components = tarjan_scc(self.edges)
         for component in components:
             if len(component) > 1:
                 cycles.append(component)
-                #every nontrivial strongly connected component
-                #contains at least one directed cycle, so len()>1 is a showstopper
+                verbose(LOGGER).debug("Found cycle %s in graph %s", component, self.edges)
+                # every nontrivial strongly connected component
+                # contains at least one directed cycle, so len()>1 is a showstopper
 
         if len(cycles) > 0:
             error_message = "Found cycle(s) in variable declarations :\n"

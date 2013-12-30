@@ -21,5 +21,4 @@ set -e
 source "configuration.sh"
 source "library.sh"
 
-
 build_and_install_config_rpm_maker

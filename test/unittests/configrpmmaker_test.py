@@ -19,7 +19,6 @@ from mock import Mock, call, patch
 from Queue import Queue
 
 from unittest_support import UnitTests
-from config_rpm_maker.configuration import get_max_failed_hosts
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 
 

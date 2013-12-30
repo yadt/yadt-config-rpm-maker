@@ -1,7 +1,7 @@
 yadt-config-rpm-maker [![Build Status](https://travis-ci.org/yadt/yadt-config-rpm-maker.png?branch=master)](https://travis-ci.org/yadt/yadt-config-rpm-maker)
 =====================
 
-* Organize the configuration of your datacenter hosts in a subversion repository.
+* Organize the configuration of your data center hosts in a subversion repository.
 * Run `config-rpm-maker` as post-commit hook of your configuration repository:
   * Builds RPMs containing the configuration for each host.
   * Builds only the configuration RPMs for the affected hosts.
@@ -51,7 +51,7 @@ config-rpm-maker svn://host/repository/ 123
 
 ## Getting Started
 
-If you simply want to try and understand how `yadt-config-rpm-maker` works we recommend to "[setup a devlopment enviroment](https://github.com/yadt/yadt-config-rpm-maker#setup-a-devlopment-enviroment)".
+If you simply want to try and understand how _yadt-config-rpm-maker_ works we recommend to "[setup a devlopment enviroment](https://github.com/yadt/yadt-config-rpm-maker#setup-a-devlopment-enviroment)".
 
 #### Step by Step Installation
 
@@ -89,7 +89,8 @@ and run `config-rpm-maker` in a `post-commit` hook.
 
 #### Configuration
 
-`yadt-config-rpm-maker` is configured using a yaml file. Read more in our "[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)".
+_yadt-config-rpm-maker_ is configured using a yaml file. Read more in
+"[Configuration Documentation](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/CONFIGURATION.md#configuration)".
 
 ### Example Content for Configuration Repository
 
@@ -102,11 +103,12 @@ build the config RPMs. Use this as a starting point to setup your own environmen
 
 ### Setup a Development Environment
 
-`yadt-config-rpm-maker` is created for Red Hat Linux Distributions.
+_yadt-config-rpm-maker_ is created for Red Hat Linux Distributions.
 
-We recommend to develop in a vagrant box. Read our tutorial "[How to develop in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
+We recommend to develop in a vagrant box. Read our tutorial
+"[Build and install in a vagrant box](https://github.com/yadt/yadt-config-rpm-maker/tree/master/develop-in-a-vagrant-box)".
 
-But of course you can set up a development environment on other platforms as well:
+Of course you can set up a development environment on other platforms too:
 * [How to develop under CentOS](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_CentOS.md)
 * [How to develop under OpenSUSE](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_OpenSUSE.md)
 * [How to develop under Debian / Mint / Ubuntu](https://github.com/yadt/yadt-config-rpm-maker/blob/master/docs/HOWTO_Debian.md)
@@ -119,7 +121,7 @@ python setup.py test
 ```
 
 The feedback of the test loader is not helping if the imports fail.
-This is a known bug [issue7559](http://bugs.python.org/issue7559).
+This is a known issue (see [7559](http://bugs.python.org/issue7559)).
 But there are import checks in [`test/__init__.py`](https://github.com/yadt/yadt-config-rpm-maker/blob/master/test/__init__.py)
 
 Run the checks to see if you have import errors by executing:
@@ -127,12 +129,12 @@ Run the checks to see if you have import errors by executing:
 PYTHONPATH=src python test/__init__.py
 ```
 
-When you run the integration tests, the yadt-config-rpm-maker will build test RPMs.
+When you run the integration tests _yadt-config-rpm-maker_ will build test RPMs.
 
 
 Measuring test coverage using [coverage](https://pypi.python.org/pypi/coverage)
 ```bash
-coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setup.py,src/config_rpm_maker/magic.py
+coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setup.py,src/config_rpm_maker/utilities/magic.py
 ```
 
 ### Execution in the working directory
@@ -140,7 +142,7 @@ coverage run --branch setup.py test && coverage report --omit=test/*,/usr/*,setu
 ```bash
 ./config-rpm-maker
 ```
-The `config-rpm-maker` script allows you to execute config-rpm-maker in your working directory.
+The `config-rpm-maker` script allows you to execute yadt-config-rpm-maker in your working directory.
 
 ### Build yadt-config-rpm-maker RPM
 

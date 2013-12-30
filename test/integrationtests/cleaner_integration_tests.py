@@ -14,13 +14,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from subprocess import call
 from integration_test_support import IntegrationTest, IntegrationTestException
 
 from config_rpm_maker.configuration.properties import get_svn_path_to_config
 from config_rpm_maker.configuration import build_config_viewer_host_directory
-from config_rpm_maker.configrpmmaker import ConfigRpmMaker, configuration
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.svnservice import SvnService
 

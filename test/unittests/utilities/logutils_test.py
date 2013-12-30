@@ -17,11 +17,11 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from logging import ERROR, Logger
+from logging.handlers import SysLogHandler
 from unittest import TestCase
 
 from mock import Mock, call, patch
 
-from config_rpm_maker.configuration.properties import is_verbose_enabled
 from config_rpm_maker.configuration import ConfigurationProperty
 from config_rpm_maker.utilities.logutils import (SYS_LOG_LEVEL,
                                                  MutedLogger,
@@ -72,6 +72,17 @@ class CreateConsoleHandlerTests(TestCase):
 @patch('config_rpm_maker.utilities.logutils.SysLogHandler')
 @patch('config_rpm_maker.utilities.logutils.Formatter')
 class CreateSysLogHandlerTests(TestCase):
+
+    def test_should_initialze_syslog_handler_with_default_address_and_facility(self, mock_formatter_class, mock_sys_log_handler_class):
+
+        mock_formatter = Mock()
+        mock_formatter_class.return_value = mock_formatter
+        mock_handler = Mock()
+        mock_sys_log_handler_class.return_value = mock_handler
+
+        create_sys_log_handler(123)
+
+        mock_sys_log_handler_class.assert_called_with(address='/dev/log', facility=SysLogHandler.LOG_USER)
 
     def test_should_initialze_formatter_using_the_revision_number_in_the_format(self, mock_formatter_class, mock_sys_log_handler_class):
 

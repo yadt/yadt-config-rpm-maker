@@ -25,8 +25,11 @@ from config_rpm_maker.configuration import get_properties, get_file_path_of_load
 LOGGER = getLogger(__name__)
 
 SYS_LOG_ADDRESS = "/dev/log"
-SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
+SYS_LOG_FACILITY = SysLogHandler.LOG_USER
 SYS_LOG_LEVEL = DEBUG
+
+# When initializing the syslog handler {0} will be replaced with the revision.
+SYS_LOG_FORMAT = "config_rpm_maker[{0}]: [%(levelname)5s] %(message)s"
 
 
 class MutedLogger(object):
@@ -48,7 +51,7 @@ _muted_logger = MutedLogger()
 
 
 def verbose(logger):
-    """ Returns the given logger if verbose is configured or it will return _muted_logger """
+    """ returns the given logger if verbose is configured or it will return _muted_logger """
 
     if is_verbose_enabled():
         return logger
@@ -57,7 +60,8 @@ def verbose(logger):
 
 
 def create_console_handler(log_level):
-    """ Returnes a root_logger which logs to the console using the given log_level. """
+    """ returns a root_logger which logs to the console using the given log_level. """
+
     formatter = Formatter(get_log_format.default)
 
     console_handler = StreamHandler()
@@ -68,11 +72,12 @@ def create_console_handler(log_level):
 
 
 def create_sys_log_handler(revision):
-    """ Create a logger handler which logs to sys log and uses the given revision within the format """
+    """ creates a logger handler which logs to syslog and uses the given revision within the log format """
+
     format = SYS_LOG_FORMAT.format(revision)
     formatter = Formatter(format)
 
-    sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS)
+    sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS, facility=SYS_LOG_FACILITY)
     sys_log_handler.setFormatter(formatter)
     sys_log_handler.setLevel(SYS_LOG_LEVEL)
 
@@ -80,7 +85,7 @@ def create_sys_log_handler(revision):
 
 
 def log_configuration(logging_function, configuration, path):
-    """ Logs the path to configuration file and the properties """
+    """ Logs the path to configuration file and the properties including their value and value type """
 
     logging_function('Loaded configuration file "%s"', path)
 
@@ -115,12 +120,14 @@ def log_elements_of_list(logging_function, summary_message, unsorted_list):
 
 def log_process_id(logging_function):
     """ Calls the given logging function to log the current process id """
+
     process_id = getpid()
     logging_function("Process ID is %s", process_id)
 
 
 def append_console_logger(logger, console_log_level):
     """ Creates and appends a console log handler with the given log level """
+
     console_handler = create_console_handler(console_log_level)
     logger.addHandler(console_handler)
 
@@ -130,11 +137,13 @@ def append_console_logger(logger, console_log_level):
 
 def log_additional_information():
     """ Logs additional information as the process id and the configuration. """
+
     log_process_id(LOGGER.info)
     log_configuration(LOGGER.debug, get_properties(), get_file_path_of_loaded_configuration())
 
 
 def log_exception_message(message):
-    """ Logs the given multiline message line by line. """
+    """ Logs the given multi line message line by line. """
+
     for line in str(message).split("\n"):
         LOGGER.error(line)

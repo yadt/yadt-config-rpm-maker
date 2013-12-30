@@ -14,7 +14,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import os
 import shutil
 import subprocess
@@ -44,7 +43,6 @@ from config_rpm_maker.hostrpmbuilder import HostRpmBuilder
 from config_rpm_maker.utilities.logutils import log_elements_of_list
 from config_rpm_maker.utilities.profiler import measure_execution_time, log_directories_summary
 from config_rpm_maker.segment import OVERLAY_ORDER
-
 
 LOGGER = getLogger(__name__)
 
@@ -152,12 +150,12 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             self._upload_rpms(rpms)
             self._move_configviewer_dirs_to_final_destination(affected_hosts)
 
-        except BaseConfigRpmMakerException, e:
-            self.logger.error('Last error during build:\n%s' % str(e))
+        except BaseConfigRpmMakerException as exception:
+            self.logger.error('Last error during build:\n%s' % str(exception))
             self.__build_error_msg_and_move_to_public_access(self.revision)
-            raise e
+            raise exception
 
-        except Exception, e:
+        except Exception as exception:
             self.logger.exception('Last error during build:')
             error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
             raise Exception('Unexpected error occurred, stacktrace will follow.\n%s\n\n%s' % (traceback.format_exc(), error_msg))

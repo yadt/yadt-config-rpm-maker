@@ -43,7 +43,7 @@ class SvnServiceTests(TestCase):
         self.assert_is_ordinary_string(actual_host_names[1])
 
     def assert_is_ordinary_string(self, text):
-        self.assertTrue(isinstance(text, str), '"%s" is NOT a ordniary string!' % text)
+        self.assertTrue(isinstance(text, str), '"%s" is NOT a ordinary string!' % text)
 
 
 class GetLogsForRevision(TestCase):

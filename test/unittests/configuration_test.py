@@ -22,18 +22,17 @@ from unittest import TestCase
 
 from unittest_support import UnitTests
 from config_rpm_maker import configuration
-from config_rpm_maker.configuration import (ConfigurationException,
-                                            CONFIGURATION_FILE_PATH,
+from config_rpm_maker.configuration import (CONFIGURATION_FILE_PATH,
                                             ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE,
+                                            ConfigurationException,
+                                            ConfigurationProperty,
                                             unknown_hosts_are_allowed,
                                             get_config_rpm_prefix,
-                                            is_config_viewer_only_enabled,
                                             get_config_viewer_host_directory,
                                             get_custom_dns_search_list,
                                             get_error_log_directory,
                                             get_error_log_url,
                                             get_log_level,
-                                            is_no_clean_up_enabled,
                                             get_max_failed_hosts,
                                             get_max_file_size,
                                             get_path_to_spec_file,
@@ -43,8 +42,9 @@ from config_rpm_maker.configuration import (ConfigurationException,
                                             get_rpm_upload_command,
                                             get_thread_count,
                                             get_temporary_directory,
+                                            is_no_clean_up_enabled,
+                                            is_config_viewer_only_enabled,
                                             is_verbose_enabled,
-                                            ConfigurationProperty,
                                             build_config_viewer_host_directory,
                                             get_file_path_of_loaded_configuration,
                                             get_properties,
@@ -182,7 +182,7 @@ class LoadConfigurationPropertiesFromYamlFileTests(UnitTests):
         self.assertEqual({'foo': 'bar'}, actual_properties)
 
 
-class EnsurePropertiesAreValidTest(TestCase):
+class EnsurePropertiesAreValidTest(UnitTests):
 
     @patch('config_rpm_maker.configuration.LOGGER')
     def test_should_log_that_configuration_properties_are_empty(self, mock_logger):
@@ -479,6 +479,15 @@ class EnsurePropertiesAreValidTest(TestCase):
         _ensure_properties_are_valid(properties)
 
         mock_logger.warn.assert_called_with('Unknown configuration propertie(s) found: foo_spam')
+
+    @patch('config_rpm_maker.configuration.LOGGER')
+    def test_should_not_warn_when_raw_properties_contain_a_known_property_name(self, mock_logger):
+
+        properties = {'max_file_size': 1234}
+
+        _ensure_properties_are_valid(properties)
+
+        self.assert_mock_never_called(mock_logger.warn)
 
     @patch('config_rpm_maker.configuration._ensure_is_an_integer')
     def test_should_return_max_file_size(self, mock_ensure_is_an_integer):

@@ -30,7 +30,7 @@ LOGGER = getLogger(__name__)
 
 def clean_up_deleted_hosts_data(svn_service, revision):
     """ Deletes host directories within config viewer data
-        when svn change set deletes host directory """
+        when the svn change set contains a delete of the host directory """
 
     deleted_paths = svn_service.get_deleted_paths(revision)
 

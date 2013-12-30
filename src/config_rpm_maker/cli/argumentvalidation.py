@@ -18,7 +18,8 @@ from logging import getLogger
 from urlparse import urlparse
 
 from config_rpm_maker.cli.exitprogram import exit_program
-from config_rpm_maker.cli.returncodes import RETURN_CODE_REVISION_IS_NOT_AN_INTEGER, RETURN_CODE_REPOSITORY_URL_INVALID
+from config_rpm_maker.cli.returncodes import (RETURN_CODE_REVISION_IS_NOT_AN_INTEGER,
+                                              RETURN_CODE_REPOSITORY_URL_INVALID)
 
 LOGGER = getLogger(__name__)
 
@@ -26,17 +27,23 @@ VALID_REPOSITORY_URL_SCHEMES = ['http', 'https', 'file', 'ssh', 'svn']
 
 
 def ensure_valid_revision(revision):
-    """ Ensures that the given argument is a valid revision and exits the program if not """
+    """ Ensures that the given argument is a valid revision (a string of digits)
+        and exits the program if not.
+
+        returns: the given revision """
 
     if not revision.isdigit():
-        exit_program('Given revision "%s" is not an integer.' % revision, return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
+        exit_program('Given revision "%s" is not an integer.' % revision,
+                     return_code=RETURN_CODE_REVISION_IS_NOT_AN_INTEGER)
 
     LOGGER.debug('Accepting "%s" as a valid subversion revision.', revision)
     return revision
 
 
 def ensure_valid_repository_url(repository_url):
-    """ Ensures that the given url is a valid repository url """
+    """ Ensures that the given url is a valid repository url
+
+        returns: the given repository_url """
 
     parsed_url = urlparse(repository_url)
     scheme = parsed_url.scheme

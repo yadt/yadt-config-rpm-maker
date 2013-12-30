@@ -1,85 +1,155 @@
 #!/usr/bin/env python
+#
+#   yadt-config-rpm-maker
+#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os.path import exists
+"""
+    This script will create more test data by copying the existing host
+    directories.
+"""
+
+from os.path import exists, join
 from shutil import copytree
-from random import choice, randint
 
-MAX_DEVELOPMENT_HOSTS = 5
-MAX_TEST_HOSTS = 5
-MAX_PRODUCTION_HOSTS = 20
-
-MIN_DEVELOPMENT_HOSTS = 3
-MIN_TEST_HOSTS = 1
-MIN_PRODUCTION_HOSTS = 5
-
-CONFIGURATION_DIRECTORY = 'testdata/svn_repo/config'
-
-BASE_DEVELOPMENT_HOST = '{configuration_directory}/host/devweb01'.format(configuration_directory=CONFIGURATION_DIRECTORY)
-BASE_TEST_HOST = '{configuration_directory}/host/tuvweb01'.format(configuration_directory=CONFIGURATION_DIRECTORY)
-BASE_PRODUCTION_HOST = '{configuration_directory}/host/berweb01'.format(configuration_directory=CONFIGURATION_DIRECTORY)
-
-DEVELOPMENT_HOST_DESTINATION = '{configuration_directory}/host/dev{abbreviation}%02d'
-TEST_HOST_DESTINATION = '{configuration_directory}/host/tuv{abbreviation}%02d'
-PRODUCTION_HOST_DESTINATION = '{configuration_directory}/host/ber{abbreviation}%02d'
+HOST_DIRECTORY = join('testdata', 'svn_repo', 'config', 'host')
 
 
-def create_development_host(abbreviation, host_number):
-    dev_format = DEVELOPMENT_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
-                                                     abbreviation=abbreviation)
-    host_dir = dev_format % host_number
-    if not exists(host_dir):
-        copytree(BASE_DEVELOPMENT_HOST, host_dir)
+class Location(object):
+
+    def __init__(self, name, base_host, hosts_count):
+        self.name = name
+        self.base_host = base_host
+        self.hosts_count = hosts_count
 
 
-def create_test_host(abbreviation, host_number):
-    tuv_format = TEST_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
-                                              abbreviation=abbreviation)
-    host_dir = tuv_format % host_number
-    if not exists(host_dir):
-        copytree(BASE_TEST_HOST, host_dir)
+class ProductionLocation(Location):
+
+    def __init__(self, hosts_count):
+        Location.__init__(self, 'prd', 'tuvweb01', hosts_count)
 
 
-def create_production_host(abbreviation, host_number):
-    prod_format = PRODUCTION_HOST_DESTINATION.format(configuration_directory=CONFIGURATION_DIRECTORY,
-                                                     abbreviation=abbreviation)
-    host_dir = prod_format % host_number
-    if not exists(host_dir):
-        copytree(BASE_PRODUCTION_HOST, host_dir)
+class PreProductionLocation(Location):
+
+    def __init__(self, hosts_count):
+        Location.__init__(self, 'pre', 'devweb01', hosts_count)
 
 
-def create_type(abbreviation):
-    count_of_development_hosts = randint(MIN_DEVELOPMENT_HOSTS, MAX_DEVELOPMENT_HOSTS)
-    for host_number in range(1, count_of_development_hosts):
-        create_development_host(abbreviation, host_number)
+class TestLocation(Location):
 
-    count_of_test_hosts = randint(MIN_TEST_HOSTS, MAX_TEST_HOSTS)
-    for host_number in range(1, count_of_test_hosts):
-        create_test_host(abbreviation, host_number)
+    def __init__(self, hosts_count):
+        Location.__init__(self, 'tst', 'berweb01', hosts_count)
 
-    count_of_production_hosts = randint(MIN_PRODUCTION_HOSTS, MAX_PRODUCTION_HOSTS)
-    for host_number in range(1, count_of_production_hosts):
-        create_production_host(abbreviation, host_number)
 
-    print 'type "%s": %02d dev   %02d tuv   %02d ber' % (abbreviation,
-                                                         count_of_development_hosts,
-                                                         count_of_test_hosts,
-                                                         count_of_production_hosts)
+#  Please adapt the TEST_DATA list to generate test data which
+#  might look like the host structure in your data center.
+#
+#  First entry explained:
+#     a host group type called "app".
+#     For example a host group serving a web application.
 
-    return count_of_development_hosts + count_of_test_hosts + count_of_production_hosts
+TEST_DATA = [('app', [ProductionLocation(20),    # 20 hosts in production
+                                                 # this will generate host names from: prdapp01 to prdapp20
+
+                      PreProductionLocation(5),  # 5 hosts in pre-production
+                                                 # this will generate host names from: preapp01 to preapp05
+
+                      TestLocation(3)]),         # 3 hosts in test
+                                                 # this will generate host names from: tstapp01 to tstapp03
+
+             ('cld', [ProductionLocation(3),
+                      PreProductionLocation(1),
+                      TestLocation(1)]),
+             ('mem', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('bet', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('bus', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('cor', [ProductionLocation(99),
+                      PreProductionLocation(10),
+                      TestLocation(10)]),
+             ('cit', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('def', [ProductionLocation(15),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('int', [ProductionLocation(65),
+                      PreProductionLocation(45),
+                      TestLocation(20)]),
+             ('mgo', [ProductionLocation(30),
+                      PreProductionLocation(25),
+                      TestLocation(56)]),
+             ('www', [ProductionLocation(99),
+                      PreProductionLocation(20),
+                      TestLocation(17)]),
+             ('wik', [ProductionLocation(1),
+                      PreProductionLocation(1),
+                      TestLocation(1)]),
+             ('med', [ProductionLocation(80),
+                      PreProductionLocation(10),
+                      TestLocation(10)]),
+             ('dns', [ProductionLocation(10),
+                      PreProductionLocation(5),
+                      TestLocation(5)]),
+             ('dbs', [ProductionLocation(75),
+                      PreProductionLocation(50),
+                      TestLocation(50)]),
+             ('dev', [ProductionLocation(5),
+                      PreProductionLocation(36),
+                      TestLocation(80)])]
+
+total_count_of_created_hosts = 0
+
+
+def create_host(type_name, location, host_number):
+
+    global total_count_of_created_hosts
+
+    host_name = "%s%s%02d" % (location.name, type_name, host_number)
+    destination_host_directory = join(HOST_DIRECTORY, host_name)
+    if not exists(destination_host_directory):
+        source_host_directory = join(HOST_DIRECTORY, location.base_host)
+        copytree(source_host_directory, destination_host_directory)
+        total_count_of_created_hosts += 1
+
+
+def create_hosts_in_location(type_name, location):
+
+    for host_number in range(1, location.hosts_count + 1):
+        create_host(type_name, location, host_number)
+
+
+def create_hosts_for_type(type_name, locations):
+
+    for location in locations:
+        create_hosts_in_location(type_name, location)
 
 
 def main():
-    min_count_of_hosts = 1000
 
-    first_character = 'abcdefghijklmnopqrstuvxyz'
-    second_character = 'abcdefghijklmnopqrstuvwxyz'
-    third_character = 'abcdefghijklmnopqrstuvwxyz'
+    global total_count_of_created_hosts
 
-    count_of_hosts = 0
-    while count_of_hosts < min_count_of_hosts:
-        abbreviation = choice(first_character) + choice(second_character) + choice(third_character)
-        count_of_hosts += create_type(abbreviation)
-    print "Created %d hosts" % count_of_hosts
+    for type_name, locations in TEST_DATA:
+        create_hosts_for_type(type_name, locations)
+
+    print "Created %d hosts." % total_count_of_created_hosts
 
 
 if __name__ == '__main__':

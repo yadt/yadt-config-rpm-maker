@@ -16,6 +16,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+    This module contains all return codes used by the command line
+    interface.
+"""
 
 RETURN_CODE_SUCCESS = 0
 RETURN_CODE_VERSION = RETURN_CODE_SUCCESS
@@ -23,6 +27,6 @@ RETURN_CODE_NOT_ENOUGH_ARGUMENTS = 1
 RETURN_CODE_REVISION_IS_NOT_AN_INTEGER = 2
 RETURN_CODE_CONFIGURATION_ERROR = 3
 RETURN_CODE_EXCEPTION_OCCURRED = 4
-RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED = 5
+RETURN_CODE_UNKNOWN_EXCEPTION_OCCURRED = 5
 RETURN_CODE_REPOSITORY_URL_INVALID = 6
 RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER = 7

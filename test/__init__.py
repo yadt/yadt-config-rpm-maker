@@ -15,43 +15,50 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-    This module contains imports to ensure that the user gets useful feedback
-    when executing "python setup.py test" and some system dependencies are missing.
+    This module contains imports to ensure that the user gets useful
+    feedback when executing "python setup.py test" and some system
+    dependencies are missing.
+
+    Unfortunately the feedback from the test loader is insufficient.
+    This is a known bug. See http://bugs.python.org/issue7559
 """
 
 at_least_one_import_failed = False
 
 
+def print_import_error(error):
+    global at_least_one_import_failed
+    at_least_one_import_failed = True
+
+    print "Import error: " + str(error)
+
+
 try:
     import pysvn  # nopep8
 
-except ImportError:
-    print 'Could not import "pysvn"! Please install it.'
-    at_least_one_import_failed = True
+except ImportError as import_error:
+    print_import_error(import_error)
 
 
 try:
     import rpm  # nopep8
 
-except ImportError:
-    print 'Could not import "rpm"! Please install it.'
-    at_least_one_import_failed = True
+except ImportError as import_error:
+    print_import_error(import_error)
 
 
 try:
     import yaml  # nopep8
 
-except ImportError:
-    print 'Could not import "yaml"! Please install it.'
-    at_least_one_import_failed = True
+except ImportError as import_error:
+    print_import_error(import_error)
 
 
 try:
     import mock  # nopep8
 
-except ImportError:
-    print 'Could not import "mock"! Please install it.'
-    at_least_one_import_failed = True
+except ImportError as import_error:
+    print_import_error(import_error)
 
 
 if at_least_one_import_failed:

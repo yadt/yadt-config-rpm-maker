@@ -64,10 +64,10 @@ function setup_svn_server_with_test_data_and_start_it() {
 
   # Configure svn server
   rm ${SUBVERSION_CONFIGURATION_FILE}
-  cp /vagrant/svnserve.conf ${SUBVERSION_CONFIGURATION_FILE}
-  cp /vagrant/post-commit ${HOOKS_DIRECTORY}
+  cp ${SHARED_DIRECTORY}/svnserve.conf ${SUBVERSION_CONFIGURATION_FILE}
+  cp ${SHARED_DIRECTORY}/post-commit ${HOOKS_DIRECTORY}
   chmod 755 ${HOOKS_DIRECTORY}/post-commit
-  cp /vagrant/yadt-config-rpm-maker.yaml ${HOOKS_DIRECTORY}
+  cp ${SHARED_DIRECTORY}/yadt-config-rpm-maker.yaml ${HOOKS_DIRECTORY}
 
   # Import the test data into the configuration repository
   svn import ${SOURCE_DIRECTORY}/testdata/svn_repo/ file:///${CONFIGURATION_REPOSITORY}/ -m "Initial commit"

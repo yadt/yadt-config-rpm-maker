@@ -14,18 +14,15 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = '2.0'
-
 import traceback
 
-from logging import DEBUG, getLogger
+from logging import DEBUG, getLogger, getLevelName
 from sys import argv
 
-from config_rpm_maker.configuration.properties import get_svn_path_to_config
 from config_rpm_maker.cli.argumentvalidation import ensure_valid_repository_url, ensure_valid_revision
 from config_rpm_maker.cli.exitprogram import start_measuring_time, exit_program
 from config_rpm_maker.cli.returncodes import (RETURN_CODE_CONFIGURATION_ERROR,
-                                              RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED,
+                                              RETURN_CODE_UNKNOWN_EXCEPTION_OCCURRED,
                                               RETURN_CODE_EXCEPTION_OCCURRED,
                                               RETURN_CODE_SUCCESS,
                                               RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
@@ -35,7 +32,7 @@ from config_rpm_maker.cli.parsearguments import (ARGUMENT_REPOSITORY,
                                                  apply_arguments_to_config,
                                                  determine_console_log_level,
                                                  parse_arguments)
-from config_rpm_maker.configuration import get_svn_path_to_config, ConfigurationException
+from config_rpm_maker.configuration import get_svn_path_to_config, ConfigurationException, load_configuration_file
 from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.cleaner import clean_up_deleted_hosts_data
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
@@ -45,15 +42,16 @@ from config_rpm_maker.utilities.logutils import (append_console_logger,
                                                  log_exception_message)
 from config_rpm_maker.svnservice import SvnService
 
+from config_rpm_maker.version import __version__
+
 LOGGER = getLogger(__name__)
 
 MESSAGE_SUCCESS = "Success."
 
 
 def main():
-    """
-        This function will be called by the command line interface.
-    """
+    """ This function will be called by the command line interface. """
+
     LOGGER.setLevel(DEBUG)
 
     try:
@@ -77,8 +75,10 @@ def main():
         return exit_program('An exception occurred!', return_code=RETURN_CODE_EXCEPTION_OCCURRED)
 
     except Exception:
-        traceback.print_exc(5)
-        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKOWN_EXCEPTION_OCCURRED)
+        stack_trace = traceback.format_exc(5)
+        for line in stack_trace.split('\n'):
+            LOGGER.error(line)
+        return exit_program('An unknown exception occurred!', return_code=RETURN_CODE_UNKNOWN_EXCEPTION_OCCURRED)
 
     except KeyboardInterrupt:
         return exit_program('Execution interrupted by user!', return_code=RETURN_CODE_EXECUTION_INTERRUPTED_BY_USER)
@@ -89,30 +89,35 @@ def main():
 def initialize_logging_to_console(arguments):
     """ Initializes the logging to console and
         appends the console handler to the root logger """
+
     console_log_level = determine_console_log_level(arguments)
     append_console_logger(LOGGER, console_log_level)
 
 
 def initialize_configuration(arguments):
     """ Load the configuration file and applies the given arguments to the configuration. """
-    configuration.load_configuration_file()
+
+    load_configuration_file()
     apply_arguments_to_config(arguments)
 
 
 def extract_repository_url_and_revision_from_arguments(arguments):
     """ Extracts the repository url and the revision from the given
         arguments ensuring that they have valid values. """
+
     repository_url = ensure_valid_repository_url(arguments[ARGUMENT_REPOSITORY])
     revision = ensure_valid_revision(arguments[ARGUMENT_REVISION])
     return repository_url, revision
 
 
 def initialize_logging_to_syslog(arguments, revision):
-    """ Initializes the logging to syslog and
-        appends the syslog handler to the root logger if not omitted by the --no-syslog option """
+    """ Initializes the logging to syslog and appends the syslog handler to
+        the root logger if not omitted by the --no-syslog option """
+
     if not arguments[OPTION_NO_SYSLOG]:
         sys_log_handler = create_sys_log_handler(revision)
         LOGGER.addHandler(sys_log_handler)
+        LOGGER.info("Logging to syslog on level %s", getLevelName(sys_log_handler.level))
 
 
 def building_configuration_rpms_and_clean_host_directories(repository, revision):

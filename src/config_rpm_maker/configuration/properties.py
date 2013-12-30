@@ -14,13 +14,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+    This module contains all configuration properties for
+    yadt-config-rpm-maker. The configuration property values will be read
+    from the configuration file.
+"""
+
 from config_rpm_maker.configuration import ConfigurationProperty
 
 get_config_viewer_host_directory = ConfigurationProperty(key='config_viewer_hosts_dir', default='/tmp')
 get_config_rpm_prefix = ConfigurationProperty(key='config_rpm_prefix', default='yadt-config-')
 get_custom_dns_search_list = ConfigurationProperty(key='custom_dns_searchlist', default=[])
-get_error_log_url = ConfigurationProperty(key='error_log_url', default='')
 get_error_log_directory = ConfigurationProperty(key='error_log_dir', default="")
+get_error_log_url = ConfigurationProperty(key='error_log_url', default='')
 get_log_format = ConfigurationProperty(key="log_format", default="[%(levelname)5s] %(message)s")
 get_log_level = ConfigurationProperty(key="log_level", default='DEBUG')
 get_max_failed_hosts = ConfigurationProperty(key='max_failed_hosts', default=3)

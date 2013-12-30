@@ -24,7 +24,6 @@ from unittest_support import UnitTests
 
 import config_rpm_maker
 
-from config_rpm_maker.configuration import is_config_viewer_only_enabled, is_no_clean_up_enabled
 from config_rpm_maker.hostrpmbuilder import CouldNotBuildRpmException, ConfigDirAlreadyExistsException, CouldNotCreateConfigDirException, HostRpmBuilder
 
 
@@ -166,8 +165,8 @@ class BuildTests(TestCase):
         return mock_overlay_segment
 
     def setUp(self):
-        self.VARIABLES_DIRECTORY = 'variables-directory'
-        self.RPM_REQUIRES_PATH = 'rpm-requires-path'
+        self.variables_directory = '/path/to/variables-directory'
+        self.rpm_requires_path = '/path/to/rpm-requires'
 
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.thread_name = 'Mock-Thread'
@@ -175,8 +174,8 @@ class BuildTests(TestCase):
         mock_host_rpm_builder.logger = Mock()
         mock_host_rpm_builder.revision = '123'
         mock_host_rpm_builder.host_config_dir = '/foo/bar'
-        mock_host_rpm_builder.variables_dir = self.VARIABLES_DIRECTORY
-        mock_host_rpm_builder.rpm_requires_path = self.RPM_REQUIRES_PATH
+        mock_host_rpm_builder.variables_dir = self.variables_directory
+        mock_host_rpm_builder.rpm_requires_path = self.rpm_requires_path
         mock_host_rpm_builder.rpm_provides_path = 'rpm-provides-path'
         mock_host_rpm_builder.config_viewer_host_dir = 'config_viewer_host_dir'
 
@@ -227,7 +226,7 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        mock_mkdir.assert_any_call('variables-directory')
+        mock_mkdir.assert_any_call('/path/to/variables-directory')
 
     @patch('config_rpm_maker.hostrpmbuilder.OVERLAY_ORDER')
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
@@ -378,7 +377,7 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        self.mock_host_rpm_builder._write_file.assert_any_call('variables-directory/VARIABLES', 'patchinfo1\npatchinfo2\npatchinfo3\n')
+        self.mock_host_rpm_builder._write_file.assert_any_call('/path/to/variables-directory/VARIABLES', 'patchinfo1\npatchinfo2\npatchinfo3\n')
         self.mock_host_rpm_builder._write_file.assert_any_call('config_viewer_host_dir/devweb01.variables', 'patchinfo1\npatchinfo2\npatchinfo3\n')
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
@@ -560,8 +559,7 @@ class WriteRevisionFileForConfigViewerTests(TestCase):
 @patch('config_rpm_maker.hostrpmbuilder.environ')
 class BuildRpmUsingRpmbuildTests(UnitTests):
 
-    def test_should_tar_sources_before_building_rpm(self, mock_environ, mock_abspath, mock_popen, mock_config):
-
+    def setUp(self):
         mock_host_rpm_builder = Mock(HostRpmBuilder)
         mock_host_rpm_builder.hostname = 'berweb01'
         mock_host_rpm_builder.thread_name = 'thread-0'
@@ -573,26 +571,21 @@ class BuildRpmUsingRpmbuildTests(UnitTests):
         mock_process = Mock()
         mock_process.communicate.return_value = ('stdout', 'stderr')
         mock_process.returncode = 0
-        mock_popen.return_value = mock_process
 
-        HostRpmBuilder._build_rpm_using_rpmbuild(mock_host_rpm_builder)
+        self.mock_host_rpm_builder = mock_host_rpm_builder
+        self.mock_process = mock_process
 
-        mock_host_rpm_builder._tar_sources.assert_called_with()
+    def test_should_tar_sources_before_building_rpm(self, mock_environ, mock_abspath, mock_popen, mock_config):
+
+        mock_popen.return_value = self.mock_process
+
+        HostRpmBuilder._build_rpm_using_rpmbuild(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._tar_sources.assert_called_with()
 
     def test_should_call_rpmbuild(self, mock_environ, mock_abspath, mock_popen, mock_config):
 
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.hostname = 'berweb01'
-        mock_host_rpm_builder.thread_name = 'thread-0'
-        mock_host_rpm_builder.logger = Mock()
-        mock_host_rpm_builder.work_dir = '/path/to/working/directory'
-        mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
-        mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
-
-        mock_process = Mock()
-        mock_process.communicate.return_value = ('stdout', 'stderr')
-        mock_process.returncode = 0
-        mock_popen.return_value = mock_process
+        mock_popen.return_value = self.mock_process
 
         mock_environment_copy = {}
         mock_environ.copy.return_value = mock_environment_copy
@@ -602,25 +595,14 @@ class BuildRpmUsingRpmbuildTests(UnitTests):
 
         mock_abspath.side_effect = fake_abspath
 
-        HostRpmBuilder._build_rpm_using_rpmbuild(mock_host_rpm_builder)
+        HostRpmBuilder._build_rpm_using_rpmbuild(self.mock_host_rpm_builder)
 
         mock_popen.assert_called_withPopen("rpmbuild --define --clean '_topdir /absolute/path/to/rpm/build/directory' -ta /path/to/tarred_sources.tar.gz", shell=True, env=mock_environment_copy, stderr=PIPE, stdout=PIPE)
 
     def test_should_not_append_clean_option_when_configration_says_no_clean_up(self, mock_environ, mock_abspath, mock_popen, mock_config):
 
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.hostname = 'berweb01'
-        mock_host_rpm_builder.thread_name = 'thread-0'
-        mock_host_rpm_builder.logger = Mock()
-        mock_host_rpm_builder.work_dir = '/path/to/working/directory'
-        mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
-        mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
-
         mock_config.return_value = True
-        mock_process = Mock()
-        mock_process.communicate.return_value = ('stdout', 'stderr')
-        mock_process.returncode = 0
-        mock_popen.return_value = mock_process
+        mock_popen.return_value = self.mock_process
 
         mock_environment_copy = {}
         mock_environ.copy.return_value = mock_environment_copy
@@ -630,25 +612,16 @@ class BuildRpmUsingRpmbuildTests(UnitTests):
 
         mock_abspath.side_effect = fake_abspath
 
-        HostRpmBuilder._build_rpm_using_rpmbuild(mock_host_rpm_builder)
+        HostRpmBuilder._build_rpm_using_rpmbuild(self.mock_host_rpm_builder)
 
         mock_popen.assert_called_with("rpmbuild  --define '_topdir /absolute/path/to/rpm/build/directory' -ta /path/to/tarred_sources.tar.gz", shell=True, env=mock_environment_copy, stderr=PIPE, stdout=PIPE)
 
     def test_should_write_stdout_to_logger(self, mock_environ, mock_abspath, mock_popen, mock_config):
 
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.hostname = 'berweb01'
-        mock_host_rpm_builder.thread_name = 'thread-0'
         mock_logger = Mock()
-        mock_host_rpm_builder.logger = mock_logger
-        mock_host_rpm_builder.work_dir = '/path/to/working/directory'
-        mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
-        mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
+        self.mock_host_rpm_builder.logger = mock_logger
 
-        mock_process = Mock()
-        mock_process.communicate.return_value = ('stdout', 'stderr')
-        mock_process.returncode = 0
-        mock_popen.return_value = mock_process
+        mock_popen.return_value = self.mock_process
 
         mock_environment_copy = {}
         mock_environ.copy.return_value = mock_environment_copy
@@ -658,25 +631,16 @@ class BuildRpmUsingRpmbuildTests(UnitTests):
 
         mock_abspath.side_effect = fake_abspath
 
-        HostRpmBuilder._build_rpm_using_rpmbuild(mock_host_rpm_builder)
+        HostRpmBuilder._build_rpm_using_rpmbuild(self.mock_host_rpm_builder)
 
         mock_logger.info.assert_called_with('stdout')
 
     def test_should_write_stderr_to_logger(self, mock_environ, mock_abspath, mock_popen, mock_config):
 
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.hostname = 'berweb01'
-        mock_host_rpm_builder.thread_name = 'thread-0'
         mock_logger = Mock()
-        mock_host_rpm_builder.logger = mock_logger
-        mock_host_rpm_builder.work_dir = '/path/to/working/directory'
-        mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
-        mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
+        self.mock_host_rpm_builder.logger = mock_logger
 
-        mock_process = Mock()
-        mock_process.communicate.return_value = ('stdout', 'stderr')
-        mock_process.returncode = 0
-        mock_popen.return_value = mock_process
+        mock_popen.return_value = self.mock_process
 
         mock_environment_copy = {}
         mock_environ.copy.return_value = mock_environment_copy
@@ -686,44 +650,24 @@ class BuildRpmUsingRpmbuildTests(UnitTests):
 
         mock_abspath.side_effect = fake_abspath
 
-        HostRpmBuilder._build_rpm_using_rpmbuild(mock_host_rpm_builder)
+        HostRpmBuilder._build_rpm_using_rpmbuild(self.mock_host_rpm_builder)
 
         mock_logger.error.assert_called_with('stderr')
 
     def test_should_not_write_stderr_to_logger_when_not_given(self, mock_environ, mock_abspath, mock_popen, mock_config):
 
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.hostname = 'berweb01'
-        mock_host_rpm_builder.thread_name = 'thread-0'
         mock_logger = Mock()
-        mock_host_rpm_builder.logger = mock_logger
-        mock_host_rpm_builder.work_dir = '/path/to/working/directory'
-        mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
-        mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
+        self.mock_host_rpm_builder.logger = mock_logger
+        self.mock_process.communicate.return_value = ('stdout', "")
+        mock_popen.return_value = self.mock_process
 
-        mock_process = Mock()
-        mock_process.communicate.return_value = ('stdout', "")
-        mock_process.returncode = 0
-        mock_popen.return_value = mock_process
-
-        HostRpmBuilder._build_rpm_using_rpmbuild(mock_host_rpm_builder)
+        HostRpmBuilder._build_rpm_using_rpmbuild(self.mock_host_rpm_builder)
 
         self.assert_mock_never_called(mock_logger.error)
 
     def test_should_raise_exception_when_process_returns_with_error_code(self, mock_environ, mock_abspath, mock_popen, mock_config):
 
-        mock_host_rpm_builder = Mock(HostRpmBuilder)
-        mock_host_rpm_builder.hostname = 'berweb01'
-        mock_host_rpm_builder.thread_name = 'thread-0'
-        mock_logger = Mock()
-        mock_host_rpm_builder.logger = mock_logger
-        mock_host_rpm_builder.work_dir = '/path/to/working/directory'
-        mock_host_rpm_builder.rpm_build_dir = '/path/to/rpm/build/directory'
-        mock_host_rpm_builder._tar_sources.return_value = '/path/to/tarred_sources.tar.gz'
+        self.mock_process.returncode = 123
+        mock_popen.return_value = self.mock_process
 
-        mock_process = Mock()
-        mock_process.communicate.return_value = ('stdout', "")
-        mock_process.returncode = 123
-        mock_popen.return_value = mock_process
-
-        self.assertRaises(CouldNotBuildRpmException, HostRpmBuilder._build_rpm_using_rpmbuild, mock_host_rpm_builder)
+        self.assertRaises(CouldNotBuildRpmException, HostRpmBuilder._build_rpm_using_rpmbuild, self.mock_host_rpm_builder)

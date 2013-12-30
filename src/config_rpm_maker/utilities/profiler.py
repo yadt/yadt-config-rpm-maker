@@ -14,6 +14,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+    This module contains functions which were created for performance
+    tweaking. The test coverage of this module is low since it's main
+    purpose is to add logging information.
+"""
 
 from functools import wraps
 from logging import getLogger
@@ -26,7 +31,6 @@ from config_rpm_maker.configuration import get_thread_count
 
 LOGGER = getLogger(__name__)
 
-NUMBER_OF_LARGEST_FILES_TO_LOG = 10
 LOG_EACH_MEASUREMENT = False
 
 _execution_time_summary = {}
