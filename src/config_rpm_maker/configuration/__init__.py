@@ -52,10 +52,9 @@ class ConfigurationProperty(object):
         configuration properties which have a readable name and return the
         configuration value. """
 
-    def __init__(self, key, default, validator=None):
+    def __init__(self, key, default):
         self.key = key
         self.default = default
-        self.validator = validator
 
     def __call__(self):
         """ Get the configuration property """
