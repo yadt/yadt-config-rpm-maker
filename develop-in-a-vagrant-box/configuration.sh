@@ -31,3 +31,5 @@ readonly RESULT_RPM="yadt-config-rpm-maker-3.2-1.noarch.rpm"
 readonly CONFIGURATION_REPOSITORY="${WORKING_DIRECTORY}/configuration-repository"
 readonly HOOKS_DIRECTORY="${CONFIGURATION_REPOSITORY}/hooks"
 readonly SUBVERSION_CONFIGURATION_FILE="${CONFIGURATION_REPOSITORY}/conf/svnserve.conf"
+
+readonly SHARED_DIRECTORY="/vagrant"
