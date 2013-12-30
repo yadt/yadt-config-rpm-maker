@@ -20,8 +20,8 @@ import sys
 
 from setuptools import setup, find_packages
 
-PATH_TO_VERSION_FILE = 'src/config_rpm_maker/version.py'
 SOURCE_DIRECTORY = 'src'
+PATH_TO_VERSION_FILE = '{source_directory}/config_rpm_maker/version.py'.format(source_directory=SOURCE_DIRECTORY)
 
 sys.path.append(SOURCE_DIRECTORY)
 
