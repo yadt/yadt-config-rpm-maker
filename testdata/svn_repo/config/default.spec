@@ -100,6 +100,12 @@ filterPercentDirectives () {
                 lastline="%dir \"${line%.%dir}\""
                 rm -f "$base/$line"
             ;;
+            (*.%symlink)
+                lastline="${line%.%symlink}"
+                target="$(cat "$base/$line")"
+                ln -s "$target" "$base/$lastline"
+                rm -f "$base/$line"
+            ;;
             (*)
                 lastline="\"$line\""
                 lastfile="$line"

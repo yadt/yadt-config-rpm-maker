@@ -100,7 +100,8 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
                           'files/file_from_pro': '',
                           'files/override': 'berweb',
                           'vars/override': 'berweb',
-                          'vars/var_in_var': 'berwebberweb'}
+                          'vars/var_in_var': 'berwebberweb'},
+                'symlinks': {'symlinks/link1' : '/foo/bar'}
             }
         }
 
@@ -109,7 +110,8 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             requires = host_to_check.get('requires', None)
             provides = host_to_check.get('provides', None)
             files = host_to_check.get('files', None)
-            self.assertRpm(host, rpms, requires=requires, provides=provides, files=files)
+            symlinks = host_to_check.get('symlinks', None)
+            self.assertRpm(host, rpms, requires=requires, provides=provides, files=files, symlinks=symlinks)
 
     def test_should_perform_chunked_uploads(self):
         old_config = get_rpm_upload_command()
@@ -184,7 +186,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         return ConfigRpmMaker('2', svn_service)
 
-    def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None):
+    def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None, symlinks=None):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)
@@ -209,6 +211,17 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         extract_path = self.extractRpmFiles(path, hostname)
         self.assertFiles(files, extract_path)
+        self.assertSymlinks(symlinks, extract_path)
+
+    def assertSymlinks(self, symlinks, extract_path):
+        if symlinks:
+            for symlink_file in symlinks:
+                complete_path = os.path.join(extract_path, symlink_file)
+                if os.path.exists(complete_path):
+                    self.fail("Symlink %s was not created." % complete_path)
+                expected_target = symlinks[symlink_file]
+                real_target = os.readlink(complete_path)
+                self.assertEquals(real_target, expected_target, "Symlink target for %s differs\nExpected: %s\nGot: %s" % (complete_path, expected_target, real_target))
 
     def assertFiles(self, files, extract_path):
         if files:

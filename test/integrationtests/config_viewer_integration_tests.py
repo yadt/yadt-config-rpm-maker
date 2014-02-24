@@ -47,6 +47,8 @@ all:/files/file_from_all
 loc/ber:/files/file_from_ber
 loc/pro:/files/file_from_pro
 loctyp/berweb:/files/override
+host/berweb01:/symlinks
+host/berweb01:/symlinks/link1.%symlink
 loctyp/berweb:/vars
 all:/vars/override
 loctyp/berweb:/vars/var_in_var
