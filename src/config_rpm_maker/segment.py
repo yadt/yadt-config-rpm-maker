@@ -57,6 +57,8 @@ class Loc(HostnameSegment):
         loc = hostname[0:3]
         if loc == 'ber' or loc == 'ham':
             return ['pro', loc, ]
+        elif loc == 'dia' or loc == 'dib' or loc == 'dic':
+            return ['dev', loc, ]
         else:
             return [loc, ]
 
