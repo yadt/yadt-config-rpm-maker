@@ -158,7 +158,8 @@ git remote add upstream https://github.com/yadt/yadt-config-rpm-maker.git
 ```
 ... and pull from time to time via ...
 ```bash
-git pull upstream master
+git remote update
+git merge upstream/master --ff-only
 ```
 ... to omit merge problems.
 
