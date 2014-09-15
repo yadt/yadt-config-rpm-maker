@@ -1,17 +1,17 @@
 # Turn off the brp-python-bytecompile script
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
-Name:		yadt-config-@@@HOST@@@
+Name:		yadt-config-@@@RPM_NAME@@@
 Version:	21
 Release:	@@@REVISION@@@
-Summary:	YADT config RPM for @@@HOST@@@
+Summary:	YADT config RPM for @@@RPM_NAME@@@
 Group:		YADT
 License:	GPL
-Source0:	yadt-config-@@@HOST@@@.tar.gz
+Source0:	yadt-config-@@@RPM_NAME@@@.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch:	noarch
 Provides:	yadt-config-all, @@@RPM_PROVIDES@@@
-Requires:	yadt-minion, %{name}-repos = %{version}-%{release}, hostname-@@@HOST@@@, @@@RPM_REQUIRES_NON_REPOS@@@
+Requires:	yadt-minion, %{name}-repos = %{version}-%{release}, hostname-@@@RPM_NAME@@@, @@@RPM_REQUIRES_NON_REPOS@@@
 
 %description
 YADT config RPM generated automatically from SVN
@@ -38,7 +38,7 @@ mkdir -p $RPM_BUILD_ROOT
 tar -c . | tar -C $RPM_BUILD_ROOT/ -x -v
 
 if test "$BASH_VERSION" && set +o posix ; then
-    : # RPM runs scripts under /bin/sh which puts bash into POSIX mode which does not support < <( 
+    : # RPM runs scripts under /bin/sh which puts bash into POSIX mode which does not support < <(
 else
     echo 1>&2 "ERROR: THIS RPM NEEDS /bin/sh TO BE A REAL bash (dash SUCKS) !!! BASH_VERSION = $BASH_VERSION && set +o posix $?"
     exit 1
@@ -76,12 +76,12 @@ filterPercentDirectives () {
             (*)
                 # other lines either start new section (%dir, %defattr) or are plain data lines
                 # hence we can output what we collected so far.
-                
+
                 # theoretically we could use the excplicit_attr variable here to automatically
                 # inject a %attr(755,-,-) for those files that don't have an explicit attr set
                 # but happen to be executable. HOWEVER, THIS WOULD BE A REALLY BAD IDEA!
                 # Because we would be setting a *default* exectuable attr of 755 that would cause
-                # havoc in some special places like /etc/sudoers.d ... 
+                # havoc in some special places like /etc/sudoers.d ...
                 explicit_attr=0
 
                 output "$lastline"
@@ -141,12 +141,12 @@ rm -rf $RPM_BUILD_ROOT
 # Requires should not be empty, so require something that is there in any case
 Requires: yum, @@@RPM_REQUIRES_REPOS@@@
 Group: YADT
-Summary: YADT config RPM - YUM Repo definitions and repo dependencies for @@@HOST@@@
+Summary: YADT config RPM - YUM Repo definitions and repo dependencies for @@@RPM_NAME@@@
 
 %description -n %{name}-repos
-This subpackage encapsulates the YUM repository definitions and dependencies 
-for this host. This package should be installed before the 
-yadt-config-@@@HOST@@@ package as it will configure all external YUM repos. The 
+This subpackage encapsulates the YUM repository definitions and dependencies
+for this host. This package should be installed before the
+yadt-config-@@@RPM_NAME@@@ package as it will configure all external YUM repos. The
 main config RPM can then use packages from these repos.
 
 %files -n %{name}-repos -f files-repos.lst

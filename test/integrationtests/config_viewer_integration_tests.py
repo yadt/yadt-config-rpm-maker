@@ -64,6 +64,7 @@ loctyp/berweb:/vars/var_in_var
                                   LOCTYP : berweb
                                 OVERRIDE : berweb
                                 REVISION : 2
+                                RPM_NAME : berweb01
                             RPM_PROVIDES : pro-prov2, all-prov2, all-prov, pro-prov, typ-web-provides, all-prov3
                             RPM_REQUIRES : ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement
                   RPM_REQUIRES_NON_REPOS : ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement
@@ -128,6 +129,7 @@ all:/vars/override
                                   LOCTYP : devweb
                                 OVERRIDE : all
                                 REVISION : 2
+                                RPM_NAME : devweb01
                             RPM_PROVIDES : typ-web-provides, all-prov, all-prov2, all-prov3
                             RPM_REQUIRES : all-req2, all-req, ty-web-requirement
                   RPM_REQUIRES_NON_REPOS : all-req2, all-req, ty-web-requirement
@@ -166,6 +168,7 @@ all:/vars/override
                                   LOCTYP : tuvweb
                                 OVERRIDE : all
                                 REVISION : 2
+                                RPM_NAME : tuvweb01
                             RPM_PROVIDES : typ-web-provides, all-prov, all-prov2, all-prov3
                             RPM_REQUIRES : all-req2, all-req, ty-web-requirement
                   RPM_REQUIRES_NON_REPOS : all-req2, all-req, ty-web-requirement

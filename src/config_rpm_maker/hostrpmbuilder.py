@@ -117,6 +117,7 @@ class HostRpmBuilder(object):
         self._write_dependency_file(overall_requires, self.rpm_requires_path, collapse_duplicates=True)
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
+        self._write_file(os.path.join(self.variables_dir, 'RPM_NAME'), self.hostname)
 
         repo_packages_regex = get_repo_packages_regex()
         self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)

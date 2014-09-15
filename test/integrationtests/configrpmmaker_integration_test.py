@@ -101,7 +101,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
                           'files/override': 'berweb',
                           'vars/override': 'berweb',
                           'vars/var_in_var': 'berwebberweb'},
-                'symlinks': {'symlinks/link1' : '/foo/bar'}
+                'symlinks': {'symlinks/link1': '/foo/bar'}
             }
         }
 
