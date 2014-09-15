@@ -38,9 +38,11 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
         service = SvnService(self.repo_url, None, None, path_to_config=get_svn_path_to_config())
 
-        self.assertEqual([('host/berweb01', 'VARIABLES'), ('host/berweb01', 'VARIABLES/RPM_REQUIRES'),
-                          ('host/berweb01', 'symlinks'), ('host/berweb01', 'symlinks/link1.%symlink')],
-                         service.export('host/berweb01', 'target/tmp/test', 2))
+        expected_elements = [('host/berweb01', 'VARIABLES'), ('host/berweb01', 'VARIABLES/RPM_REQUIRES'),
+                             ('host/berweb01', 'symlinks'), ('host/berweb01', 'symlinks/link1.%symlink')]
+        actual_elements = service.export('host/berweb01', 'target/tmp/test', 2)
+
+        self.assertEqual(sorted(expected_elements), sorted(actual_elements))
 
     def test_should_return_exactly_one_svn_log(self):
 
