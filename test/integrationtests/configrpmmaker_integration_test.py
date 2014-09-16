@@ -196,8 +196,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         if not path:
             raise Exception("Did not find host '%s' in %s." % (hostname, str(rpms)))
-
-        self.assertTrue(os.path.exists(path), "Could not find file %s ." % path)
+        self.assertTrue(os.path.exists(path), "Could not find file %s." % path)
         ts = rpm.TransactionSet()
         ts.setVSFlags((rpm._RPMVSF_NOSIGNATURES | rpm._RPMVSF_NODIGESTS))
         f = os.open(path, os.O_RDONLY)

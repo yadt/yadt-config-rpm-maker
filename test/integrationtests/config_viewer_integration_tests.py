@@ -59,6 +59,7 @@ loctyp/berweb:/vars/var_in_var
                                     FQDN : .+
                                     HOST : berweb01
                                   HOSTNR : 01
+           INSTALL_PROTECTION_DEPENDENCY : hostname-<strong title="HOST">berweb01</strong>
                                       IP : .+
                                      LOC : ber
                                   LOCTYP : berweb
@@ -124,6 +125,7 @@ all:/vars/override
                                     FQDN : .+
                                     HOST : devweb01
                                   HOSTNR : 01
+           INSTALL_PROTECTION_DEPENDENCY : hostname-<strong title="HOST">devweb01</strong>
                                       IP : .+
                                      LOC : dev
                                   LOCTYP : devweb
@@ -163,6 +165,7 @@ all:/vars/override
                                     FQDN : .+
                                     HOST : tuvweb01
                                   HOSTNR : 01
+           INSTALL_PROTECTION_DEPENDENCY : hostname-<strong title="HOST">tuvweb01</strong>
                                       IP : .+
                                      LOC : tuv
                                   LOCTYP : tuvweb

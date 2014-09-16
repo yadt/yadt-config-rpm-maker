@@ -11,7 +11,7 @@ Source0:	yadt-config-@@@RPM_NAME@@@.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch:	noarch
 Provides:	yadt-config-all, @@@RPM_PROVIDES@@@
-Requires:	yadt-minion, %{name}-repos = %{version}-%{release}, hostname-@@@RPM_NAME@@@, @@@RPM_REQUIRES_NON_REPOS@@@
+Requires:	yadt-minion, %{name}-repos = %{version}-%{release}, @@@INSTALL_PROTECTION_DEPENDENCY@@@, @@@RPM_REQUIRES_NON_REPOS@@@
 
 %description
 YADT config RPM generated automatically from SVN
