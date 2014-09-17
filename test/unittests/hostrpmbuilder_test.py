@@ -366,6 +366,40 @@ class BuildTests(TestCase):
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
+    @patch('config_rpm_maker.hostrpmbuilder.open', create=True)
+    def test_should_write_rpm_name_and_protection_variable_for_host_rpm(self, _, mock_exists, mock_mkdir):
+        mock_exists.return_value = False
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._write_file.assert_any_call('/path/to/variables-directory/RPM_NAME',
+                                                               'devweb01')
+        self.mock_host_rpm_builder._write_file.assert_any_call('/path/to/variables-directory/INSTALL_PROTECTION_DEPENDENCY',
+                                                               'hostname-@@@HOST@@@')
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    @patch('config_rpm_maker.hostrpmbuilder.open', create=True)
+    def test_should_write_empty_protection_variable_for_group_rpm(self, mock_open, mock_exists, mock_mkdir):
+        def only_rpm_name_variable_file_exists(path):
+            if path.endswith("RPM_NAME"):
+                return True
+            return False
+        mock_exists.side_effect = only_rpm_name_variable_file_exists
+        mock_open.return_value.__enter__.return_value.read.return_value.rstrip.return_value = "any-group-rpm-name"
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._write_file.assert_any_call('/path/to/variables-directory/INSTALL_PROTECTION_DEPENDENCY',
+                                                               '')
+        for write_call in self.mock_host_rpm_builder._write_file.call_args_list:
+            write_args, _write_kwargs = write_call
+            if "/path/to/variables-directory/RPM_NAME" in write_args:
+                self.fail("Found unwanted call %s, for a group rpm we should not overwrite the RPM_NAME variable!" % str(write_call))
+        self.assertEqual(self.mock_host_rpm_builder.rpm_name, "any-group-rpm-name")
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
     def test_should_save_network_variables(self, mock_exists, mock_mkdir):
 
         mock_exists.return_value = False
