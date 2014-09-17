@@ -120,16 +120,18 @@ class HostRpmBuilder(object):
 
         do_not_write_host_segment_variable = False
         rpm_name_variable_file = os.path.join(self.variables_dir, 'RPM_NAME')
-        if not os.path.exists(rpm_name_variable_file):
-            self._write_file(rpm_name_variable_file, self.hostname)
-            self.rpm_name = self.hostname
-            self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), 'hostname-@@@HOST@@@')
-        else:
+        self.is_a_group_rpm = exists(rpm_name_variable_file)
+
+        if self.is_a_group_rpm:
             with open(rpm_name_variable_file) as f:
                 self.rpm_name = f.read().rstrip()
             self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.rpm_name + '.spec')
             self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), '')
             do_not_write_host_segment_variable = True
+        else:
+            self._write_file(rpm_name_variable_file, self.hostname)
+            self.rpm_name = self.hostname
+            self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), 'hostname-@@@HOST@@@')
 
         repo_packages_regex = get_repo_packages_regex()
         self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)
@@ -246,7 +248,7 @@ class HostRpmBuilder(object):
 
     @measure_execution_time
     def _tar_sources(self):
-        if self.rpm_name != self.hostname:
+        if self.is_a_group_rpm:
             import shutil
             group_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.rpm_name)
             shutil.move(self.host_config_dir, group_config_dir)
@@ -299,9 +301,7 @@ class HostRpmBuilder(object):
             all_segments = OVERLAY_ORDER[:-1]
         else:
             all_segments = ALL_SEGEMENTS
-        print "%s : %s" % (self.hostname, all_segments)
         for segment in all_segments:
-            print "Write segment variable %s" % segment.get_variable_name()
             self._write_file(os.path.join(self.variables_dir, segment.get_variable_name()), segment.get(self.hostname)[-1])
 
     def _save_file_list(self):

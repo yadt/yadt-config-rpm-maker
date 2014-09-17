@@ -178,6 +178,7 @@ class BuildTests(TestCase):
         mock_host_rpm_builder.rpm_requires_path = self.rpm_requires_path
         mock_host_rpm_builder.rpm_provides_path = 'rpm-provides-path'
         mock_host_rpm_builder.config_viewer_host_dir = 'config_viewer_host_dir'
+        mock_host_rpm_builder.config_rpm_prefix = "any-config-prefix"
 
         mock_host_rpm_builder._overlay_segment = self._create_mock_overlay_segment_method()
 
@@ -346,7 +347,22 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        self.mock_host_rpm_builder._save_segment_variables.assert_called_with()
+        self.mock_host_rpm_builder._save_segment_variables.assert_called_with(False)
+
+    @patch('config_rpm_maker.hostrpmbuilder.mkdir')
+    @patch('config_rpm_maker.hostrpmbuilder.exists')
+    @patch('config_rpm_maker.hostrpmbuilder.open', create=True)
+    def test_should_save_segment_variables_without_host_when_(self, _, mock_exists, mock_mkdir):
+        def only_rpm_name_variable_file_exists(path):
+            if path.endswith("RPM_NAME"):
+                return True
+            return False
+
+        mock_exists.side_effect = only_rpm_name_variable_file_exists
+
+        HostRpmBuilder.build(self.mock_host_rpm_builder)
+
+        self.mock_host_rpm_builder._save_segment_variables.assert_called_with(True)
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
