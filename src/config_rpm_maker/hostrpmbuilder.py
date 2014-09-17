@@ -125,6 +125,7 @@ class HostRpmBuilder(object):
         if self.is_a_group_rpm:
             with open(rpm_name_variable_file) as f:
                 self.rpm_name = f.read().rstrip()
+            LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
             self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.rpm_name + '.spec')
             self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), '')
         else:
