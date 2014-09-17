@@ -118,16 +118,15 @@ class HostRpmBuilder(object):
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
-        do_not_write_host_segment_variable = False
         rpm_name_variable_file = os.path.join(self.variables_dir, 'RPM_NAME')
         self.is_a_group_rpm = exists(rpm_name_variable_file)
+        do_not_write_host_segment_variable = self.is_a_group_rpm
 
         if self.is_a_group_rpm:
             with open(rpm_name_variable_file) as f:
                 self.rpm_name = f.read().rstrip()
             self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.rpm_name + '.spec')
             self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), '')
-            do_not_write_host_segment_variable = True
         else:
             self._write_file(rpm_name_variable_file, self.hostname)
             self.rpm_name = self.hostname

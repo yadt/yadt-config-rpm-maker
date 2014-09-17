@@ -32,7 +32,7 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
         service = SvnService(self.repo_url, None, None, path_to_config=get_svn_path_to_config())
 
-        self.assertEqual(['berweb01', 'devweb01', 'tuvweb01'], service.get_hosts(2))
+        self.assertEqual(['berweb01', 'devweb00', 'devweb01', 'tuvweb01'], service.get_hosts(2))
 
     def test_should_return_tuples_of_svn_path_and_the_affected_file(self):
 

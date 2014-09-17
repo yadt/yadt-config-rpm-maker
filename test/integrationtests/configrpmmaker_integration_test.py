@@ -87,7 +87,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         config_rpm_maker = self._given_config_rpm_maker()
         rpms = config_rpm_maker.build()
 
-        self.assertEqual(9, len(rpms))
+        self.assertEqual(12, len(rpms))
 
         hosts_to_check = {
             'devweb01': {},
@@ -102,7 +102,12 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
                           'vars/override': 'berweb',
                           'vars/var_in_var': 'berwebberweb'},
                 'symlinks': {'symlinks/link1': '/foo/bar'}
-            }
+            },
+            'group-devweb': {
+                'requires': [],  # standard requirements are automatically added by assertRequires
+                'provides': [],
+                'files': [],
+            },
         }
 
         for host in hosts_to_check:
