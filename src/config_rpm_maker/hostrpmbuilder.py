@@ -249,7 +249,6 @@ class HostRpmBuilder(object):
     @measure_execution_time
     def _tar_sources(self):
         if self.is_a_group_rpm:
-            import shutil
             group_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.rpm_name)
             shutil.move(self.host_config_dir, group_config_dir)
             self.host_config_dir = group_config_dir
