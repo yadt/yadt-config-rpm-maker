@@ -87,7 +87,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         config_rpm_maker = self._given_config_rpm_maker()
         rpms = config_rpm_maker.build()
 
-        self.assertEqual(9, len(rpms))
+        self.assertEqual(12, len(rpms))
 
         hosts_to_check = {
             'devweb01': {},
@@ -101,8 +101,8 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
                           'files/override': 'berweb',
                           'vars/override': 'berweb',
                           'vars/var_in_var': 'berwebberweb'},
-                'symlinks': {'symlinks/link1' : '/foo/bar'}
-            }
+                'symlinks': {'symlinks/link1': '/foo/bar'},
+            },
         }
 
         for host in hosts_to_check:
@@ -112,6 +112,12 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             files = host_to_check.get('files', None)
             symlinks = host_to_check.get('symlinks', None)
             self.assertRpm(host, rpms, requires=requires, provides=provides, files=files, symlinks=symlinks)
+
+        self.assertRpm("group-devweb",
+                       rpms,
+                       requires=['all-req', 'all-req2', 'ty-web-requirement', 'yadt-config-group-devweb-repos', 'yadt-minion'],
+                       provides=['all-prov', 'all-prov2', 'all-prov3', 'typ-web-provides', 'yadt-config-all', 'yadt-config-group-devweb'],
+                       exhaustive=True)
 
     def test_should_perform_chunked_uploads(self):
         old_config = get_rpm_upload_command()
@@ -186,7 +192,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         return ConfigRpmMaker('2', svn_service)
 
-    def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None, symlinks=None):
+    def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None, symlinks=None, exhaustive=False):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)
@@ -196,16 +202,15 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
 
         if not path:
             raise Exception("Did not find host '%s' in %s." % (hostname, str(rpms)))
-
-        self.assertTrue(os.path.exists(path), "Could not find file %s ." % path)
+        self.assertTrue(os.path.exists(path), "Could not find file %s." % path)
         ts = rpm.TransactionSet()
         ts.setVSFlags((rpm._RPMVSF_NOSIGNATURES | rpm._RPMVSF_NODIGESTS))
         f = os.open(path, os.O_RDONLY)
         try:
             hdr = ts.hdrFromFdno(f)
             del ts
-            self.assertRequires(hdr, hostname, requires)
-            self.assertProvides(hdr, hostname, provides)
+            self.assertRequires(hdr, hostname, requires, exhaustive)
+            self.assertProvides(hdr, hostname, provides, exhaustive)
         finally:
             os.close(f)
 
@@ -238,16 +243,28 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         filtered_requires = [package_name for package_name in requires if not package_name.startswith('rpmlib')]
         return sorted(filtered_requires)
 
-    def assertRequires(self, hdr, hostname, requires):
+    def assertRequires(self, hdr, hostname, requires, exhaustive):
         if requires:
-            real_requires = requires + ['hostname-' + hostname, 'yadt-config-' + hostname + '-repos', 'rpmlib(CompressedFileNames)', 'rpmlib(PayloadFilesHavePrefix)', 'yadt-minion']
+            if exhaustive:
+                real_requires = requires
+            else:
+                real_requires = requires + ['hostname-' + hostname,
+                                            'yadt-config-' + hostname + '-repos',
+                                            'rpmlib(CompressedFileNames)',
+                                            'rpmlib(PayloadFilesHavePrefix)',
+                                            'yadt-minion']
+
             expected_requires = self._without_rpmlib_packages(real_requires)
             actual_requires = self._without_rpmlib_packages(hdr['requires'])
             self.assertListsEqual(expected_requires, actual_requires)
 
-    def assertProvides(self, hdr, hostname, provides):
+    def assertProvides(self, hdr, hostname, provides, exhaustive):
         if provides:
-            real_provides = provides + ['yadt-config-all', 'yadt-config-' + hostname, ]
+            if exhaustive:
+                real_provides = provides
+            else:
+                real_provides = provides + ['yadt-config-all', 'yadt-config-' + hostname, ]
+
             self.assertListsEqual(sorted(real_provides), sorted(hdr['provides']))
 
     def assertListsEqual(self, expected, actual):

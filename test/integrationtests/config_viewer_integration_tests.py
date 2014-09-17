@@ -59,11 +59,13 @@ loctyp/berweb:/vars/var_in_var
                                     FQDN : .+
                                     HOST : berweb01
                                   HOSTNR : 01
+           INSTALL_PROTECTION_DEPENDENCY : hostname-<strong title="HOST">berweb01</strong>
                                       IP : .+
                                      LOC : ber
                                   LOCTYP : berweb
                                 OVERRIDE : berweb
                                 REVISION : 2
+                                RPM_NAME : berweb01
                             RPM_PROVIDES : pro-prov2, all-prov2, all-prov, pro-prov, typ-web-provides, all-prov3
                             RPM_REQUIRES : ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement
                   RPM_REQUIRES_NON_REPOS : ber-req2, pro-req, all-req, ber-req, ty-web-requirement, all-req2, host-spec-requirement
@@ -123,11 +125,13 @@ all:/vars/override
                                     FQDN : .+
                                     HOST : devweb01
                                   HOSTNR : 01
+           INSTALL_PROTECTION_DEPENDENCY : hostname-<strong title="HOST">devweb01</strong>
                                       IP : .+
                                      LOC : dev
                                   LOCTYP : devweb
                                 OVERRIDE : all
                                 REVISION : 2
+                                RPM_NAME : devweb01
                             RPM_PROVIDES : typ-web-provides, all-prov, all-prov2, all-prov3
                             RPM_REQUIRES : all-req2, all-req, ty-web-requirement
                   RPM_REQUIRES_NON_REPOS : all-req2, all-req, ty-web-requirement
@@ -161,11 +165,13 @@ all:/vars/override
                                     FQDN : .+
                                     HOST : tuvweb01
                                   HOSTNR : 01
+           INSTALL_PROTECTION_DEPENDENCY : hostname-<strong title="HOST">tuvweb01</strong>
                                       IP : .+
                                      LOC : tuv
                                   LOCTYP : tuvweb
                                 OVERRIDE : all
                                 REVISION : 2
+                                RPM_NAME : tuvweb01
                             RPM_PROVIDES : typ-web-provides, all-prov, all-prov2, all-prov3
                             RPM_REQUIRES : all-req2, all-req, ty-web-requirement
                   RPM_REQUIRES_NON_REPOS : all-req2, all-req, ty-web-requirement

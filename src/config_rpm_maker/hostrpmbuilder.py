@@ -118,6 +118,21 @@ class HostRpmBuilder(object):
         self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
+        rpm_name_variable_file = os.path.join(self.variables_dir, 'RPM_NAME')
+        self.is_a_group_rpm = exists(rpm_name_variable_file)
+        do_not_write_host_segment_variable = self.is_a_group_rpm
+
+        if self.is_a_group_rpm:
+            with open(rpm_name_variable_file) as f:
+                self.rpm_name = f.read().rstrip()
+            LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
+            self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.rpm_name + '.spec')
+            self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), '')
+        else:
+            self._write_file(rpm_name_variable_file, self.hostname)
+            self.rpm_name = self.hostname
+            self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), 'hostname-@@@HOST@@@')
+
         repo_packages_regex = get_repo_packages_regex()
         self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'), filter_regex=repo_packages_regex)
         self._write_dependency_file(overall_requires, os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'), filter_regex=repo_packages_regex, positive_filter=False)
@@ -129,7 +144,7 @@ class HostRpmBuilder(object):
         self._move_variables_out_of_rpm_dir()
         self._save_file_list()
 
-        self._save_segment_variables()
+        self._save_segment_variables(do_not_write_host_segment_variable)
         self._save_network_variables()
 
         patch_info = self._generate_patch_info()
@@ -191,11 +206,11 @@ class HostRpmBuilder(object):
         result = []
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'RPMS')):
             for filename in files:
-                if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
+                if filename.startswith(self.config_rpm_prefix + self.rpm_name) and filename.endswith('.rpm'):
                     result.append(os.path.join(root, filename))
         for root, dirs, files in os.walk(os.path.join(self.rpm_build_dir, 'SRPMS')):
             for filename in files:
-                if filename.startswith(self.config_rpm_prefix + self.hostname) and filename.endswith('.rpm'):
+                if filename.startswith(self.config_rpm_prefix + self.rpm_name) and filename.endswith('.rpm'):
                     result.append(os.path.join(root, filename))
         return result
 
@@ -233,8 +248,16 @@ class HostRpmBuilder(object):
 
     @measure_execution_time
     def _tar_sources(self):
-        output_file = self.host_config_dir + '.tar.gz'
-        tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
+        if self.is_a_group_rpm:
+            group_config_dir = os.path.join(self.work_dir, self.config_rpm_prefix + self.rpm_name)
+            shutil.move(self.host_config_dir, group_config_dir)
+            self.host_config_dir = group_config_dir
+            output_file = group_config_dir + '.tar.gz'
+            tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.rpm_name)
+        else:
+            output_file = self.host_config_dir + '.tar.gz'
+            tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
+
         self.logger.debug("Executing %s ...", tar_cmd)
         process = subprocess.Popen(tar_cmd,
                                    shell=True,
@@ -272,8 +295,12 @@ class HostRpmBuilder(object):
         self._write_file(os.path.join(self.variables_dir, 'FQDN'), fqdn)
         self._write_file(os.path.join(self.variables_dir, 'ALIASES'), aliases)
 
-    def _save_segment_variables(self):
-        for segment in ALL_SEGEMENTS:
+    def _save_segment_variables(self, do_not_write_host_segment_variable):
+        if do_not_write_host_segment_variable:
+            all_segments = OVERLAY_ORDER[:-1]
+        else:
+            all_segments = ALL_SEGEMENTS
+        for segment in all_segments:
             self._write_file(os.path.join(self.variables_dir, segment.get_variable_name()), segment.get(self.hostname)[-1])
 
     def _save_file_list(self):
