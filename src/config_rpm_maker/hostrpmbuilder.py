@@ -122,7 +122,13 @@ class HostRpmBuilder(object):
         self.is_a_group_rpm = exists(rpm_name_variable_file)
         do_not_write_host_segment_variable = self.is_a_group_rpm
 
+        self._save_segment_variables(do_not_write_host_segment_variable)
+
         if self.is_a_group_rpm:
+            try:
+                TokenReplacer.filter_directory(os.path.dirname(self.variables_dir), self.variables_dir, thread_name=self.thread_name, skip=False)
+            except Exception as e:
+                LOGGER.warning("Problem during preliminary filtering of variables for group {0}: {1}".format(self.hostname, e))
             with open(rpm_name_variable_file) as f:
                 self.rpm_name = f.read().rstrip()
             LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
@@ -144,7 +150,6 @@ class HostRpmBuilder(object):
         self._move_variables_out_of_rpm_dir()
         self._save_file_list()
 
-        self._save_segment_variables(do_not_write_host_segment_variable)
         self._save_network_variables()
 
         patch_info = self._generate_patch_info()

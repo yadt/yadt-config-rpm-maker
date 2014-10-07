@@ -113,10 +113,10 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
             symlinks = host_to_check.get('symlinks', None)
             self.assertRpm(host, rpms, requires=requires, provides=provides, files=files, symlinks=symlinks)
 
-        self.assertRpm("group-devweb",
+        self.assertRpm("group-dev-web",
                        rpms,
-                       requires=['all-req', 'all-req2', 'ty-web-requirement', 'yadt-config-group-devweb-repos', 'yadt-minion'],
-                       provides=['all-prov', 'all-prov2', 'all-prov3', 'typ-web-provides', 'yadt-config-all', 'yadt-config-group-devweb'],
+                       requires=['all-req', 'all-req2', 'ty-web-requirement', 'yadt-config-group-dev-web-repos', 'yadt-minion'],
+                       provides=['all-prov', 'all-prov2', 'all-prov3', 'typ-web-provides', 'yadt-config-all', 'yadt-config-group-dev-web'],
                        exhaustive=True)
 
     def test_should_perform_chunked_uploads(self):

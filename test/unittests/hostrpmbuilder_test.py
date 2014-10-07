@@ -351,8 +351,9 @@ class BuildTests(TestCase):
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
+    @patch('config_rpm_maker.hostrpmbuilder.TokenReplacer')
     @patch('config_rpm_maker.hostrpmbuilder.open', create=True)
-    def test_should_save_segment_variables_without_host_when_building_group_rpm(self, _, mock_exists, mock_mkdir):
+    def test_should_save_segment_variables_without_host_when_building_group_rpm(self, _, token_replacer, mock_exists, mock_mkdir):
         def only_rpm_name_variable_file_exists(path):
             if path.endswith("RPM_NAME"):
                 return True
@@ -379,8 +380,9 @@ class BuildTests(TestCase):
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
+    @patch('config_rpm_maker.hostrpmbuilder.TokenReplacer')
     @patch('config_rpm_maker.hostrpmbuilder.open', create=True)
-    def test_should_write_empty_protection_variable_for_group_rpm(self, mock_open, mock_exists, mock_mkdir):
+    def test_should_write_empty_protection_variable_for_group_rpm(self, mock_open, token_replacer, mock_exists, mock_mkdir):
         def only_rpm_name_variable_file_exists(path):
             if path.endswith("RPM_NAME"):
                 return True

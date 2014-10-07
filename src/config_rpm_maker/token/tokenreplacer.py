@@ -93,6 +93,7 @@ class TokenReplacer(object):
                          replacer_function=None,
                          html_escape=False,
                          html_escape_function=None,
+                         skip=True,
                          thread_name="no thread name"):
         LOGGER.debug('%s: filtering files in directory "%s"', thread_name, directory)
 
@@ -100,7 +101,7 @@ class TokenReplacer(object):
                                             replacer_function=replacer_function, html_escape_function=html_escape_function)
 
         for root, _, filenames in os.walk(directory):
-            if variables_definition_directory in root:
+            if variables_definition_directory in root and skip:
                 continue
             for filename in filenames:
                 absolute_filename = os.path.join(root, filename)
