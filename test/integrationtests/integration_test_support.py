@@ -53,7 +53,7 @@ class IntegrationTest(unittest.TestCase):
 
         self.clean_up_temporary_directory(self.temporary_directory)
 
-    def create_svn_repo(self):
+    def create_empty_svn_repo(self):
         self._create_repository_directory()
 
         if subprocess.call('svnadmin create %s' % self.repository_directory, shell=True):
@@ -61,6 +61,8 @@ class IntegrationTest(unittest.TestCase):
 
         self.repo_url = 'file://%s' % self.repository_directory
 
+    def create_svn_repo(self):
+        self.create_empty_svn_repo()
         if subprocess.call('svn import -q -m import testdata/svn_repo %s' % self.repo_url, shell=True):
             raise IntegrationTestException('Could not import test data.')
 
