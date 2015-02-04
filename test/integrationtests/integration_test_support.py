@@ -43,15 +43,10 @@ class IntegrationTestException(Exception):
 class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
-
         configuration.set_property(is_no_clean_up_enabled, KEEP_TEMPORARY_DIRECTORY)
-
         temporary_directory = get_temporary_directory()
-
         self.clean_up_temporary_directory(temporary_directory)
-
         self.temporary_directory = temporary_directory
-
         self.create_svn_repo()
 
     def tearDown(self):
