@@ -18,7 +18,9 @@ import os
 import subprocess
 import rpm
 
-from integration_test_support import IntegrationTest, IntegrationTestException
+from integration_test_support import (IntegrationTest,
+                                      IntegrationTestWithNonConfigCommitAndNoConfig,
+                                      IntegrationTestException)
 
 from config_rpm_maker.configrpmmaker import (CouldNotBuildSomeRpmsException,
                                              CouldNotUploadRpmsException,
@@ -37,6 +39,13 @@ EXECUTION_ERROR_MESSAGE = """Execution of "{command_with_arguments}" failed. Err
 stdout was: "{stdout}"
 stderr was: "{stderr}"
 """
+
+
+class ConfigRpmMakerIntegrationTestWithNonConfigCommitAndNoConfig(IntegrationTestWithNonConfigCommitAndNoConfig):
+    def test_build_should_not_fail_on_non_config_commit_with_no_config(self):
+        config_rpm_maker = self._given_config_rpm_maker(revision='1')
+        rpms = config_rpm_maker.build()
+        self.assertEqual(rpms, None)
 
 
 class ConfigRpmMakerIntegrationTest(IntegrationTest):

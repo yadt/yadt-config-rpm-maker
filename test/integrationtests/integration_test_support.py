@@ -154,3 +154,14 @@ Expected: "{expected}"
     def clean_up_temporary_directory(self, temporary_directory):
         if not KEEP_TEMPORARY_DIRECTORY and exists(temporary_directory):
             rmtree(temporary_directory)
+
+
+class IntegrationTestWithNonConfigCommitAndNoConfig(IntegrationTest):
+    def setUp(self):
+        configuration.set_property(is_no_clean_up_enabled, KEEP_TEMPORARY_DIRECTORY)
+        temporary_directory = get_temporary_directory()
+        self.clean_up_temporary_directory(temporary_directory)
+        self.temporary_directory = temporary_directory
+        self.create_empty_svn_repo()
+        if subprocess.call('svn mkdir -q -m mkdir --parents  %s/XXXXXX/host/devweb01/' % self.repo_url, shell=True):
+            raise IntegrationTestException('Could not import test data.')
