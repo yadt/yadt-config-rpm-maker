@@ -187,10 +187,10 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(build_config_viewer_host_directory('tuvweb01', revision='2'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
 
-    def _given_config_rpm_maker(self):
+    def _given_config_rpm_maker(self, revision='2'):
         svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
 
-        return ConfigRpmMaker('2', svn_service)
+        return ConfigRpmMaker(revision, svn_service)
 
     def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None, symlinks=None, exhaustive=False):
         path = None
