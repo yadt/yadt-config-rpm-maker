@@ -79,10 +79,13 @@ class SvnService(object):
 
         log_entries = self.get_logs_for_revision(revision)
 
-        start_pos = len(self.path_to_config + '/')
+        path_to_config_slash = self.path_to_config + '/'
+        start_pos = len(path_to_config_slash)
         action_and_path = []
         for info in log_entries:
             for path_obj in info.changed_paths:
+                if not path_obj.path.startswith(path_to_config_slash):
+                    continue
                 changed_path = path_obj.path[start_pos:]
                 action_and_path.append((changed_path, path_obj.action))
 
