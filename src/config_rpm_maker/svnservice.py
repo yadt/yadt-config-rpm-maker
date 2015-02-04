@@ -75,7 +75,7 @@ class SvnService(object):
         return logs
 
     def get_changed_paths_with_action(self, revision):
-        """ Returns a list of all paths from the change set which were marked with action "delete" """
+        """ Returns a list of all (path, action) tuples from the change set """
 
         log_entries = self.get_logs_for_revision(revision)
 
