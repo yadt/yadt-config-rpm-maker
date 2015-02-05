@@ -66,7 +66,7 @@ class SvnService(object):
         """ Returns the logs for the given revision of the repository at the config_url """
 
         try:
-            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision),
+            logs = self.client.log(self.base_url, self._rev(revision), self._rev(revision),
                                    discover_changed_paths=True)
         except Exception as e:
             LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',

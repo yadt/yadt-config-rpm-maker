@@ -51,7 +51,8 @@ class GetLogsForRevision(TestCase):
     def test_should_raise_exception_when_pysvn_client_fails_to_log(self):
 
         mock_svn_service = Mock(SvnService)
-        mock_svn_service.config_url = 'svn://url/for/configuration/repository'
+        mock_svn_service.config_url = 'svn://url/for/configuration/repository/config'
+        mock_svn_service.base_url = 'svn://url/for/configuration/repository'
         mock_svn_service.path_to_config = '/config'
         mock_svn_service.client = Mock()
         mock_svn_service.client.log.side_effect = Exception("Aaarrrgggghh...")
@@ -60,7 +61,7 @@ class GetLogsForRevision(TestCase):
 
     def test_should_return_logs_for_revision(self):
         mock_svn_service = Mock(SvnService)
-        mock_svn_service.config_url = 'svn://url/for/configuration/repository'
+        mock_svn_service.base_url = 'svn://url/for/configuration/repository'
         mock_svn_service.path_to_config = '/config'
         mock_svn_service.client = Mock()
         mock_logs = Mock()
