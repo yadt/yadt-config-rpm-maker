@@ -51,7 +51,8 @@ class GetLogsForRevision(TestCase):
     def test_should_raise_exception_when_pysvn_client_fails_to_log(self):
 
         mock_svn_service = Mock(SvnService)
-        mock_svn_service.config_url = 'svn://url/for/configuration/repository'
+        mock_svn_service.config_url = 'svn://url/for/configuration/repository/config'
+        mock_svn_service.base_url = 'svn://url/for/configuration/repository'
         mock_svn_service.path_to_config = '/config'
         mock_svn_service.client = Mock()
         mock_svn_service.client.log.side_effect = Exception("Aaarrrgggghh...")
@@ -60,7 +61,7 @@ class GetLogsForRevision(TestCase):
 
     def test_should_return_logs_for_revision(self):
         mock_svn_service = Mock(SvnService)
-        mock_svn_service.config_url = 'svn://url/for/configuration/repository'
+        mock_svn_service.base_url = 'svn://url/for/configuration/repository'
         mock_svn_service.path_to_config = '/config'
         mock_svn_service.client = Mock()
         mock_logs = Mock()
@@ -109,6 +110,33 @@ class GetChangedPathsWithActionTests(TestCase):
         actual = SvnService.get_changed_paths_with_action(mock_svn_service, '1980')
 
         self.assertEqual([('', 'A'), ('spam.egg', 'A')], actual)
+
+    def test_should_not_include_files_outside_config_directory(self):
+
+        mock_svn_service = Mock(SvnService)
+        mock_svn_service.config_url = 'svn://url/for/configuration/repository'
+        mock_svn_service.path_to_config = '/config'
+        mock_svn_service.client = Mock()
+        mock_info = Mock()
+
+        mock_path_object_1 = Mock()
+        mock_path_object_1.path = '/config/foo'
+        mock_path_object_1.action = 'A'
+
+        mock_path_object_2 = Mock()
+        mock_path_object_2.path = '/XXXXXX/bar'
+        mock_path_object_2.action = 'A'
+
+        mock_path_object_3 = Mock()
+        mock_path_object_3.path = '/XXX/foobar'
+        mock_path_object_3.action = 'A'
+
+        mock_info.changed_paths = [mock_path_object_1, mock_path_object_2, mock_path_object_3]
+        mock_svn_service.get_logs_for_revision.return_value = [mock_info]
+
+        actual = SvnService.get_changed_paths_with_action(mock_svn_service, '1980')
+
+        self.assertEqual([('foo', 'A')], actual)
 
     def test_should_return_list_with_tuples_including_one_tuple_which_has_a_delete_action(self):
 

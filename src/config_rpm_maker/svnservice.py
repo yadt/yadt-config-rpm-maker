@@ -66,7 +66,7 @@ class SvnService(object):
         """ Returns the logs for the given revision of the repository at the config_url """
 
         try:
-            logs = self.client.log(self.config_url, self._rev(revision), self._rev(revision),
+            logs = self.client.log(self.base_url, self._rev(revision), self._rev(revision),
                                    discover_changed_paths=True)
         except Exception as e:
             LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
@@ -75,14 +75,17 @@ class SvnService(object):
         return logs
 
     def get_changed_paths_with_action(self, revision):
-        """ Returns a list of all paths from the change set which were marked with action "delete" """
+        """ Returns a list of all (path, action) tuples from the change set """
 
         log_entries = self.get_logs_for_revision(revision)
 
-        start_pos = len(self.path_to_config + '/')
+        path_to_config_slash = self.path_to_config + '/'
+        start_pos = len(path_to_config_slash)
         action_and_path = []
         for info in log_entries:
             for path_obj in info.changed_paths:
+                if not path_obj.path.startswith(path_to_config_slash):
+                    continue
                 changed_path = path_obj.path[start_pos:]
                 action_and_path.append((changed_path, path_obj.action))
 

@@ -3,6 +3,7 @@ python:
   - "2.7"
 
 before_script:
+  - sudo apt-get update
   - sudo apt-get install python-svn 
   - ln -s /usr/lib/python2.7/dist-packages/pysvn $VIRTUAL_ENV/lib/python2.7/site-packages/
   - sudo apt-get install rpm python-rpm

@@ -29,6 +29,7 @@ from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
                                                        get_temporary_directory,
                                                        get_svn_path_to_config)
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.configuration import build_config_viewer_host_directory
 
 # This constant exists for debugging purposes.
@@ -43,22 +44,17 @@ class IntegrationTestException(Exception):
 class IntegrationTest(unittest.TestCase):
 
     def setUp(self):
-
         configuration.set_property(is_no_clean_up_enabled, KEEP_TEMPORARY_DIRECTORY)
-
         temporary_directory = get_temporary_directory()
-
         self.clean_up_temporary_directory(temporary_directory)
-
         self.temporary_directory = temporary_directory
-
         self.create_svn_repo()
 
     def tearDown(self):
 
         self.clean_up_temporary_directory(self.temporary_directory)
 
-    def create_svn_repo(self):
+    def create_empty_svn_repo(self):
         self._create_repository_directory()
 
         if subprocess.call('svnadmin create %s' % self.repository_directory, shell=True):
@@ -66,6 +62,8 @@ class IntegrationTest(unittest.TestCase):
 
         self.repo_url = 'file://%s' % self.repository_directory
 
+    def create_svn_repo(self):
+        self.create_empty_svn_repo()
         if subprocess.call('svn import -q -m import testdata/svn_repo %s' % self.repo_url, shell=True):
             raise IntegrationTestException('Could not import test data.')
 
@@ -80,6 +78,11 @@ class IntegrationTest(unittest.TestCase):
             shutil.rmtree(self.repository_directory)
 
         makedirs(self.repository_directory)
+
+    def _given_config_rpm_maker(self, revision='2'):
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
+
+        return ConfigRpmMaker(revision, svn_service)
 
     def write_revision_file_for_hostname(self, hostname, revision):
 
@@ -157,3 +160,12 @@ Expected: "{expected}"
     def clean_up_temporary_directory(self, temporary_directory):
         if not KEEP_TEMPORARY_DIRECTORY and exists(temporary_directory):
             rmtree(temporary_directory)
+
+
+class IntegrationTestWithNonConfigCommitAndNoConfigDir(IntegrationTest):
+    def setUp(self):
+        configuration.set_property(is_no_clean_up_enabled, KEEP_TEMPORARY_DIRECTORY)
+        temporary_directory = get_temporary_directory()
+        self.clean_up_temporary_directory(temporary_directory)
+        self.temporary_directory = temporary_directory
+        self.create_empty_svn_repo()

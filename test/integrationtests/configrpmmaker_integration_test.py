@@ -18,25 +18,43 @@ import os
 import subprocess
 import rpm
 
-from integration_test_support import IntegrationTest, IntegrationTestException
+from integration_test_support import (IntegrationTest,
+                                      IntegrationTestWithNonConfigCommitAndNoConfigDir,
+                                      IntegrationTestException)
 
 from config_rpm_maker.configrpmmaker import (CouldNotBuildSomeRpmsException,
                                              CouldNotUploadRpmsException,
                                              ConfigRpmMaker,
                                              configuration)
 from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
-                                                       get_svn_path_to_config,
                                                        get_config_rpm_prefix,
                                                        get_temporary_directory,
                                                        get_rpm_upload_command)
 from config_rpm_maker.configuration import build_config_viewer_host_directory
 from config_rpm_maker.segment import All, Typ
-from config_rpm_maker.svnservice import SvnService
 
 EXECUTION_ERROR_MESSAGE = """Execution of "{command_with_arguments}" failed. Error code was {error_code}
 stdout was: "{stdout}"
 stderr was: "{stderr}"
 """
+
+
+class ConfigRpmMakerIntegrationTestWithNonConfigCommitAndNoConfig(IntegrationTestWithNonConfigCommitAndNoConfigDir):
+    def test_no_build_fail_on_non_config_commit_with_same_prefix_length(self):
+        # "/XXXXXX" has the same length as the configpath prefix "/config".
+        if subprocess.call('svn mkdir -q -m mkdir --parents  %s/XXXXXX/host/devweb01/' % self.repo_url, shell=True):
+            raise IntegrationTestException('Could not import test data.')
+        config_rpm_maker = self._given_config_rpm_maker(revision='1')
+        rpms = config_rpm_maker.build()
+        self.assertEqual(rpms, None)
+
+    def test_no_build_fail_on_non_config_commit_with_path_shorter_than_prefix(self):
+        # The commit path "/X/Y" is shorter than the configpath prefix "/config".
+        if subprocess.call('svn mkdir -q -m mkdir --parents  %s/X/Y/' % self.repo_url, shell=True):
+            raise IntegrationTestException('Could not import test data.')
+        config_rpm_maker = self._given_config_rpm_maker(revision='1')
+        rpms = config_rpm_maker.build()
+        self.assertEqual(rpms, None)
 
 
 class ConfigRpmMakerIntegrationTest(IntegrationTest):
@@ -186,11 +204,6 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(build_config_viewer_host_directory('devweb01', revision='2'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('tuvweb01', revision='2'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
-
-    def _given_config_rpm_maker(self):
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
-
-        return ConfigRpmMaker('2', svn_service)
 
     def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None, symlinks=None, exhaustive=False):
         path = None
