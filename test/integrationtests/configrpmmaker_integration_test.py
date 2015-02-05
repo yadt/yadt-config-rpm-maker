@@ -19,7 +19,7 @@ import subprocess
 import rpm
 
 from integration_test_support import (IntegrationTest,
-                                      IntegrationTestWithNonConfigCommitAndNoConfig,
+                                      IntegrationTestWithNonConfigCommitAndNoConfigDir,
                                       IntegrationTestException)
 
 from config_rpm_maker.configrpmmaker import (CouldNotBuildSomeRpmsException,
@@ -39,8 +39,19 @@ stderr was: "{stderr}"
 """
 
 
-class ConfigRpmMakerIntegrationTestWithNonConfigCommitAndNoConfig(IntegrationTestWithNonConfigCommitAndNoConfig):
-    def test_build_should_not_fail_on_non_config_commit_with_no_config(self):
+class ConfigRpmMakerIntegrationTestWithNonConfigCommitAndNoConfig(IntegrationTestWithNonConfigCommitAndNoConfigDir):
+    def test_no_build_fail_on_non_config_commit_with_same_prefix_length(self):
+        # "/XXXXXX" has the same length as the configpath prefix "/config".
+        if subprocess.call('svn mkdir -q -m mkdir --parents  %s/XXXXXX/host/devweb01/' % self.repo_url, shell=True):
+            raise IntegrationTestException('Could not import test data.')
+        config_rpm_maker = self._given_config_rpm_maker(revision='1')
+        rpms = config_rpm_maker.build()
+        self.assertEqual(rpms, None)
+
+    def test_no_build_fail_on_non_config_commit_with_path_shorter_than_prefix(self):
+        # The commit path "/X/Y" is shorter than the configpath prefix "/config".
+        if subprocess.call('svn mkdir -q -m mkdir --parents  %s/X/Y/' % self.repo_url, shell=True):
+            raise IntegrationTestException('Could not import test data.')
         config_rpm_maker = self._given_config_rpm_maker(revision='1')
         rpms = config_rpm_maker.build()
         self.assertEqual(rpms, None)
