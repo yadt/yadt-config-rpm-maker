@@ -78,6 +78,11 @@ class IntegrationTest(unittest.TestCase):
 
         makedirs(self.repository_directory)
 
+    def _given_config_rpm_maker(self, revision='2'):
+        svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
+
+        return ConfigRpmMaker(revision, svn_service)
+
     def write_revision_file_for_hostname(self, hostname, revision):
 
         config_viewer_host_directory = build_config_viewer_host_directory(hostname)

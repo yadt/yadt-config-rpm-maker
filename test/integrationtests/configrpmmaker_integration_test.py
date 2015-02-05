@@ -27,13 +27,11 @@ from config_rpm_maker.configrpmmaker import (CouldNotBuildSomeRpmsException,
                                              ConfigRpmMaker,
                                              configuration)
 from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
-                                                       get_svn_path_to_config,
                                                        get_config_rpm_prefix,
                                                        get_temporary_directory,
                                                        get_rpm_upload_command)
 from config_rpm_maker.configuration import build_config_viewer_host_directory
 from config_rpm_maker.segment import All, Typ
-from config_rpm_maker.svnservice import SvnService
 
 EXECUTION_ERROR_MESSAGE = """Execution of "{command_with_arguments}" failed. Error code was {error_code}
 stdout was: "{stdout}"
@@ -195,11 +193,6 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         self.assert_path_does_not_exist(build_config_viewer_host_directory('devweb01', revision='2'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('tuvweb01', revision='2'))
         self.assert_path_does_not_exist(build_config_viewer_host_directory('berweb01', revision='2'))
-
-    def _given_config_rpm_maker(self, revision='2'):
-        svn_service = SvnService(base_url=self.repo_url, path_to_config=get_svn_path_to_config())
-
-        return ConfigRpmMaker(revision, svn_service)
 
     def assertRpm(self, hostname, rpms, requires=None, provides=None, files=None, symlinks=None, exhaustive=False):
         path = None
