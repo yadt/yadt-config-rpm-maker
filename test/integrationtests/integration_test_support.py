@@ -29,6 +29,7 @@ from config_rpm_maker.svnservice import SvnService
 from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
                                                        get_temporary_directory,
                                                        get_svn_path_to_config)
+from config_rpm_maker.configrpmmaker import ConfigRpmMaker
 from config_rpm_maker.configuration import build_config_viewer_host_directory
 
 # This constant exists for debugging purposes.
