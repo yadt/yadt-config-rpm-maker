@@ -36,18 +36,13 @@ LOG_EACH_MEASUREMENT = False
 _execution_time_summary = {}
 
 
-def round_to_two_decimals_after_dot(elapsed_time_in_seconds):
-    return ceil(elapsed_time_in_seconds * 100) / 100
-
-
 def measure_execution_time(original_function):
 
     def process_measurement(elapsed_time_in_seconds, args, kwargs):
-        arguments = ', '.join(map(lambda arg: arg if type(arg) == str else str(arg), args[1:]))
+        arguments = ', '.join([str(arg) for arg in args[1:]])
 
-        if len(kwargs.keys()) == 0:
-            key_word_arguments = ""
-        else:
+        key_word_arguments = ""
+        if kwargs:
             key_word_arguments = ", " + str(kwargs)
 
         if len(args) > 0:
@@ -63,8 +58,7 @@ def measure_execution_time(original_function):
 
         if LOG_EACH_MEASUREMENT:
             function_call = '%s(%s%s)' % (function_name, arguments, key_word_arguments)
-            rounded_elapsed_time_in_seconds = round_to_two_decimals_after_dot(elapsed_time_in_seconds)
-            LOGGER.debug('Took %ss to perform %s', rounded_elapsed_time_in_seconds, function_call)
+            LOGGER.debug('Took %.2fs to perform %s', elapsed_time_in_seconds, function_call)
 
     @wraps(original_function)
     def wrapped_function(*args, **kwargs):
@@ -88,11 +82,11 @@ def log_execution_time_summaries(logging_function):
 
     for function_name in sorted(_execution_time_summary.keys()):
         summary_of_function = _execution_time_summary[function_name]
-        rounded_elapsed_time = round_to_two_decimals_after_dot(summary_of_function[0])
-        average_time = round_to_two_decimals_after_dot(summary_of_function[0] / summary_of_function[1])
+        elapsed_time = summary_of_function[0]
+        average_time = summary_of_function[0] / summary_of_function[1]
 
-        logging_function('    %5s times with average %5ss = sum %7ss : %s',
-                         summary_of_function[1], average_time, rounded_elapsed_time, function_name)
+        logging_function('    %5s times with average %5.2fs = sum %7.2fs : %s',
+                         summary_of_function[1], average_time, elapsed_time, function_name)
 
 
 def log_directories_summary(logging_function, start_path):
