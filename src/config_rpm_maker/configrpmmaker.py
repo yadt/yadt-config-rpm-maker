@@ -22,7 +22,7 @@ import traceback
 from logging import ERROR, FileHandler, Formatter, getLogger
 from os import makedirs, remove
 from os.path import exists, join
-from Queue import Queue
+from Queue import Queue, Empty
 from shutil import rmtree, move
 from threading import Thread
 from tempfile import mkdtemp
@@ -73,9 +73,9 @@ class BuildHostThread(Thread):
 
     def run(self):
         rpms = []
-        while not self.host_queue.empty():
-            host = self.host_queue.get()
+        while True:
             try:
+                host = self.host_queue.get(block=False)
                 rpms = HostRpmBuilder(thread_name=self.name,
                                       hostname=host,
                                       revision=self.revision,
@@ -87,6 +87,9 @@ class BuildHostThread(Thread):
 
             except BaseConfigRpmMakerException as e:
                 self._notify_that_host_failed(host, str(e))
+
+            except Empty:
+                break
 
             except Exception:
                 self._notify_that_host_failed(host, traceback.format_exc())
