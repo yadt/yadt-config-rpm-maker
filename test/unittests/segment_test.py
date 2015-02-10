@@ -28,19 +28,9 @@ class SegmentTest(unittest.TestCase):
     def test_should_return_corresponding_loctyp(self):
         self.assertEqual(['devweb', ], LocTyp().get('devweb01'))
 
-        self.assertEqual(['devweb', 'diaweb'], LocTyp().get('diaweb01'))
-        self.assertEqual(['devweb', 'dibweb'], LocTyp().get('dibweb01'))
-        self.assertEqual(['devweb', 'dicweb'], LocTyp().get('dicweb01'))
-
         self.assertEqual(['proweb', 'berweb'], LocTyp().get('berweb01'))
         self.assertEqual(['proweb', 'hamweb'], LocTyp().get('hamweb01'))
 
-        self.assertEqual(['loctyp/devweb', 'loctyp/diaweb'],
-                         LocTyp().get_svn_paths('diaweb17'))
-        self.assertEqual(['loctyp/devweb', 'loctyp/dibweb'],
-                         LocTyp().get_svn_paths('dibweb17'))
-        self.assertEqual(['loctyp/devweb', 'loctyp/dicweb'],
-                         LocTyp().get_svn_paths('dicweb17'))
         self.assertEqual(['loctyp/proweb', 'loctyp/berweb'],
                          LocTyp().get_svn_paths('berweb17'))
         self.assertEqual(['loctyp/proweb', 'loctyp/hamweb'],
