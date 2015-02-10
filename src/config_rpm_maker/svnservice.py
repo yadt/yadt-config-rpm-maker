@@ -119,7 +119,7 @@ class SvnService(object):
 
         items = self.client.list(url, revision=self._rev(revision), depth=pysvn.depth.immediates)
 
-        # remove first item
+        # First entry is /host itself.
         items = items[1:]
 
         repos_paths = [item[0].repos_path.encode(HOST_NAME_ENCODING) for item in items]
