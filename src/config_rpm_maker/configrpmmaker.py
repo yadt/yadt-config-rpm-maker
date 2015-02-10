@@ -75,7 +75,6 @@ class BuildHostThread(Thread):
         rpms = []
         while not self.host_queue.empty():
             host = self.host_queue.get()
-            self.host_queue.task_done()
             try:
                 rpms = HostRpmBuilder(thread_name=self.name,
                                       hostname=host,
@@ -337,7 +336,6 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
         while not queue.empty():
             item = queue.get()
-            queue.task_done()
             items.append(item)
 
         return items
