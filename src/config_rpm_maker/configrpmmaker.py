@@ -91,9 +91,8 @@ class BuildHostThread(Thread):
             except Exception:
                 self._notify_that_host_failed(host, traceback.format_exc())
 
-        count_of_rpms = len(rpms)
-        if count_of_rpms > 0:
-            LOGGER.debug('%s: finished and built %s rpm(s).', self.name, count_of_rpms)
+        if rpms:
+            LOGGER.debug('%s: finished and built %s rpm(s).', self.name, len(rpms))
         else:
             LOGGER.debug('%s: finished without building any rpm!', self.name)
 
