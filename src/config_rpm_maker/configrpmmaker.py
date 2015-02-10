@@ -49,15 +49,27 @@ LOGGER = getLogger(__name__)
 
 class BuildHostThread(Thread):
 
-    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, notify_that_host_failed, work_dir, name=None, error_logging_handler=None):
+    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
         super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
         self.svn_service_queue = svn_service_queue
         self.rpm_queue = rpm_queue
+        self.failed_host_queue = failed_host_queue
         self.work_dir = work_dir
-        self.notify_that_host_failed = notify_that_host_failed
         self.error_logging_handler = error_logging_handler
+
+    def _notify_that_host_failed(self, host_name, stack_trace):
+        failure_information = (host_name, stack_trace)
+        self.failed_host_queue.put(failure_information)
+        approximately_count = self.failed_host_queue.qsize()
+        LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
+                                                                                                        count=approximately_count))
+
+        maximum_allowed_failed_hosts = get_max_failed_hosts()
+        if approximately_count >= maximum_allowed_failed_hosts:
+            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % maximum_allowed_failed_hosts)
+            self.host_queue.queue.clear()
 
     def run(self):
         rpms = []
@@ -75,10 +87,10 @@ class BuildHostThread(Thread):
                     self.rpm_queue.put(rpm)
 
             except BaseConfigRpmMakerException as e:
-                self.notify_that_host_failed(host, str(e))
+                self._notify_that_host_failed(host, str(e))
 
             except Exception:
-                self.notify_that_host_failed(host, traceback.format_exc())
+                self._notify_that_host_failed(host, traceback.format_exc())
 
         count_of_rpms = len(rpms)
         if count_of_rpms > 0:
@@ -117,10 +129,9 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         self.svn_service = svn_service
         self.temp_dir = get_temporary_directory()
         self._assure_temp_dir_if_set()
+        self.logger = None
         self._create_logger()
         self.work_dir = None
-        self.host_queue = Queue()
-        self.failed_host_queue = Queue()
 
     def __build_error_msg_and_move_to_public_access(self, revision):
         err_url = get_error_log_url()
@@ -220,28 +231,19 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             LOGGER.debug('Updating configviewer data for host "%s"', host)
             move(temp_path, dest_path)
 
-    def _notify_that_host_failed(self, host_name, stack_trace):
-        failure_information = (host_name, stack_trace)
-        self.failed_host_queue.put(failure_information)
-        approximately_count = self.failed_host_queue.qsize()
-        LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
-                                                                                                        count=approximately_count))
-
-        maximum_allowed_failed_hosts = get_max_failed_hosts()
-        if approximately_count >= maximum_allowed_failed_hosts:
-            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % maximum_allowed_failed_hosts)
-            self.host_queue.queue.clear()
 
     def _build_hosts(self, hosts):
         if not hosts:
             LOGGER.warn('Trying to build rpms for hosts, but no hosts given!')
             return
 
+        host_queue = Queue()
         for host in hosts:
-            self.host_queue.put(host)
+            host_queue.put(host)
 
         rpm_queue = Queue()
         svn_service_queue = Queue()
+        failed_host_queue = Queue()
         svn_service_queue.put(self.svn_service)
 
         thread_count = self._get_thread_count(hosts)
@@ -249,8 +251,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                                        revision=self.revision,
                                        svn_service_queue=svn_service_queue,
                                        rpm_queue=rpm_queue,
-                                       notify_that_host_failed=self._notify_that_host_failed,
-                                       host_queue=self.host_queue,
+                                       host_queue=host_queue,
+                                       failed_host_queue=failed_host_queue,
                                        work_dir=self.work_dir,
                                        error_logging_handler=self.error_handler) for i in range(thread_count)]
 
@@ -261,7 +263,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         for thread in thread_pool:
             thread.join()
 
-        failed_hosts = dict(self._consume_queue(self.failed_host_queue))
+        failed_hosts = dict(self._consume_queue(failed_host_queue))
         if failed_hosts:
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
             raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
