@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 #   yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
