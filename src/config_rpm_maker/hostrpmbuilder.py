@@ -413,12 +413,10 @@ Change set:
 
     def _parse_dependency_file(self, path):
         if os.path.exists(path):
-            f = open(path)
-            try:
-                content = f.read()
-                return [item for line in content.split('\n') for item in line.split(',')]
-            finally:
-                f.close()
+            with open(path, 'r') as dependency_file:
+                content = dependency_file.read()
+
+            return [item for line in content.split('\n') for item in line.split(',')]
 
         return []
 
