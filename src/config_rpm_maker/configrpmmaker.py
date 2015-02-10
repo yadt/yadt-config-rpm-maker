@@ -72,7 +72,7 @@ class BuildHostThread(Thread):
             self.host_queue.queue.clear()
 
     def run(self):
-        rpms = []
+        rpms_built = 0
         while True:
             try:
                 host = self.host_queue.get(block=False)
@@ -84,6 +84,7 @@ class BuildHostThread(Thread):
                                       error_logging_handler=self.error_logging_handler).build()
                 for rpm in rpms:
                     self.rpm_queue.put(rpm)
+                rpms_built += len(rpms)
 
             except BaseConfigRpmMakerException as e:
                 self._notify_that_host_failed(host, str(e))
@@ -94,8 +95,8 @@ class BuildHostThread(Thread):
             except Exception:
                 self._notify_that_host_failed(host, traceback.format_exc())
 
-        if rpms:
-            LOGGER.debug('%s: finished and built %s rpm(s).', self.name, len(rpms))
+        if rpms_built:
+            LOGGER.debug('%s: finished and built %s rpm(s).', self.name, rpms_built)
         else:
             LOGGER.debug('%s: finished without building any rpm!', self.name)
 
