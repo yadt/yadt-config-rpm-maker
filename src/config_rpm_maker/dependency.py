@@ -42,7 +42,7 @@ class Dependency:
 
     def _add(self, raw_dependency_string):
         dependency = re.sub("\s*([<>=]+)\s*", "\\1", raw_dependency_string)  # remove spaces around <>=
-        dependency = re.sub("\s*,\s*", "\n", dependency)         # change , spearator into newline
+        dependency = re.sub("\s*,\s*", "\n", dependency)         # change ',' separator into newline
         dependency = re.sub("\s+", "\n", dependency)             # all spaces left are separators now, change into newline
         dependency = re.sub("([<>=]+)", " \\1", dependency)      # add a space in front of <>= so we have tuples now
 
