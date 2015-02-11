@@ -41,21 +41,21 @@ class Dependency:
         self.dependencies = filtered_dependencies
 
     def _add(self, raw_dependency_string):
-        dependency = re.sub("\s*([<>=]+)\s*", "\\1", raw_dependency_string)  # remove spaces around <>=
-        dependency = re.sub("\s*,\s*", "\n", dependency)         # change ',' separator into newline
-        dependency = re.sub("\s+", "\n", dependency)             # all spaces left are separators now, change into newline
-        dependency = re.sub("([<>=]+)", " \\1 ", dependency)     # add spaces around <>=
+        dependencies = re.sub("\s*([<>=]+)\s*", "\\1", raw_dependency_string)  # remove spaces around <>=
+        dependencies = re.sub("\s*,\s*", "\n", dependencies)         # change ',' separator into newline
+        dependencies = re.sub("\s+", "\n", dependencies)             # all spaces left are separators now, change into newline
+        dependencies = re.sub("([<>=]+)", " \\1 ", dependencies)     # add spaces around <>=
 
-        for dependency in dependency.split("\n"):
-            dependency = dependency.strip()
-            if dependency:
-                package = dependency.split(" ", 1)[0]
+        for new_dependency in dependencies.split("\n"):
+            new_dependency = new_dependency.strip()
+            if new_dependency:
+                package = new_dependency.split(" ", 1)[0]
 
                 if (package in self.dependencies) and self.accumulate_dependencies:
-                    if self.dependencies[package] != dependency:
-                        self.dependencies[package] = self.dependencies[package] + ", " + dependency
+                    if self.dependencies[package] != new_dependency:
+                        self.dependencies[package] = self.dependencies[package] + ", " + new_dependency
                 else:
-                    self.dependencies[package] = dependency
+                    self.dependencies[package] = new_dependency
 
     def add(self, raw_dependencies):
         if isinstance(raw_dependencies, ListType):
