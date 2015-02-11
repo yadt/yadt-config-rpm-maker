@@ -383,7 +383,6 @@ Change set:
             svn_service.export(get_path_to_spec_file(), self.spec_file_path, self.revision)
         finally:
             self.svn_service_queue.put(svn_service)
-            self.svn_service_queue.task_done()
 
     @measure_execution_time
     def _get_next_svn_service_from_queue(self):
@@ -402,9 +401,10 @@ Change set:
 
             except ClientError:
                 pass
+
             finally:
                 self.svn_service_queue.put(svn_service)
-                self.svn_service_queue.task_done()
+
             svn_base_paths.append(svn_path)
             requires += self._parse_dependency_file(self.rpm_requires_path)
             provides += self._parse_dependency_file(self.rpm_provides_path)
