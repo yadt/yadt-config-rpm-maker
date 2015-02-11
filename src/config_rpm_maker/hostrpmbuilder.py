@@ -125,6 +125,7 @@ class HostRpmBuilder(object):
             do_not_write_host_segment_variable=self.is_a_group_rpm)
 
         if self.is_a_group_rpm:
+            # Do some preliminary token filtering so that the RPM_NAME is expanded
             try:
                 TokenReplacer.filter_directory(os.path.dirname(self.variables_dir),
                                                self.variables_dir,
