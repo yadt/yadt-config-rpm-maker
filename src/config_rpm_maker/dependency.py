@@ -68,7 +68,7 @@ class Dependency:
             self._add(raw_dependencies)
         self._filter_dependencies()
 
-    def __repr__(self):
+    def __str__(self):
         """ nicely prints the previously added RPM dependencies """
 
         return ", ".join(self.dependencies.values())

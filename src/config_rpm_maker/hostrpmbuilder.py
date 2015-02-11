@@ -423,7 +423,7 @@ Change set:
     def _write_dependency_file(self, dependencies, file_path, collapse_duplicates=False, filter_regex='.*', positive_filter=True):
         dep = Dependency(collapse_dependencies=collapse_duplicates, filter_regex=filter_regex, positive_filter=positive_filter)
         dep.add(dependencies)
-        self._write_file(file_path, dep.__repr__())
+        self._write_file(file_path, str(dep))
 
     def _write_file(self, file_path, content):
         f = open(file_path, 'w')

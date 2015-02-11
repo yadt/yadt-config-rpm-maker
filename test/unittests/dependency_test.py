@@ -38,7 +38,7 @@ class DependencyTest(TestCase):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
         dep = Dependency(False, "^yadt-.*-repo$")
         dep.add(rawDependency)
-        result = repr(dep)
+        result = str(dep)
         self.assertEqual(result.count("yadt-dev-snapshots-repo"), 1, msg="Don't have yadt-dev-snaphosts-repo in <" + result + ">")
         self.assertEqual(result.count("yadt-boo-repo"), 1, msg="Don't have yadt-boo-repo in <" + result + ">")
         self.assertEqual(result.count("yadt-foo"), 0, msg="Filter don't work. Found yadt-foo <" + result + ">")
@@ -48,7 +48,7 @@ class DependencyTest(TestCase):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
         dep = Dependency(False, "^yadt-.*-repo$", False)
         dep.add(rawDependency)
-        result = repr(dep)
+        result = str(dep)
         self.assertEqual(result.count("yadt-dev-snapshots-repo"), 0, msg="Filter don't work. Found yadt-dev-snaphosts-repo in <" + result + ">")
         self.assertEqual(result.count("yadt-boo-repo"), 0, msg="Filter don't work. Found yadt-boo-repo in <" + result + ">")
         self.assertEqual(result.count("yadt-foo"), 1, msg="Filter don't work. Not found yadt-foo <" + result + ">")
@@ -58,7 +58,7 @@ class DependencyTest(TestCase):
         rawDependency = "httpd httpd httpd a b httpd"
         dep = Dependency(False)
         dep.add(rawDependency)
-        result = repr(dep)
+        result = str(dep)
         self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 1, msg="Don't have the right amount of 'httpd' <" + result + ">")
@@ -67,7 +67,7 @@ class DependencyTest(TestCase):
         rawDependency = "httpd httpd httpd a b httpd a httpd > 4"
         dep = Dependency(False)
         dep.add(rawDependency)
-        result = repr(dep)
+        result = str(dep)
         self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 2, msg="Don't have the right amount of 'httpd' <" + result + ">")
@@ -76,14 +76,14 @@ class DependencyTest(TestCase):
         rawDependency = "a= 12 dummy-snapshot = 1.30-SNAPSHOT20100819155634 a = 13"
         dep = Dependency(True)
         dep.add(rawDependency)
-        result = repr(dep)
+        result = str(dep)
         self.assertEquals("a = 13, dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
     def test_should_read_dependency_with_snapshot_as_version(self):
         rawDependency = """dummy-snapshot = 1.30-SNAPSHOT20100819155634"""
         dep = Dependency(True)
         dep.add(rawDependency)
-        result = repr(dep)
+        result = str(dep)
         self.assertEqual("dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
     def test_should_read_dependencies_from_args_not_collapsed_and_list(self):
@@ -115,7 +115,7 @@ class DependencyTest(TestCase):
     def __readDependencies(self, rawDependencies, collapseDuplicates):
         dep = Dependency(collapseDuplicates)
         dep.add(rawDependencies)
-        return repr(dep)
+        return str(dep)
 
     def __checkDependenciesAreCorrectAndNotCollapsed(self, result):
         # check that all keys are present multiple times
