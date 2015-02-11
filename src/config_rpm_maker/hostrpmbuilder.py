@@ -318,14 +318,11 @@ class HostRpmBuilder(object):
             self._write_file(os.path.join(self.variables_dir, segment.get_variable_name()), segment.get(self.hostname)[-1])
 
     def _save_file_list(self):
-        f = open(os.path.join(self.work_dir, 'filelist.' + self.hostname), 'w')
-        try:
-            for root, dirs, files in os.walk(self.host_config_dir):
-                for file in files:
-                    f.write(os.path.join(root, file))
-                    f.write("\n")
-        finally:
-            f.close()
+        with open(os.path.join(self.work_dir, 'filelist.' + self.hostname), 'w') as file_list:
+            for root, dirs, file_names in os.walk(self.host_config_dir):
+                for file_name in file_names:
+                    file_list.write(os.path.join(root, file_name) + "\n")
+
 
     def _move_variables_out_of_rpm_dir(self):
         new_var_dir = os.path.join(self.work_dir, 'VARIABLES.' + self.hostname)
