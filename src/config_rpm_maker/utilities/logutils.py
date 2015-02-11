@@ -74,8 +74,8 @@ def create_console_handler(log_level):
 def create_sys_log_handler(revision):
     """ creates a logger handler which logs to syslog and uses the given revision within the log format """
 
-    format = SYS_LOG_FORMAT.format(revision)
-    formatter = Formatter(format)
+    syslog_format = SYS_LOG_FORMAT.format(revision)
+    formatter = Formatter(syslog_format)
 
     sys_log_handler = SysLogHandler(address=SYS_LOG_ADDRESS, facility=SYS_LOG_FACILITY)
     sys_log_handler.setFormatter(formatter)
