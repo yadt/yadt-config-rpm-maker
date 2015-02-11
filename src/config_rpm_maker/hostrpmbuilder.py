@@ -87,12 +87,14 @@ class HostRpmBuilder(object):
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if exists(self.host_config_dir):
-            raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already although I should be creating it now.' % self.host_config_dir)
+            raise ConfigDirAlreadyExistsException(
+                'ERROR: "%s" exists already although I should be creating it now.' % self.host_config_dir)
 
         try:
             mkdir(self.host_config_dir)
         except Exception as exception:
-            raise CouldNotCreateConfigDirException('Could not create host config directory "%s".' % self.host_config_dir, exception)
+            raise CouldNotCreateConfigDirException(
+                'Could not create host config directory "%s".' % self.host_config_dir, exception)
 
         overall_requires = []
         overall_provides = []
@@ -240,7 +242,8 @@ class HostRpmBuilder(object):
         if is_no_clean_up_enabled():
             clean_option = ""
 
-        rpmbuild_cmd = "rpmbuild %s --define '_topdir %s' -ta %s" % (clean_option, absolute_rpm_build_path, tar_path)
+        rpmbuild_cmd = "rpmbuild %s --define '_topdir %s' -ta %s" % (
+            clean_option, absolute_rpm_build_path, tar_path)
 
         LOGGER.debug('%s: building rpms by executing "%s"', self.thread_name, rpmbuild_cmd)
         self.logger.info("Executing '%s' ...", rpmbuild_cmd)
@@ -258,7 +261,9 @@ class HostRpmBuilder(object):
             self.logger.error(stderr)
 
         if process.returncode:
-            raise CouldNotBuildRpmException('Could not build RPM for host "%s": stdout="%s", stderr="%s"' % (self.hostname, stdout.strip(), stderr.strip()))
+            raise CouldNotBuildRpmException(
+                'Could not build RPM for host "%s": stdout="%s", stderr="%s"' % (
+                    self.hostname, stdout.strip(), stderr.strip()))
 
     @measure_execution_time
     def _tar_sources(self):
@@ -267,10 +272,12 @@ class HostRpmBuilder(object):
             shutil.move(self.host_config_dir, group_config_dir)
             self.host_config_dir = group_config_dir
             output_file = group_config_dir + '.tar.gz'
-            tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.rpm_name)
+            tar_cmd = 'tar -cvzf "%s" -C %s %s' % (
+                output_file, self.work_dir, self.config_rpm_prefix + self.rpm_name)
         else:
             output_file = self.host_config_dir + '.tar.gz'
-            tar_cmd = 'tar -cvzf "%s" -C %s %s' % (output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
+            tar_cmd = 'tar -cvzf "%s" -C %s %s' % (
+                output_file, self.work_dir, self.config_rpm_prefix + self.hostname)
 
         self.logger.debug("Executing %s ...", tar_cmd)
         process = subprocess.Popen(tar_cmd,
@@ -281,7 +288,8 @@ class HostRpmBuilder(object):
         if process.returncode:
             stdout = stdout.strip()
             stderr = stderr.strip()
-            raise CouldNotTarConfigurationDirectoryException('Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
+            raise CouldNotTarConfigurationDirectoryException(
+                'Creating tar of config dir failed:\n  stdout="%s",\n  stderr="%s"' % (stdout, stderr))
         return output_file
 
     @measure_execution_time
