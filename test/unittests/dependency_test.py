@@ -54,66 +54,66 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("yadt-foo"), 1, msg="Filter don't work. Not found yadt-foo <" + result + ">")
         self.assertEqual(result.count("yadt-bla"), 1, msg="Filter don't work. Not found yadt-bla <" + result + ">")
 
-    def test_should_multiple_completly_equal_dependencies_get_always_collapsed(self):
+    def test_should_multiple_completly_equal_dependencies_get_always_overwritten(self):
         rawDependency = "httpd httpd httpd a b httpd"
-        dep = Dependency(False)
+        dep = Dependency(True)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 1, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
-    def test_should_multiple_completly_equal_dependencies_get_always_collapsed_but_differing_version_spec_count_as_not_equal(self):
+    def test_should_multiple_completly_equal_dependencies_get_always_overwritten_but_differing_version_spec_count_as_not_equal(self):
         rawDependency = "httpd httpd httpd a b httpd a httpd > 4"
-        dep = Dependency(False)
+        dep = Dependency(True)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 2, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
-    def test_should_read_dependency_with_snapshot_as_version_mixed_with_digits_only_collapse(self):
+    def test_should_read_dependency_with_snapshot_as_version_mixed_with_digits_only_overwrite(self):
         rawDependency = "a= 12 dummy-snapshot = 1.30-SNAPSHOT20100819155634 a = 13"
-        dep = Dependency(True)
+        dep = Dependency(False)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEquals("a = 13, dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
     def test_should_read_dependency_with_snapshot_as_version(self):
         rawDependency = """dummy-snapshot = 1.30-SNAPSHOT20100819155634"""
-        dep = Dependency(True)
+        dep = Dependency(False)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual("dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
-    def test_should_read_dependencies_from_args_not_collapsed_and_list(self):
-        resultString = self.__readDependencies(self.identicalDependAsString, False)
-        resultList = self.__readDependencies(self.identicaldependAsList, False)
-        self.assertEqual(resultString, resultList)
-
-    def test_should_read_dependencies_collapsed_from_args_and_list(self):
+    def test_should_read_dependencies_from_args_not_overwritten_and_list(self):
         resultString = self.__readDependencies(self.identicalDependAsString, True)
         resultList = self.__readDependencies(self.identicaldependAsList, True)
         self.assertEqual(resultString, resultList)
 
-    def test_should_read_dependencies_not_collapsed_from_args(self):
+    def test_should_read_dependencies_overwritten_from_args_and_list(self):
         resultString = self.__readDependencies(self.identicalDependAsString, False)
+        resultList = self.__readDependencies(self.identicaldependAsList, False)
+        self.assertEqual(resultString, resultList)
+
+    def test_should_read_dependencies_not_overwritten_from_args(self):
+        resultString = self.__readDependencies(self.identicalDependAsString, True)
         self.__checkDependenciesAreCorrectAndNotCollapsed(resultString)
 
-    def test_should_read_dependencies_collapsed_from_args(self):
-        resultString = self.__readDependencies(self.identicalDependAsString, True)
+    def test_should_read_dependencies_overwritten_from_args(self):
+        resultString = self.__readDependencies(self.identicalDependAsString, False)
         self.__checkDependenciesAreCorrectAndCollapsed(resultString)
 
-    def test_should_read_dependencies_collapsed_from_wired_args(self):
-        resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, True)
+    def test_should_read_dependencies_overwritten_from_wired_args(self):
+        resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, False) # todo f***ing typo
         self.__checkDependenciesAreCorrectAndCollapsed(resultWired)
 
-    def test_should_read_dependencies_not_collapsed_from_wired_args(self):
-        resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, False)
+    def test_should_read_dependencies_not_overwritten_from_wired_args(self):
+        resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, True)
         self.__checkDependenciesAreCorrectAndNotCollapsed(resultWired)
 
-    def __readDependencies(self, rawDependencies, collapseDuplicates):
-        dep = Dependency(collapseDuplicates)
+    def __readDependencies(self, rawDependencies, overwriteDuplicates):
+        dep = Dependency(overwriteDuplicates)
         dep.add(rawDependencies)
         return str(dep)
 

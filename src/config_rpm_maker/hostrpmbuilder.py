@@ -114,8 +114,8 @@ class HostRpmBuilder(object):
         if not exists(self.variables_dir):
             mkdir(self.variables_dir)
 
-        self._write_dependency_file(overall_requires, self.rpm_requires_path, collapse_duplicates=True)
-        self._write_dependency_file(overall_provides, self.rpm_provides_path, False)
+        self._write_dependency_file(overall_requires, self.rpm_requires_path, accumulate_duplicates=False)
+        self._write_dependency_file(overall_provides, self.rpm_provides_path, accumulate_duplicates=True)
         self._write_file(os.path.join(self.variables_dir, 'REVISION'), self.revision)
 
         rpm_name_variable_file = os.path.join(self.variables_dir, 'RPM_NAME')
@@ -134,6 +134,7 @@ class HostRpmBuilder(object):
                 LOGGER.warning("Problem during preliminary filtering of variables for group {0}: {1}".format(self.hostname, e))
             with open(rpm_name_variable_file) as f:
                 self.rpm_name = f.read().rstrip()
+
             LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
             self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.rpm_name + '.spec')
             self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), '')
@@ -423,8 +424,8 @@ Change set:
 
         return []
 
-    def _write_dependency_file(self, dependencies, file_path, collapse_duplicates=False, filter_regex='.*', positive_filter=True):
-        dep = Dependency(collapse_dependencies=collapse_duplicates, filter_regex=filter_regex, positive_filter=positive_filter)
+    def _write_dependency_file(self, dependencies, file_path, accumulate_duplicates=True, filter_regex='.*', positive_filter=True):
+        dep = Dependency(accumulate_dependencies=accumulate_duplicates, filter_regex=filter_regex, positive_filter=positive_filter)
         dep.add(dependencies)
         self._write_file(file_path, str(dep))
 

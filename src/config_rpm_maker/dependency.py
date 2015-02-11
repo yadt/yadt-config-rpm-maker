@@ -20,12 +20,12 @@ from types import ListType
 
 
 class Dependency:
-    """ Consumes raw formatted RPM dependencies. Either accumulates them or collapses them
+    """ Consumes raw formatted RPM dependencies. Either accumulates them or overwrites them
         so the first/gerneral ones get overwritten by the later/specific ones """
 
-    def __init__(self, collapse_dependencies=False, filter_regex=".*", positive_filter=True):
+    def __init__(self, accumulate_dependencies=True, filter_regex=".*", positive_filter=True):
         self.dependencies = dict([])
-        self.collapse_dependencies = collapse_dependencies
+        self.accumulate_dependencies = accumulate_dependencies
         self.filter_regex = filter_regex
         self.positive_filter = positive_filter
 
@@ -54,7 +54,7 @@ class Dependency:
                 else:
                     package = dependency
 
-                if (package in self.dependencies) and not self.collapse_dependencies:
+                if (package in self.dependencies) and self.accumulate_dependencies:
                     if self.dependencies[package] != dependency:
                         self.dependencies[package] = self.dependencies[package] + ", " + dependency
                 else:
