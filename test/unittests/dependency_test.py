@@ -63,6 +63,17 @@ class DependencyTest(TestCase):
         self.assertEqual(result.count("b"), 1, msg="Don't have the right amount of 'b' <" + result + ">")
         self.assertEqual(result.count("httpd"), 1, msg="Don't have the right amount of 'httpd' <" + result + ">")
 
+    def test_should_remove_duplicates(self):
+        rawDependency = "httpd httpd>42 httpd"
+        dep = Dependency(accumulate_dependencies=True)
+        dep.add(rawDependency)
+        result = str(dep)
+        # Duplicate "httpd" must have been removed. Since set() is used to remove
+        # duplices, we cannot rely on the exact order.
+        one = "httpd, httpd > 42"
+        two = "httpd > 42, httpd"
+        self.assertTrue(result in (one, two))
+
     def test_should_multiple_completly_equal_dependencies_get_always_overwritten_but_differing_version_spec_count_as_not_equal(self):
         rawDependency = "httpd httpd httpd a b httpd a httpd > 4"
         dep = Dependency(accumulate_dependencies=True)

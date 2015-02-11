@@ -24,6 +24,7 @@ class Dependency:
         so the first/gerneral ones get overwritten by the later/specific ones """
 
     def __init__(self, accumulate_dependencies=True, filter_regex=".*", positive_filter=True):
+        # Looks like    {'httpd': set(['httpd', 'httpd = 42'])}
         self.dependencies = dict([])
         self.accumulate_dependencies = accumulate_dependencies
         self.filter_regex = filter_regex
@@ -52,10 +53,9 @@ class Dependency:
                 package = new_dependency.split(" ", 1)[0]
 
                 if (package in self.dependencies) and self.accumulate_dependencies:
-                    if self.dependencies[package] != new_dependency:
-                        self.dependencies[package] = self.dependencies[package] + ", " + new_dependency
+                    self.dependencies[package].add(new_dependency)
                 else:
-                    self.dependencies[package] = new_dependency
+                    self.dependencies[package] = set([new_dependency])
 
     def add(self, raw_dependencies):
         if isinstance(raw_dependencies, ListType):
@@ -66,6 +66,5 @@ class Dependency:
         self._filter_dependencies()
 
     def __str__(self):
-        """ nicely prints the previously added RPM dependencies """
-
-        return ", ".join(self.dependencies.values())
+        """return RPM dependencies formatted for use in the spec file"""
+        return ", ".join(", ".join(deps) for deps in self.dependencies.values())
