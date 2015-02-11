@@ -126,7 +126,10 @@ class HostRpmBuilder(object):
 
         if self.is_a_group_rpm:
             try:
-                TokenReplacer.filter_directory(os.path.dirname(self.variables_dir), self.variables_dir, thread_name=self.thread_name, skip=False)
+                TokenReplacer.filter_directory(os.path.dirname(self.variables_dir),
+                                               self.variables_dir,
+                                               thread_name=self.thread_name,
+                                               skip=False)
             except Exception as e:
                 LOGGER.warning("Problem during preliminary filtering of variables for group {0}: {1}".format(self.hostname, e))
             with open(rpm_name_variable_file) as f:
