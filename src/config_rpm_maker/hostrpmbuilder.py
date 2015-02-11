@@ -430,18 +430,12 @@ Change set:
         self._write_file(file_path, str(dep))
 
     def _write_file(self, file_path, content):
-        f = open(file_path, 'w')
-        try:
-            f.write(content)
-        finally:
-            f.close()
+        with open(file_path, 'w') as file_to_write:
+            file_to_write.write(content)
 
     def _get_content(self, path):
-        f = open(path, 'r')
-        try:
-            return f.read()
-        finally:
-            f.close()
+        with open(path, 'r') as file_to_read:
+            return file_to_read.read()
 
     def _remove_logger_handlers(self):
         self.logger.removeHandler(self.error_handler)
