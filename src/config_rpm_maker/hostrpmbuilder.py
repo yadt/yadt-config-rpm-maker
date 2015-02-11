@@ -106,10 +106,10 @@ class HostRpmBuilder(object):
             overall_requires += requires
             overall_provides += provides
 
-        self.logger.debug("Overall_exported: %s", str(overall_exported))
-        self.logger.info("Overall_requires: %s", str(overall_requires))
-        self.logger.info("Overall_provides: %s", str(overall_provides))
-        self.logger.debug("Overall_svn_paths: %s", str(overall_svn_paths))
+        self.logger.debug("Overall_exported: %s", overall_exported)
+        self.logger.info("Overall_requires: %s", overall_requires)
+        self.logger.info("Overall_provides: %s", overall_provides)
+        self.logger.debug("Overall_svn_paths: %s", overall_svn_paths)
 
         if not exists(self.variables_dir):
             mkdir(self.variables_dir)
