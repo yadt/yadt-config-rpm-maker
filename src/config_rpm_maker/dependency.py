@@ -42,10 +42,10 @@ class Dependency:
         self.dependencies = filtered_dependencies
 
     def _add(self, raw_dependency_string):
-        dependencies = re.sub("\s*([<>=]+)\s*", "\\1", raw_dependency_string)  # remove spaces around <>=
-        dependencies = re.sub("\s*,\s*", "\n", dependencies)         # change ',' separator into newline
-        dependencies = re.sub("\s+", "\n", dependencies)             # all spaces left are separators now, change into newline
-        dependencies = re.sub("([<>=]+)", " \\1 ", dependencies)     # add spaces around <>=
+        dependencies = re.sub(r"\s*([<>=]+)\s*", r"\1", raw_dependency_string)  # remove spaces around <>=
+        dependencies = re.sub(r"\s*,\s*", "\n", dependencies)         # change ',' separator into newline
+        dependencies = re.sub(r"\s+", "\n", dependencies)             # all spaces left are separators now, change into newline
+        dependencies = re.sub(r"([<>=]+)", r" \1 ", dependencies)     # add spaces around <>=
 
         for new_dependency in dependencies.split("\n"):
             new_dependency = new_dependency.strip()
