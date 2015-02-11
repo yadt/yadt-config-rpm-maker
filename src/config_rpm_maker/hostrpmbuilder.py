@@ -120,9 +120,9 @@ class HostRpmBuilder(object):
 
         rpm_name_variable_file = os.path.join(self.variables_dir, 'RPM_NAME')
         self.is_a_group_rpm = exists(rpm_name_variable_file)
-        do_not_write_host_segment_variable = self.is_a_group_rpm
 
-        self._save_segment_variables(do_not_write_host_segment_variable)
+        self._save_segment_variables(
+            do_not_write_host_segment_variable=self.is_a_group_rpm)
 
         if self.is_a_group_rpm:
             try:

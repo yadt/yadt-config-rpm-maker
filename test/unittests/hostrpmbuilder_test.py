@@ -347,7 +347,8 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        self.mock_host_rpm_builder._save_segment_variables.assert_called_with(False)
+        self.mock_host_rpm_builder._save_segment_variables.assert_called_with(
+            do_not_write_host_segment_variable=False)
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
@@ -363,7 +364,8 @@ class BuildTests(TestCase):
 
         HostRpmBuilder.build(self.mock_host_rpm_builder)
 
-        self.mock_host_rpm_builder._save_segment_variables.assert_called_with(True)
+        self.mock_host_rpm_builder._save_segment_variables.assert_called_with(
+            do_not_write_host_segment_variable=True)
 
     @patch('config_rpm_maker.hostrpmbuilder.mkdir')
     @patch('config_rpm_maker.hostrpmbuilder.exists')
