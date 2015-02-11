@@ -297,10 +297,13 @@ class HostRpmBuilder(object):
         shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
 
     def _generate_patch_info(self):
-        variables = filter(lambda name: name != 'SVNLOG' and name != 'OVERLAYING', os.listdir(self.variables_dir))
-        variables = sorted(variables)
-        variables = [var_name.rjust(40) + ' : ' + self._get_content(os.path.join(self.variables_dir, var_name)) for var_name in variables]
-        return "\n".join(variables) + "\n"
+        variables = filter(lambda name: name not in ('SVNLOG', 'OVERLAYING'), os.listdir(self.variables_dir))
+
+        info_lines = []
+        for variable_name in sorted(variables):
+            variable_value = self._get_content(os.path.join(self.variables_dir, variable_name))
+            info_lines.append(variable_name.rjust(40) + ' : ' + variable_value)
+        return "\n".join(info_lines) + "\n"
 
     @measure_execution_time
     def _save_network_variables(self):
@@ -315,7 +318,9 @@ class HostRpmBuilder(object):
         else:
             all_segments = ALL_SEGEMENTS
         for segment in all_segments:
-            self._write_file(os.path.join(self.variables_dir, segment.get_variable_name()), segment.get(self.hostname)[-1])
+            self._write_file(
+                os.path.join(self.variables_dir, segment.get_variable_name()),
+                segment.get(self.hostname)[-1])
 
     def _save_file_list(self):
         with open(os.path.join(self.work_dir, 'filelist.' + self.hostname), 'w') as file_list:
