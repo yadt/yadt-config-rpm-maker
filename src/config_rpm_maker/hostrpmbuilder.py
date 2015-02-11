@@ -132,9 +132,8 @@ class HostRpmBuilder(object):
                                                skip=False)
             except Exception as e:
                 LOGGER.warning("Problem during preliminary filtering of variables for group {0}: {1}".format(self.hostname, e))
-            with open(rpm_name_variable_file) as f:
-                self.rpm_name = f.read().rstrip()
 
+            self.rpm_name = self._get_content(rpm_name_variable_file).rstrip()
             LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
             self.spec_file_path = os.path.join(self.host_config_dir, self.config_rpm_prefix + self.rpm_name + '.spec')
             self._write_file(os.path.join(self.variables_dir, 'INSTALL_PROTECTION_DEPENDENCY'), '')
