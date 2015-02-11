@@ -36,7 +36,7 @@ class DependencyTest(TestCase):
 
     def test_should_filter_for_repos(self):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
-        dep = Dependency(False, "^yadt-.*-repo$")
+        dep = Dependency(accumulate_dependencies=False, filter_regex="^yadt-.*-repo$")
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual(result.count("yadt-dev-snapshots-repo"), 1, msg="Don't have yadt-dev-snaphosts-repo in <" + result + ">")
@@ -46,7 +46,7 @@ class DependencyTest(TestCase):
 
     def test_should_negative_filter_for_repos(self):
         rawDependency = "yadt-foo yadt-dev-snapshots-repo yadt-bla yadt-boo-repo"
-        dep = Dependency(False, "^yadt-.*-repo$", False)
+        dep = Dependency(accumulate_dependencies=False, filter_regex="^yadt-.*-repo$", positive_filter=False)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual(result.count("yadt-dev-snapshots-repo"), 0, msg="Filter don't work. Found yadt-dev-snaphosts-repo in <" + result + ">")
@@ -56,7 +56,7 @@ class DependencyTest(TestCase):
 
     def test_should_multiple_completly_equal_dependencies_get_always_overwritten(self):
         rawDependency = "httpd httpd httpd a b httpd"
-        dep = Dependency(True)
+        dep = Dependency(accumulate_dependencies=True)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
@@ -65,7 +65,7 @@ class DependencyTest(TestCase):
 
     def test_should_multiple_completly_equal_dependencies_get_always_overwritten_but_differing_version_spec_count_as_not_equal(self):
         rawDependency = "httpd httpd httpd a b httpd a httpd > 4"
-        dep = Dependency(True)
+        dep = Dependency(accumulate_dependencies=True)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual(result.count("a"), 1, msg="Don't have the right amount of 'a' <" + result + ">")
@@ -74,14 +74,14 @@ class DependencyTest(TestCase):
 
     def test_should_read_dependency_with_snapshot_as_version_mixed_with_digits_only_overwrite(self):
         rawDependency = "a= 12 dummy-snapshot = 1.30-SNAPSHOT20100819155634 a = 13"
-        dep = Dependency(False)
+        dep = Dependency(accumulate_dependencies=False)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEquals("a = 13, dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
 
     def test_should_read_dependency_with_snapshot_as_version(self):
         rawDependency = """dummy-snapshot = 1.30-SNAPSHOT20100819155634"""
-        dep = Dependency(False)
+        dep = Dependency(accumulate_dependencies=False)
         dep.add(rawDependency)
         result = str(dep)
         self.assertEqual("dummy-snapshot = 1.30-SNAPSHOT20100819155634", result)
@@ -113,7 +113,7 @@ class DependencyTest(TestCase):
         self.__checkDependenciesAreCorrectAndNotCollapsed(resultWired)
 
     def __readDependencies(self, rawDependencies, overwriteDuplicates):
-        dep = Dependency(overwriteDuplicates)
+        dep = Dependency(accumulate_dependencies=overwriteDuplicates)
         dep.add(rawDependencies)
         return str(dep)
 
