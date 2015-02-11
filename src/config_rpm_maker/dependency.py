@@ -47,8 +47,9 @@ class Dependency:
         dependency = re.sub("([<>=]+)", " \\1", dependency)      # add a space in front of <>= so we have tuples now
 
         for dependency in dependency.split("\n"):
-            if len(dependency.strip()) != 0:
-                if re.search(" ", dependency):
+            dependency = dependency.strip()
+            if dependency:
+                if " " in dependency:
                     (package, versionSpec) = dependency.split(" ")
                     dependency = re.sub("\s*([<>=]+\s*)", " \\1 ", dependency)  # add a surrounding space
                 else:
