@@ -87,7 +87,7 @@ class HostRpmBuilder(object):
         self.logger.info("Building config rpm for host %s revision %s", self.hostname, self.revision)
 
         if exists(self.host_config_dir):
-            raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already whereas I should be creating it now.' % self.host_config_dir)
+            raise ConfigDirAlreadyExistsException('ERROR: "%s" exists already although I should be creating it now.' % self.host_config_dir)
 
         try:
             mkdir(self.host_config_dir)
