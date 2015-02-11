@@ -79,7 +79,7 @@ def tarjan_scc(graph):
 
         try:
             successors = graph[node]
-        except:
+        except Exception:
             successors = []
         for successor in successors:
             if successor not in lowlinks:
