@@ -89,16 +89,16 @@ def log_configuration(logging_function, configuration, path):
 
     logging_function('Loaded configuration file "%s"', path)
 
-    properties = sorted(configuration.keys())
-    if len(properties) == 0:
+    log_properties = sorted(configuration.keys())
+    if not log_properties:
         logging_function('Configuration file was empty!')
         return
 
-    max_length = len(max(properties, key=lambda property: len(property.key)).key) + 2  # two is for quotes on left and right side
+    max_length = len(max(log_properties, key=lambda log_property: len(log_property.key)).key) + 2  # two is for quotes on left and right side
 
-    for property in properties:
-        indented_key = ('"%s"' % property.key).ljust(max_length)
-        value = configuration[property]
+    for log_property in log_properties:
+        indented_key = ('"%s"' % log_property.key).ljust(max_length)
+        value = configuration[log_property]
         logging_function('Configuration property %s = "%s" (%s)', indented_key, value, type(value).__name__)
 
 
