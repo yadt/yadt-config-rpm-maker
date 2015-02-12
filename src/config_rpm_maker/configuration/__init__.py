@@ -48,16 +48,17 @@ class ConfigurationException(BaseConfigRpmMakerException):
 
 
 class ConfigurationProperty(object):
-    """ A callable configuration property. Using this class one can define
-        configuration properties which have a readable name and return the
-        configuration value. """
+    """A callable configuration property.
 
+    Using this class one can define configuration properties which have a
+    readable name and return the configuration value.
+    """
     def __init__(self, key, default):
         self.key = key
         self.default = default
 
     def __call__(self):
-        """ Get the configuration property """
+        """Get the configuration property."""
 
         if not get_properties():
             load_configuration_file()
@@ -74,9 +75,10 @@ from config_rpm_maker.configuration.properties import *
 
 
 def load_configuration_file():
-    """ Determines where to find the configuration file,
-        loads it and ensures the loaded properties are valid. """
+    """Determine where to find the configuration file.
 
+    Load it and ensure that the loaded properties are valid.
+    """
     configuration_file_path = _determine_configuration_file_path()
 
     if not exists(configuration_file_path):
@@ -93,10 +95,10 @@ def load_configuration_file():
 
 
 def build_config_viewer_host_directory(host_name, revision=False):
-    """ Returns the path to the config viewer host directory for the given host_name
+    """Return the path to the config viewer host directory for the given host_name.
 
-        If revision is given it will append the revision to the path name """
-
+    If revision is given it will append the revision to the path name.
+    """
     config_viewer_hosts_directory = get_config_viewer_host_directory()
     path = join(config_viewer_hosts_directory, host_name)
 
@@ -107,11 +109,12 @@ def build_config_viewer_host_directory(host_name, revision=False):
 
 
 def set_property(name, value):
-    """ set the configuration property identified by the given name to the given value.
+    """Set the configuration property identified by the given name to the given value.
 
-        Before setting the property it will check if the configuration file has already been loaded.
-        If this is not the case it will load the configuration file. """
-
+    Before setting the property it will check if the configuration file has
+    already been loaded. If this is not the case it will load the configuration
+    file.
+    """
     if not name:
         raise ConfigurationException("No configuration property name given")
 
@@ -125,41 +128,35 @@ def set_property(name, value):
 
 
 def get_properties():
-    """ Returns the application configuration properties if they have already been loaded """
-
+    """Return the application configuration properties if they have already been loaded."""
     return _properties
 
 
 def set_properties(new_properties):
-    """ Sets the application configuration properties (a dictionary) """
-
+    """Set the application configuration properties (a dictionary)."""
     global _properties
     _properties = new_properties
 
 
 def get_file_path_of_loaded_configuration():
-    """ Returns the path to the loaded configuration file (if it has been loaded) """
-
+    """Return the path to the loaded configuration file (if it has been loaded)."""
     return _file_path_of_loaded_configuration
 
 
 def _set_file_path_of_loaded_configuration(new_file_path):
     """ Use this function after loading a configuration file
         to declare which file has been loaded """
-
     global _file_path_of_loaded_configuration
     _file_path_of_loaded_configuration = new_file_path
 
 
 def _determine_configuration_file_path():
-    """ Checks if the environment variable has been set. """
-
+    """Check if the environment variable has been set."""
     return environ.get(ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE, CONFIGURATION_FILE_PATH)
 
 
 def _load_configuration_properties_from_yaml_file(configuration_file_path):
     """ Load the configuration properties from the given path to a yaml file. """
-
     try:
         with open(configuration_file_path) as configuration_file:
             properties = yaml.load(configuration_file)
@@ -174,12 +171,14 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
 
 
 def _ensure_properties_are_valid(raw_properties):
-    """ Ensures that the configuration properties are valid by parsing them.
-        If there is a default defined for a property it will return the default value.
+    """Ensure that the configuration properties are valid by parsing them.
 
-        Returns a dictionary containing valid application configuration properties.
-        Throws a exception if some parameters are invalid. """
+    If there is a default defined for a property, it will return the default
+    value.
 
+    Returns a dictionary containing valid application configuration properties.
+    Throws an exception if some parameters are invalid.
+    """
     if raw_properties is None:
         LOGGER.warn("Loaded configuration properties are empty.")
         raw_properties = {}
@@ -233,7 +232,7 @@ def _ensure_properties_are_valid(raw_properties):
 
 
 def _ensure_is_a_boolean_value(key, value):
-    """ Returns a boolean value or raises a exception if the given value is not a boolean """
+    """Return the given value or raise an exception if it is not a boolean."""
     if not isinstance(value, bool):
         raise ConfigurationException('Invalid value "%s" for "%s" has to be a boolean.' % (value, key))
 
@@ -241,7 +240,7 @@ def _ensure_is_a_boolean_value(key, value):
 
 
 def _ensure_valid_log_level(log_level_name):
-    """ Returns a valid log level """
+    """Return a valid log level."""
     if not isinstance(log_level_name, basestring):
         raise ConfigurationException('Invalid log level "%s". Log level has to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
 
@@ -258,7 +257,7 @@ def _ensure_valid_log_level(log_level_name):
 
 
 def _ensure_is_a_string(key, value):
-    """ Retuns the given string or raises an exception if the given value is not a string """
+    """Return the given string or raise an exception if it is not a string."""
     if not isinstance(value, basestring):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
                                      % (key, value, type(value).__name__))
@@ -267,7 +266,7 @@ def _ensure_is_a_string(key, value):
 
 
 def _ensure_is_an_integer(key, value):
-    """ Returns the given int or raises an exception if the given value is not an integer"""
+    """Return the given int or raise an exception if it is not an integer."""
     if not isinstance(value, int):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
                                      % (key, value, type(value).__name__))
@@ -276,7 +275,7 @@ def _ensure_is_an_integer(key, value):
 
 
 def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
-    """ returns the given value if it is a valid regular expression or raises an exception if not """
+    """Return the given value or raise an exception if it's not a valid regex."""
     if not isinstance(value, basestring):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
                                      % (get_repo_packages_regex, value, type(value).__name__))
@@ -290,14 +289,14 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
 
 def _ensure_is_a_string_or_none(key, value):
-    """ returns the given value if it is valid string or none. Raises an exception otherwise. """
+    """Return the given value if it is string or None, raise an exception otherwise."""
     if value is None:
         return None
     return _ensure_is_a_string(key, value)
 
 
 def _ensure_is_a_list_of_strings(key, value):
-    """ returns the given value if the value is a list of string or raises an expcetion """
+    """Return the given value if it is a list of strings or raises an exception."""
     if not isinstance(value, list):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
                                      % (key, value, type(value).__name__))
