@@ -163,10 +163,10 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
             _set_file_path_of_loaded_configuration(configuration_file_path)
             return properties
 
-    except Exception as e:
+    except Exception as exc:
         error_message = ('Could not load configuration file "%s".\nCurrent '
                 'working directory is "%s"\nError: %s')
-        error_message %= (configuration_file_path, getcwd(), str(e))
+        error_message %= (configuration_file_path, getcwd(), exc)
         raise ConfigurationException(error_message)
 
 
@@ -243,7 +243,7 @@ def _ensure_valid_log_level(log_level_name):
     """Return a valid log level."""
     if not isinstance(log_level_name, basestring):
         raise ConfigurationException('Invalid log level "%s". Log level has '
-                'to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
+                'to be a string (DEBUG, ERROR or INFO).' % (log_level_name,))
 
     log_level_name = log_level_name.upper().strip()
 
@@ -288,9 +288,9 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
     try:
         compile(value)
-    except Exception as e:
+    except Exception as exc:
         raise ConfigurationException('The given string "%s" is not a valid '
-                'regular expression. Error was "%s".' % (value, str(e)))
+                'regular expression. Error was "%s".' % (value, exc))
 
     return value
 
