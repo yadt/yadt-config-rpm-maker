@@ -48,7 +48,8 @@ class SvnService(object):
         self.client.set_auth_cache(True)
 
         if username:
-            LOGGER.debug('Setting default username for subversion client to "%s".', username)
+            LOGGER.debug('Setting default username for subversion client to "%s".',
+                    username)
             self.client.set_default_username(username)
 
         if password:
@@ -60,22 +61,23 @@ class SvnService(object):
 
         log_entries = self.get_logs_for_revision(revision)
         for info in log_entries:
-            LOGGER.info('Commit message is "%s" (%s, %s)', info.message.strip(), info.author, ctime(info.date))
+            LOGGER.info('Commit message is "%s" (%s, %s)',
+                    info.message.strip(), info.author, ctime(info.date))
 
     def get_logs_for_revision(self, revision):
-        """ Returns the logs for the given revision of the repository at the config_url """
+        """Return the logs for given revision of the repository at config_url"""
 
         try:
-            logs = self.client.log(self.base_url, self._rev(revision), self._rev(revision),
-                                   discover_changed_paths=True)
-        except Exception as e:
-            LOGGER.error('Retrieving change set information for revision "%s" in repository "%s" failed.',
-                         revision, self.config_url)
-            raise SvnServiceException(str(e))
+            logs = self.client.log(self.base_url, self._rev(revision),
+                    self._rev(revision), discover_changed_paths=True)
+        except Exception as exc:
+            LOGGER.error('Retrieving change set information for revision "%s"'
+                    ' in repository "%s" failed.', revision, self.config_url)
+            raise SvnServiceException(str(exc))
         return logs
 
     def get_changed_paths_with_action(self, revision):
-        """ Returns a list of all (path, action) tuples from the change set """
+        """Return a list of all (path, action) tuples from the change set"""
 
         log_entries = self.get_logs_for_revision(revision)
 
@@ -92,7 +94,7 @@ class SvnService(object):
         return action_and_path
 
     def get_deleted_paths(self, revision):
-        """ Returns all paths which have been deleted in the given revision"""
+        """Return all paths which have been deleted in the given revision"""
 
         paths_with_action = self.get_changed_paths_with_action(revision)
 
@@ -100,7 +102,7 @@ class SvnService(object):
 
     @measure_execution_time
     def get_changed_paths(self, revision):
-        """ Returns the list of all changed paths from the change set with the given revision """
+        """Return list of all paths that were changed in given revision"""
 
         path_with_action = self.get_changed_paths_with_action(revision)
 
@@ -110,14 +112,17 @@ class SvnService(object):
             changed_paths.append(path)
             changed_paths_and_action.append("%s (%s)" % (path, action))
 
-        log_elements_of_list(LOGGER.debug, 'The commit change set contained %s changed path(s). Listing with svn action.', changed_paths_and_action)
+        log_elements_of_list(LOGGER.debug, 'The commit change set contained '
+                '%s changed path(s). Listing with svn action.',
+                changed_paths_and_action)
         return changed_paths
 
     @measure_execution_time
     def get_hosts(self, revision):
         url = self.config_url + '/host'
 
-        items = self.client.list(url, revision=self._rev(revision), depth=pysvn.depth.immediates)
+        items = self.client.list(url, revision=self._rev(revision),
+                depth=pysvn.depth.immediates)
 
         # First entry is /host itself.
         items = items[1:]
@@ -154,4 +159,6 @@ class SvnService(object):
             return self.config_url + '/' + svn_path
 
     def __str__(self):
-        return '{0}(base_url="{1}", path_to_config="{2}")'.format(SvnService.__name__, self.base_url, self.path_to_config)
+        return '{0}(base_url="{1}", path_to_config="{2}")'.format(
+                SvnService.__name__, self.base_url, self.path_to_config)
+
