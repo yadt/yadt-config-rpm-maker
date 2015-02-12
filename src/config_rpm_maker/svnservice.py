@@ -140,11 +140,6 @@ class SvnService(object):
 
         return [(svn_path, path) for path in normalized_paths]
 
-    @measure_execution_time
-    def log(self, svn_path, revision, limit=0):
-        url = self._get_url(svn_path)
-        return self.client.log(url, pysvn.Revision(pysvn.opt_revision_kind.head), self._rev(revision), discover_changed_paths=True, limit=limit)
-
     def _rev(self, revision):
         return pysvn.Revision(pysvn.opt_revision_kind.number, int(revision))
 

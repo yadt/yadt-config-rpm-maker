@@ -44,14 +44,6 @@ class SvnServiceIntegrationTest(IntegrationTest):
 
         self.assertEqual(sorted(expected_elements), sorted(actual_elements))
 
-    def test_should_return_exactly_one_svn_log(self):
-
-        service = SvnService(self.repo_url, None, None, path_to_config=get_svn_path_to_config())
-
-        logs = service.log('', 2, 5)
-
-        self.assertEqual(1, len(logs))
-
     def test_should_raise_SvnServiceException_when_invalid_revision_is_given(self):
 
         service = SvnService(self.repo_url, None, None, path_to_config=get_svn_path_to_config())

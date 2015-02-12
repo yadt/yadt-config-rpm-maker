@@ -343,21 +343,15 @@ class HostRpmBuilder(object):
 
     def _save_log_entries_to_variable(self, svn_paths):
         svn_service = self._get_next_svn_service_from_queue()
-        logs = []
         try:
-            for svn_path in svn_paths:
-                for log_entry in svn_service.log(svn_path, self.revision, 5):
-                    logs.append(log_entry)
-        except ClientError:
-            pass
+            logs = svn_service.get_logs_for_revision(self.revision)
+        except SvnServiceException, exc:
+            svn_log = "Could not retrieve log for revision: {0}".format(exc)
+        else:
+            svn_log = self._render_log(logs[0])
         finally:
             self.svn_service_queue.put(svn_service)
-            self.svn_service_queue.task_done()
 
-        logs = sorted(logs, key=lambda log: log['revision'].number, reverse=True)
-        logs = logs[:5]
-        logs_text = [self._render_log(log) for log in logs]
-        svn_log = "\n".join(logs_text)
         self._write_file(os.path.join(self.variables_dir, 'SVNLOG'), svn_log)
 
     def _save_overlaying_to_variable(self, exported_dict):
