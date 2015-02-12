@@ -19,7 +19,7 @@ import yaml
 from os import environ, getcwd
 from os.path import abspath, exists, join
 from logging import DEBUG, ERROR, INFO, getLogger
-from re import compile
+import re
 
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
@@ -287,7 +287,7 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
                 get_repo_packages_regex, value, type(value).__name__))
 
     try:
-        compile(value)
+        re.compile(value)
     except Exception as exc:
         raise ConfigurationException('The given string "%s" is not a valid '
                 'regular expression. Error was "%s".' % (value, exc))
