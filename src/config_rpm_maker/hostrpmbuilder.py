@@ -134,7 +134,8 @@ class HostRpmBuilder(object):
                                                thread_name=self.thread_name,
                                                skip=False)
             except Exception as e:
-                LOGGER.warning("Problem during preliminary filtering of variables for group {0}: {1}".format(self.hostname, e))
+                LOGGER.warning("Problem during preliminary filtering of "
+                        "variables for group {0}: {1}".format(self.hostname, e))
 
             self.rpm_name = self._get_content(rpm_name_variable_file).rstrip()
             LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
@@ -357,20 +358,27 @@ class HostRpmBuilder(object):
     def _save_overlaying_to_variable(self, exported_dict):
         overlaying = {}
         for segment in OVERLAY_ORDER:
-            for path_tuple in exported_dict[segment]:
-                overlaying[path_tuple[1]] = path_tuple[0]
+            for segment_name, path in exported_dict[segment]:
+                overlaying[path] = segment_name
 
-        content = "\n".join([overlaying[path].rjust(25) + ' : /' + path for path in sorted(overlaying.keys())])
+        lines = [segment_name.rjust(25) + ' : /' + path
+                for path, segment_name in sorted(overlaying.items())]
+        content = "\n".join(lines)
         self._write_file(os.path.join(self.variables_dir, 'OVERLAYING'), content)
 
     def _write_overlaying_for_config_viewer(self, exported_dict):
         overlaying = {}
         for segment in OVERLAY_ORDER:
-            for path_tuple in exported_dict[segment]:
-                overlaying[path_tuple[1]] = path_tuple[0]
+            for segment_name, path in exported_dict[segment]:
+                overlaying[path] = segment_name
 
-        content = "\n".join([overlaying[path] + ':/' + path for path in sorted(overlaying.keys())])
-        self._write_file(os.path.join(self.config_viewer_host_dir, self.hostname + '.overlaying'), content + "\n")
+        lines = [segment_name + ':/' + path
+                for path, segment_name in sorted(overlaying.items())]
+        content = "\n".join(lines) + "\n"
+
+        file_name = os.path.join(self.config_viewer_host_dir,
+                self.hostname + '.overlaying')
+        self._write_file(file_name, content)
 
     def _render_log(self, log):
         author = log.get("author", "unknown_author")
