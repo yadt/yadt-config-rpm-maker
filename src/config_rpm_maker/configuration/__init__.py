@@ -167,7 +167,9 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
             return properties
 
     except Exception as e:
-        error_message = 'Could not load configuration file "%s".\nCurrent working directory is "%s"\nError: %s' % (configuration_file_path, getcwd(), str(e))
+        error_message = ('Could not load configuration file "%s".\nCurrent '
+                'working directory is "%s"\nError: %s')
+        error_message %= (configuration_file_path, getcwd(), str(e))
         raise ConfigurationException(error_message)
 
 
@@ -232,8 +234,7 @@ def _ensure_properties_are_valid(raw_properties):
 
 def _ensure_is_a_boolean_value(key, value):
     """ Returns a boolean value or raises a exception if the given value is not a boolean """
-
-    if type(value) is not bool:
+    if not isinstance(value, bool):
         raise ConfigurationException('Invalid value "%s" for "%s" has to be a boolean.' % (value, key))
 
     return value
@@ -241,8 +242,7 @@ def _ensure_is_a_boolean_value(key, value):
 
 def _ensure_valid_log_level(log_level_name):
     """ Returns a valid log level """
-
-    if type(log_level_name) is not str:
+    if not isinstance(log_level_name, basestring):
         raise ConfigurationException('Invalid log level "%s". Log level has to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
 
     log_level_name = log_level_name.upper().strip()
@@ -259,33 +259,27 @@ def _ensure_valid_log_level(log_level_name):
 
 def _ensure_is_a_string(key, value):
     """ Retuns the given string or raises an exception if the given value is not a string """
-
-    value_type = type(value)
-    if value_type is not str:
+    if not isinstance(value, basestring):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
-                                     % (key, str(value), value_type.__name__))
+                                     % (key, value, type(value).__name__))
 
     return value
 
 
 def _ensure_is_an_integer(key, value):
     """ Returns the given int or raises an exception if the given value is not an integer"""
-
-    value_type = type(value)
-    if value_type is not int:
+    if not isinstance(value, int):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
-                                     % (key, str(value), value_type.__name__))
+                                     % (key, value, type(value).__name__))
 
     return value
 
 
 def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
     """ returns the given value if it is a valid regular expression or raises an exception if not """
-
-    value_type = type(value)
-    if value_type is not str:
+    if not isinstance(value, basestring):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
-                                     % (get_repo_packages_regex, str(value), value_type.__name__))
+                                     % (get_repo_packages_regex, value, type(value).__name__))
 
     try:
         compile(value)
@@ -297,30 +291,20 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
 
 def _ensure_is_a_string_or_none(key, value):
     """ returns the given value if it is valid string or none. Raises an exception otherwise. """
-
     if value is None:
         return None
-
-    value_type = type(value)
-    if value_type is not str:
-        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
-                                     % (key, str(value), value_type.__name__))
-
-    return value
+    return _ensure_is_a_string(key, value)
 
 
 def _ensure_is_a_list_of_strings(key, value):
     """ returns the given value if the value is a list of string or raises an expcetion """
-
-    value_type = type(value)
-    if value_type is not list:
+    if not isinstance(value, list):
         raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
-                                     % (key, str(value), value_type.__name__))
+                                     % (key, value, type(value).__name__))
 
     for element in value:
-        element_type = type(element)
-        if element_type is not str:
-            raise ConfigurationException('Configuration parameter "%s": invalid list "%s"  with element "%s" of type "%s"! Please use a list of strings.'
-                                         % (key, str(value), str(element), element_type.__name__))
+        if not isinstance(element, basestring):
+            raise ConfigurationException('Configuration parameter "%s": invalid list "%s" with element "%s" of type "%s"! Please use a list of strings.'
+                                         % (key, value, element, type(element).__name__))
 
     return value
