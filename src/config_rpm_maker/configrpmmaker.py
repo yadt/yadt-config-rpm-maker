@@ -49,7 +49,8 @@ LOGGER = getLogger(__name__)
 
 class BuildHostThread(Thread):
 
-    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue, failed_host_queue, work_dir, name=None, error_logging_handler=None):
+    def __init__(self, revision, host_queue, svn_service_queue, rpm_queue,
+            failed_host_queue, work_dir, name=None, error_logging_handler=None):
         super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
@@ -63,12 +64,15 @@ class BuildHostThread(Thread):
         failure_information = (host_name, stack_trace)
         self.failed_host_queue.put(failure_information)
         approximately_count = self.failed_host_queue.qsize()
-        LOGGER.error('Build for host "{host_name}" failed. Approximately {count} builds failed.'.format(host_name=host_name,
-                                                                                                        count=approximately_count))
+        LOGGER.error('Build for host "{host_name}" failed. Approximately '
+                '{count} builds failed.'.format(host_name=host_name,
+                count=approximately_count))
 
         maximum_allowed_failed_hosts = get_max_failed_hosts()
         if approximately_count >= maximum_allowed_failed_hosts:
-            LOGGER.error('Stopping to build more hosts since the maximum of %d failed hosts has been reached' % maximum_allowed_failed_hosts)
+            LOGGER.error('Stopping to build more hosts since the maximum of '
+                    '%d failed hosts has been reached',
+                     maximum_allowed_failed_hosts)
             self.host_queue.queue.clear()
 
     def run(self):
