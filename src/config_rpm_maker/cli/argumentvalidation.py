@@ -52,7 +52,7 @@ def ensure_valid_repository_url(repository_url):
         LOGGER.debug('Accepting "%s" as a valid repository url.', repository_url)
         return repository_url
 
-    if scheme is '':
+    if scheme == '':
         file_uri = 'file://%s' % parsed_url.path
         LOGGER.debug('Accepting "%s" as a valid repository url.', file_uri)
         return file_uri
