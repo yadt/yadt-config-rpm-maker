@@ -83,10 +83,11 @@ def load_configuration_file():
     configuration_file_path = _determine_configuration_file_path()
 
     if not exists(configuration_file_path):
-        message = MISSING_CONFIGURATION_FILE_MESSAGE.format(configuration_file_path=configuration_file_path,
-                                                            default_path=CONFIGURATION_FILE_PATH,
-                                                            current_working_directory=abspath('.'),
-                                                            environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
+        message = MISSING_CONFIGURATION_FILE_MESSAGE.format(
+                configuration_file_path=configuration_file_path,
+                default_path=CONFIGURATION_FILE_PATH,
+                current_working_directory=abspath('.'),
+                environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
         raise ConfigurationException(message)
 
     raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)

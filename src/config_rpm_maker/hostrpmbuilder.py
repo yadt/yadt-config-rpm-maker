@@ -306,11 +306,13 @@ class HostRpmBuilder(object):
         shutil.copytree(self.variables_dir, os.path.join(self.config_viewer_host_dir, 'VARIABLES'))
 
     def _generate_patch_info(self):
-        variables = filter(lambda name: name not in ('SVNLOG', 'OVERLAYING'), os.listdir(self.variables_dir))
+        name_filter = lambda name: name not in ('SVNLOG', 'OVERLAYING')
+        variables = filter(name_filter, os.listdir(self.variables_dir))
 
         info_lines = []
         for variable_name in sorted(variables):
-            variable_value = self._get_content(os.path.join(self.variables_dir, variable_name))
+            variable_value = self._get_content(
+                    os.path.join(self.variables_dir, variable_name))
             info_lines.append(variable_name.rjust(40) + ' : ' + variable_value)
         return "\n".join(info_lines) + "\n"
 
@@ -332,7 +334,8 @@ class HostRpmBuilder(object):
                 segment.get(self.hostname)[-1])
 
     def _save_file_list(self):
-        with open(os.path.join(self.work_dir, 'filelist.' + self.hostname), 'w') as file_list:
+        path = os.path.join(self.work_dir, 'filelist.' + self.hostname)
+        with open(path, 'w') as file_list:
             for root, _, file_names in os.walk(self.host_config_dir):
                 for file_name in file_names:
                     file_list.write(os.path.join(root, file_name) + "\n")
