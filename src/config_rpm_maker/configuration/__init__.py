@@ -60,10 +60,7 @@ class ConfigurationProperty(object):
         """ Get the configuration property """
 
         if not get_properties():
-            try:
-                load_configuration_file()
-            except Exception as e:
-                raise e
+            load_configuration_file()
 
         properties = get_properties()
 
