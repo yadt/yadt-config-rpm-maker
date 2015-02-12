@@ -242,7 +242,8 @@ def _ensure_is_a_boolean_value(key, value):
 def _ensure_valid_log_level(log_level_name):
     """Return a valid log level."""
     if not isinstance(log_level_name, basestring):
-        raise ConfigurationException('Invalid log level "%s". Log level has to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
+        raise ConfigurationException('Invalid log level "%s". Log level has '
+                'to be a string (DEBUG, ERROR or INFO).' % str(log_level_name))
 
     log_level_name = log_level_name.upper().strip()
 
@@ -253,14 +254,16 @@ def _ensure_valid_log_level(log_level_name):
     elif log_level_name == 'ERROR':
         return ERROR
 
-    raise ConfigurationException('Invalid log level "%s". Log level hast to be DEBUG, ERROR or INFO' % log_level_name)
+    raise ConfigurationException('Invalid log level "%s". Log level hast to '
+            'be DEBUG, ERROR or INFO' % log_level_name)
 
 
 def _ensure_is_a_string(key, value):
     """Return the given string or raise an exception if it is not a string."""
     if not isinstance(value, basestring):
-        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a string.'
-                                     % (key, value, type(value).__name__))
+        raise ConfigurationException('Configuration parameter "%s": invalid '
+                'value "%s" of type "%s"! Please use a string.' % (
+                key, value, type(value).__name__))
 
     return value
 
@@ -268,8 +271,9 @@ def _ensure_is_a_string(key, value):
 def _ensure_is_an_integer(key, value):
     """Return the given int or raise an exception if it is not an integer."""
     if not isinstance(value, int):
-        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use an integer.'
-                                     % (key, value, type(value).__name__))
+        raise ConfigurationException('Configuration parameter "%s": invalid '
+                'value "%s" of type "%s"! Please use an integer.' % (
+                key, value, type(value).__name__))
 
     return value
 
@@ -277,13 +281,16 @@ def _ensure_is_an_integer(key, value):
 def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
     """Return the given value or raise an exception if it's not a valid regex."""
     if not isinstance(value, basestring):
-        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! The parameter has to be a valid regular expression.'
-                                     % (get_repo_packages_regex, value, type(value).__name__))
+        raise ConfigurationException('Configuration parameter "%s": invalid '
+                'value "%s" of type "%s"! The parameter has to be a valid '
+                'regular expression.' % (
+                get_repo_packages_regex, value, type(value).__name__))
 
     try:
         compile(value)
     except Exception as e:
-        raise ConfigurationException('The given string "%s" is not a valid regular expression. Error was "%s".' % (value, str(e)))
+        raise ConfigurationException('The given string "%s" is not a valid '
+                'regular expression. Error was "%s".' % (value, str(e)))
 
     return value
 
@@ -298,12 +305,15 @@ def _ensure_is_a_string_or_none(key, value):
 def _ensure_is_a_list_of_strings(key, value):
     """Return the given value if it is a list of strings or raises an exception."""
     if not isinstance(value, list):
-        raise ConfigurationException('Configuration parameter "%s": invalid value "%s" of type "%s"! Please use a list of strings.'
-                                     % (key, value, type(value).__name__))
+        raise ConfigurationException('Configuration parameter "%s": invalid '
+                'value "%s" of type "%s"! Please use a list of strings.' % (
+                key, value, type(value).__name__))
 
     for element in value:
-        if not isinstance(element, basestring):
-            raise ConfigurationException('Configuration parameter "%s": invalid list "%s" with element "%s" of type "%s"! Please use a list of strings.'
-                                         % (key, value, element, type(element).__name__))
+        if isinstance(element, basestring):
+            continue
+        raise ConfigurationException('Configuration parameter "%s": invalid '
+                'list "%s" with element "%s" of type "%s"! Please use a list '
+                'of strings.' % (key, value, element, type(element).__name__))
 
     return value
