@@ -116,7 +116,7 @@ class DependencyTest(TestCase):
         self.__checkDependenciesAreCorrectAndCollapsed(resultString)
 
     def test_should_read_dependencies_overwritten_from_wired_args(self):
-        resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, False) # todo f***ing typo
+        resultWired = self.__readDependencies(self.identicaldependAsStringWiredlyFormatted, False)
         self.__checkDependenciesAreCorrectAndCollapsed(resultWired)
 
     def test_should_read_dependencies_not_overwritten_from_wired_args(self):
