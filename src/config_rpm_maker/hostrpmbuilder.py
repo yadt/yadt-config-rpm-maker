@@ -33,6 +33,7 @@ from config_rpm_maker.configuration.properties import (is_no_clean_up_enabled,
                                                        get_config_rpm_prefix,
                                                        is_config_viewer_only_enabled,
                                                        get_path_to_spec_file)
+from config_rpm_maker.svnservice import SvnServiceException
 from config_rpm_maker.configuration import build_config_viewer_host_directory
 from config_rpm_maker.dependency import Dependency
 from config_rpm_maker.exceptions import BaseConfigRpmMakerException
