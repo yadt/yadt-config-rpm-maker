@@ -338,7 +338,7 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
             elif thread_count > len(affected_hosts):
                 reason = "More threads available than affected hosts"
             thread_count = len(affected_hosts)
-            LOGGER.info("%s: using one thread for each affected host." % (reason))
+            LOGGER.info("%s: using one thread for each affected host." % reason)
         return thread_count
 
     def _consume_queue(self, queue):
