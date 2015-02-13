@@ -1,4 +1,4 @@
-#   yadt-config-rpm-maker
+# yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -48,9 +48,8 @@ LOGGER = getLogger(__name__)
 
 
 class BuildHostThread(Thread):
-
     def __init__(self, revision, host_queue, svn_service_queue, rpm_queue,
-            failed_host_queue, work_dir, name=None, error_logging_handler=None):
+                 failed_host_queue, work_dir, name=None, error_logging_handler=None):
         super(BuildHostThread, self).__init__(name=name)
         self.revision = revision
         self.host_queue = host_queue
@@ -65,14 +64,14 @@ class BuildHostThread(Thread):
         self.failed_host_queue.put(failure_information)
         approximately_count = self.failed_host_queue.qsize()
         LOGGER.error('Build for host "{host_name}" failed. Approximately '
-                '{count} builds failed.'.format(host_name=host_name,
-                count=approximately_count))
+                     '{count} builds failed.'.format(host_name=host_name,
+                                                     count=approximately_count))
 
         maximum_allowed_failed_hosts = get_max_failed_hosts()
         if approximately_count >= maximum_allowed_failed_hosts:
             LOGGER.error('Stopping to build more hosts since the maximum of '
-                    '%d failed hosts has been reached',
-                     maximum_allowed_failed_hosts)
+                         '%d failed hosts has been reached',
+                         maximum_allowed_failed_hosts)
             self.host_queue.queue.clear()
 
     def run(self):
@@ -118,7 +117,6 @@ class ConfigurationException(BaseConfigRpmMakerException):
 
 
 class ConfigRpmMaker(object):
-
     ERROR_MSG = """
 ------------------------------------------------------------------------
 Your commit has been accepted by the SVN server, but due to the errors
@@ -178,14 +176,16 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         except Exception as exception:
             self.logger.exception('Last error during build:')
             error_msg = self.__build_error_msg_and_move_to_public_access(self.revision)
-            raise Exception('Unexpected error occurred, stacktrace will follow.\n%s\n\n%s' % (traceback.format_exc(), error_msg))
+            raise Exception(
+                'Unexpected error occurred, stacktrace will follow.\n%s\n\n%s' % (traceback.format_exc(), error_msg))
 
         self._clean_up_work_dir()
         return rpms
 
     def _clean_up_work_dir(self):
         if self._keep_work_dir():
-            LOGGER.info('All working data can be found in "{working_directory}"'.format(working_directory=self.work_dir))
+            LOGGER.info(
+                'All working data can be found in "{working_directory}"'.format(working_directory=self.work_dir))
         else:
             if self.work_dir and exists(self.work_dir):
 
@@ -228,7 +228,9 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 revision_from_file = self._read_integer_from_file(path_to_revision_file)
 
                 if revision_from_file > int(self.revision):
-                    LOGGER.debug('Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s', host, revision_from_file, self.revision)
+                    LOGGER.debug(
+                        'Will not update configviewer data for host "%s" since the current revision file contains revision %d which is higher than %s',
+                        host, revision_from_file, self.revision)
                     rmtree(temp_path)
                     continue
 
@@ -236,7 +238,6 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
 
             LOGGER.debug('Updating configviewer data for host "%s"', host)
             move(temp_path, dest_path)
-
 
     def _build_hosts(self, hosts):
         if not hosts:
@@ -272,7 +273,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         failed_hosts = dict(self._consume_queue(failed_host_queue))
         if failed_hosts:
             failed_hosts_str = ['\n%s:\n\n%s\n\n' % (key, value) for (key, value) in failed_hosts.iteritems()]
-            raise CouldNotBuildSomeRpmsException("Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
+            raise CouldNotBuildSomeRpmsException(
+                "Could not build config rpm for some host(s): %s" % '\n'.join(failed_hosts_str))
 
         LOGGER.info("Finished building configuration rpm(s).")
         built_rpms = self._consume_queue(rpm_queue)
@@ -296,7 +298,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
                 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = process.communicate()
                 if process.returncode:
-                    error_message = 'Rpm upload failed with exit code %s. Executed command "%s"\n' % (process.returncode, cmd)
+                    error_message = 'Rpm upload failed with exit code %s. Executed command "%s"\n' % (
+                        process.returncode, cmd)
                     if stdout:
                         error_message += 'stdout: "%s"\n' % stdout.strip()
                     if stderr:
@@ -382,7 +385,8 @@ Please fix the issues and trigger the RPM creation with a dummy commit.
         try:
             chunk_size = int(chunk_size_raw)
         except ValueError:
-            raise ConfigurationException('rpm_upload_chunk_size (%s) is not a legal value (should be int)' % chunk_size_raw)
+            raise ConfigurationException(
+                'rpm_upload_chunk_size (%s) is not a legal value (should be int)' % chunk_size_raw)
         if chunk_size < 0:
             raise ConfigurationException("Config param 'rpm_upload_cmd_chunk_size' needs to be greater or equal 0")
 
