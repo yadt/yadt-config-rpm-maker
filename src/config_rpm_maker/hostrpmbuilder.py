@@ -1,4 +1,4 @@
-#   yadt-config-rpm-maker
+# yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -135,7 +135,7 @@ class HostRpmBuilder(object):
                                                skip=False)
             except Exception as e:
                 LOGGER.warning("Problem during preliminary filtering of "
-                        "variables for group {0}: {1}".format(self.hostname, e))
+                               "variables for group {0}: {1}".format(self.hostname, e))
 
             self.rpm_name = self._get_content(rpm_name_variable_file).rstrip()
             LOGGER.info('Host {0} will trigger group rpm build with name {1}'.format(self.hostname, self.rpm_name))
@@ -148,12 +148,12 @@ class HostRpmBuilder(object):
 
         repo_packages_regex = get_repo_packages_regex()
         self._write_dependency_file(overall_requires,
-            os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'),
-            filter_regex=repo_packages_regex)
+                                    os.path.join(self.variables_dir, 'RPM_REQUIRES_REPOS'),
+                                    filter_regex=repo_packages_regex)
         self._write_dependency_file(overall_requires,
-            os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'),
-            filter_regex=repo_packages_regex,
-            positive_filter=False)
+                                    os.path.join(self.variables_dir, 'RPM_REQUIRES_NON_REPOS'),
+                                    filter_regex=repo_packages_regex,
+                                    positive_filter=False)
 
         self._export_spec_file()
         self._save_log_entries_to_variable(overall_svn_paths)
@@ -312,7 +312,7 @@ class HostRpmBuilder(object):
         info_lines = []
         for variable_name in sorted(variables):
             variable_value = self._get_content(
-                    os.path.join(self.variables_dir, variable_name))
+                os.path.join(self.variables_dir, variable_name))
             info_lines.append(variable_name.rjust(40) + ' : ' + variable_value)
         return "\n".join(info_lines) + "\n"
 
@@ -365,7 +365,7 @@ class HostRpmBuilder(object):
                 overlaying[path] = segment_name
 
         lines = [segment_name.rjust(25) + ' : /' + path
-                for path, segment_name in sorted(overlaying.items())]
+                 for path, segment_name in sorted(overlaying.items())]
         content = "\n".join(lines)
         self._write_file(os.path.join(self.variables_dir, 'OVERLAYING'), content)
 
@@ -376,11 +376,11 @@ class HostRpmBuilder(object):
                 overlaying[path] = segment_name
 
         lines = [segment_name + ':/' + path
-                for path, segment_name in sorted(overlaying.items())]
+                 for path, segment_name in sorted(overlaying.items())]
         content = "\n".join(lines) + "\n"
 
         file_name = os.path.join(self.config_viewer_host_dir,
-                self.hostname + '.overlaying')
+                                 self.hostname + '.overlaying')
         self._write_file(file_name, content)
 
     def _render_log(self, log):
@@ -438,8 +438,10 @@ Change set:
 
         return []
 
-    def _write_dependency_file(self, dependencies, file_path, accumulate_duplicates=True, filter_regex='.*', positive_filter=True):
-        dep = Dependency(accumulate_dependencies=accumulate_duplicates, filter_regex=filter_regex, positive_filter=positive_filter)
+    def _write_dependency_file(self, dependencies, file_path, accumulate_duplicates=True, filter_regex='.*',
+                               positive_filter=True):
+        dep = Dependency(accumulate_dependencies=accumulate_duplicates, filter_regex=filter_regex,
+                         positive_filter=positive_filter)
         dep.add(dependencies)
         self._write_file(file_path, str(dep))
 
