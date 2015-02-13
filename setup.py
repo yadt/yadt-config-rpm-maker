@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#   yadt-config-rpm-maker
+# yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
 #   This program is free software: you can redistribute it and/or modify
