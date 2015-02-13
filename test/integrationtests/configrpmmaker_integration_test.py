@@ -209,7 +209,7 @@ class ConfigRpmMakerIntegrationTest(IntegrationTest):
         path = None
         for rpm_name in rpms:
             name = os.path.basename(rpm_name)
-            if name.startswith(get_config_rpm_prefix() + hostname) and 'noarch' in name and not 'repos' in name:
+            if name.startswith(get_config_rpm_prefix() + hostname) and 'noarch' in name and 'repos' not in name:
                 path = rpm_name
                 break
 
