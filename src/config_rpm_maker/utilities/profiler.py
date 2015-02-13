@@ -22,7 +22,6 @@
 
 from functools import wraps
 from logging import getLogger
-from math import ceil
 from time import time
 from os import walk
 from os.path import join, getsize
