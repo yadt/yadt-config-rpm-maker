@@ -66,8 +66,8 @@ class IntegrationTestBase(unittest.TestCase):
 
     def ensure_file_contents(self, filename, contents, binary=False):
         with open(os.path.join(self.tmp_directory, normalize_pathname(filename)),
-                  file_mode("r", binary)) as file:
-            actual = file.read()
+                  file_mode("r", binary)) as file_to_verify:
+            actual = file_to_verify.read()
             if not binary:
                 failure_message = "Contents of file %s does not match: Expected '%s' but got '%s'." % (filename, contents, actual)
             else:
