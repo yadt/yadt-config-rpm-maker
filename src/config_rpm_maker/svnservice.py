@@ -1,4 +1,4 @@
-#   yadt-config-rpm-maker
+# yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,6 @@ class SvnServiceException(BaseConfigRpmMakerException):
 
 
 class SvnService(object):
-
     def __init__(self, base_url, username=None, password=None, path_to_config='/config'):
         self.path_to_config = path_to_config
         self.base_url = base_url
@@ -49,7 +48,7 @@ class SvnService(object):
 
         if username:
             LOGGER.debug('Setting default username for subversion client to "%s".',
-                    username)
+                         username)
             self.client.set_default_username(username)
 
         if password:
@@ -62,17 +61,17 @@ class SvnService(object):
         log_entries = self.get_logs_for_revision(revision)
         for info in log_entries:
             LOGGER.info('Commit message is "%s" (%s, %s)',
-                    info.message.strip(), info.author, ctime(info.date))
+                        info.message.strip(), info.author, ctime(info.date))
 
     def get_logs_for_revision(self, revision):
         """Return the logs for given revision of the repository at config_url"""
 
         try:
             logs = self.client.log(self.base_url, self._rev(revision),
-                    self._rev(revision), discover_changed_paths=True)
+                                   self._rev(revision), discover_changed_paths=True)
         except Exception as exc:
             LOGGER.error('Retrieving change set information for revision "%s"'
-                    ' in repository "%s" failed.', revision, self.config_url)
+                         ' in repository "%s" failed.', revision, self.config_url)
             raise SvnServiceException(str(exc))
         return logs
 
@@ -113,8 +112,8 @@ class SvnService(object):
             changed_paths_and_action.append("%s (%s)" % (path, action))
 
         log_elements_of_list(LOGGER.debug, 'The commit change set contained '
-                '%s changed path(s). Listing with svn action.',
-                changed_paths_and_action)
+                                           '%s changed path(s). Listing with svn action.',
+                             changed_paths_and_action)
         return changed_paths
 
     @measure_execution_time
@@ -122,7 +121,7 @@ class SvnService(object):
         url = self.config_url + '/host'
 
         items = self.client.list(url, revision=self._rev(revision),
-                depth=pysvn.depth.immediates)
+                                 depth=pysvn.depth.immediates)
 
         # First entry is /host itself.
         items = items[1:]
@@ -160,5 +159,5 @@ class SvnService(object):
 
     def __str__(self):
         return '{0}(base_url="{1}", path_to_config="{2}")'.format(
-                SvnService.__name__, self.base_url, self.path_to_config)
+            SvnService.__name__, self.base_url, self.path_to_config)
 
