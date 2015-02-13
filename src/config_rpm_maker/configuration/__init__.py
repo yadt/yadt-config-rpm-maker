@@ -1,4 +1,4 @@
-#   yadt-config-rpm-maker
+# yadt-config-rpm-maker
 #   Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ from config_rpm_maker.exceptions import BaseConfigRpmMakerException
 
 LOGGER = getLogger(__name__)
 
-
 MISSING_CONFIGURATION_FILE_MESSAGE = """Could not find configuration file "{configuration_file_path}"!
 
 Please provide "{default_path}" in the current working directory "{current_working_directory}"
@@ -37,7 +36,6 @@ CONFIGURATION_FILE_PATH = 'yadt-config-rpm-maker.yaml'
 DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 LOG_FILE_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
 LOG_FILE_DATE_FORMAT = DATE_FORMAT
-
 
 _properties = None
 _file_path_of_loaded_configuration = None
@@ -53,6 +51,7 @@ class ConfigurationProperty(object):
     Using this class one can define configuration properties which have a
     readable name and return the configuration value.
     """
+
     def __init__(self, key, default):
         self.key = key
         self.default = default
@@ -83,10 +82,10 @@ def load_configuration_file():
 
     if not exists(configuration_file_path):
         message = MISSING_CONFIGURATION_FILE_MESSAGE.format(
-                configuration_file_path=configuration_file_path,
-                default_path=CONFIGURATION_FILE_PATH,
-                current_working_directory=abspath('.'),
-                environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
+            configuration_file_path=configuration_file_path,
+            default_path=CONFIGURATION_FILE_PATH,
+            current_working_directory=abspath('.'),
+            environment_variable_name=ENVIRONMENT_VARIABLE_KEY_CONFIGURATION_FILE)
         raise ConfigurationException(message)
 
     raw_properties = _load_configuration_properties_from_yaml_file(configuration_file_path)
@@ -165,7 +164,7 @@ def _load_configuration_properties_from_yaml_file(configuration_file_path):
 
     except Exception as exc:
         error_message = ('Could not load configuration file "%s".\nCurrent '
-                'working directory is "%s"\nError: %s')
+                         'working directory is "%s"\nError: %s')
         error_message %= (configuration_file_path, getcwd(), exc)
         raise ConfigurationException(error_message)
 
@@ -185,7 +184,8 @@ def _ensure_properties_are_valid(raw_properties):
 
     allow_unknown_hosts = raw_properties.get(unknown_hosts_are_allowed.key, unknown_hosts_are_allowed.default)
     config_rpm_prefix = raw_properties.get(get_config_rpm_prefix.key, get_config_rpm_prefix.default)
-    config_viewer_hosts_dir = raw_properties.get(get_config_viewer_host_directory.key, get_config_viewer_host_directory.default)
+    config_viewer_hosts_dir = raw_properties.get(get_config_viewer_host_directory.key,
+                                                 get_config_viewer_host_directory.default)
     custom_dns_searchlist = raw_properties.get(get_custom_dns_search_list.key, get_custom_dns_search_list.default)
     error_log_directory = raw_properties.get(get_error_log_directory.key, get_error_log_directory.default)
     error_log_url = raw_properties.get(get_error_log_url.key, get_error_log_url.default)
@@ -205,7 +205,8 @@ def _ensure_properties_are_valid(raw_properties):
         unknown_hosts_are_allowed: _ensure_is_a_boolean_value(unknown_hosts_are_allowed, allow_unknown_hosts),
         get_config_rpm_prefix: _ensure_is_a_string(get_config_rpm_prefix, config_rpm_prefix),
         is_config_viewer_only_enabled: is_config_viewer_only_enabled.default,
-        get_config_viewer_host_directory: _ensure_is_a_string(get_config_viewer_host_directory, config_viewer_hosts_dir),
+        get_config_viewer_host_directory: _ensure_is_a_string(get_config_viewer_host_directory,
+                                                              config_viewer_hosts_dir),
         get_custom_dns_search_list: _ensure_is_a_list_of_strings(get_custom_dns_search_list, custom_dns_searchlist),
         get_error_log_directory: _ensure_is_a_string(get_error_log_directory, error_log_directory),
         get_error_log_url: _ensure_is_a_string(get_error_log_url, error_log_url),
@@ -243,7 +244,7 @@ def _ensure_valid_log_level(log_level_name):
     """Return a valid log level."""
     if not isinstance(log_level_name, basestring):
         raise ConfigurationException('Invalid log level "%s". Log level has '
-                'to be a string (DEBUG, ERROR or INFO).' % (log_level_name,))
+                                     'to be a string (DEBUG, ERROR or INFO).' % (log_level_name,))
 
     log_level_name = log_level_name.upper().strip()
 
@@ -255,15 +256,15 @@ def _ensure_valid_log_level(log_level_name):
         return ERROR
 
     raise ConfigurationException('Invalid log level "%s". Log level hast to '
-            'be DEBUG, ERROR or INFO' % log_level_name)
+                                 'be DEBUG, ERROR or INFO' % log_level_name)
 
 
 def _ensure_is_a_string(key, value):
     """Return the given string or raise an exception if it is not a string."""
     if not isinstance(value, basestring):
         raise ConfigurationException('Configuration parameter "%s": invalid '
-                'value "%s" of type "%s"! Please use a string.' % (
-                key, value, type(value).__name__))
+                                     'value "%s" of type "%s"! Please use a string.' % (
+                                         key, value, type(value).__name__))
 
     return value
 
@@ -272,8 +273,8 @@ def _ensure_is_an_integer(key, value):
     """Return the given int or raise an exception if it is not an integer."""
     if not isinstance(value, int):
         raise ConfigurationException('Configuration parameter "%s": invalid '
-                'value "%s" of type "%s"! Please use an integer.' % (
-                key, value, type(value).__name__))
+                                     'value "%s" of type "%s"! Please use an integer.' % (
+                                         key, value, type(value).__name__))
 
     return value
 
@@ -282,15 +283,15 @@ def _ensure_repo_packages_regex_is_a_valid_regular_expression(value):
     """Return the given value or raise an exception if it's not a valid regex."""
     if not isinstance(value, basestring):
         raise ConfigurationException('Configuration parameter "%s": invalid '
-                'value "%s" of type "%s"! The parameter has to be a valid '
-                'regular expression.' % (
-                get_repo_packages_regex, value, type(value).__name__))
+                                     'value "%s" of type "%s"! The parameter has to be a valid '
+                                     'regular expression.' % (
+                                         get_repo_packages_regex, value, type(value).__name__))
 
     try:
         re.compile(value)
     except Exception as exc:
         raise ConfigurationException('The given string "%s" is not a valid '
-                'regular expression. Error was "%s".' % (value, exc))
+                                     'regular expression. Error was "%s".' % (value, exc))
 
     return value
 
@@ -306,14 +307,14 @@ def _ensure_is_a_list_of_strings(key, value):
     """Return the given value if it is a list of strings or raises an exception."""
     if not isinstance(value, list):
         raise ConfigurationException('Configuration parameter "%s": invalid '
-                'value "%s" of type "%s"! Please use a list of strings.' % (
-                key, value, type(value).__name__))
+                                     'value "%s" of type "%s"! Please use a list of strings.' % (
+                                         key, value, type(value).__name__))
 
     for element in value:
         if isinstance(element, basestring):
             continue
         raise ConfigurationException('Configuration parameter "%s": invalid '
-                'list "%s" with element "%s" of type "%s"! Please use a list '
-                'of strings.' % (key, value, element, type(element).__name__))
+                                     'list "%s" with element "%s" of type "%s"! Please use a list '
+                                     'of strings.' % (key, value, element, type(element).__name__))
 
     return value
