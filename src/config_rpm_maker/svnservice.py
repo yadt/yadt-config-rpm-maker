@@ -1,5 +1,5 @@
 # yadt-config-rpm-maker
-#   Copyright (C) 2011-2013 Immobilien Scout GmbH
+# Copyright (C) 2011-2013 Immobilien Scout GmbH
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
