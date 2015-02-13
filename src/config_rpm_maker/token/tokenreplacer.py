@@ -158,7 +158,7 @@ class TokenReplacer(object):
             if not match:
                 return content
             token_name = match.group(1)
-            if not token_name in self.token_values:
+            if token_name not in self.token_values:
                 raise MissingTokenException(token_name)
             replacement = self.replacer_function(token_name,
                                                  self.token_values[token_name])
