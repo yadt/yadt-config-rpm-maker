@@ -124,7 +124,9 @@ class TokenReplacer(object):
 
         return cls(token_values=token_values, replacer_function=replacer_function, html_escape_function=html_escape_function)
 
-    def __init__(self, token_values={}, replacer_function=None, html_escape_function=None):
+    def __init__(self, token_values=None, replacer_function=None, html_escape_function=None):
+        if token_values is None:
+            token_values = {}
         self.token_values = {}
         self.token_used = set()
         for token in token_values:

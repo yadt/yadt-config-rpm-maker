@@ -24,7 +24,9 @@ class NameNotAcceptedException(Exception):
 
 
 class TreeNode:
-    def __init__(self, name, children=[]):
+    def __init__(self, name, children=None):
+        if children is None:
+            children=[]
         if name is None or len(name) == 0:
             raise NameNotAcceptedException(name)
         self.name = name
