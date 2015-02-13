@@ -54,8 +54,8 @@ class IntegrationTestBase(unittest.TestCase):
         os.mkdir(os.path.join(self.tmp_directory, normalize_pathname(name)))
 
     def create_tmp_file(self, filename, content, binary=False):
-        with open(os.path.join(self.tmp_directory, normalize_pathname(filename)), file_mode("w", binary)) as file:
-            file.write(content)
+        with open(os.path.join(self.tmp_directory, normalize_pathname(filename)), file_mode("w", binary)) as tmp_file:
+            tmp_file.write(content)
 
     def tmp_file_name(self, filename):
         return os.path.join(self.tmp_directory, filename)
